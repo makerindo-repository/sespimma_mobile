@@ -59,16 +59,19 @@ class _EwsScreenState extends State<EwsScreen>
   List<EwsModel> get _filteredList {
     return _allReports.where((serdik) {
       final String selectedP = _selectedPokjar.trim().toLowerCase();
-      final bool matchesPokjar = selectedP == 'semua pokjar' ||
+      final bool matchesPokjar =
+          selectedP == 'semua pokjar' ||
           serdik.pokjar.trim().toLowerCase() == selectedP;
 
-      final bool matchesRisk = _selectedRiskFilter == 'Semua Risiko' ||
+      final bool matchesRisk =
+          _selectedRiskFilter == 'Semua Risiko' ||
           (_selectedRiskFilter == 'Risiko Tinggi' && serdik.isHighRisk) ||
           (_selectedRiskFilter == 'Risiko Sedang' && serdik.isMediumRisk) ||
           (_selectedRiskFilter == 'Aman' && serdik.isSafe);
 
       final String query = _searchQuery.trim().toLowerCase();
-      final bool matchesSearch = query.isEmpty ||
+      final bool matchesSearch =
+          query.isEmpty ||
           serdik.name.toLowerCase().contains(query) ||
           serdik.nrp.toLowerCase().contains(query);
 
@@ -94,7 +97,11 @@ class _EwsScreenState extends State<EwsScreen>
             .animate(
               CurvedAnimation(
                 parent: _animController!,
-                curve: Interval(beginInterval, endInterval, curve: Curves.easeOutQuart),
+                curve: Interval(
+                  beginInterval,
+                  endInterval,
+                  curve: Curves.easeOutQuart,
+                ),
               ),
             ),
         child: child,
@@ -189,10 +196,15 @@ class _EwsScreenState extends State<EwsScreen>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusXl,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.04),
@@ -206,7 +218,8 @@ class _EwsScreenState extends State<EwsScreen>
                           Expanded(
                             child: TextField(
                               controller: _searchController,
-                              onChanged: (val) => setState(() => _searchQuery = val),
+                              onChanged: (val) =>
+                                  setState(() => _searchQuery = val),
                               decoration: InputDecoration(
                                 hintText: 'Cari Nama/NRP...',
                                 hintStyle: TextStyle(
@@ -216,7 +229,9 @@ class _EwsScreenState extends State<EwsScreen>
                                 ),
                                 border: InputBorder.none,
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
                               ),
                               style: const TextStyle(
                                 color: _primaryNavy,
@@ -230,7 +245,8 @@ class _EwsScreenState extends State<EwsScreen>
                             label: 'Pokjar',
                             value: _selectedPokjar,
                             items: _pokjars,
-                            onChanged: (val) => setState(() => _selectedPokjar = val!),
+                            onChanged: (val) =>
+                                setState(() => _selectedPokjar = val!),
                           ),
                           const SizedBox(width: AppDimensions.sm),
                           _buildFilterIcon(
@@ -241,9 +257,10 @@ class _EwsScreenState extends State<EwsScreen>
                               'Semua Risiko',
                               'Risiko Tinggi',
                               'Risiko Sedang',
-                              'Aman'
+                              'Aman',
                             ],
-                            onChanged: (val) => setState(() => _selectedRiskFilter = val!),
+                            onChanged: (val) =>
+                                setState(() => _selectedRiskFilter = val!),
                           ),
                         ],
                       ),
@@ -293,7 +310,9 @@ class _EwsScreenState extends State<EwsScreen>
     final bool isFiltered = value != items.first;
     return PopupMenuButton<String>(
       onSelected: onChanged,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+      ),
       offset: const Offset(0, 45),
       itemBuilder: (context) => items.map((item) {
         return PopupMenuItem(
@@ -321,7 +340,9 @@ class _EwsScreenState extends State<EwsScreen>
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.sm),
         decoration: BoxDecoration(
-          color: isFiltered ? _primaryNavy.withValues(alpha: 0.08) : Colors.transparent,
+          color: isFiltered
+              ? _primaryNavy.withValues(alpha: 0.08)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
         ),
         child: Icon(
@@ -450,7 +471,11 @@ class _EwsScreenState extends State<EwsScreen>
               color: statusColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(riskIcon, color: statusColor, size: AppDimensions.iconLg),
+            child: Icon(
+              riskIcon,
+              color: statusColor,
+              size: AppDimensions.iconLg,
+            ),
           ),
           title: Text(
             serdik.name,
@@ -503,7 +528,11 @@ class _EwsScreenState extends State<EwsScreen>
                           statusColor,
                         ),
                       ),
-                      Container(width: 1, height: 30, color: Colors.grey.shade200),
+                      Container(
+                        width: 1,
+                        height: 30,
+                        color: Colors.grey.shade200,
+                      ),
                       Expanded(
                         child: _buildMetricItem(
                           'Pelanggaran',
@@ -550,19 +579,28 @@ class _EwsScreenState extends State<EwsScreen>
                         side: BorderSide(color: Colors.grey.shade200),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                        ),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(AppIcons.receiptFill,
-                              size: AppDimensions.iconSm, color: _primaryNavy),
+                          Icon(
+                            AppIcons.receiptFill,
+                            size: AppDimensions.iconSm,
+                            color: _primaryNavy,
+                          ),
                           SizedBox(width: AppDimensions.sm),
-                          Text('Log',
-                              style: TextStyle(
-                                  fontSize: AppDimensions.fontMd,
-                                  fontWeight: FontWeight.w800,
-                                  color: _primaryNavy)),
+                          Text(
+                            'Log',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontMd,
+                              fontWeight: FontWeight.w800,
+                              color: _primaryNavy,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -576,19 +614,28 @@ class _EwsScreenState extends State<EwsScreen>
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                        ),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(AppIcons.paperPlaneTiltFill,
-                              size: AppDimensions.iconSm, color: Colors.white),
+                          Icon(
+                            AppIcons.paperPlaneTiltFill,
+                            size: AppDimensions.iconSm,
+                            color: Colors.white,
+                          ),
                           SizedBox(width: AppDimensions.sm),
-                          Text('Hubungi Patun',
-                              style: TextStyle(
-                                  fontSize: AppDimensions.fontMd,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white)),
+                          Text(
+                            'Hubungi Patun',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontMd,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -630,8 +677,11 @@ class _EwsScreenState extends State<EwsScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(AppIcons.magnifyingGlassFill,
-              size: AppDimensions.iconDisplay, color: Colors.blueGrey.shade200),
+          Icon(
+            AppIcons.magnifyingGlassFill,
+            size: AppDimensions.iconDisplay,
+            color: Colors.blueGrey.shade200,
+          ),
           const SizedBox(height: AppDimensions.md),
           Text(
             'Data tidak ditemukan',
@@ -651,7 +701,9 @@ class _EwsScreenState extends State<EwsScreen>
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXxl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+        ),
         titlePadding: EdgeInsets.zero,
         title: Container(
           padding: const EdgeInsets.all(AppDimensions.xl),
@@ -664,7 +716,11 @@ class _EwsScreenState extends State<EwsScreen>
           ),
           child: Row(
             children: [
-              const Icon(AppIcons.warningCircleFill, color: Colors.white, size: AppDimensions.iconXl),
+              const Icon(
+                AppIcons.warningCircleFill,
+                color: Colors.white,
+                size: AppDimensions.iconXl,
+              ),
               const SizedBox(width: AppDimensions.md),
               Expanded(
                 child: Column(
@@ -672,12 +728,20 @@ class _EwsScreenState extends State<EwsScreen>
                   children: [
                     const Text(
                       'Log Pelanggaran',
-                      style: TextStyle(color: Colors.white, fontSize: AppDimensions.fontXl, fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: AppDimensions.fontXl,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: AppDimensions.xs / 2),
                     Text(
                       serdik.name,
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: AppDimensions.fontMd, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: AppDimensions.fontMd,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -685,32 +749,44 @@ class _EwsScreenState extends State<EwsScreen>
             ],
           ),
         ),
-        content: Builder(builder: (context) {
-          final punishments = PimpinanMockData.customActivities
-              .where((a) => a['nrp'] == serdik.nrp && a['type'] == 'punishment')
-              .toList();
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: punishments.isEmpty
-                ? [
-                    const SizedBox(height: AppDimensions.md),
-                    const Text(
-                      'Belum ada pelanggaran tercatat.',
-                      style: TextStyle(color: Colors.blueGrey, fontStyle: FontStyle.italic),
-                    ),
-                  ]
-                : punishments.map((p) {
-                    final dateStr = (p['date'] != null && p['date'].toString().isNotEmpty)
-                        ? p['date']
-                        : p['timeRaw'] ?? '';
-                    return Padding(
-                      padding: const EdgeInsets.only(top: AppDimensions.md),
-                      child: _buildLogItem(p['subtitle'] ?? p['title'], dateStr, AppIcons.warningFill),
-                    );
-                  }).toList(),
-          );
-        }),
+        content: Builder(
+          builder: (context) {
+            final punishments = PimpinanMockData.customActivities
+                .where(
+                  (a) => a['nrp'] == serdik.nrp && a['type'] == 'punishment',
+                )
+                .toList();
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: punishments.isEmpty
+                  ? [
+                      const SizedBox(height: AppDimensions.md),
+                      const Text(
+                        'Belum ada pelanggaran tercatat.',
+                        style: TextStyle(
+                          color: Colors.blueGrey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ]
+                  : punishments.map((p) {
+                      final dateStr =
+                          (p['date'] != null && p['date'].toString().isNotEmpty)
+                          ? p['date']
+                          : p['timeRaw'] ?? '';
+                      return Padding(
+                        padding: const EdgeInsets.only(top: AppDimensions.md),
+                        child: _buildLogItem(
+                          p['subtitle'] ?? p['title'],
+                          dateStr,
+                          AppIcons.warningFill,
+                        ),
+                      );
+                    }).toList(),
+            );
+          },
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -741,7 +817,11 @@ class _EwsScreenState extends State<EwsScreen>
               color: const Color(0xFFD32F2F).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFFD32F2F), size: AppDimensions.iconMd),
+            child: Icon(
+              icon,
+              color: const Color(0xFFD32F2F),
+              size: AppDimensions.iconMd,
+            ),
           ),
           const SizedBox(width: AppDimensions.md),
           Expanded(
@@ -750,12 +830,20 @@ class _EwsScreenState extends State<EwsScreen>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(fontSize: AppDimensions.fontDefault, fontWeight: FontWeight.w700, color: Color(0xFF001C40)),
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontDefault,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF001C40),
+                  ),
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
                   date,
-                  style: TextStyle(fontSize: AppDimensions.fontSm + 1, fontWeight: FontWeight.w600, color: Colors.blueGrey),
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontSm + 1,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blueGrey,
+                  ),
                 ),
               ],
             ),

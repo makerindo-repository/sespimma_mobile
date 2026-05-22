@@ -36,8 +36,7 @@ void main() {
       });
 
       test('mengembalikan default jika format tanggal tidak valid', () {
-        final result =
-            SamaptaScoringService.getAgeAndGolongan('invalid-date');
+        final result = SamaptaScoringService.getAgeAndGolongan('invalid-date');
 
         expect(result['age'], 25);
         expect(result['golongan'], 'Golongan I');
@@ -128,21 +127,20 @@ void main() {
     group('calculateAkademikScore', () {
       test('menghitung rata-rata akademik dengan bobot yang benar', () {
         double getVal(int idx) => switch (idx) {
-              0 => 80.0,
-              1 => 85.0,
-              2 => 90.0,
-              3 => 75.0,
-              4 => 88.0,
-              5 => 82.0,
-              6 => 78.0,
-              7 => 85.0,
-              8 => 80.0,
-              9 => 90.0,
-              _ => 0.0,
-            };
+          0 => 80.0,
+          1 => 85.0,
+          2 => 90.0,
+          3 => 75.0,
+          4 => 88.0,
+          5 => 82.0,
+          6 => 78.0,
+          7 => 85.0,
+          8 => 80.0,
+          9 => 90.0,
+          _ => 0.0,
+        };
 
-        final score =
-            SamaptaScoringService.calculateAkademikScore(getVal);
+        final score = SamaptaScoringService.calculateAkademikScore(getVal);
 
         expect(score, greaterThan(0));
         expect(score, lessThanOrEqualTo(100));
@@ -153,8 +151,7 @@ void main() {
       test('menghitung rata-rata mental dengan lookup points', () {
         double getVal(int idx) => 80.0;
 
-        final score =
-            SamaptaScoringService.calculateMentalScore(getVal, 0.50);
+        final score = SamaptaScoringService.calculateMentalScore(getVal, 0.50);
 
         expect(score, greaterThan(0));
       });
@@ -163,14 +160,16 @@ void main() {
     group('calculateJasmaniScore', () {
       test('mengembalikan nKes untuk Tim Medis', () {
         double getVal(int idx) => switch (idx) {
-              0 => 85.0,
-              1 => 90.0,
-              2 => 80.0,
-              _ => 70.0,
-            };
+          0 => 85.0,
+          1 => 90.0,
+          2 => 80.0,
+          _ => 70.0,
+        };
 
-        final score =
-            SamaptaScoringService.calculateJasmaniScore(getVal, 'Tim Medis');
+        final score = SamaptaScoringService.calculateJasmaniScore(
+          getVal,
+          'Tim Medis',
+        );
 
         expect(score, closeTo(85.0, 0.1));
       });
@@ -178,8 +177,10 @@ void main() {
       test('mengembalikan nJas untuk Korsis', () {
         double getVal(int idx) => 80.0;
 
-        final score =
-            SamaptaScoringService.calculateJasmaniScore(getVal, 'Korsis');
+        final score = SamaptaScoringService.calculateJasmaniScore(
+          getVal,
+          'Korsis',
+        );
 
         expect(score, greaterThan(0));
       });
@@ -194,10 +195,7 @@ void main() {
       });
 
       test('mengembalikan M untuk skor 80-85', () {
-        expect(
-          SamaptaScoringService.getScorePredicate(82.5),
-          'Memuaskan (M)',
-        );
+        expect(SamaptaScoringService.getScorePredicate(82.5), 'Memuaskan (M)');
       });
 
       test('mengembalikan Tidak Lulus untuk skor <= 70', () {

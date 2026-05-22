@@ -26,19 +26,23 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
   final List<Map<String, String>> _faqs = [
     {
       'q': 'Bagaimana cara Absensi Geofencing?',
-      'a': 'Gunakan menu "Apel" di navigasi bawah. Pastikan fitur GPS di perangkat Anda aktif dan Anda berada di dalam radius Geofencing yang telah ditentukan. Anda juga dapat menggunakan fitur Scan QR Code jika diminta.',
+      'a':
+          'Gunakan menu "Apel" di navigasi bawah. Pastikan fitur GPS di perangkat Anda aktif dan Anda berada di dalam radius Geofencing yang telah ditentukan. Anda juga dapat menggunakan fitur Scan QR Code jika diminta.',
     },
     {
       'q': 'Bagaimana sistem perhitungan bobot nilai?',
-      'a': 'Sistem penilaian terintegrasi (IDMS) menerapkan pembobotan transparan: 70% Nilai Akademik, 20% Nilai Mental & Kepribadian, dan 10% Kesamaptaan Jasmani. Detail progres dapat dilihat pada menu "Nilai".',
+      'a':
+          'Sistem penilaian terintegrasi (IDMS) menerapkan pembobotan transparan: 70% Nilai Akademik, 20% Nilai Mental & Kepribadian, dan 10% Kesamaptaan Jasmani. Detail progres dapat dilihat pada menu "Nilai".',
     },
     {
       'q': 'Bagaimana cara mengumpulkan Tugas Harian?',
-      'a': 'Masuk ke menu "Tugas", pilih Sprint/Tugas yang berstatus aktif, lalu klik "Unggah Bukti". Pastikan Anda mengunggah foto atau dokumen sebelum batas waktu 1x24 jam berakhir agar nilai Anda tidak terpotong.',
+      'a':
+          'Masuk ke menu "Tugas", pilih Sprint/Tugas yang berstatus aktif, lalu klik "Unggah Bukti". Pastikan Anda mengunggah foto atau dokumen sebelum batas waktu 1x24 jam berakhir agar nilai Anda tidak terpotong.',
     },
     {
       'q': 'Apa yang harus dilakukan jika GPS tidak akurat?',
-      'a': 'Pastikan izin lokasi (Location Permission) disetel ke "Selalu Izinkan" (Always Allow) dengan opsi Akurasi Tinggi. Jika radius geofencing masih tidak sesuai, segera hubungi Admin IT.',
+      'a':
+          'Pastikan izin lokasi (Location Permission) disetel ke "Selalu Izinkan" (Always Allow) dengan opsi Akurasi Tinggi. Jika radius geofencing masih tidak sesuai, segera hubungi Admin IT.',
     },
   ];
 
@@ -114,7 +118,10 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
                 const Expanded(
                   child: Text(
                     'Gagal membuka WhatsApp. Pastikan aplikasi terinstal.',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: AppDimensions.fontDefault),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: AppDimensions.fontDefault,
+                    ),
                   ),
                 ),
               ],
@@ -333,7 +340,10 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
                 elevation: 4,
                 shadowColor: _waColor.withValues(alpha: 0.4),
               ),
-              icon: Icon(AppIcons.whatsappLogoFill, size: AppDimensions.iconDefault + 2),
+              icon: Icon(
+                AppIcons.whatsappLogoFill,
+                size: AppDimensions.iconDefault + 2,
+              ),
               label: const Text(
                 'Hubungi via WhatsApp',
                 style: TextStyle(
@@ -391,8 +401,10 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
                 )
               : null,
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 16,
+          ),
         ),
       ),
     );

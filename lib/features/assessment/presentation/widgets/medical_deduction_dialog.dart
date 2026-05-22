@@ -67,8 +67,9 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
                 style: TextStyle(
                   fontSize: AppDimensions.fontDefault,
                   fontWeight: FontWeight.bold,
-                  color:
-                      hasSanksi ? Colors.red.shade700 : Colors.green.shade700,
+                  color: hasSanksi
+                      ? Colors.red.shade700
+                      : Colors.green.shade700,
                 ),
               ),
             ],
@@ -89,8 +90,9 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
   }
 
   void _save() {
-    final index = PimpinanMockData.sharedReportData
-        .indexWhere((r) => r.nrp == widget.serdik['nrp']);
+    final index = PimpinanMockData.sharedReportData.indexWhere(
+      (r) => r.nrp == widget.serdik['nrp'],
+    );
     if (index != -1 && pengurangan > 0) {
       final current = PimpinanMockData.sharedReportData[index];
       PimpinanMockData.sharedReportData[index] = current.copyWith(
@@ -104,8 +106,9 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor:
-            pengurangan > 0 ? Colors.red.shade700 : Colors.green.shade700,
+        backgroundColor: pengurangan > 0
+            ? Colors.red.shade700
+            : Colors.green.shade700,
       ),
     );
     widget.onSaved();
@@ -121,10 +124,7 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
       ),
       title: Row(
         children: [
-          Icon(
-            Icons.local_hospital_rounded,
-            color: Colors.orange.shade700,
-          ),
+          Icon(Icons.local_hospital_rounded, color: Colors.orange.shade700),
           const SizedBox(width: AppDimensions.md - 2),
           const Text(
             'Pencatatan Medis (Status C)',
@@ -158,9 +158,7 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
             ),
             const SizedBox(height: AppDimensions.xs + 2),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.md,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.md),
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
@@ -170,22 +168,23 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
                 child: DropdownButton<String>(
                   value: statusCatatan,
                   isExpanded: true,
-                  items: [
-                    'Rawat Inap RS (Akibat Kelalaian)',
-                    'Berobat Poliklinik (Biasa)',
-                  ]
-                      .map(
-                        (v) => DropdownMenuItem(
-                          value: v,
-                          child: Text(
-                            v,
-                            style: const TextStyle(
-                              fontSize: AppDimensions.fontLg,
+                  items:
+                      [
+                            'Rawat Inap RS (Akibat Kelalaian)',
+                            'Berobat Poliklinik (Biasa)',
+                          ]
+                          .map(
+                            (v) => DropdownMenuItem(
+                              value: v,
+                              child: Text(
+                                v,
+                                style: const TextStyle(
+                                  fontSize: AppDimensions.fontLg,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      )
-                      .toList(),
+                          )
+                          .toList(),
                   onChanged: (val) {
                     if (val != null) {
                       setState(() {
@@ -211,9 +210,7 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
               TextField(
                 controller: hariController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppDimensions.lg,
@@ -222,9 +219,7 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
                   filled: true,
                   fillColor: Colors.grey.shade100,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      AppDimensions.radiusLg,
-                    ),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
                   hintText: 'Masukkan jumlah hari',

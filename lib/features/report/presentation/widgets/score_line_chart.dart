@@ -23,12 +23,16 @@ class ScoreLineChart extends StatelessWidget {
     const colorMen = Color(0xFF10B981);
     const colorJas = Color(0xFFF59E0B);
 
-    final bool hasWarning = (nilaiAkademik > 0 && nilaiAkademik < 70.0) ||
+    final bool hasWarning =
+        (nilaiAkademik > 0 && nilaiAkademik < 70.0) ||
         (nilaiMental > 0 && nilaiMental < 70.0) ||
         (nilaiJasmani > 0 && nilaiJasmani < 70.0);
 
     final List<FlSpot> spotsAka = _generateSpots(nilaiAkademik, 'Akademik');
-    final List<FlSpot> spotsMen = _generateSpots(nilaiMental, 'Mental Kepribadian');
+    final List<FlSpot> spotsMen = _generateSpots(
+      nilaiMental,
+      'Mental Kepribadian',
+    );
     final List<FlSpot> spotsJas = _generateSpots(nilaiJasmani, 'Jasmani');
 
     return Container(
@@ -56,18 +60,40 @@ class ScoreLineChart extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
-                _buildLegendItem('Akademik', colorAka, selectedCategory == 'Akademik', nilaiAkademik),
+                _buildLegendItem(
+                  'Akademik',
+                  colorAka,
+                  selectedCategory == 'Akademik',
+                  nilaiAkademik,
+                ),
                 const SizedBox(width: AppDimensions.sm),
-                _buildLegendItem('Mental', colorMen, selectedCategory == 'Mental Kepribadian', nilaiMental),
+                _buildLegendItem(
+                  'Mental',
+                  colorMen,
+                  selectedCategory == 'Mental Kepribadian',
+                  nilaiMental,
+                ),
                 const SizedBox(width: AppDimensions.sm),
-                _buildLegendItem('Jasmani', colorJas, selectedCategory == 'Jasmani', nilaiJasmani),
+                _buildLegendItem(
+                  'Jasmani',
+                  colorJas,
+                  selectedCategory == 'Jasmani',
+                  nilaiJasmani,
+                ),
               ],
             ),
           ),
           const SizedBox(height: AppDimensions.xxl),
           SizedBox(
             height: 200,
-            child: _buildChart(spotsAka, spotsMen, spotsJas, colorAka, colorMen, colorJas),
+            child: _buildChart(
+              spotsAka,
+              spotsMen,
+              spotsJas,
+              colorAka,
+              colorMen,
+              colorJas,
+            ),
           ),
         ],
       ),
@@ -95,7 +121,9 @@ class ScoreLineChart extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                hasWarning ? 'Peringatan Tren Menurun (EWS)' : 'Analisis Tren Perkembangan',
+                hasWarning
+                    ? 'Peringatan Tren Menurun (EWS)'
+                    : 'Analisis Tren Perkembangan',
                 style: TextStyle(
                   fontSize: AppDimensions.fontMd,
                   fontWeight: FontWeight.w800,
@@ -118,7 +146,14 @@ class ScoreLineChart extends StatelessWidget {
     );
   }
 
-  LineChart _buildChart(List<FlSpot> sAka, List<FlSpot> sMen, List<FlSpot> sJas, Color cAka, Color cMen, Color cJas) {
+  LineChart _buildChart(
+    List<FlSpot> sAka,
+    List<FlSpot> sMen,
+    List<FlSpot> sJas,
+    Color cAka,
+    Color cMen,
+    Color cJas,
+  ) {
     return LineChart(
       LineChartData(
         gridData: FlGridData(
@@ -154,15 +189,23 @@ class ScoreLineChart extends StatelessWidget {
           ],
         ),
         titlesData: FlTitlesData(
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 30,
               interval: 1,
               getTitlesWidget: (value, meta) {
-                const style = TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w700, fontSize: AppDimensions.fontSm);
+                const style = TextStyle(
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.w700,
+                  fontSize: AppDimensions.fontSm,
+                );
                 String text = '';
                 if (value == 0.0) text = 'Tahap I';
                 if (value == 1.0) text = 'Tahap II';
@@ -183,14 +226,21 @@ class ScoreLineChart extends StatelessWidget {
               reservedSize: 32,
               getTitlesWidget: (value, meta) => Text(
                 value.toInt().toString(),
-                style: const TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w700, fontSize: AppDimensions.fontSm),
+                style: const TextStyle(
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.w700,
+                  fontSize: AppDimensions.fontSm,
+                ),
                 textAlign: TextAlign.right,
               ),
             ),
           ),
         ),
         borderData: FlBorderData(show: false),
-        minX: -0.1, maxX: 3.1, minY: 0, maxY: 100,
+        minX: -0.1,
+        maxX: 3.1,
+        minY: 0,
+        maxY: 100,
         lineBarsData: [
           _buildLineBar(sAka, cAka, 'Akademik'),
           _buildLineBar(sMen, cMen, 'Mental Kepribadian'),
@@ -203,7 +253,11 @@ class ScoreLineChart extends StatelessWidget {
               return touchedSpots.map((spot) {
                 return LineTooltipItem(
                   '${_resolveLabel(spot.barIndex)}: ${spot.y.toStringAsFixed(1)}',
-                  const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: AppDimensions.fontSm),
+                  const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: AppDimensions.fontSm,
+                  ),
                 );
               }).toList();
             },
@@ -240,7 +294,14 @@ class ScoreLineChart extends StatelessWidget {
   }
 
   List<FlSpot> _generateSpots(double finalScore, String cat) {
-    if (finalScore == 0) return [const FlSpot(0, 0), const FlSpot(1, 0), const FlSpot(2, 0), const FlSpot(3, 0)];
+    if (finalScore == 0) {
+      return [
+        const FlSpot(0, 0),
+        const FlSpot(1, 0),
+        const FlSpot(2, 0),
+        const FlSpot(3, 0),
+      ];
+    }
     final bool isWarning = finalScore < 70.0;
     if (isWarning) {
       return [
@@ -251,20 +312,45 @@ class ScoreLineChart extends StatelessWidget {
       ];
     } else {
       if (cat == 'Akademik') {
-        return [FlSpot(0, (finalScore - 4.5).clamp(0.0, 100.0)), FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)), FlSpot(2, (finalScore - 1.2).clamp(0.0, 100.0)), FlSpot(3, finalScore)];
+        return [
+          FlSpot(0, (finalScore - 4.5).clamp(0.0, 100.0)),
+          FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)),
+          FlSpot(2, (finalScore - 1.2).clamp(0.0, 100.0)),
+          FlSpot(3, finalScore),
+        ];
       } else if (cat == 'Mental Kepribadian') {
-        return [FlSpot(0, (finalScore - 3.8).clamp(0.0, 100.0)), FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)), FlSpot(2, (finalScore - 1.0).clamp(0.0, 100.0)), FlSpot(3, finalScore)];
+        return [
+          FlSpot(0, (finalScore - 3.8).clamp(0.0, 100.0)),
+          FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)),
+          FlSpot(2, (finalScore - 1.0).clamp(0.0, 100.0)),
+          FlSpot(3, finalScore),
+        ];
       } else {
-        return [FlSpot(0, (finalScore - 2.5).clamp(0.0, 100.0)), FlSpot(1, (finalScore - 1.8).clamp(0.0, 100.0)), FlSpot(2, (finalScore - 0.6).clamp(0.0, 100.0)), FlSpot(3, finalScore)];
+        return [
+          FlSpot(0, (finalScore - 2.5).clamp(0.0, 100.0)),
+          FlSpot(1, (finalScore - 1.8).clamp(0.0, 100.0)),
+          FlSpot(2, (finalScore - 0.6).clamp(0.0, 100.0)),
+          FlSpot(3, finalScore),
+        ];
       }
     }
   }
 
-  Widget _buildLegendItem(String label, Color color, bool isSelected, double score) {
+  Widget _buildLegendItem(
+    String label,
+    Color color,
+    bool isSelected,
+    double score,
+  ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.sm + 2, vertical: AppDimensions.xs + 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.sm + 2,
+        vertical: AppDimensions.xs + 2,
+      ),
       decoration: BoxDecoration(
-        color: isSelected ? color.withValues(alpha: 0.08) : Colors.blueGrey.shade50.withValues(alpha: 0.5),
+        color: isSelected
+            ? color.withValues(alpha: 0.08)
+            : Colors.blueGrey.shade50.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppDimensions.radiusSm + 2),
         border: Border.all(
           color: isSelected ? color.withValues(alpha: 0.2) : Colors.transparent,
@@ -275,7 +361,8 @@ class ScoreLineChart extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 7, height: 7,
+            width: 7,
+            height: 7,
             decoration: BoxDecoration(
               color: isSelected ? color : color.withValues(alpha: 0.5),
               shape: BoxShape.circle,

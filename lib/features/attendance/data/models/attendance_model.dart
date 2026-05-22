@@ -73,15 +73,15 @@ class AttendanceModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        userId,
-        type,
-        status,
-        timestamp,
-        latitude,
-        longitude,
-        isLocationValid,
-      ];
+    id,
+    userId,
+    type,
+    status,
+    timestamp,
+    latitude,
+    longitude,
+    isLocationValid,
+  ];
 }
 
 class AttendanceSummaryModel extends Equatable {
@@ -124,9 +124,5 @@ class AttendanceSummaryModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-        presentCount,
-        permissionCount,
-        absentCount,
-      ];
+  List<Object?> get props => [presentCount, permissionCount, absentCount];
 }

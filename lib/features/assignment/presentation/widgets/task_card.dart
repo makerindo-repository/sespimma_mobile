@@ -71,7 +71,10 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isAktif = assignment.status == 'aktif';
-    final Color deadlineColor = _getDeadlineColor(assignment.deadline, assignment.status);
+    final Color deadlineColor = _getDeadlineColor(
+      assignment.deadline,
+      assignment.status,
+    );
     final statusColor = _getStatusColor(assignment.status);
 
     return Container(
@@ -117,7 +120,9 @@ class TaskCard extends StatelessWidget {
                         padding: const EdgeInsets.all(AppDimensions.lg - 2),
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusLg,
+                          ),
                         ),
                         child: Icon(
                           _getStatusIcon(assignment.status),
@@ -168,10 +173,15 @@ class TaskCard extends StatelessWidget {
                   child: Material(
                     color: Colors.transparent,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: deadlineColor.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                         border: Border.all(
                           color: deadlineColor.withValues(alpha: 0.15),
                         ),
@@ -182,15 +192,18 @@ class TaskCard extends StatelessWidget {
                             assignment.status == 'diperiksa'
                                 ? AppIcons.hourglassHigh
                                 : (assignment.status == 'selesai'
-                                    ? AppIcons.checkCircle
-                                    : AppIcons.timer),
+                                      ? AppIcons.checkCircle
+                                      : AppIcons.timer),
                             color: deadlineColor,
                             size: AppDimensions.iconMd,
                           ),
                           const SizedBox(width: AppDimensions.sm + 2),
                           Expanded(
                             child: Text(
-                              _getDeadlineText(assignment.deadline, assignment.status),
+                              _getDeadlineText(
+                                assignment.deadline,
+                                assignment.status,
+                              ),
                               style: TextStyle(
                                 fontSize: AppDimensions.fontDefault,
                                 fontWeight: FontWeight.w600,

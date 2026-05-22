@@ -94,9 +94,7 @@ class EvidenceBottomSheet {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    isReward
-                        ? AppIcons.medalFill
-                        : AppIcons.warningCircleFill,
+                    isReward ? AppIcons.medalFill : AppIcons.warningCircleFill,
                     color: mainColor,
                     size: 28,
                   ),
@@ -216,8 +214,7 @@ class EvidenceBottomSheet {
                           return Container(
                             color: Colors.grey.shade100,
                             child: const Center(
-                              child:
-                                  CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           );
                         },

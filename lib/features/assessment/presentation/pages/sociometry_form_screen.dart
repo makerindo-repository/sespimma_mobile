@@ -316,7 +316,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
     final item = _indicators[index];
     final controller = _scoreControllers[index];
     final bool isEmptyInput = controller.text.trim().isEmpty;
-    
+
     final double currentScore = double.tryParse(controller.text) ?? 0.0;
     final ratingMeta = isEmptyInput
         ? {
@@ -325,7 +325,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
             'color': Colors.blueGrey.shade300,
           }
         : _getQualitativeRating(currentScore);
-        
+
     final Color badgeColor = ratingMeta['color'] as Color;
 
     return Container(
@@ -480,13 +480,17 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
                     ),
                     counterText: '',
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(
                         color: badgeColor.withValues(alpha: 0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(color: badgeColor, width: 2.0),
                     ),
                   ),
@@ -512,10 +516,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
         children: [
           Row(
             children: [
-              Icon(
-                AppIcons.warningCircleFill,
-                color: Colors.orange.shade800,
-              ),
+              Icon(AppIcons.warningCircleFill, color: Colors.orange.shade800),
               const SizedBox(width: AppDimensions.sm),
               Expanded(
                 child: Text(
@@ -543,7 +544,10 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
           TextField(
             controller: _justificationController,
             maxLines: 3,
-            style: const TextStyle(fontSize: AppDimensions.fontDefault, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: AppDimensions.fontDefault,
+              fontWeight: FontWeight.w600,
+            ),
             onChanged: (val) => setState(() {}),
             decoration: InputDecoration(
               hintText:
@@ -633,7 +637,9 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXxl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+        ),
         title: const Row(
           children: [
             Icon(
@@ -653,7 +659,11 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
         ),
         content: const Text(
           'Tindakan evaluasi sosiometri bersifat final dan anonim. Nilai Anda akan digabungkan ke dalam basis data Pokjar. Lanjutkan?',
-          style: TextStyle(fontSize: AppDimensions.fontDefault, height: 1.6, color: Colors.blueGrey),
+          style: TextStyle(
+            fontSize: AppDimensions.fontDefault,
+            height: 1.6,
+            color: Colors.blueGrey,
+          ),
         ),
         actions: [
           TextButton(
@@ -669,10 +679,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pop(
-                context,
-                true,
-              );
+              Navigator.pop(context, true);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Row(

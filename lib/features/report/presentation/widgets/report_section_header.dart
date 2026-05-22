@@ -5,10 +5,7 @@ import 'package:sespimma_mobile/core/theme/app_colors.dart';
 class ReportSectionHeader extends StatelessWidget {
   final String judul;
 
-  const ReportSectionHeader({
-    super.key,
-    required this.judul,
-  });
+  const ReportSectionHeader({super.key, required this.judul});
 
   @override
   Widget build(BuildContext context) {

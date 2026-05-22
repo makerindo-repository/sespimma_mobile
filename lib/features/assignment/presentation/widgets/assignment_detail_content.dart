@@ -62,17 +62,13 @@ class AssignmentDetailContent extends StatelessWidget {
                     isExpired: isExpired,
                   ),
                   const SizedBox(height: AppDimensions.xxxl),
-                  AssignmentInstructionSection(
-                    deskripsi: assignment.deskripsi,
-                  ),
-                  if (assignment.attachmentName?.isNotEmpty ==
-                      true) ...[
+                  AssignmentInstructionSection(deskripsi: assignment.deskripsi),
+                  if (assignment.attachmentName?.isNotEmpty == true) ...[
                     const SizedBox(height: AppDimensions.xxl),
                     AssignmentAttachmentSection(
                       attachmentName: assignment.attachmentName!,
-                      onDownload: () => onDownloadFile(
-                        assignment.attachmentName!,
-                      ),
+                      onDownload: () =>
+                          onDownloadFile(assignment.attachmentName!),
                     ),
                   ],
                   const SizedBox(height: AppDimensions.xxxl),
@@ -88,8 +84,7 @@ class AssignmentDetailContent extends StatelessWidget {
                     AssignmentSubmittedSectionWidget(
                       assignment: assignment,
                       onDownload: () => onDownloadFile(
-                        assignment.submissionFileName ??
-                            'Berkas Terlampir',
+                        assignment.submissionFileName ?? 'Berkas Terlampir',
                       ),
                     ),
                 ],

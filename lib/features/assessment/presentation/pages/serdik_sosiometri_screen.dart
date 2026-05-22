@@ -49,31 +49,47 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
   int get _totalCount => _currentPeers.length;
   bool get _isAllEvaluated => _evaluatedCount == _totalCount;
 
-  bool get _isCurrentPhaseActive => _isPhaseAwal 
-      ? SociometryPeriodConfig.isAwalActive() 
+  bool get _isCurrentPhaseActive => _isPhaseAwal
+      ? SociometryPeriodConfig.isAwalActive()
       : SociometryPeriodConfig.isAkhirActive();
 
-  bool get _isCurrentTabLocked => _isPhaseAwal 
-      ? SociometryPeriodConfig.isAwalLocked 
+  bool get _isCurrentTabLocked => _isPhaseAwal
+      ? SociometryPeriodConfig.isAwalLocked
       : SociometryPeriodConfig.isAkhirLocked;
 
   String _formatIndoDate(DateTime date) {
     final List<String> months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     return "${date.day} ${months[date.month - 1]} ${date.year}";
   }
 
   String _getDynamicPeriodRange(bool isAwal) {
-    final start = isAwal ? SociometryPeriodConfig.awalStartDate : SociometryPeriodConfig.akhirStartDate;
-    final end = isAwal ? SociometryPeriodConfig.awalEndDate : SociometryPeriodConfig.akhirEndDate;
+    final start = isAwal
+        ? SociometryPeriodConfig.awalStartDate
+        : SociometryPeriodConfig.akhirStartDate;
+    final end = isAwal
+        ? SociometryPeriodConfig.awalEndDate
+        : SociometryPeriodConfig.akhirEndDate;
     return "${_formatIndoDate(start)} - ${_formatIndoDate(end)}";
   }
 
   @override
   Widget build(BuildContext context) {
-    final double progressPercent = _totalCount > 0 ? _evaluatedCount / _totalCount : 0;
+    final double progressPercent = _totalCount > 0
+        ? _evaluatedCount / _totalCount
+        : 0;
 
     return Scaffold(
       backgroundColor: _lightGrey,
@@ -116,10 +132,15 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: _primaryNavy.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusSm,
+                          ),
                         ),
                         child: Text(
                           'Total: $_totalCount',
@@ -137,7 +158,8 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: _currentPeers.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: AppDimensions.md),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: AppDimensions.md),
                     itemBuilder: (context, index) {
                       return _buildPeerTile(context, index);
                     },
@@ -193,7 +215,9 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                     style: TextStyle(
                       fontSize: AppDimensions.fontDefault,
                       fontWeight: FontWeight.w800,
-                      color: _isPhaseAwal ? _primaryIndigo : Colors.blueGrey.shade400,
+                      color: _isPhaseAwal
+                          ? _primaryIndigo
+                          : Colors.blueGrey.shade400,
                     ),
                   ),
                 ),
@@ -227,7 +251,9 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                     style: TextStyle(
                       fontSize: AppDimensions.fontDefault,
                       fontWeight: FontWeight.w800,
-                      color: !_isPhaseAwal ? _primaryIndigo : Colors.blueGrey.shade400,
+                      color: !_isPhaseAwal
+                          ? _primaryIndigo
+                          : Colors.blueGrey.shade400,
                     ),
                   ),
                 ),
@@ -294,7 +320,11 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(AppIcons.usersThreeFill, color: Colors.white, size: AppDimensions.iconLg),
+                child: const Icon(
+                  AppIcons.usersThreeFill,
+                  color: Colors.white,
+                  size: AppDimensions.iconLg,
+                ),
               ),
             ],
           ),
@@ -308,7 +338,11 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(AppIcons.calendarBlankFill, color: Colors.white, size: AppDimensions.fontLg),
+                const Icon(
+                  AppIcons.calendarBlankFill,
+                  color: Colors.white,
+                  size: AppDimensions.fontLg,
+                ),
                 const SizedBox(width: AppDimensions.sm),
                 Text(
                   'Periode: $periodLabel',
@@ -378,7 +412,10 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-          onTap: (peer.isEvaluated || !_isCurrentPhaseActive || _isCurrentTabLocked)
+          onTap:
+              (peer.isEvaluated ||
+                  !_isCurrentPhaseActive ||
+                  _isCurrentTabLocked)
               ? null
               : () async {
                   HapticFeedback.mediumImpact();
@@ -440,8 +477,12 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                         style: TextStyle(
                           fontSize: AppDimensions.fontLg,
                           fontWeight: FontWeight.w800,
-                          color: (peer.isEvaluated || !_isCurrentPhaseActive) ? Colors.blueGrey.shade300 : _primaryNavy,
-                          decoration: peer.isEvaluated ? TextDecoration.lineThrough : null,
+                          color: (peer.isEvaluated || !_isCurrentPhaseActive)
+                              ? Colors.blueGrey.shade300
+                              : _primaryNavy,
+                          decoration: peer.isEvaluated
+                              ? TextDecoration.lineThrough
+                              : null,
                         ),
                       ),
                       const SizedBox(height: AppDimensions.xs),
@@ -489,16 +530,24 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
               ),
             ),
             const SizedBox(width: AppDimensions.xs),
-            Icon(AppIcons.lockFill, color: Colors.grey.shade500, size: AppDimensions.iconXs),
+            Icon(
+              AppIcons.lockFill,
+              color: Colors.grey.shade500,
+              size: AppDimensions.iconXs,
+            ),
           ],
         ),
       );
     }
 
-    final Color bg = isEvaluated ? const Color(0xFFECFDF5) : _primaryIndigo.withValues(alpha: 0.05);
+    final Color bg = isEvaluated
+        ? const Color(0xFFECFDF5)
+        : _primaryIndigo.withValues(alpha: 0.05);
     final Color fg = isEvaluated ? const Color(0xFF047857) : _primaryIndigo;
     final String label = isEvaluated ? 'DINILAI' : 'MULAI';
-    final IconData icon = isEvaluated ? AppIcons.checkCircleFill : AppIcons.caretRightBold;
+    final IconData icon = isEvaluated
+        ? AppIcons.checkCircleFill
+        : AppIcons.caretRightBold;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -544,7 +593,10 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
           width: double.infinity,
           height: 56,
           child: ElevatedButton.icon(
-            onPressed: (!_isCurrentPhaseActive || !_isAllEvaluated || _isCurrentTabLocked)
+            onPressed:
+                (!_isCurrentPhaseActive ||
+                    !_isAllEvaluated ||
+                    _isCurrentTabLocked)
                 ? null
                 : () {
                     HapticFeedback.heavyImpact();
@@ -553,29 +605,35 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryNavy,
               foregroundColor: Colors.white,
-              disabledBackgroundColor: _isCurrentTabLocked ? const Color(0xFFECFDF5) : Colors.grey.shade200,
-              disabledForegroundColor: _isCurrentTabLocked ? const Color(0xFF047857) : Colors.grey.shade400,
+              disabledBackgroundColor: _isCurrentTabLocked
+                  ? const Color(0xFFECFDF5)
+                  : Colors.grey.shade200,
+              disabledForegroundColor: _isCurrentTabLocked
+                  ? const Color(0xFF047857)
+                  : Colors.grey.shade400,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               ),
               elevation: 0,
-              side: _isCurrentTabLocked 
+              side: _isCurrentTabLocked
                   ? const BorderSide(color: Color(0xFF10B981), width: 1.5)
                   : BorderSide.none,
             ),
-            icon: Icon(_isCurrentTabLocked
-                ? AppIcons.shieldCheckFill
-                : !_isCurrentPhaseActive
-                    ? AppIcons.lockFill
-                    : AppIcons.lockKeyFill),
+            icon: Icon(
+              _isCurrentTabLocked
+                  ? AppIcons.shieldCheckFill
+                  : !_isCurrentPhaseActive
+                  ? AppIcons.lockFill
+                  : AppIcons.lockKeyFill,
+            ),
             label: Text(
               _isCurrentTabLocked
                   ? 'DATA TELAH DIKUNCI PERMANEN'
                   : !_isCurrentPhaseActive
-                      ? 'TAHAP BELUM DIBUKA'
-                      : !_isAllEvaluated
-                          ? 'SELESAIKAN PENILAIAN ($_evaluatedCount/$_totalCount)'
-                          : 'KUNCI & KIRIM DATA',
+                  ? 'TAHAP BELUM DIBUKA'
+                  : !_isAllEvaluated
+                  ? 'SELESAIKAN PENILAIAN ($_evaluatedCount/$_totalCount)'
+                  : 'KUNCI & KIRIM DATA',
               style: const TextStyle(
                 fontSize: AppDimensions.fontLg,
                 fontWeight: FontWeight.w800,
@@ -592,14 +650,25 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXxl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+        ),
         title: Row(
           children: [
-            const Icon(AppIcons.lockKeyFill, color: _primaryNavy, size: AppDimensions.iconXl),
+            const Icon(
+              AppIcons.lockKeyFill,
+              color: _primaryNavy,
+              size: AppDimensions.iconXl,
+            ),
             const SizedBox(width: AppDimensions.md - 4),
             Text(
-              _isPhaseAwal ? 'Kunci Sosiometri Awal?' : 'Kunci Sosiometri Akhir?',
-              style: const TextStyle(fontWeight: FontWeight.w800, color: _primaryNavy),
+              _isPhaseAwal
+                  ? 'Kunci Sosiometri Awal?'
+                  : 'Kunci Sosiometri Akhir?',
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                color: _primaryNavy,
+              ),
             ),
           ],
         ),
@@ -607,14 +676,21 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
           _isPhaseAwal
               ? 'Setelah dikunci, penilaian Sosiometri Awal tidak dapat diubah lagi. Data akan dirata-rata ke modul Mental IDMS. Lanjutkan?'
               : 'Setelah dikunci, penilaian Sosiometri Akhir bersifat final. Lanjutkan?',
-          style: const TextStyle(fontSize: AppDimensions.fontDefault, height: 1.6, color: Colors.blueGrey),
+          style: const TextStyle(
+            fontSize: AppDimensions.fontDefault,
+            height: 1.6,
+            color: Colors.blueGrey,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Kembali',
-              style: TextStyle(color: Colors.blueGrey.shade600, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                color: Colors.blueGrey.shade600,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
           ElevatedButton(
@@ -645,7 +721,9 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                   ),
                   backgroundColor: _primaryNavy,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  ),
                   margin: const EdgeInsets.all(AppDimensions.xl - 4),
                 ),
               );
@@ -653,9 +731,14 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryNavy,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              ),
             ),
-            child: const Text('Kunci Permanen', style: TextStyle(fontWeight: FontWeight.w800)),
+            child: const Text(
+              'Kunci Permanen',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
           ),
         ],
       ),

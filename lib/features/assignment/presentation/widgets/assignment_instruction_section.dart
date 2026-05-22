@@ -5,10 +5,7 @@ import 'package:sespimma_mobile/core/theme/app_colors.dart';
 class AssignmentInstructionSection extends StatelessWidget {
   final String? deskripsi;
 
-  const AssignmentInstructionSection({
-    super.key,
-    required this.deskripsi,
-  });
+  const AssignmentInstructionSection({super.key, required this.deskripsi});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +25,11 @@ class AssignmentInstructionSection extends StatelessWidget {
           deskripsi?.isNotEmpty == true
               ? deskripsi!
               : 'Silahkan selesaikan naskah sesuai dengan '
-                  'pedoman yang telah dibagikan. Pastikan format '
-                  'penulisan mematuhi standar SESPIMMA. Unggah '
-                  'dokumen dalam format PDF atau foto bukti '
-                  'kegiatan yang relevan sebelum batas waktu '
-                  'berakhir.',
+                    'pedoman yang telah dibagikan. Pastikan format '
+                    'penulisan mematuhi standar SESPIMMA. Unggah '
+                    'dokumen dalam format PDF atau foto bukti '
+                    'kegiatan yang relevan sebelum batas waktu '
+                    'berakhir.',
           style: TextStyle(
             fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w500,

@@ -54,8 +54,7 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
       width: AppDimensions.huge - 8,
       decoration: BoxDecoration(
         color: Colors.grey.shade300,
-        borderRadius:
-            BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
       ),
     );
   }
@@ -68,9 +67,7 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: Icon(
-        isExpired
-            ? AppIcons.warningCircleFill
-            : AppIcons.cloudArrowUpFill,
+        isExpired ? AppIcons.warningCircleFill : AppIcons.cloudArrowUpFill,
         color: _btnColor,
         size: AppDimensions.huge - 8,
       ),
@@ -79,9 +76,7 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
 
   Widget _buildTitle() {
     return Text(
-      isExpired
-          ? 'Kirim Secara Terlambat?'
-          : 'Konfirmasi Pengumpulan',
+      isExpired ? 'Kirim Secara Terlambat?' : 'Konfirmasi Pengumpulan',
       style: TextStyle(
         fontSize: AppDimensions.fontXxl,
         fontWeight: FontWeight.w800,
@@ -94,19 +89,17 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
     return Text(
       isExpired
           ? 'Tenggat waktu tugas ini telah berakhir. '
-              'Jika dilanjutkan, tugas akan ditandai TELAT '
-              'pada audit trail IDMS & dikenakan pemotongan '
-              '-0.50 Poin Kepribadian (Disiplin).'
+                'Jika dilanjutkan, tugas akan ditandai TELAT '
+                'pada audit trail IDMS & dikenakan pemotongan '
+                '-0.50 Poin Kepribadian (Disiplin).'
           : 'Apakah Anda yakin berkas yang dilampirkan '
-              'sudah sesuai? Tindakan pengumpulan tugas '
-              'bersifat final.',
+                'sudah sesuai? Tindakan pengumpulan tugas '
+                'bersifat final.',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: AppDimensions.fontDefault,
         fontWeight: isExpired ? FontWeight.w600 : FontWeight.w500,
-        color: isExpired
-            ? Colors.red.shade900
-            : Colors.blueGrey.shade600,
+        color: isExpired ? Colors.red.shade900 : Colors.blueGrey.shade600,
         height: 1.5,
       ),
     );
@@ -117,8 +110,7 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.lg),
       decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius:
-            BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
@@ -152,14 +144,10 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
               Navigator.pop(context);
             },
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppDimensions.lg,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: AppDimensions.lg),
               side: BorderSide(color: Colors.grey.shade300),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  AppDimensions.radiusXl,
-                ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
               ),
             ),
             child: Text(
@@ -183,13 +171,9 @@ class AssignmentSubmitConfirmationSheet extends StatelessWidget {
               backgroundColor: _btnColor,
               foregroundColor: AppColors.textOnPrimary,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(
-                vertical: AppDimensions.lg,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: AppDimensions.lg),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  AppDimensions.radiusXl,
-                ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
               ),
             ),
             child: Text(

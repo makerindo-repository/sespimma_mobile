@@ -2,112 +2,112 @@ import 'package:flutter/material.dart';
 
 abstract final class AssessmentSubCategories {
   static List<Map<String, dynamic>> getAkademik() => [
-        {
-          'index': 0,
-          'name': 'Ujian MP (30% - Pelajaran)',
-          'icon': Icons.menu_book_rounded,
-          'tahap': 'Pelajaran',
-        },
-        {
-          'index': 1,
-          'name': 'NKKP (5% - Pelajaran)',
-          'icon': Icons.menu_book_rounded,
-          'tahap': 'Pelajaran',
-        },
-        {
-          'index': 2,
-          'name': 'NPKP (5% - Pelajaran)',
-          'icon': Icons.menu_book_rounded,
-          'tahap': 'Pelajaran',
-        },
-        {
-          'index': 3,
-          'name': 'NKP (60% - Pelajaran)',
-          'icon': Icons.menu_book_rounded,
-          'tahap': 'Pelajaran',
-        },
-        {
-          'index': 4,
-          'name': 'Keaktifan (60% - Simulasi)',
-          'icon': Icons.lightbulb_rounded,
-          'tahap': 'Simulasi',
-        },
-        {
-          'index': 5,
-          'name': 'Produk (20% - Simulasi)',
-          'icon': Icons.lightbulb_rounded,
-          'tahap': 'Simulasi',
-        },
-        {
-          'index': 6,
-          'name': 'Tata Ruang (20% - Simulasi)',
-          'icon': Icons.lightbulb_rounded,
-          'tahap': 'Simulasi',
-        },
-        {
-          'index': 7,
-          'name': 'Materi (40% - Taskap)',
-          'icon': Icons.assignment_rounded,
-          'tahap': 'Taskap',
-        },
-        {
-          'index': 8,
-          'name': 'Menulis (30% - Taskap)',
-          'icon': Icons.assignment_rounded,
-          'tahap': 'Taskap',
-        },
-        {
-          'index': 9,
-          'name': 'Paparan (30% - Taskap)',
-          'icon': Icons.assignment_rounded,
-          'tahap': 'Taskap',
-        },
-      ];
+    {
+      'index': 0,
+      'name': 'Ujian MP (30% - Pelajaran)',
+      'icon': Icons.menu_book_rounded,
+      'tahap': 'Pelajaran',
+    },
+    {
+      'index': 1,
+      'name': 'NKKP (5% - Pelajaran)',
+      'icon': Icons.menu_book_rounded,
+      'tahap': 'Pelajaran',
+    },
+    {
+      'index': 2,
+      'name': 'NPKP (5% - Pelajaran)',
+      'icon': Icons.menu_book_rounded,
+      'tahap': 'Pelajaran',
+    },
+    {
+      'index': 3,
+      'name': 'NKP (60% - Pelajaran)',
+      'icon': Icons.menu_book_rounded,
+      'tahap': 'Pelajaran',
+    },
+    {
+      'index': 4,
+      'name': 'Keaktifan (60% - Simulasi)',
+      'icon': Icons.lightbulb_rounded,
+      'tahap': 'Simulasi',
+    },
+    {
+      'index': 5,
+      'name': 'Produk (20% - Simulasi)',
+      'icon': Icons.lightbulb_rounded,
+      'tahap': 'Simulasi',
+    },
+    {
+      'index': 6,
+      'name': 'Tata Ruang (20% - Simulasi)',
+      'icon': Icons.lightbulb_rounded,
+      'tahap': 'Simulasi',
+    },
+    {
+      'index': 7,
+      'name': 'Materi (40% - Taskap)',
+      'icon': Icons.assignment_rounded,
+      'tahap': 'Taskap',
+    },
+    {
+      'index': 8,
+      'name': 'Menulis (30% - Taskap)',
+      'icon': Icons.assignment_rounded,
+      'tahap': 'Taskap',
+    },
+    {
+      'index': 9,
+      'name': 'Paparan (30% - Taskap)',
+      'icon': Icons.assignment_rounded,
+      'tahap': 'Taskap',
+    },
+  ];
 
   static List<Map<String, dynamic>> getMentalKepribadian() => [
-        {
-          'index': 0,
-          'name': 'Moral (20%)',
-          'icon': Icons.psychology_alt_rounded,
-          'tahap': 'Observasi Harian',
-        },
-        {
-          'index': 1,
-          'name': 'Disiplin (15%)',
-          'icon': Icons.access_time_filled_rounded,
-          'tahap': 'Observasi Harian',
-        },
-        {
-          'index': 2,
-          'name': 'Kepemimpinan (20%)',
-          'icon': Icons.flag_circle_rounded,
-          'tahap': 'Observasi Harian',
-        },
-        {
-          'index': 3,
-          'name': 'Pengendalian Diri (15%)',
-          'icon': Icons.self_improvement_rounded,
-          'tahap': 'Observasi Harian',
-        },
-        {
-          'index': 4,
-          'name': 'Penampilan (15%)',
-          'icon': Icons.checkroom_rounded,
-          'tahap': 'Observasi Harian',
-        },
-        {
-          'index': 5,
-          'name': 'Sosiometri Awal (Bobot 30%)',
-          'icon': Icons.groups_rounded,
-          'tahap': 'Sosiometri Awal',
-        },
-        {
-          'index': 6,
-          'name': 'Sosiometri Akhir (Bobot 30%)',
-          'icon': Icons.groups_rounded,
-          'tahap': 'Sosiometri Akhir',
-        },
-      ];
+    {
+      'index': 0,
+      'name': 'Moral (20%)',
+      'icon': Icons.psychology_alt_rounded,
+      'tahap': 'Observasi Harian',
+    },
+    {
+      'index': 1,
+      'name': 'Disiplin (15%)',
+      'icon': Icons.access_time_filled_rounded,
+      'tahap': 'Observasi Harian',
+    },
+    {
+      'index': 2,
+      'name': 'Kepemimpinan (20%)',
+      'icon': Icons.flag_circle_rounded,
+      'tahap': 'Observasi Harian',
+    },
+    {
+      'index': 3,
+      'name': 'Pengendalian Diri (15%)',
+      'icon': Icons.self_improvement_rounded,
+      'tahap': 'Observasi Harian',
+    },
+    {
+      'index': 4,
+      'name': 'Penampilan (15%)',
+      'icon': Icons.checkroom_rounded,
+      'tahap': 'Observasi Harian',
+    },
+    {
+      'index': 5,
+      'name': 'Sosiometri Awal (Bobot 30%)',
+      'icon': Icons.groups_rounded,
+      'tahap': 'Sosiometri Awal',
+    },
+    {
+      'index': 6,
+      'name': 'Sosiometri Akhir (Bobot 30%)',
+      'icon': Icons.groups_rounded,
+      'tahap': 'Sosiometri Akhir',
+    },
+  ];
 
   static List<Map<String, dynamic>> getJasmani({
     required bool isWanita,

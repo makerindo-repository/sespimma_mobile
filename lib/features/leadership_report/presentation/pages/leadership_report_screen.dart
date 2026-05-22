@@ -61,15 +61,18 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
   List<FinalRecapModel> get _filteredReports {
     return _allReports.where((report) {
       final String selectedP = _selectedPokjar.trim().toLowerCase();
-      final bool matchesPokjar = selectedP == 'semua pokjar' ||
+      final bool matchesPokjar =
+          selectedP == 'semua pokjar' ||
           report.pokjar.trim().toLowerCase() == selectedP;
 
-      final bool matchesStatus = _selectedStatusFilter == 'Semua Status' ||
+      final bool matchesStatus =
+          _selectedStatusFilter == 'Semua Status' ||
           (_selectedStatusFilter == 'Lulus' && report.average >= 70.0) ||
           (_selectedStatusFilter == 'Tidak Lulus' && report.average < 70.0);
 
       final String query = _searchQuery.trim().toLowerCase();
-      final bool matchesSearch = query.isEmpty ||
+      final bool matchesSearch =
+          query.isEmpty ||
           report.name.toLowerCase().contains(query) ||
           report.nrp.toLowerCase().contains(query);
 
@@ -95,7 +98,11 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
             .animate(
               CurvedAnimation(
                 parent: _animController!,
-                curve: Interval(beginInterval, endInterval, curve: Curves.easeOutQuart),
+                curve: Interval(
+                  beginInterval,
+                  endInterval,
+                  curve: Curves.easeOutQuart,
+                ),
               ),
             ),
         child: child,
@@ -161,7 +168,9 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                   const SizedBox(height: AppDimensions.xl),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: AiRecommendationCard(selectedPokjar: _selectedPokjar),
+                    child: AiRecommendationCard(
+                      selectedPokjar: _selectedPokjar,
+                    ),
                   ),
                 ],
               ),
@@ -179,10 +188,15 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusXl,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.04),
@@ -196,7 +210,8 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                           Expanded(
                             child: TextField(
                               controller: _searchController,
-                              onChanged: (val) => setState(() => _searchQuery = val),
+                              onChanged: (val) =>
+                                  setState(() => _searchQuery = val),
                               decoration: InputDecoration(
                                 hintText: 'Cari Nama/NRP...',
                                 hintStyle: TextStyle(
@@ -206,7 +221,9 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                                 ),
                                 border: InputBorder.none,
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
                               ),
                               style: const TextStyle(
                                 color: _primaryNavy,
@@ -220,15 +237,21 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                             label: 'Pokjar',
                             value: _selectedPokjar,
                             items: _pokjars,
-                            onChanged: (val) => setState(() => _selectedPokjar = val!),
+                            onChanged: (val) =>
+                                setState(() => _selectedPokjar = val!),
                           ),
                           const SizedBox(width: AppDimensions.sm),
                           _buildFilterIcon(
                             icon: AppIcons.funnelFill,
                             label: 'Status',
                             value: _selectedStatusFilter,
-                            items: const ['Semua Status', 'Lulus', 'Tidak Lulus'],
-                            onChanged: (val) => setState(() => _selectedStatusFilter = val!),
+                            items: const [
+                              'Semua Status',
+                              'Lulus',
+                              'Tidak Lulus',
+                            ],
+                            onChanged: (val) =>
+                                setState(() => _selectedStatusFilter = val!),
                           ),
                         ],
                       ),
@@ -242,9 +265,7 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 60),
             sliver: filtered.isEmpty
-                ? SliverToBoxAdapter(
-                    child: _buildEmptyState(),
-                  )
+                ? SliverToBoxAdapter(child: _buildEmptyState())
                 : SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => _buildAnimatedSection(
@@ -274,7 +295,9 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
     final bool isFiltered = value != items.first;
     return PopupMenuButton<String>(
       onSelected: onChanged,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+      ),
       offset: const Offset(0, 45),
       itemBuilder: (context) => items.map((item) {
         return PopupMenuItem(
@@ -302,7 +325,9 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.sm),
         decoration: BoxDecoration(
-          color: isFiltered ? _primaryNavy.withValues(alpha: 0.08) : Colors.transparent,
+          color: isFiltered
+              ? _primaryNavy.withValues(alpha: 0.08)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
         ),
         child: Icon(
@@ -335,8 +360,11 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const SizedBox(height: AppDimensions.avatarMd),
-          Icon(AppIcons.magnifyingGlassFill,
-              size: AppDimensions.iconDisplay, color: Colors.blueGrey.shade200),
+          Icon(
+            AppIcons.magnifyingGlassFill,
+            size: AppDimensions.iconDisplay,
+            color: Colors.blueGrey.shade200,
+          ),
           const SizedBox(height: AppDimensions.md),
           Text(
             'Data tidak ditemukan',
@@ -352,13 +380,14 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
   }
 
   Future<void> _handleExportPdf(
-      BuildContext context, List<FinalRecapModel> data) async {
+    BuildContext context,
+    List<FinalRecapModel> data,
+  ) async {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(color: _primaryNavy),
-      ),
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: _primaryNavy)),
     );
 
     try {
@@ -367,7 +396,7 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
         pokjar: _selectedPokjar,
       );
       if (context.mounted) Navigator.pop(context);
-      
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

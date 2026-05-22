@@ -14,7 +14,8 @@ class ScanQrScreen extends StatefulWidget {
   State<ScanQrScreen> createState() => _ScanQrScreenState();
 }
 
-class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderStateMixin {
+class _ScanQrScreenState extends State<ScanQrScreen>
+    with SingleTickerProviderStateMixin {
   late final MobileScannerController _controller;
   late final AnimationController _animController;
   late final Animation<double> _laserAnimation;
@@ -72,24 +73,49 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
         child: AlertDialog(
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXxl)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+          ),
           title: Row(
             children: [
-              const Icon(AppIcons.checkCircleFill, color: AppColors.successGreen),
+              const Icon(
+                AppIcons.checkCircleFill,
+                color: AppColors.successGreen,
+              ),
               const SizedBox(width: AppDimensions.md - 4),
-              const Text('QR Code Terdeteksi', style: TextStyle(fontWeight: FontWeight.w800)),
+              const Text(
+                'QR Code Terdeteksi',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Data QR:', style: TextStyle(fontSize: AppDimensions.fontMd, color: Colors.grey)),
+              const Text(
+                'Data QR:',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontMd,
+                  color: Colors.grey,
+                ),
+              ),
               const SizedBox(height: AppDimensions.xs),
-              Text(code, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppDimensions.fontXl)),
+              Text(
+                code,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: AppDimensions.fontXl,
+                ),
+              ),
               const SizedBox(height: AppDimensions.md),
-              const Text('Absensi Anda telah diverifikasi melalui QR Code.', 
-                style: TextStyle(fontSize: AppDimensions.fontLg, color: Colors.blueGrey)),
+              const Text(
+                'Absensi Anda telah diverifikasi melalui QR Code.',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  color: Colors.blueGrey,
+                ),
+              ),
             ],
           ),
           actions: [
@@ -98,7 +124,10 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.w800)),
+              child: const Text(
+                'OK',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
             ),
           ],
         ),
@@ -116,10 +145,7 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
       appBar: _buildTransparentAppBar(context),
       body: Stack(
         children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-          ),
+          MobileScanner(controller: _controller, onDetect: _onDetect),
 
           ColorFiltered(
             colorFilter: ColorFilter.mode(
@@ -140,7 +166,9 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
                     width: scanArea,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusXxl,
+                      ),
                     ),
                   ),
                 ),
@@ -153,10 +181,7 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
               width: scanArea,
               height: scanArea,
               child: Stack(
-                children: [
-                  _buildCorners(scanArea),
-                  _buildLaser(scanArea),
-                ],
+                children: [_buildCorners(scanArea), _buildLaser(scanArea)],
               ),
             ),
           ),
@@ -203,48 +228,104 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
         Positioned(
           top: 0,
           left: 0,
-          child: _buildCornerPart(top: thickness, left: 0, width: cornerSize, height: thickness, color: cornerColor),
+          child: _buildCornerPart(
+            top: thickness,
+            left: 0,
+            width: cornerSize,
+            height: thickness,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           top: 0,
           left: 0,
-          child: _buildCornerPart(top: 0, left: 0, width: thickness, height: cornerSize, color: cornerColor),
+          child: _buildCornerPart(
+            top: 0,
+            left: 0,
+            width: thickness,
+            height: cornerSize,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           top: 0,
           right: 0,
-          child: _buildCornerPart(top: thickness, right: 0, width: cornerSize, height: thickness, color: cornerColor),
+          child: _buildCornerPart(
+            top: thickness,
+            right: 0,
+            width: cornerSize,
+            height: thickness,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           top: 0,
           right: 0,
-          child: _buildCornerPart(top: 0, right: 0, width: thickness, height: cornerSize, color: cornerColor),
+          child: _buildCornerPart(
+            top: 0,
+            right: 0,
+            width: thickness,
+            height: cornerSize,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           bottom: 0,
           left: 0,
-          child: _buildCornerPart(bottom: thickness, left: 0, width: cornerSize, height: thickness, color: cornerColor),
+          child: _buildCornerPart(
+            bottom: thickness,
+            left: 0,
+            width: cornerSize,
+            height: thickness,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           bottom: 0,
           left: 0,
-          child: _buildCornerPart(bottom: 0, left: 0, width: thickness, height: cornerSize, color: cornerColor),
+          child: _buildCornerPart(
+            bottom: 0,
+            left: 0,
+            width: thickness,
+            height: cornerSize,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           bottom: 0,
           right: 0,
-          child: _buildCornerPart(bottom: thickness, right: 0, width: cornerSize, height: thickness, color: cornerColor),
+          child: _buildCornerPart(
+            bottom: thickness,
+            right: 0,
+            width: cornerSize,
+            height: thickness,
+            color: cornerColor,
+          ),
         ),
         Positioned(
           bottom: 0,
           right: 0,
-          child: _buildCornerPart(bottom: 0, right: 0, width: thickness, height: cornerSize, color: cornerColor),
+          child: _buildCornerPart(
+            bottom: 0,
+            right: 0,
+            width: thickness,
+            height: cornerSize,
+            color: cornerColor,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildCornerPart({double? top, double? bottom, double? left, double? right, required double width, required double height, required Color color}) {
+  Widget _buildCornerPart({
+    double? top,
+    double? bottom,
+    double? left,
+    double? right,
+    required double width,
+    required double height,
+    required Color color,
+  }) {
     return Container(
       width: width,
       height: height,
@@ -313,7 +394,9 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
                   builder: (context, state, child) {
                     final bool isTorchOn = state.torchState == TorchState.on;
                     return Icon(
-                      isTorchOn ? AppIcons.flashlightFill : AppIcons.flashlightBold,
+                      isTorchOn
+                          ? AppIcons.flashlightFill
+                          : AppIcons.flashlightBold,
                       color: Colors.white,
                       size: AppDimensions.iconLg,
                     );
@@ -326,7 +409,11 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
               ),
               const SizedBox(width: AppDimensions.lg),
               _buildControlCircle(
-                icon: const Icon(AppIcons.arrowsClockwiseBold, color: Colors.white, size: AppDimensions.iconLg),
+                icon: const Icon(
+                  AppIcons.arrowsClockwiseBold,
+                  color: Colors.white,
+                  size: AppDimensions.iconLg,
+                ),
                 onTap: () {
                   HapticFeedback.selectionClick();
                   _controller.switchCamera();
@@ -339,7 +426,10 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildControlCircle({required Widget icon, required VoidCallback onTap}) {
+  Widget _buildControlCircle({
+    required Widget icon,
+    required VoidCallback onTap,
+  }) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
       child: BackdropFilter(
@@ -354,7 +444,10 @@ class _ScanQrScreenState extends State<ScanQrScreen> with SingleTickerProviderSt
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  width: 1,
+                ),
               ),
               child: icon,
             ),

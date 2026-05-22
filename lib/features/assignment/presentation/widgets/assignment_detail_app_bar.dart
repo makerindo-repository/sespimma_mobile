@@ -18,10 +18,7 @@ class AssignmentDetailAppBar extends StatelessWidget
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
-        icon: const Icon(
-          AppIcons.arrowLeft,
-          color: AppColors.primaryNavy,
-        ),
+        icon: const Icon(AppIcons.arrowLeft, color: AppColors.primaryNavy),
         onPressed: () => Navigator.pop(context),
       ),
       title: const Text(

@@ -19,7 +19,12 @@ class ZoneInfoSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppDimensions.xxl, AppDimensions.xl, AppDimensions.xxl, AppDimensions.xxxl + 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.xxl,
+        AppDimensions.xl,
+        AppDimensions.xxl,
+        AppDimensions.xxxl + 8,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,7 +39,11 @@ class ZoneInfoSheet extends StatelessWidget {
                   opacity: 0.15,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: AppDimensions.sm),
-                    child: Icon(Icons.arrow_left_rounded, size: AppDimensions.iconSm, color: Colors.grey),
+                    child: Icon(
+                      Icons.arrow_left_rounded,
+                      size: AppDimensions.iconSm,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -53,7 +62,11 @@ class ZoneInfoSheet extends StatelessWidget {
                   opacity: 0.15,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: AppDimensions.sm),
-                    child: Icon(Icons.arrow_right_rounded, size: AppDimensions.iconSm, color: Colors.grey),
+                    child: Icon(
+                      Icons.arrow_right_rounded,
+                      size: AppDimensions.iconSm,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -82,14 +95,20 @@ class ZoneInfoSheet extends StatelessWidget {
           _InfoRow(
             icon: Icons.timer_off_rounded,
             label: 'Batas Waktu Absen',
-            value: '${zone.deadline.hour.toString().padLeft(2, '0')}:${zone.deadline.minute.toString().padLeft(2, '0')} WIB',
-            valueColor: DateTime.now().isAfter(zone.deadline) ? AppColors.dangerRed : AppColors.successGreen,
+            value:
+                '${zone.deadline.hour.toString().padLeft(2, '0')}:${zone.deadline.minute.toString().padLeft(2, '0')} WIB',
+            valueColor: DateTime.now().isAfter(zone.deadline)
+                ? AppColors.dangerRed
+                : AppColors.successGreen,
           ),
           _InfoRow(
             icon: Icons.lock_clock_rounded,
             label: 'Batas Toleransi Alpha',
-            value: '${zone.cutoffTime.hour.toString().padLeft(2, '0')}:${zone.cutoffTime.minute.toString().padLeft(2, '0')} WIB',
-            valueColor: DateTime.now().isAfter(zone.cutoffTime) ? AppColors.dangerRed : AppColors.primaryNavy,
+            value:
+                '${zone.cutoffTime.hour.toString().padLeft(2, '0')}:${zone.cutoffTime.minute.toString().padLeft(2, '0')} WIB',
+            valueColor: DateTime.now().isAfter(zone.cutoffTime)
+                ? AppColors.dangerRed
+                : AppColors.primaryNavy,
           ),
           _InfoRow(
             icon: Icons.location_on_rounded,
@@ -106,10 +125,16 @@ class ZoneInfoSheet extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: onLeaveRequest,
-              icon: const Icon(AppIcons.fileTextBold, size: AppDimensions.iconSm),
+              icon: const Icon(
+                AppIcons.fileTextBold,
+                size: AppDimensions.iconSm,
+              ),
               label: const Text(
                 'AJUKAN IZIN KHUSUS',
-                style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.warningOrange,
@@ -148,7 +173,11 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: AppDimensions.iconXs + 2, color: AppColors.primaryNavy),
+          Icon(
+            icon,
+            size: AppDimensions.iconXs + 2,
+            color: AppColors.primaryNavy,
+          ),
           const SizedBox(width: AppDimensions.sm + 2),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

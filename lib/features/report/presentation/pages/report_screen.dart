@@ -40,17 +40,13 @@ class _ReportScreenState extends State<ReportScreen> {
             letterSpacing: 0.5,
           ),
         ),
-        iconTheme: const IconThemeData(
-          color: AppColors.textOnPrimary,
-        ),
+        iconTheme: const IconThemeData(color: AppColors.textOnPrimary),
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state is AuthLoading) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primaryNavy,
-              ),
+              child: CircularProgressIndicator(color: AppColors.primaryNavy),
             );
           } else if (state is AuthFailure) {
             return ReportErrorState(message: state.message);
@@ -62,9 +58,7 @@ class _ReportScreenState extends State<ReportScreen> {
             );
           }
           return const Center(
-            child: CircularProgressIndicator(
-              color: AppColors.primaryNavy,
-            ),
+            child: CircularProgressIndicator(color: AppColors.primaryNavy),
           );
         },
       ),

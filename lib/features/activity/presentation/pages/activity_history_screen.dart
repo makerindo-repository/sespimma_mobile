@@ -19,7 +19,8 @@ class ActivityHistoryScreen extends StatefulWidget {
   State<ActivityHistoryScreen> createState() => _ActivityHistoryScreenState();
 }
 
-class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with SingleTickerProviderStateMixin {
+class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   List<Map<String, dynamic>> _mockActivities = [];
   bool _isDataPopulated = false;
@@ -29,11 +30,29 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
   String _getDynamicDateStr(int daysAgo) {
     final target = DateTime.now().subtract(Duration(days: daysAgo));
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
-    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    
+    const days = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
+
     final dayIndex = target.weekday == 7 ? 0 : target.weekday;
     final dayName = days[dayIndex];
     final monthName = months[target.month - 1];
@@ -45,14 +64,14 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
     if (parts.length < 2) return rawTimeWib;
     int hour = int.parse(parts[0]);
     final minute = parts[1];
-    
+
     int shift = 0;
     if (targetTz == 'WITA') shift = 1;
     if (targetTz == 'WIT') shift = 2;
-    
+
     int targetHour = (hour + shift) % 24;
     final hourStr = targetHour.toString().padLeft(2, '0');
-    
+
     return '$hourStr:$minute $targetTz';
   }
 
@@ -80,11 +99,14 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         final filledCount = SociometryPeriodConfig.getFilledCount();
         if (filledCount > 0) {
           final totalCount = SociometryPeriodConfig.getTotalCount();
-          final phase = SociometryPeriodConfig.isAkhirActive() ? 'Akhir' : 'Awal';
+          final phase = SociometryPeriodConfig.isAkhirActive()
+              ? 'Akhir'
+              : 'Awal';
           list.add({
             'id': 'act_dyn_sosiometri',
             'title': 'Pengisian Sosiometri $phase',
-            'subtitle': 'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
+            'subtitle':
+                'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
             'timeRaw': '14:30',
             'date': _getDynamicDateStr(0),
             'dateTime': today,
@@ -98,7 +120,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         list.add({
           'id': 'act_dyn_nak',
           'title': 'Nilai Akhir Disetujui',
-          'subtitle': 'Nilai Akhir Keseluruhan (NAK) Anda telah disetujui dan divalidasi oleh Pimpinan Sespimma.',
+          'subtitle':
+              'Nilai Akhir Keseluruhan (NAK) Anda telah disetujui dan divalidasi oleh Pimpinan Sespimma.',
           'timeRaw': '10:00',
           'date': _getDynamicDateStr(0),
           'dateTime': today,
@@ -164,7 +187,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         list.add({
           'id': 'act_gadik_dyn_sosiometri',
           'title': 'Memonitor Progres Sosiometri',
-          'subtitle': 'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
+          'subtitle':
+              'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
           'timeRaw': '09:15',
           'date': _getDynamicDateStr(0),
           'dateTime': today,
@@ -177,7 +201,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         {
           'id': 'act_g001',
           'title': 'Penilaian Resume Kepemimpinan',
-          'subtitle': 'Selesai melakukan penilaian dan input skor ke portal akademik untuk 25 Siswa.',
+          'subtitle':
+              'Selesai melakukan penilaian dan input skor ke portal akademik untuk 25 Siswa.',
           'timeRaw': '15:30',
           'date': _getDynamicDateStr(0),
           'dateTime': today,
@@ -187,7 +212,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         {
           'id': 'act_g002',
           'title': 'Pemberian Reward Karakter Siswa',
-          'subtitle': 'Pemberian +0.50 poin mental kepada Siswa Budi Hartono atas prakarsa ketertiban.',
+          'subtitle':
+              'Pemberian +0.50 poin mental kepada Siswa Budi Hartono atas prakarsa ketertiban.',
           'timeRaw': '11:00',
           'date': _getDynamicDateStr(0),
           'dateTime': today,
@@ -197,7 +223,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         {
           'id': 'act_g003',
           'title': 'Mengajar Kuliah Strategi Ops',
-          'subtitle': 'Pelaksanaan modul tatap muka di Gedung C untuk Pokjar Gabungan.',
+          'subtitle':
+              'Pelaksanaan modul tatap muka di Gedung C untuk Pokjar Gabungan.',
           'timeRaw': '08:00',
           'date': _getDynamicDateStr(1),
           'dateTime': yesterday,
@@ -209,7 +236,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
       list.add({
         'id': 'act_pimpinan_dyn_nak',
         'title': 'Persetujuan NAK Gelombang I',
-        'subtitle': 'Melakukan verifikasi akhir dan pengesahan tanda tangan elektronik berkas NAK Siswa.',
+        'subtitle':
+            'Melakukan verifikasi akhir dan pengesahan tanda tangan elektronik berkas NAK Siswa.',
         'timeRaw': '16:00',
         'date': _getDynamicDateStr(0),
         'dateTime': today,
@@ -221,7 +249,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         {
           'id': 'act_p002',
           'title': 'Pemeriksaan Radar Deteksi EWS',
-          'subtitle': 'Mengaudit dasbor alarm performa siswa untuk meninjau tren disiplin rawan.',
+          'subtitle':
+              'Mengaudit dasbor alarm performa siswa untuk meninjau tren disiplin rawan.',
           'timeRaw': '13:30',
           'date': _getDynamicDateStr(0),
           'dateTime': today,
@@ -231,7 +260,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         {
           'id': 'act_p003',
           'title': 'Memimpin Rapat Kurikulum Pleno',
-          'subtitle': 'Evaluasi bulanan keselarasan materi pengajaran dengan target mutu lulusan.',
+          'subtitle':
+              'Evaluasi bulanan keselarasan materi pengajaran dengan target mutu lulusan.',
           'timeRaw': '10:00',
           'date': _getDynamicDateStr(1),
           'dateTime': yesterday,
@@ -269,7 +299,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
 
   Future<void> _pickDateRange() async {
     final now = DateTime.now();
-    final initial = _selectedDateRange ??
+    final initial =
+        _selectedDateRange ??
         DateTimeRange(
           start: DateTime(now.year, now.month, 1),
           end: DateTime(now.year, now.month, now.day),
@@ -384,9 +415,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
       builder: (context, state) {
         if (state is! AuthSuccess) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(color: _primaryNavy),
-            ),
+            body: Center(child: CircularProgressIndicator(color: _primaryNavy)),
           );
         }
 
@@ -425,7 +454,9 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
             ? dateFiltered
             : dateFiltered.where((a) {
                 if (_selectedFilter == 'Reward') return a['type'] == 'reward';
-                if (_selectedFilter == 'Punishment') return a['type'] == 'punishment';
+                if (_selectedFilter == 'Punishment') {
+                  return a['type'] == 'punishment';
+                }
                 if (_selectedFilter == 'Tugas') return a['type'] == 'task';
                 return true;
               }).toList();
@@ -440,235 +471,253 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> with Sing
         }
 
         return Scaffold(
-      backgroundColor: _lightGrey,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Riwayat Aktivitas',
-          style: TextStyle(
-            color: _primaryNavy,
-            fontWeight: FontWeight.w800,
-            fontSize: AppDimensions.fontXl,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(AppIcons.caretLeft, color: _primaryNavy),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _selectedDateRange != null
-                  ? AppIcons.calendarFill
-                  : AppIcons.calendarBlank,
-              color: _selectedDateRange != null
-                  ? Colors.teal.shade600
-                  : _primaryNavy,
-              size: AppDimensions.iconDefault + 2,
-            ),
-            tooltip: 'Filter Tanggal',
-            onPressed: _pickDateRange,
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(
-              AppIcons.funnel,
-              color: _primaryNavy,
-              size: AppDimensions.iconDefault + 2,
-            ),
-            tooltip: 'Kategori',
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-            ),
-            position: PopupMenuPosition.under,
-            onSelected: (String filter) {
-              setState(() {
-                _selectedFilter = filter;
-              });
-              _animController.forward(from: 0.0);
-            },
-            itemBuilder: (BuildContext context) {
-              return <PopupMenuEntry<String>>[
-                ..._filters.map((String filter) {
-                  final isSelected = _selectedFilter == filter;
-                  return PopupMenuItem<String>(
-                    value: filter,
-                    child: Row(
-                      children: [
-                        Text(
-                          filter,
-                          style: TextStyle(
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            color: isSelected ? _primaryNavy : Colors.black87,
-                            fontSize: AppDimensions.fontLg,
-                          ),
-                        ),
-                        if (isSelected) ...[
-                          const Spacer(),
-                          const Icon(
-                            AppIcons.checkCircleFill,
-                            size: AppDimensions.iconMd,
-                            color: _primaryNavy,
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                }),
-              ];
-            },
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(
-              AppIcons.dotsThreeVerticalBold,
-              color: _primaryNavy,
-            ),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
-            onSelected: (value) {
-              if (value == 'refresh') {
-                _animController.forward(from: 0.0);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Data berhasil diperbarui'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2)),
-                  ),
-                );
-              } else if (value == 'clear_filter') {
-                setState(() {
-                  _selectedFilter = 'Semua';
-                  _selectedDateRange = null;
-                });
-                _animController.forward(from: 0.0);
-              }
-            },
-            itemBuilder: (context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem(
-                value: 'refresh',
-                child: Text(
-                  'Refresh',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
+          backgroundColor: _lightGrey,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: true,
+            title: const Text(
+              'Riwayat Aktivitas',
+              style: TextStyle(
+                color: _primaryNavy,
+                fontWeight: FontWeight.w800,
+                fontSize: AppDimensions.fontXl,
               ),
-              if (_selectedDateRange != null || _selectedFilter != 'Semua') ...[
-                const PopupMenuDivider(),
-                const PopupMenuItem<String>(
-                  value: 'clear_filter',
-                  child: Text(
-                    'Bersihkan Semua Filter',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: Colors.redAccent,
-                    ),
-                  ),
+            ),
+            leading: IconButton(
+              icon: const Icon(AppIcons.caretLeft, color: _primaryNavy),
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  _selectedDateRange != null
+                      ? AppIcons.calendarFill
+                      : AppIcons.calendarBlank,
+                  color: _selectedDateRange != null
+                      ? Colors.teal.shade600
+                      : _primaryNavy,
+                  size: AppDimensions.iconDefault + 2,
                 ),
-              ],
-            ],
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildActiveFiltersBar(),
-          Expanded(
-            child: filteredActivities.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppDimensions.lg),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey.shade50,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            AppIcons.archive,
-                            size: AppDimensions.iconDisplay,
-                            color: Colors.blueGrey.shade300,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.lg),
-                        const Text(
-                          'Tidak Ada Riwayat',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontXxl,
-                            fontWeight: FontWeight.w800,
-                            color: _primaryNavy,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.sm),
-                        Text(
-                          'Belum ada aktivitas yang tercatat.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontLg,
-                            color: Colors.blueGrey.shade400,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
-                    itemCount: groupedActivities.length,
-                    itemBuilder: (context, index) {
-                      final dateKey = groupedActivities.keys.elementAt(index);
-                      final items = groupedActivities[dateKey]!;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(
-                                bottom: 12, top: index == 0 ? 0 : 16),
-                            child: Text(
-                              dateKey,
+                tooltip: 'Filter Tanggal',
+                onPressed: _pickDateRange,
+              ),
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  AppIcons.funnel,
+                  color: _primaryNavy,
+                  size: AppDimensions.iconDefault + 2,
+                ),
+                tooltip: 'Kategori',
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                ),
+                position: PopupMenuPosition.under,
+                onSelected: (String filter) {
+                  setState(() {
+                    _selectedFilter = filter;
+                  });
+                  _animController.forward(from: 0.0);
+                },
+                itemBuilder: (BuildContext context) {
+                  return <PopupMenuEntry<String>>[
+                    ..._filters.map((String filter) {
+                      final isSelected = _selectedFilter == filter;
+                      return PopupMenuItem<String>(
+                        value: filter,
+                        child: Row(
+                          children: [
+                            Text(
+                              filter,
                               style: TextStyle(
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? _primaryNavy
+                                    : Colors.black87,
                                 fontSize: AppDimensions.fontLg,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.blueGrey.shade700,
                               ),
                             ),
-                          ),
-                          ...items.map((item) {
-                            final itemIndex = filteredActivities.indexOf(item);
-                            final animation = CurvedAnimation(
-                              parent: _animController,
-                              curve: Interval(
-                                (itemIndex / filteredActivities.length)
-                                    .clamp(0.0, 1.0),
-                                1.0,
-                                curve: Curves.easeOutCubic,
+                            if (isSelected) ...[
+                              const Spacer(),
+                              const Icon(
+                                AppIcons.checkCircleFill,
+                                size: AppDimensions.iconMd,
+                                color: _primaryNavy,
                               ),
-                            );
-                            final formattedTime = _formatDynamicTime(item['timeRaw'], _selectedTimezone);
-                            return _AnimatedActivityTile(
-                              key: ValueKey(item['id']),
-                              title: item['title'],
-                              subtitle: item['subtitle'],
-                              time: formattedTime,
-                              points: item['points'],
-                              type: item['type'],
-                              animation: animation,
-                            );
-                          }),
-                        ],
+                            ],
+                          ],
+                        ),
                       );
-                    },
+                    }),
+                  ];
+                },
+              ),
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  AppIcons.dotsThreeVerticalBold,
+                  color: _primaryNavy,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                ),
+                onSelected: (value) {
+                  if (value == 'refresh') {
+                    _animController.forward(from: 0.0);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Data berhasil diperbarui'),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd + 2,
+                          ),
+                        ),
+                      ),
+                    );
+                  } else if (value == 'clear_filter') {
+                    setState(() {
+                      _selectedFilter = 'Semua';
+                      _selectedDateRange = null;
+                    });
+                    _animController.forward(from: 0.0);
+                  }
+                },
+                itemBuilder: (context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem(
+                    value: 'refresh',
+                    child: Text(
+                      'Refresh',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
+                  if (_selectedDateRange != null ||
+                      _selectedFilter != 'Semua') ...[
+                    const PopupMenuDivider(),
+                    const PopupMenuItem<String>(
+                      value: 'clear_filter',
+                      child: Text(
+                        'Bersihkan Semua Filter',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+          body: Column(
+            children: [
+              _buildActiveFiltersBar(),
+              Expanded(
+                child: filteredActivities.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(AppDimensions.lg),
+                              decoration: BoxDecoration(
+                                color: Colors.blueGrey.shade50,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                AppIcons.archive,
+                                size: AppDimensions.iconDisplay,
+                                color: Colors.blueGrey.shade300,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.lg),
+                            const Text(
+                              'Tidak Ada Riwayat',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontXxl,
+                                fontWeight: FontWeight.w800,
+                                color: _primaryNavy,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.sm),
+                            Text(
+                              'Belum ada aktivitas yang tercatat.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontLg,
+                                color: Colors.blueGrey.shade400,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        itemCount: groupedActivities.length,
+                        itemBuilder: (context, index) {
+                          final dateKey = groupedActivities.keys.elementAt(
+                            index,
+                          );
+                          final items = groupedActivities[dateKey]!;
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: 12,
+                                  top: index == 0 ? 0 : 16,
+                                ),
+                                child: Text(
+                                  dateKey,
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontLg,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.blueGrey.shade700,
+                                  ),
+                                ),
+                              ),
+                              ...items.map((item) {
+                                final itemIndex = filteredActivities.indexOf(
+                                  item,
+                                );
+                                final animation = CurvedAnimation(
+                                  parent: _animController,
+                                  curve: Interval(
+                                    (itemIndex / filteredActivities.length)
+                                        .clamp(0.0, 1.0),
+                                    1.0,
+                                    curve: Curves.easeOutCubic,
+                                  ),
+                                );
+                                final formattedTime = _formatDynamicTime(
+                                  item['timeRaw'],
+                                  _selectedTimezone,
+                                );
+                                return _AnimatedActivityTile(
+                                  key: ValueKey(item['id']),
+                                  title: item['title'],
+                                  subtitle: item['subtitle'],
+                                  time: formattedTime,
+                                  points: item['points'],
+                                  type: item['type'],
+                                  animation: animation,
+                                );
+                              }),
+                            ],
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
@@ -720,7 +769,10 @@ class _AnimatedActivityTile extends StatelessWidget {
     return FadeTransition(
       opacity: animation,
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.2),
+          end: Offset.zero,
+        ).animate(animation),
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
@@ -739,17 +791,22 @@ class _AnimatedActivityTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
             child: InkWell(
               borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-              onTap: (type == 'task' || points.isEmpty) ? null : () {
-                EvidenceBottomSheet.show(
-                  context,
-                  title: title,
-                  subtitle: '$subtitle - $time',
-                  points: points,
-                  type: type,
-                );
-              },
+              onTap: (type == 'task' || points.isEmpty)
+                  ? null
+                  : () {
+                      EvidenceBottomSheet.show(
+                        context,
+                        title: title,
+                        subtitle: '$subtitle - $time',
+                        points: points,
+                        type: type,
+                      );
+                    },
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Row(
                   children: [
                     Container(
@@ -758,7 +815,11 @@ class _AnimatedActivityTile extends StatelessWidget {
                         color: iconColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(iconData, color: iconColor, size: AppDimensions.iconLg),
+                      child: Icon(
+                        iconData,
+                        color: iconColor,
+                        size: AppDimensions.iconLg,
+                      ),
                     ),
                     const SizedBox(width: AppDimensions.md),
                     Expanded(

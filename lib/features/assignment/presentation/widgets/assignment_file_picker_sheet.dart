@@ -30,8 +30,7 @@ class AssignmentFilePickerSheet extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: AppDimensions.xxl),
               decoration: BoxDecoration(
                 color: Colors.grey.shade300,
-                borderRadius:
-                    BorderRadius.circular(AppDimensions.radiusLg),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               ),
             ),
             const Text(
@@ -85,16 +84,14 @@ class _ModalOption extends StatelessWidget {
         padding: const EdgeInsets.all(AppDimensions.lg),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade200),
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusXl),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(AppDimensions.md),
               decoration: BoxDecoration(
-                color: AppColors.primaryNavy
-                    .withValues(alpha: 0.05),
+                color: AppColors.primaryNavy.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -116,9 +113,7 @@ class _ModalOption extends StatelessWidget {
                       color: AppColors.primaryNavy,
                     ),
                   ),
-                  SizedBox(
-                    height: AppDimensions.xs / 2,
-                  ),
+                  SizedBox(height: AppDimensions.xs / 2),
                   Text(
                     subtitle,
                     style: TextStyle(
@@ -130,10 +125,7 @@ class _ModalOption extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              AppIcons.caretRight,
-              color: Colors.grey.shade400,
-            ),
+            Icon(AppIcons.caretRight, color: Colors.grey.shade400),
           ],
         ),
       ),

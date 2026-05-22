@@ -79,7 +79,8 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
             TextFormField(
               controller: reasonCtrl,
               maxLines: 3,
-              validator: (v) => v == null || v.trim().isEmpty ? 'Alasan wajib diisi' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Alasan wajib diisi' : null,
               decoration: InputDecoration(
                 hintText: 'Ketik alasan pengajuan izin...',
                 filled: true,
@@ -99,7 +100,13 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                       try {
                         final result = await FilePicker.pickFiles(
                           type: FileType.custom,
-                          allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'png'],
+                          allowedExtensions: [
+                            'pdf',
+                            'doc',
+                            'docx',
+                            'jpg',
+                            'png',
+                          ],
                         );
                         if (result != null) {
                           setState(() {
@@ -116,14 +123,20 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                   color: Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   border: Border.all(
-                    color: attachedFileName != null ? AppColors.successGreen : Colors.grey.shade300,
+                    color: attachedFileName != null
+                        ? AppColors.successGreen
+                        : Colors.grey.shade300,
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      attachedFileName != null ? AppIcons.filePdfFill : AppIcons.paperclip,
-                      color: attachedFileName != null ? AppColors.successGreen : Colors.blueGrey,
+                      attachedFileName != null
+                          ? AppIcons.filePdfFill
+                          : AppIcons.paperclip,
+                      color: attachedFileName != null
+                          ? AppColors.successGreen
+                          : Colors.blueGrey,
                     ),
                     const SizedBox(width: AppDimensions.lg),
                     Expanded(
@@ -131,8 +144,12 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                         attachedFileName ?? 'Lampirkan Dokumen Bukti',
                         style: TextStyle(
                           fontSize: AppDimensions.fontSm,
-                          fontWeight: attachedFileName != null ? FontWeight.w700 : FontWeight.w600,
-                          color: attachedFileName != null ? AppColors.successGreen : Colors.blueGrey,
+                          fontWeight: attachedFileName != null
+                              ? FontWeight.w700
+                              : FontWeight.w600,
+                          color: attachedFileName != null
+                              ? AppColors.successGreen
+                              : Colors.blueGrey,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -165,14 +182,19 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryNavy,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: AppDimensions.lg),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.lg,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   ),
                 ),
                 child: const Text(
                   'KIRIM PERMOHONAN',
-                  style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ),

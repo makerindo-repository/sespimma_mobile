@@ -18,8 +18,18 @@ class AssignmentDeadlineCardWidget extends StatelessWidget {
 
   static String _formatIndoDate(DateTime dt) {
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
   }

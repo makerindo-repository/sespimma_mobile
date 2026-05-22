@@ -19,7 +19,9 @@ class AttendanceFloatingInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color statusColor = isInRadius ? AppColors.successGreen : AppColors.dangerRed;
+    final Color statusColor = isInRadius
+        ? AppColors.successGreen
+        : AppColors.dangerRed;
 
     return GestureDetector(
       onTap: () {
@@ -27,7 +29,10 @@ class AttendanceFloatingInfo extends StatelessWidget {
         onTapInfo();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.lg, vertical: AppDimensions.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.lg,
+          vertical: AppDimensions.md,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
@@ -71,7 +76,9 @@ class AttendanceFloatingInfo extends StatelessWidget {
                   ),
                   const SizedBox(height: AppDimensions.xs / 2),
                   Text(
-                    isInRadius ? 'Berada di Radius Absensi' : 'Di Luar Radius Absensi',
+                    isInRadius
+                        ? 'Berada di Radius Absensi'
+                        : 'Di Luar Radius Absensi',
                     style: TextStyle(
                       fontSize: AppDimensions.fontXs - 1,
                       color: statusColor,

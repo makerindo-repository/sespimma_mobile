@@ -130,8 +130,6 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     _positionStreamSubscription =
         Geolocator.getPositionStream(locationSettings: locationSettings).listen(
           (Position pos) {
-
-
             if (pos.isMocked) {
               if (mounted) {
                 setState(() {
@@ -153,8 +151,6 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
         ),
       );
       if (mounted) {
-
-
         if (current.isMocked) {
           setState(() {
             _isInRadius = false;
@@ -172,7 +168,12 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     }
   }
 
-  void _updateFromPosition(double lat, double lng, bool isFakeGps, {List<AttendanceZone>? overrideZones}) {
+  void _updateFromPosition(
+    double lat,
+    double lng,
+    bool isFakeGps, {
+    List<AttendanceZone>? overrideZones,
+  }) {
     final zonesToUse = overrideZones ?? widget.zones;
 
     if (zonesToUse.isEmpty) {
@@ -213,7 +214,6 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
       );
     }
 
-
     bool inRadius = matchedZone != null;
 
     if (mounted) {
@@ -229,7 +229,6 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
   void _setLoadingState(bool loading) {
     if (mounted) setState(() => _isLoading = loading);
   }
-
 
   void _animateTo(LatLng target) {
     _mapController.move(target, _defaultZoom);
@@ -260,7 +259,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
 
     double minDistance = double.infinity;
     AttendanceZone? nearest;
-    
+
     for (final zone in widget.zones) {
       final d = Geolocator.distanceBetween(
         zone.latitude,
@@ -289,22 +288,35 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
           children: [
             const Text(
               '🛰️ AUDIT LOCATION DEBUG',
-              style: TextStyle(color: Colors.white, fontSize: AppDimensions.fontSm, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: AppDimensions.fontSm,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const Divider(color: Colors.white24, height: 8),
             Text(
               'User: ${_userLatLng!.latitude.toStringAsFixed(6)}, ${_userLatLng!.longitude.toStringAsFixed(6)}',
-              style: const TextStyle(color: Colors.white70, fontSize: AppDimensions.fontSm, fontFamily: 'monospace'),
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: AppDimensions.fontSm,
+                fontFamily: 'monospace',
+              ),
             ),
             if (nearest != null) ...[
               Text(
                 'Zone: ${nearest.name}',
-                style: const TextStyle(color: Colors.white70, fontSize: AppDimensions.fontSm),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: AppDimensions.fontSm,
+                ),
               ),
               Text(
                 'Dist: ${minDistance.toStringAsFixed(2)}m / Radius: ${nearest.radiusMeters}m',
                 style: TextStyle(
-                  color: minDistance <= nearest.radiusMeters ? Colors.greenAccent : Colors.orangeAccent,
+                  color: minDistance <= nearest.radiusMeters
+                      ? Colors.greenAccent
+                      : Colors.orangeAccent,
                   fontSize: AppDimensions.fontSm + 1,
                   fontWeight: FontWeight.bold,
                 ),
@@ -460,9 +472,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
 
   Widget _buildReloadFab() {
     return Positioned(
-      bottom:
-          MediaQuery.of(context).size.height * 0.25 +
-          120,
+      bottom: MediaQuery.of(context).size.height * 0.25 + 120,
       right: 16,
       child: Material(
         color: Colors.white,
@@ -483,15 +493,18 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
                     final latestZones = AttendanceZones.activeZones;
                     if (_userLatLng != null) {
                       _updateFromPosition(
-                        _userLatLng!.latitude, 
-                        _userLatLng!.longitude, 
+                        _userLatLng!.latitude,
+                        _userLatLng!.longitude,
                         false,
                         overrideZones: latestZones,
                       );
                     }
 
                     if (latestZones.isNotEmpty) {
-                      final firstZone = LatLng(latestZones.first.latitude, latestZones.first.longitude);
+                      final firstZone = LatLng(
+                        latestZones.first.latitude,
+                        latestZones.first.longitude,
+                      );
                       _animateTo(firstZone);
                     }
                   }
@@ -520,8 +533,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
 
   Widget _buildLayerFab() {
     return Positioned(
-      bottom:
-          MediaQuery.of(context).size.height * 0.25 + 60,
+      bottom: MediaQuery.of(context).size.height * 0.25 + 60,
       right: 16,
       child: Material(
         color: Colors.white,
@@ -658,7 +670,6 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
       ),
     );
   }
-
 
   Widget _buildCenterFab() {
     return Positioned(

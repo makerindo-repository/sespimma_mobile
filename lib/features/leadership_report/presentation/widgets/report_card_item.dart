@@ -78,7 +78,9 @@ class _ReportCardItemState extends State<ReportCardItem> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         border: Border.all(
-          color: isFailed ? _dangerRed.withValues(alpha: 0.3) : Colors.grey.shade100,
+          color: isFailed
+              ? _dangerRed.withValues(alpha: 0.3)
+              : Colors.grey.shade100,
           width: isFailed ? 1.5 : 1.0,
         ),
         boxShadow: [
@@ -108,7 +110,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
-                      child: Icon(AppIcons.userFill, color: _primaryNavy, size: AppDimensions.iconDefault),
+                      child: Icon(
+                        AppIcons.userFill,
+                        color: _primaryNavy,
+                        size: AppDimensions.iconDefault,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.md),
@@ -138,16 +144,25 @@ class _ReportCardItemState extends State<ReportCardItem> {
                   ),
                   const SizedBox(width: AppDimensions.md - 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: isFailed ? _dangerRed.withValues(alpha: 0.1) : _successGreen.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
+                      color: isFailed
+                          ? _dangerRed.withValues(alpha: 0.1)
+                          : _successGreen.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd + 2,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isFailed ? AppIcons.warningCircleFill : AppIcons.checkCircleFill,
+                          isFailed
+                              ? AppIcons.warningCircleFill
+                              : AppIcons.checkCircleFill,
                           color: isFailed ? _dangerRed : _successGreen,
                           size: AppDimensions.fontLg,
                         ),
@@ -192,7 +207,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
                 children: [
                   Row(
                     children: [
-                      const Icon(AppIcons.chartPieFill, size: AppDimensions.iconSm, color: _primaryNavy),
+                      const Icon(
+                        AppIcons.chartPieFill,
+                        size: AppDimensions.iconSm,
+                        color: _primaryNavy,
+                      ),
                       const SizedBox(width: AppDimensions.sm),
                       Text(
                         'RINCIAN KOMPETENSI',
@@ -206,7 +225,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
                     ],
                   ),
                   const SizedBox(height: AppDimensions.xl),
-                  _buildRincianHeader('AKADEMIK (70%)', AppIcons.bookOpenFill, Colors.indigo),
+                  _buildRincianHeader(
+                    'AKADEMIK (70%)',
+                    AppIcons.bookOpenFill,
+                    Colors.indigo,
+                  ),
                   _buildSubRow('Ujian MP', acUjian, '30%'),
                   _buildSubRow('NKKP', acNKKP, '5%'),
                   _buildSubRow('NPKP', acNPKP, '5%'),
@@ -218,7 +241,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
                   _buildSubRow('Menulis', acMenulis, '30%'),
                   _buildSubRow('Paparan', acPaparan, '30%'),
                   const SizedBox(height: AppDimensions.md),
-                  _buildRincianHeader('MENTAL (20%)', AppIcons.brainFill, Colors.amber.shade800),
+                  _buildRincianHeader(
+                    'MENTAL (20%)',
+                    AppIcons.brainFill,
+                    Colors.amber.shade800,
+                  ),
                   _buildSubRow('Moral', meMoral, '20%'),
                   _buildSubRow('Disiplin', meDisiplin, '15%'),
                   _buildSubRow('Kepemimpinan', meKepemimpinan, '20%'),
@@ -227,7 +254,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
                   _buildSubRow('Sosiometri Awal', meSosioAwal, '30%'),
                   _buildSubRow('Sosiometri Akhir', meSosioAkhir, '30%'),
                   const SizedBox(height: AppDimensions.md),
-                  _buildRincianHeader('JASMANI (10%)', AppIcons.barbellFill, Colors.teal),
+                  _buildRincianHeader(
+                    'JASMANI (10%)',
+                    AppIcons.barbellFill,
+                    Colors.teal,
+                  ),
                   _buildSubRow('Kes Awal', phKesAwal, 'Kes'),
                   _buildSubRow('Kes Akhir', phKesAkhir, 'Kes'),
                   _buildSubRow('Status Kes', phKesStatus, 'Kes'),
@@ -239,18 +270,26 @@ class _ReportCardItemState extends State<ReportCardItem> {
                 ],
               ),
             ),
-            crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 300),
           ),
           InkWell(
             onTap: () => setState(() => _isExpanded = !_isExpanded),
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(20),
+            ),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
               decoration: BoxDecoration(
-                color: isFailed ? _dangerRed.withValues(alpha: 0.05) : predicateColor.withValues(alpha: 0.05),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+                color: isFailed
+                    ? _dangerRed.withValues(alpha: 0.05)
+                    : predicateColor.withValues(alpha: 0.05),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(20),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,7 +308,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
                     children: [
                       const Text(
                         'NAK: ',
-                        style: TextStyle(fontSize: AppDimensions.fontMd, fontWeight: FontWeight.w700, color: Colors.blueGrey),
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontMd,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.blueGrey,
+                        ),
                       ),
                       Text(
                         data.average.toStringAsFixed(2),
@@ -281,7 +324,9 @@ class _ReportCardItemState extends State<ReportCardItem> {
                       ),
                       const SizedBox(width: AppDimensions.sm),
                       Icon(
-                        _isExpanded ? AppIcons.caretUpFill : AppIcons.caretDownFill,
+                        _isExpanded
+                            ? AppIcons.caretUpFill
+                            : AppIcons.caretDownFill,
                         size: AppDimensions.iconSm,
                         color: Colors.blueGrey.shade400,
                       ),

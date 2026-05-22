@@ -18,14 +18,11 @@ void main() {
   group('GetAttendances', () {
     test('mengembalikan daftar attendance dari repository', () async {
       final expected = [
-        AttendanceEntity(
-          id: '1',
-          date: DateTime(2026, 5, 21),
-          status: 'hadir',
-        ),
+        AttendanceEntity(id: '1', date: DateTime(2026, 5, 21), status: 'hadir'),
       ];
-      when(() => mockRepository.getAttendances())
-          .thenAnswer((_) async => expected);
+      when(
+        () => mockRepository.getAttendances(),
+      ).thenAnswer((_) async => expected);
 
       final usecase = GetAttendances(mockRepository);
       final result = await usecase(const NoParams());
@@ -35,8 +32,7 @@ void main() {
     });
 
     test('mengembalikan daftar kosong jika tidak ada data', () async {
-      when(() => mockRepository.getAttendances())
-          .thenAnswer((_) async => []);
+      when(() => mockRepository.getAttendances()).thenAnswer((_) async => []);
 
       final usecase = GetAttendances(mockRepository);
       final result = await usecase(const NoParams());
@@ -53,8 +49,9 @@ void main() {
         status: 'hadir',
         location: 'Kampus SESPIMMA',
       );
-      when(() => mockRepository.submitAttendance(entity))
-          .thenAnswer((_) async {});
+      when(
+        () => mockRepository.submitAttendance(entity),
+      ).thenAnswer((_) async {});
 
       final usecase = SubmitAttendance(mockRepository);
       await usecase(entity);

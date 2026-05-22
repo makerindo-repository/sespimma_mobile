@@ -141,8 +141,7 @@ class AssessmentActionSheet extends StatelessWidget {
         ActionTileWidget(
           icon: Icons.local_hospital_rounded,
           title: 'Catat Rawat Inap & Sanksi',
-          subtitle:
-              'Pencatatan status C: sanksi 2 poin per hari rawat inap',
+          subtitle: 'Pencatatan status C: sanksi 2 poin per hari rawat inap',
           color: Colors.orange.shade700,
           onTap: onInputMedis,
         ),

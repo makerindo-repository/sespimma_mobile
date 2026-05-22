@@ -1,7 +1,17 @@
+import sys
+import subprocess
+
+def ensure_package():
+    try:
+        import qrcode
+    except ImportError:
+        print("Installing required package 'qrcode[pil]'...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "qrcode[pil]"])
+
+ensure_package()
 import qrcode
 import json
 import os
-
 def generate_attendance_qr(zone_id, activity_name):
     data = {
         "type": "attendance_sespimma",

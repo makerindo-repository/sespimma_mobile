@@ -31,8 +31,7 @@ class AssignmentAttachmentSection extends StatelessWidget {
           padding: const EdgeInsets.all(AppDimensions.lg),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius:
-                BorderRadius.circular(AppDimensions.radiusLg),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
@@ -45,8 +44,7 @@ class AssignmentAttachmentSection extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.all(AppDimensions.md - 2),
+                padding: const EdgeInsets.all(AppDimensions.md - 2),
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   shape: BoxShape.circle,

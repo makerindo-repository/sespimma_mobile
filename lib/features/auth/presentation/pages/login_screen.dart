@@ -288,9 +288,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ).copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible
-                            ? AppIcons.eyeSlash
-                            : AppIcons.eye,
+                        _isPasswordVisible ? AppIcons.eyeSlash : AppIcons.eye,
                         color: Colors.grey.shade500,
                         size: AppDimensions.iconDefault + 2,
                       ),
@@ -320,7 +318,9 @@ class _LoginScreenState extends State<LoginScreen>
                             });
                           },
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusXs,
+                            ),
                           ),
                           side: BorderSide(color: Colors.grey.shade400),
                           activeColor: _primaryNavy,
@@ -375,7 +375,9 @@ class _LoginScreenState extends State<LoginScreen>
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                     ),
                     elevation: 0,
                   ),
@@ -455,8 +457,15 @@ class _LoginScreenState extends State<LoginScreen>
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontLg),
-      prefixIcon: Icon(icon, color: Colors.blueGrey.shade400, size: AppDimensions.iconDefault + 2),
+      hintStyle: TextStyle(
+        color: Colors.blueGrey.shade300,
+        fontSize: AppDimensions.fontLg,
+      ),
+      prefixIcon: Icon(
+        icon,
+        color: Colors.blueGrey.shade400,
+        size: AppDimensions.iconDefault + 2,
+      ),
       filled: true,
       fillColor: const Color(0xFFFAFAFA),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),

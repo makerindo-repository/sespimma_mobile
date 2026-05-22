@@ -104,9 +104,7 @@ class AssignmentSubmittedSectionWidget extends StatelessWidget {
               AppIcons.downloadSimple,
               color: AppColors.primaryNavy,
             ),
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.background,
-            ),
+            style: IconButton.styleFrom(backgroundColor: AppColors.background),
             tooltip: 'Unduh Berkas',
           ),
         ],
@@ -277,8 +275,7 @@ class AssignmentSubmittedSectionWidget extends StatelessWidget {
         ),
         const SizedBox(height: AppDimensions.md - 2),
         Text(
-          assignment.catatan ??
-              'Tidak ada catatan tambahan dari pengajar.',
+          assignment.catatan ?? 'Tidak ada catatan tambahan dari pengajar.',
           style: const TextStyle(
             fontSize: AppDimensions.fontDefault,
             fontWeight: FontWeight.w500,

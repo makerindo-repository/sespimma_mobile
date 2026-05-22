@@ -25,8 +25,9 @@ void main() {
           status: 'aktif',
         ),
       ];
-      when(() => mockRepository.getAssignments())
-          .thenAnswer((_) async => expected);
+      when(
+        () => mockRepository.getAssignments(),
+      ).thenAnswer((_) async => expected);
 
       final usecase = GetAssignments(mockRepository);
       final result = await usecase(const NoParams());
@@ -46,8 +47,9 @@ void main() {
         status: 'aktif',
         score: 85.0,
       );
-      when(() => mockRepository.getAssignmentDetail('1'))
-          .thenAnswer((_) async => expected);
+      when(
+        () => mockRepository.getAssignmentDetail('1'),
+      ).thenAnswer((_) async => expected);
 
       final usecase = GetAssignmentDetail(mockRepository);
       final result = await usecase('1');

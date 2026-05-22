@@ -25,7 +25,8 @@ class AttendanceStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isAlpha = activeZone != null && DateTime.now().isAfter(activeZone!.cutoffTime);
+    final bool isAlpha =
+        activeZone != null && DateTime.now().isAfter(activeZone!.cutoffTime);
 
     final label = _getLabel(isAlpha);
     final chipColor = _getChipColor(isAlpha);
@@ -39,7 +40,10 @@ class AttendanceStatusChip extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 350),
             curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl, vertical: AppDimensions.md),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.xl,
+              vertical: AppDimensions.md,
+            ),
             decoration: BoxDecoration(
               color: chipColor.withValues(alpha: 0.85),
               borderRadius: BorderRadius.circular(AppDimensions.radiusXxl + 8),
@@ -71,7 +75,9 @@ class AttendanceStatusChip extends StatelessWidget {
                   Icon(
                     isFakeGps || isAlpha
                         ? AppIcons.warningOctagonFill
-                        : (isInRadius ? AppIcons.checkCircleFill : AppIcons.warningCircleFill),
+                        : (isInRadius
+                              ? AppIcons.checkCircleFill
+                              : AppIcons.warningCircleFill),
                     color: Colors.white,
                     size: AppDimensions.iconSm - 2,
                   ),

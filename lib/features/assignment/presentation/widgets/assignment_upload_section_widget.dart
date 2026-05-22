@@ -51,9 +51,7 @@ class AssignmentUploadSectionWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.dangerRed.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-        border: Border.all(
-          color: AppColors.dangerRed.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.dangerRed.withValues(alpha: 0.2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

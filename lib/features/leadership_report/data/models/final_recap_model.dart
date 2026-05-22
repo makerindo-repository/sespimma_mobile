@@ -51,7 +51,8 @@ class FinalRecapModel {
       tanggalLahir: json['tanggal_lahir'] as String? ?? '1985-01-01',
       jenisKelamin: json['jenis_kelamin'] as String? ?? 'Laki-laki',
       sanksiKesehatan: json['sanksi_kesehatan'] as int? ?? 0,
-      rawScores: (json['raw_scores'] as Map<String, dynamic>?)?.map(
+      rawScores:
+          (json['raw_scores'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, (e as num).toDouble()),
           ) ??
           {},

@@ -118,10 +118,7 @@ class _SamaptaCalculatorDialogState extends State<SamaptaCalculatorDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(
-            'Batal',
-            style: TextStyle(color: Colors.grey.shade600),
-          ),
+          child: Text('Batal', style: TextStyle(color: Colors.grey.shade600)),
         ),
         ElevatedButton(
           onPressed: () {

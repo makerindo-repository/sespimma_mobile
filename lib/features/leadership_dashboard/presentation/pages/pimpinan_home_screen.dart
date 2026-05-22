@@ -213,7 +213,8 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
             child: CircleAvatar(
               radius: 28,
               backgroundColor: _lightGrey,
-              backgroundImage: (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
+              backgroundImage:
+                  (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
                   ? FileImage(File(user.profilePhoto!)) as ImageProvider
                   : const AssetImage('assets/images/default_avatar.png'),
             ),
@@ -295,7 +296,10 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
           backgroundColor: _dangerRed,
           label: Text(
             count,
-            style: const TextStyle(fontSize: AppDimensions.fontSm, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: AppDimensions.fontSm,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           child: Container(
             padding: const EdgeInsets.all(AppDimensions.sm + 2),
@@ -303,7 +307,11 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
               color: Colors.white.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Colors.white, size: AppDimensions.iconDefault + 2),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: AppDimensions.iconDefault + 2,
+            ),
           ),
         ),
       ),
@@ -476,11 +484,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      AppIcons.trendUpFill,
-                      size: 10,
-                      color: _successGreen,
-                    ),
+                    Icon(AppIcons.trendUpFill, size: 10, color: _successGreen),
                     const SizedBox(width: AppDimensions.xs),
                     const Text(
                       'Stabil',
@@ -607,7 +611,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
     } else if (label.contains('20')) {
       multiplier = 0.2;
     }
-    
+
     return '(Kontribusi: ${(double.parse(value) * multiplier).toStringAsFixed(1)})';
   }
 
@@ -778,11 +782,13 @@ class _DonutChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DonutChartPainter oldDelegate) {
-    if (oldDelegate.values.length != values.length || oldDelegate.colors.length != colors.length) {
+    if (oldDelegate.values.length != values.length ||
+        oldDelegate.colors.length != colors.length) {
       return true;
     }
     for (int i = 0; i < values.length; i++) {
-      if (oldDelegate.values[i] != values[i] || oldDelegate.colors[i] != colors[i]) {
+      if (oldDelegate.values[i] != values[i] ||
+          oldDelegate.colors[i] != colors[i]) {
         return true;
       }
     }

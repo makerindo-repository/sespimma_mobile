@@ -14,7 +14,8 @@ class CreateTaskScreen extends StatefulWidget {
   State<CreateTaskScreen> createState() => _CreateTaskScreenState();
 }
 
-class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerProviderStateMixin {
+class _CreateTaskScreenState extends State<CreateTaskScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _judulController = TextEditingController();
   final _deskripsiController = TextEditingController();
@@ -166,7 +167,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
       if (_selectedSubject == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Silahkan pilih mata pelajaran terlebih dahulu'),
+            content: const Text(
+              'Silahkan pilih mata pelajaran terlebih dahulu',
+            ),
             backgroundColor: Colors.red.shade700,
             behavior: SnackBarBehavior.floating,
           ),
@@ -184,7 +187,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
         );
         return;
       }
-      
+
       if (_selectedDeadline == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -199,7 +202,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
       final authState = context.read<AuthBloc>().state;
       String currentNrp = '';
       String currentName = 'Pengajar';
-      
+
       if (authState is AuthSuccess) {
         currentNrp = authState.user.nrp;
         currentName = authState.user.name;
@@ -278,7 +281,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
               child: FadeTransition(
                 opacity: _formAnimation,
                 child: SlideTransition(
-                  position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(_formAnimation),
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.1),
+                    end: Offset.zero,
+                  ).animate(_formAnimation),
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(AppDimensions.xxl),
                     child: Form(
@@ -286,8 +292,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
-
                           const Text(
                             'Informasi Tugas',
                             style: TextStyle(
@@ -336,7 +340,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
             FadeTransition(
               opacity: _buttonAnimation,
               child: SlideTransition(
-                position: Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(_buttonAnimation),
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.5),
+                  end: Offset.zero,
+                ).animate(_buttonAnimation),
                 child: _buildBottomActionButton(),
               ),
             ),
@@ -345,8 +352,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
       ),
     );
   }
-
-
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -395,7 +400,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
                 fontSize: AppDimensions.fontLg,
               ),
               prefixIcon: maxLines == 1
-                  ? Icon(icon, color: Colors.blueGrey.shade400, size: AppDimensions.iconDefault)
+                  ? Icon(
+                      icon,
+                      color: Colors.blueGrey.shade400,
+                      size: AppDimensions.iconDefault,
+                    )
                   : Padding(
                       padding: const EdgeInsets.only(bottom: 80),
                       child: Icon(
@@ -491,7 +500,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
             ),
             hint: Text(
               'Pilih mata pelajaran',
-              style: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontLg),
+              style: TextStyle(
+                color: Colors.blueGrey.shade300,
+                fontSize: AppDimensions.fontLg,
+              ),
             ),
             items: _subjectList.map((String value) {
               return DropdownMenuItem<String>(
@@ -575,7 +587,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
             ),
             hint: Text(
               'Pilih kelompok belajar sasaran',
-              style: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontLg),
+              style: TextStyle(
+                color: Colors.blueGrey.shade300,
+                fontSize: AppDimensions.fontLg,
+              ),
             ),
             items: _pokjarList.map((String value) {
               return DropdownMenuItem<String>(
@@ -643,7 +658,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
               borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
               onTap: _selectDeadline,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 child: Row(
                   children: [
                     Icon(
@@ -711,7 +729,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> with SingleTickerPr
               ),
               elevation: 2,
             ),
-            icon: const Icon(Icons.send_rounded, size: AppDimensions.iconDefault),
+            icon: const Icon(
+              Icons.send_rounded,
+              size: AppDimensions.iconDefault,
+            ),
             label: const Text(
               'PUBLIKASIKAN TUGAS',
               style: TextStyle(

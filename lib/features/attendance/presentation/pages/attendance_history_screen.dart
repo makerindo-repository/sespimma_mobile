@@ -16,8 +16,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -44,7 +42,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
 
   Future<void> _pickDateRange() async {
     final now = DateTime.now();
-    final initial = _selectedDateRange ??
+    final initial =
+        _selectedDateRange ??
         DateTimeRange(
           start: DateTime(now.year, now.month, 1),
           end: DateTime(now.year, now.month, now.day),
@@ -115,7 +114,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
                   side: BorderSide(
-                      color: AppColors.primaryNavy.withValues(alpha: 0.12)),
+                    color: AppColors.primaryNavy.withValues(alpha: 0.12),
+                  ),
                 ),
               ),
             ),
@@ -212,10 +212,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
           ),
         ),
         leading: IconButton(
-          icon: const Icon(
-            AppIcons.caretLeft,
-            color: AppColors.primaryNavy,
-          ),
+          icon: const Icon(AppIcons.caretLeft, color: AppColors.primaryNavy),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -289,8 +286,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
               AppIcons.dotsThreeVerticalBold,
               color: AppColors.primaryNavy,
             ),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+            ),
             onSelected: (value) {
               if (value == 'refresh') {
                 _animController.forward(from: 0.0);
@@ -299,7 +297,10 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                     content: const Text('Data berhasil diperbarui'),
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2)),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd + 2,
+                      ),
+                    ),
                   ),
                 );
               } else if (value == 'clear_filter') {
@@ -382,7 +383,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 : ListView.builder(
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     itemCount: groupedActivities.length,
                     itemBuilder: (context, index) {
                       final dateKey = groupedActivities.keys.elementAt(index);
@@ -410,8 +413,10 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                             final animation = CurvedAnimation(
                               parent: _animController,
                               curve: Interval(
-                                (itemIndex / filteredActivities.length)
-                                    .clamp(0.0, 1.0),
+                                (itemIndex / filteredActivities.length).clamp(
+                                  0.0,
+                                  1.0,
+                                ),
                                 1.0,
                                 curve: Curves.easeOutCubic,
                               ),
@@ -423,7 +428,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                               status: item['status'],
                               type: item['type'],
                               animation: animation,
-                              onTap: () => _showAttendanceDetails(context, item),
+                              onTap: () =>
+                                  _showAttendanceDetails(context, item),
                             );
                           }),
                         ],
@@ -464,7 +470,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 height: 5,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
+                  borderRadius: BorderRadius.circular(
+                    AppDimensions.radiusMd + 2,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimensions.lg),
@@ -501,7 +509,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                           ),
                         )
                       : Icon(
-                          !isHadir ? AppIcons.xCircleFill : AppIcons.userFocusFill,
+                          !isHadir
+                              ? AppIcons.xCircleFill
+                              : AppIcons.userFocusFill,
                           size: 44,
                           color: iconColor,
                         ),
@@ -518,7 +528,10 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
               ),
               const SizedBox(height: AppDimensions.sm),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
@@ -561,7 +574,8 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                     : AppIcons.shieldWarningFill,
                 'Status Validasi',
                 item['verification'] ?? 'Sedang Diproses',
-                valueColor: item['verification'] == 'Valid' ||
+                valueColor:
+                    item['verification'] == 'Valid' ||
                         item['verification'].toString().contains('Valid')
                     ? const Color(0xFF2E7D32)
                     : const Color(0xFFD32F2F),
@@ -588,13 +602,18 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                     backgroundColor: const Color(0xFF001C40),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
                     ),
                     elevation: 0,
                   ),
                   child: const Text(
                     'TUTUP DETAIL',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: AppDimensions.fontLg),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: AppDimensions.fontLg,
+                    ),
                   ),
                 ),
               ),
@@ -620,7 +639,11 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
             color: const Color(0xFF001C40).withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
           ),
-          child: Icon(icon, size: AppDimensions.iconMd, color: const Color(0xFF001C40)),
+          child: Icon(
+            icon,
+            size: AppDimensions.iconMd,
+            color: const Color(0xFF001C40),
+          ),
         ),
         const SizedBox(width: AppDimensions.md + 2),
         Expanded(
@@ -682,9 +705,7 @@ class _AnimatedAttendanceTile extends StatelessWidget {
 
     final IconData iconData = isHadir
         ? AppIcons.checkCircleFill
-        : (isIzin
-              ? AppIcons.warningCircleFill
-              : AppIcons.xCircleFill);
+        : (isIzin ? AppIcons.warningCircleFill : AppIcons.xCircleFill);
 
     return FadeTransition(
       opacity: animation,
@@ -725,7 +746,11 @@ class _AnimatedAttendanceTile extends StatelessWidget {
                         color: iconColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(iconData, color: iconColor, size: AppDimensions.iconLg),
+                      child: Icon(
+                        iconData,
+                        color: iconColor,
+                        size: AppDimensions.iconLg,
+                      ),
                     ),
                     const SizedBox(width: AppDimensions.md),
                     Expanded(
@@ -761,7 +786,9 @@ class _AnimatedAttendanceTile extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: iconColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusXl,
+                          ),
                         ),
                         child: Text(
                           status,

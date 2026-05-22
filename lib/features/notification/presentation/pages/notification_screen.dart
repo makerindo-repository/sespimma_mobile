@@ -332,7 +332,7 @@ class _NotificationScreenState extends State<NotificationScreen>
           }
           groupedNotifs[date]!.add(notif);
         }
-        
+
         if (state is AuthInitial ||
             (state is AuthSuccess && !_isDataPopulated)) {
           return const Scaffold(
@@ -356,10 +356,7 @@ class _NotificationScreenState extends State<NotificationScreen>
               ),
             ),
             leading: IconButton(
-              icon: const Icon(
-                AppIcons.caretLeft,
-                color: _primaryNavy,
-              ),
+              icon: const Icon(AppIcons.caretLeft, color: _primaryNavy),
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
@@ -491,7 +488,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                               margin: const EdgeInsets.only(bottom: 12),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFD32F2F),
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusLg,
+                                ),
                               ),
                               child: const Icon(
                                 AppIcons.trashFill,
@@ -518,7 +517,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                                   ),
                                   behavior: SnackBarBehavior.floating,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusMd,
+                                    ),
                                   ),
                                   duration: const Duration(seconds: 2),
                                 ),
@@ -540,7 +541,8 @@ class _NotificationScreenState extends State<NotificationScreen>
 
                                 final String type = notif['type'] as String;
                                 final String title = notif['title'] as String;
-                                if ((type == 'reward' || type == 'punishment') &&
+                                if ((type == 'reward' ||
+                                        type == 'punishment') &&
                                     (title.startsWith('Reward:') ||
                                         title.startsWith('Punishment:'))) {
                                   String pts = type == 'reward'

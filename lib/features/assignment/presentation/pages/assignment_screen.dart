@@ -61,17 +61,20 @@ class _AssignmentScreenState extends State<AssignmentScreen>
       ),
     ];
 
-    final dynamicTasks = PimpinanMockData.sharedTasks.map((t) {
-      return AssignmentModel(
-        id: t.id,
-        judul: t.judul,
-        mapel: t.mapel,
-        pengajar: t.createdByName,
-        deadline: t.deadline,
-        status: t.status.toLowerCase() == 'aktif' ? 'aktif' : 'selesai',
-        deskripsi: t.deskripsi,
-      );
-    }).where((dt) => !base.any((b) => b.id == dt.id)).toList();
+    final dynamicTasks = PimpinanMockData.sharedTasks
+        .map((t) {
+          return AssignmentModel(
+            id: t.id,
+            judul: t.judul,
+            mapel: t.mapel,
+            pengajar: t.createdByName,
+            deadline: t.deadline,
+            status: t.status.toLowerCase() == 'aktif' ? 'aktif' : 'selesai',
+            deskripsi: t.deskripsi,
+          );
+        })
+        .where((dt) => !base.any((b) => b.id == dt.id))
+        .toList();
 
     return [...dynamicTasks, ...base];
   }
@@ -118,7 +121,9 @@ class _AssignmentScreenState extends State<AssignmentScreen>
         });
       },
       offset: const Offset(0, 56),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+      ),
       itemBuilder: (context) {
         return _allSubjects.map((subject) {
           final bool isSelected = subject == _selectedSubject;
@@ -150,7 +155,9 @@ class _AssignmentScreenState extends State<AssignmentScreen>
         height: 48,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: isFiltered ? _primaryNavy.withValues(alpha: 0.05) : Colors.grey.shade50,
+          color: isFiltered
+              ? _primaryNavy.withValues(alpha: 0.05)
+              : Colors.grey.shade50,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
           border: Border.all(
             color: isFiltered ? _primaryNavy : Colors.grey.shade200,
@@ -196,8 +203,11 @@ class _AssignmentScreenState extends State<AssignmentScreen>
   @override
   Widget build(BuildContext context) {
     final query = _searchQuery.trim().toLowerCase();
-    final List<AssignmentModel> searchedAssignments = _mockAssignments.where((t) {
-      if (_selectedSubject != 'Semua Mapel / Rumpun' && t.mapel != _selectedSubject) {
+    final List<AssignmentModel> searchedAssignments = _mockAssignments.where((
+      t,
+    ) {
+      if (_selectedSubject != 'Semua Mapel / Rumpun' &&
+          t.mapel != _selectedSubject) {
         return false;
       }
       if (query.isEmpty) return true;
@@ -268,16 +278,25 @@ class _AssignmentScreenState extends State<AssignmentScreen>
                       fillColor: Colors.grey.shade50,
                       contentPadding: const EdgeInsets.symmetric(vertical: 14),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                         borderSide: BorderSide(color: Colors.grey.shade200),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                         borderSide: BorderSide(color: Colors.grey.shade200),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                        borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
+                        borderSide: const BorderSide(
+                          color: _primaryNavy,
+                          width: 1.5,
+                        ),
                       ),
                     ),
                     style: const TextStyle(
@@ -305,7 +324,9 @@ class _AssignmentScreenState extends State<AssignmentScreen>
                 controller: _tabController,
                 indicator: BoxDecoration(
                   color: _primaryNavy,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
+                  borderRadius: BorderRadius.circular(
+                    AppDimensions.radiusMd + 2,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: _primaryNavy.withValues(alpha: 0.2),

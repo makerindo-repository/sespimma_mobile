@@ -41,7 +41,7 @@ class UserEntity extends Equatable {
 
   String get displayUmur {
     if (umur != null && umur!.trim().isNotEmpty) return umur!;
-    
+
     if (tanggalLahir != null) {
       try {
         final birthDate = DateTime.parse(tanggalLahir!);
@@ -93,7 +93,9 @@ class UserEntity extends Equatable {
       tanggalLahir: tanggalLahir ?? this.tanggalLahir,
       umur: umur ?? this.umur,
       isNakApproved: isNakApproved ?? this.isNakApproved,
-      profilePhoto: clearProfilePhoto ? null : (profilePhoto ?? this.profilePhoto),
+      profilePhoto: clearProfilePhoto
+          ? null
+          : (profilePhoto ?? this.profilePhoto),
       nilaiAkademik: nilaiAkademik ?? this.nilaiAkademik,
       nilaiMental: nilaiMental ?? this.nilaiMental,
       nilaiJasmani: nilaiJasmani ?? this.nilaiJasmani,
@@ -102,22 +104,22 @@ class UserEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        userId,
-        name,
-        roleId,
-        pokjar,
-        nrp,
-        pangkat,
-        angkatan,
-        agama,
-        jenisKelamin,
-        jabatan,
-        tanggalLahir,
-        umur,
-        isNakApproved,
-        profilePhoto,
-        nilaiAkademik,
-        nilaiMental,
-        nilaiJasmani,
-      ];
+    userId,
+    name,
+    roleId,
+    pokjar,
+    nrp,
+    pangkat,
+    angkatan,
+    agama,
+    jenisKelamin,
+    jabatan,
+    tanggalLahir,
+    umur,
+    isNakApproved,
+    profilePhoto,
+    nilaiAkademik,
+    nilaiMental,
+    nilaiJasmani,
+  ];
 }

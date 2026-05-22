@@ -74,7 +74,9 @@ class ScoreSummaryCard extends StatelessWidget {
             color: isSelected
                 ? scoreColor.withValues(alpha: 0.15)
                 : Colors.black.withValues(alpha: 0.03),
-            blurRadius: isSelected ? AppDimensions.radiusXl : AppDimensions.radiusLg,
+            blurRadius: isSelected
+                ? AppDimensions.radiusXl
+                : AppDimensions.radiusLg,
             offset: isSelected ? const Offset(0, 6) : const Offset(0, 4),
           ),
         ],

@@ -25,14 +25,21 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
   void initState() {
     super.initState();
     _animController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 600));
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeIn));
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeIn));
     _animController.forward();
   }
 
   @override
-  void dispose() { _animController.dispose(); super.dispose(); }
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
 
   String _stdName(AssignmentModel a, String n) {
     const nrp = '202602003097';
@@ -40,7 +47,9 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
     String c(String t) => t
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .replaceAll(RegExp(r'\s+'), ' ')
-        .trim().replaceAll(' ', '_').toUpperCase();
+        .trim()
+        .replaceAll(' ', '_')
+        .toUpperCase();
     return '${nrp}_${c(a.judul)}_${c(a.mapel)}_${c(a.pengajar)}.$ext';
   }
 
@@ -49,10 +58,13 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
     backgroundColor: AppColors.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppDimensions.radiusRound))),
+        top: Radius.circular(AppDimensions.radiusRound),
+      ),
+    ),
     builder: (_) => AssignmentFilePickerSheet(
       onPickImage: () => _pickImage(a),
-      onPickDocument: () => _pickDocument(a)),
+      onPickDocument: () => _pickDocument(a),
+    ),
   );
 
   Future<void> _pickImage(AssignmentModel a) async {
@@ -60,28 +72,38 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
     final img = await ImagePicker().pickImage(source: ImageSource.camera);
     if (img == null) return;
     await HapticFeedback.mediumImpact();
-    setState(() { _isFileAttached = true; _fileName = _stdName(a, img.name); });
+    setState(() {
+      _isFileAttached = true;
+      _fileName = _stdName(a, img.name);
+    });
   }
+
   Future<void> _pickDocument(AssignmentModel a) async {
     Navigator.pop(context);
     final r = await FilePicker.pickFiles(type: FileType.any);
     if (r == null) return;
     await HapticFeedback.mediumImpact();
     setState(() {
-      _isFileAttached = true; _fileName = _stdName(a, r.files.single.name);
+      _isFileAttached = true;
+      _fileName = _stdName(a, r.files.single.name);
     });
   }
 
   Future<void> _removeFile() async {
     await HapticFeedback.lightImpact();
-    setState(() { _isFileAttached = false; _fileName = ''; });
+    setState(() {
+      _isFileAttached = false;
+      _fileName = '';
+    });
   }
+
   Future<void> _submitTask() async {
     await HapticFeedback.heavyImpact();
     if (!mounted) return;
     AssignmentSnackbars.showSuccess(context, 'Tugas berhasil dikumpulkan');
     Navigator.pop(context);
   }
+
   Future<void> _downloadFile(String name) async {
     await HapticFeedback.lightImpact();
     try {
@@ -92,7 +114,8 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
       await HapticFeedback.mediumImpact();
       if (!mounted) return;
       AssignmentSnackbars.showSuccess(
-        context, 'Berkas $name berhasil disimpan di: $dir',
+        context,
+        'Berkas $name berhasil disimpan di: $dir',
       );
     } catch (e) {
       if (!mounted) return;
@@ -105,7 +128,10 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (_) => AssignmentSubmitConfirmationSheet(
-      isExpired: isExpired, fileName: _fileName, onConfirm: _submitTask),
+      isExpired: isExpired,
+      fileName: _fileName,
+      onConfirm: _submitTask,
+    ),
   );
 
   @override

@@ -22,7 +22,8 @@ class AttendanceScreen extends StatefulWidget {
   State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
 
-class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerProviderStateMixin {
+class _AttendanceScreenState extends State<AttendanceScreen>
+    with SingleTickerProviderStateMixin {
   bool _isInRadius = false;
   bool _isGpsLoading = true;
   bool _isSubmitting = false;
@@ -44,7 +45,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
       duration: const Duration(milliseconds: 500),
       value: 1.0,
     );
-    _chipScale = CurvedAnimation(parent: _chipController, curve: Curves.elasticOut);
+    _chipScale = CurvedAnimation(
+      parent: _chipController,
+      curve: Curves.elasticOut,
+    );
   }
 
   @override
@@ -53,13 +57,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
     super.dispose();
   }
 
-  void _onLocationDetected(AttendanceZone? activeZone, double distance, bool isFakeGps) {
+  void _onLocationDetected(
+    AttendanceZone? activeZone,
+    double distance,
+    bool isFakeGps,
+  ) {
     final inRadius = activeZone != null;
     final changed = inRadius != _isInRadius;
 
     if (isFakeGps && !_isFakeGps) {
       HapticFeedback.heavyImpact();
-      _showSnackBar('Terdeteksi Manipulasi Lokasi (Fake GPS). Absensi diblokir!', AppColors.dangerRed, AppIcons.warningOctagonFill);
+      _showSnackBar(
+        'Terdeteksi Manipulasi Lokasi (Fake GPS). Absensi diblokir!',
+        AppColors.dangerRed,
+        AppIcons.warningOctagonFill,
+      );
     } else if (changed && !_isGpsLoading && !isFakeGps) {
       HapticFeedback.mediumImpact();
     }
@@ -82,12 +94,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
       SnackBar(
         content: Row(
           children: [
-            const Icon(AppIcons.warningCircleFill, color: Colors.white, size: AppDimensions.iconSm),
+            const Icon(
+              AppIcons.warningCircleFill,
+              color: Colors.white,
+              size: AppDimensions.iconSm,
+            ),
             const SizedBox(width: AppDimensions.md),
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: AppDimensions.fontXs + 1),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: AppDimensions.fontXs + 1,
+                ),
               ),
             ),
           ],
@@ -95,12 +114,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
         action: SnackBarAction(
           label: 'PENGATURAN',
           textColor: Colors.yellowAccent,
-          onPressed: () => isPermissionError ? Geolocator.openAppSettings() : Geolocator.openLocationSettings(),
+          onPressed: () => isPermissionError
+              ? Geolocator.openAppSettings()
+              : Geolocator.openLocationSettings(),
         ),
         backgroundColor: AppColors.dangerRed.withValues(alpha: 0.95),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4)),
-        margin: const EdgeInsets.fromLTRB(AppDimensions.lg, 0, AppDimensions.lg, AppDimensions.xxl),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4),
+        ),
+        margin: const EdgeInsets.fromLTRB(
+          AppDimensions.lg,
+          0,
+          AppDimensions.lg,
+          AppDimensions.xxl,
+        ),
         duration: const Duration(seconds: 6),
       ),
     );
@@ -110,41 +138,69 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
     HapticFeedback.mediumImpact();
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
-      MaterialPageRoute(builder: (context) => const AttendanceQrScannerScreen()),
+      MaterialPageRoute(
+        builder: (context) => const AttendanceQrScannerScreen(),
+      ),
     );
 
     if (result != null && mounted) {
       final String scannedZoneId = result['zoneId'];
-      final matchedZone = _zones.where((z) => z.id == scannedZoneId).firstOrNull;
-      
+      final matchedZone = _zones
+          .where((z) => z.id == scannedZoneId)
+          .firstOrNull;
+
       if (matchedZone != null) {
-        _showSnackBar('QR Code Valid: ${matchedZone.activityName}. Mengirim presensi...', AppColors.successGreen, AppIcons.checkCircleFill);
+        _showSnackBar(
+          'QR Code Valid: ${matchedZone.activityName}. Mengirim presensi...',
+          AppColors.successGreen,
+          AppIcons.checkCircleFill,
+        );
         setState(() => _activeZone = matchedZone);
         _submitAttendance(fromQr: true);
       } else {
-        _showSnackBar('Kegiatan tidak ditemukan atau tidak aktif saat ini.', AppColors.dangerRed, AppIcons.warningOctagonFill);
+        _showSnackBar(
+          'Kegiatan tidak ditemukan atau tidak aktif saat ini.',
+          AppColors.dangerRed,
+          AppIcons.warningOctagonFill,
+        );
       }
     }
   }
 
   Future<void> _submitAttendance({bool fromQr = false}) async {
-    if (_isSubmitting || (!fromQr && !_isInRadius) || _isFakeGps || _isAttended) return;
-
-    if (_isAttended) {
-      _showSnackBar('Anda sudah melakukan presensi untuk sesi ini.', AppColors.warningOrange, AppIcons.infoFill);
+    if (_isSubmitting ||
+        (!fromQr && !_isInRadius) ||
+        _isFakeGps ||
+        _isAttended) {
       return;
     }
 
-    final bool isAlpha = _activeZone != null && DateTime.now().isAfter(_activeZone!.cutoffTime);
+    if (_isAttended) {
+      _showSnackBar(
+        'Anda sudah melakukan presensi untuk sesi ini.',
+        AppColors.warningOrange,
+        AppIcons.infoFill,
+      );
+      return;
+    }
+
+    final bool isAlpha =
+        _activeZone != null && DateTime.now().isAfter(_activeZone!.cutoffTime);
     if (isAlpha) {
       HapticFeedback.vibrate();
-      _showErrorDialog('Absensi Ditutup', 'Waktu toleransi kehadiran untuk sesi ini telah sepenuhnya berakhir. Status Anda otomatis tercatat sebagai ALPHA.');
+      _showErrorDialog(
+        'Absensi Ditutup',
+        'Waktu toleransi kehadiran untuk sesi ini telah sepenuhnya berakhir. Status Anda otomatis tercatat sebagai ALPHA.',
+      );
       return;
     }
 
     if (_lastSubmitTime != null) {
       HapticFeedback.vibrate();
-      _showErrorDialog('Absensi Ditolak', 'Sistem mendeteksi Anda telah berhasil melakukan presensi pada sesi kegiatan ini.');
+      _showErrorDialog(
+        'Absensi Ditolak',
+        'Sistem mendeteksi Anda telah berhasil melakukan presensi pada sesi kegiatan ini.',
+      );
       return;
     }
 
@@ -155,7 +211,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
 
     if (!mounted) return;
     HapticFeedback.heavyImpact();
-    
+
     setState(() {
       _isSubmitting = false;
       _lastSubmitTime = DateTime.now();
@@ -164,7 +220,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
     });
 
     final now = DateTime.now();
-    final timeStr = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} WIB";
+    final timeStr =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} WIB";
     PimpinanMockData.serdikAttendanceHistory.insert(0, {
       'id': 'att_${now.millisecondsSinceEpoch}',
       'title': _activeZone?.activityName ?? 'Kegiatan Presensi',
@@ -181,12 +238,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
     });
 
     final activityName = _activeZone?.activityName ?? 'Kegiatan Presensi';
-    final bool isLate = _activeZone != null && now.isAfter(_activeZone!.deadline);
+    final bool isLate =
+        _activeZone != null && now.isAfter(_activeZone!.deadline);
 
     if (isLate) {
-      _showSnackBar('Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.', AppColors.warningOrange, AppIcons.clockClockwiseFill);
+      _showSnackBar(
+        'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.',
+        AppColors.warningOrange,
+        AppIcons.clockClockwiseFill,
+      );
     } else {
-      _showSnackBar('Berhasil absen di jam $timeStr untuk kegiatan $activityName.', AppColors.successGreen, AppIcons.checkCircleFill);
+      _showSnackBar(
+        'Berhasil absen di jam $timeStr untuk kegiatan $activityName.',
+        AppColors.successGreen,
+        AppIcons.checkCircleFill,
+      );
     }
   }
 
@@ -194,19 +260,36 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        ),
         title: Row(
           children: [
             const Icon(AppIcons.warningOctagonFill, color: AppColors.dangerRed),
             const SizedBox(width: AppDimensions.md),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: AppDimensions.fontLg)),
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: AppDimensions.fontLg,
+              ),
+            ),
           ],
         ),
-        content: Text(content, style: const TextStyle(fontWeight: FontWeight.w500)),
+        content: Text(
+          content,
+          style: const TextStyle(fontWeight: FontWeight.w500),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('MENGERTI', style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.primaryNavy)),
+            child: const Text(
+              'MENGERTI',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryNavy,
+              ),
+            ),
           ),
         ],
       ),
@@ -221,14 +304,27 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
             Icon(icon, color: Colors.white, size: AppDimensions.iconSm),
             const SizedBox(width: AppDimensions.md),
             Expanded(
-              child: Text(message, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: AppDimensions.fontSm)),
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: AppDimensions.fontSm,
+                ),
+              ),
             ),
           ],
         ),
         backgroundColor: color.withValues(alpha: 0.95),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4)),
-        margin: const EdgeInsets.fromLTRB(AppDimensions.lg, 0, AppDimensions.lg, AppDimensions.xxl),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4),
+        ),
+        margin: const EdgeInsets.fromLTRB(
+          AppDimensions.lg,
+          0,
+          AppDimensions.lg,
+          AppDimensions.xxl,
+        ),
         elevation: 8,
         duration: const Duration(seconds: 4),
       ),
@@ -241,15 +337,24 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
     if (zoneToShow == null || _isGpsLoading) {
       showModalBottomSheet(
         context: context,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXxl))),
-        builder: (sheetCtx) => EmptyZoneSheet(onToggleMakerindo: _onToggleMakerindo),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppDimensions.radiusXxl),
+          ),
+        ),
+        builder: (sheetCtx) =>
+            EmptyZoneSheet(onToggleMakerindo: _onToggleMakerindo),
       );
       return;
     }
 
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXxl))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusXxl),
+        ),
+      ),
       builder: (sheetCtx) => ZoneInfoSheet(
         zone: zoneToShow,
         onLeaveRequest: () {
@@ -260,7 +365,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
       ),
     );
   }
-  
+
   void _onToggleMakerindo(bool val) {
     Navigator.pop(context);
     setState(() {
@@ -295,10 +400,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXxl))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusXxl),
+        ),
+      ),
       builder: (ctx) => LeaveFormSheet(
         onSuccess: () {
-          _showSnackBar('Permohonan Izin Berhasil Diajukan ke Pimpinan.', AppColors.successGreen, AppIcons.checkCircleFill);
+          _showSnackBar(
+            'Permohonan Izin Berhasil Diajukan ke Pimpinan.',
+            AppColors.successGreen,
+            AppIcons.checkCircleFill,
+          );
         },
       ),
     );
@@ -314,13 +427,21 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
         centerTitle: true,
         title: const Text(
           'Zona Apel',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: AppDimensions.fontLg, letterSpacing: 0.5),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w800,
+            fontSize: AppDimensions.fontLg,
+            letterSpacing: 0.5,
+          ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           if (_zones.isNotEmpty)
             IconButton(
-              icon: const Icon(AppIcons.infoBold, size: AppDimensions.iconSm + 2),
+              icon: const Icon(
+                AppIcons.infoBold,
+                size: AppDimensions.iconSm + 2,
+              ),
               tooltip: 'Info Zona',
               splashRadius: AppDimensions.radiusXxl,
               onPressed: () {
@@ -339,13 +460,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
               onGpsError: _onGpsError,
               onReload: () {
                 setState(() => _zones = AttendanceZones.activeZones);
-                _showSnackBar('Daftar Radius dan Geofence berhasil diperbarui!', AppColors.successGreen, AppIcons.checkCircleFill);
+                _showSnackBar(
+                  'Daftar Radius dan Geofence berhasil diperbarui!',
+                  AppColors.successGreen,
+                  AppIcons.checkCircleFill,
+                );
               },
               onRadiusTap: (tappedZone) => _showZoneInfo(context, tappedZone),
             ),
           ),
           Positioned(
-            top: AppDimensions.lg, left: 0, right: 0,
+            top: AppDimensions.lg,
+            left: 0,
+            right: 0,
             child: Center(
               child: AttendanceStatusChip(
                 zones: _zones,
@@ -358,13 +485,23 @@ class _AttendanceScreenState extends State<AttendanceScreen> with SingleTickerPr
             ),
           ),
           Positioned(
-            bottom: AppDimensions.xxxl, left: AppDimensions.lg, right: AppDimensions.lg,
+            bottom: AppDimensions.xxxl,
+            left: AppDimensions.lg,
+            right: AppDimensions.lg,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: (_activeZone != null && !_isGpsLoading && _isInRadius && !_isFakeGps)
-                      ? AttendanceFloatingInfo(activeZone: _activeZone!, isInRadius: _isInRadius, onTapInfo: () => _showZoneInfo(context))
+                  child:
+                      (_activeZone != null &&
+                          !_isGpsLoading &&
+                          _isInRadius &&
+                          !_isFakeGps)
+                      ? AttendanceFloatingInfo(
+                          activeZone: _activeZone!,
+                          isInRadius: _isInRadius,
+                          onTapInfo: () => _showZoneInfo(context),
+                        )
                       : const SizedBox.shrink(),
                 ),
                 const SizedBox(width: AppDimensions.lg),

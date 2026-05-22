@@ -16,7 +16,8 @@ class AverageStatsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double avgScore = 0;
     if (data.isNotEmpty) {
-      avgScore = data.map((e) => e.average).reduce((a, b) => a + b) / data.length;
+      avgScore =
+          data.map((e) => e.average).reduce((a, b) => a + b) / data.length;
     }
 
     String getPredicateText(double score) {
@@ -51,7 +52,11 @@ class AverageStatsCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(AppIcons.chartLineUpFill, size: AppDimensions.iconSm, color: _primaryNavy),
+                      const Icon(
+                        AppIcons.chartLineUpFill,
+                        size: AppDimensions.iconSm,
+                        color: _primaryNavy,
+                      ),
                       const SizedBox(width: AppDimensions.radiusSm),
                       Text(
                         'Rata-Rata Nilai',
@@ -75,14 +80,23 @@ class AverageStatsCard extends StatelessWidget {
                 ],
               ),
             ),
-            VerticalDivider(color: Colors.grey.shade200, thickness: 1, indent: 8, endIndent: 8),
+            VerticalDivider(
+              color: Colors.grey.shade200,
+              thickness: 1,
+              indent: 8,
+              endIndent: 8,
+            ),
             Expanded(
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(AppIcons.medalFill, size: AppDimensions.iconSm, color: _successGreen),
+                      const Icon(
+                        AppIcons.medalFill,
+                        size: AppDimensions.iconSm,
+                        color: _successGreen,
+                      ),
                       const SizedBox(width: AppDimensions.radiusSm),
                       Text(
                         'Predikat',

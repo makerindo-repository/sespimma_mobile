@@ -91,12 +91,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
             children: [
               Icon(AppIcons.warningCircleFill, color: Colors.white),
               SizedBox(width: AppDimensions.md - 4),
-              Expanded(child: Text('Mohon lengkapi kriteria keamanan password baru Anda.')),
+              Expanded(
+                child: Text(
+                  'Mohon lengkapi kriteria keamanan password baru Anda.',
+                ),
+              ),
             ],
           ),
           backgroundColor: Colors.red.shade700,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+          ),
           margin: const EdgeInsets.all(AppDimensions.lg),
         ),
       );
@@ -105,7 +111,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
 
     if (_formKey.currentState!.validate()) {
       HapticFeedback.heavyImpact();
-      
+
       context.read<AuthBloc>().add(
         ChangePasswordRequested(
           oldPassword: _oldPassController.text,
@@ -119,7 +125,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
             children: [
               Icon(AppIcons.checkCircleFill, color: Colors.white),
               SizedBox(width: AppDimensions.md - 4),
-              Expanded(child: Text('Password berhasil diperbarui!', style: TextStyle(fontWeight: FontWeight.w600))),
+              Expanded(
+                child: Text(
+                  'Password berhasil diperbarui!',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
             ],
           ),
           backgroundColor: Colors.green.shade700,
@@ -156,7 +167,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
               ),
               backgroundColor: Colors.red.shade700,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              ),
               margin: const EdgeInsets.all(AppDimensions.lg),
             ),
           );
@@ -175,7 +188,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                   backgroundColor: _lightGrey,
                   elevation: 0,
                   leading: IconButton(
-                    icon: const Icon(AppIcons.caretLeft, size: AppDimensions.iconXl),
+                    icon: const Icon(
+                      AppIcons.caretLeft,
+                      size: AppDimensions.iconXl,
+                    ),
                     color: _primaryNavy,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -202,7 +218,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(AppDimensions.xl - 4),
+                              padding: const EdgeInsets.all(
+                                AppDimensions.xl - 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: _primaryNavy.withValues(alpha: 0.05),
                                 shape: BoxShape.circle,
@@ -238,7 +256,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                               opacity: _fadeAnimation,
                               child: SlideTransition(
                                 position: _slideAnimation,
-                                child: _buildFormCard(isAuthenticated, isLoading),
+                                child: _buildFormCard(
+                                  isAuthenticated,
+                                  isLoading,
+                                ),
                               ),
                             ),
                           ],
@@ -300,9 +321,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                     ).copyWith(
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isOldPassVisible
-                              ? AppIcons.eyeSlash
-                              : AppIcons.eye,
+                          _isOldPassVisible ? AppIcons.eyeSlash : AppIcons.eye,
                           color: Colors.grey.shade500,
                           size: AppDimensions.iconDefault + 2,
                         ),
@@ -334,9 +353,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
                   ).copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPassVisible
-                            ? AppIcons.eyeSlash
-                            : AppIcons.eye,
+                        _isPassVisible ? AppIcons.eyeSlash : AppIcons.eye,
                         color: Colors.grey.shade500,
                         size: AppDimensions.iconDefault + 2,
                       ),
@@ -393,7 +410,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
             ),
             const SizedBox(height: AppDimensions.xl),
             ElevatedButton(
-              onPressed: isLoading ? null : () => _submitNewPassword(isAuthenticated),
+              onPressed: isLoading
+                  ? null
+                  : () => _submitNewPassword(isAuthenticated),
               style: ElevatedButton.styleFrom(
                 backgroundColor: _primaryNavy,
                 foregroundColor: Colors.white,
@@ -488,8 +507,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontLg),
-      prefixIcon: Icon(icon, color: Colors.blueGrey.shade400, size: AppDimensions.iconDefault + 2),
+      hintStyle: TextStyle(
+        color: Colors.blueGrey.shade300,
+        fontSize: AppDimensions.fontLg,
+      ),
+      prefixIcon: Icon(
+        icon,
+        color: Colors.blueGrey.shade400,
+        size: AppDimensions.iconDefault + 2,
+      ),
       filled: true,
       fillColor: const Color(0xFFFAFAFA),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),

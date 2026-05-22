@@ -11,7 +11,14 @@ import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/p
 class NumericInputDialogSheet extends StatefulWidget {
   final Map<String, String> serdik;
   final String currentRole;
-  final Function(double, String, Map<String, String>, List<Map<String, dynamic>>, TextEditingController) onSaveScore;
+  final Function(
+    double,
+    String,
+    Map<String, String>,
+    List<Map<String, dynamic>>,
+    TextEditingController,
+  )
+  onSaveScore;
 
   const NumericInputDialogSheet({
     super.key,
@@ -90,18 +97,25 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
       final int ctrlIndex = subCategories[i]['index'] as int;
       if (cat == 'Mental Kepribadian') {
         if (ctrlIndex == 5) {
-          _inputControllers[ctrlIndex].text =
-              serdik['sosiometriAwal'] ?? '0.0';
+          _inputControllers[ctrlIndex].text = serdik['sosiometriAwal'] ?? '0.0';
         } else if (ctrlIndex == 6) {
           _inputControllers[ctrlIndex].text =
               serdik['sosiometriAkhir'] ?? '0.0';
         } else {
-          _inputControllers[ctrlIndex].text =
-              _getDefaultValue(cat, ctrlIndex, serdik, currentRole);
+          _inputControllers[ctrlIndex].text = _getDefaultValue(
+            cat,
+            ctrlIndex,
+            serdik,
+            currentRole,
+          );
         }
       } else {
-        _inputControllers[ctrlIndex].text =
-            _getDefaultValue(cat, ctrlIndex, serdik, currentRole);
+        _inputControllers[ctrlIndex].text = _getDefaultValue(
+          cat,
+          ctrlIndex,
+          serdik,
+          currentRole,
+        );
       }
     }
   }
@@ -172,9 +186,11 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
       widget.currentRole,
     );
 
-    final availableCategories = ['Akademik', 'Mental Kepribadian', 'Jasmani']
-        .where((cat) => _isCategoryAllowed(cat, widget.currentRole))
-        .toList();
+    final availableCategories = [
+      'Akademik',
+      'Mental Kepribadian',
+      'Jasmani',
+    ].where((cat) => _isCategoryAllowed(cat, widget.currentRole)).toList();
 
     return Padding(
       padding: EdgeInsets.only(
@@ -203,16 +219,14 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
                   const SizedBox(height: AppDimensions.xxl),
                   _buildSheetHeader(widget.serdik),
                   const SizedBox(height: AppDimensions.lg),
-                  _buildCategoryDropdown(
-                    localCategory,
-                    availableCategories,
-                    (val) {
-                      setState(() {
-                        _setupCategory(val);
-                        _calculateAverage();
-                      });
-                    },
-                  ),
+                  _buildCategoryDropdown(localCategory, availableCategories, (
+                    val,
+                  ) {
+                    setState(() {
+                      _setupCategory(val);
+                      _calculateAverage();
+                    });
+                  }),
                   _buildTahapDropdown(
                     localTahap,
                     tahapOptions,
@@ -229,8 +243,7 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
                       scrollController,
                     ),
                   ),
-                  if (averageScore > 90.0)
-                    _buildJustificationSection(),
+                  if (averageScore > 90.0) _buildJustificationSection(),
                   _buildFooter(),
                 ],
               ),
@@ -384,8 +397,9 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
       itemBuilder: (context, index) {
         final sub = items[index];
         final ctrlIndex = sub['index'] as int;
-        final bool isSociometri =
-            sub['tahap'].toString().contains('Sosiometri');
+        final bool isSociometri = sub['tahap'].toString().contains(
+          'Sosiometri',
+        );
         final bool isSamapta = sub['tahap'] == 'Samapta';
         final bool isReadOnly = isSociometri || isSamapta;
 
@@ -449,18 +463,14 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
       controller: _inputControllers[ctrlIndex],
       readOnly: isReadOnly,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[\d.]')),
-      ],
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d.]'))],
       onChanged: (value) {
         if (value.isNotEmpty) {
           final double? val = double.tryParse(value);
           if (val != null && val > 100) {
             _inputControllers[ctrlIndex].text = '100';
             _inputControllers[ctrlIndex].selection = TextSelection.fromPosition(
-              TextPosition(
-                offset: _inputControllers[ctrlIndex].text.length,
-              ),
+              TextPosition(offset: _inputControllers[ctrlIndex].text.length),
             );
           }
         }
@@ -519,10 +529,7 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
     );
   }
 
-  Widget _buildCalcButton(
-    int ctrlIndex,
-    String exerciseName,
-  ) {
+  Widget _buildCalcButton(int ctrlIndex, String exerciseName) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.blueGrey.shade50,
@@ -544,10 +551,7 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
             ),
           );
         },
-        icon: const Icon(
-          Icons.calculate_rounded,
-          color: AppColors.primaryNavy,
-        ),
+        icon: const Icon(Icons.calculate_rounded, color: AppColors.primaryNavy),
         tooltip: 'Kalkulator Konversi',
       ),
     );
@@ -615,8 +619,9 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade50,
-                      borderRadius:
-                          BorderRadius.circular(AppDimensions.radiusFull),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusFull,
+                      ),
                       border: Border.all(color: Colors.red.shade200),
                     ),
                     child: Text(

@@ -25,7 +25,8 @@ class AttendanceActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isAlpha = activeZone != null && DateTime.now().isAfter(activeZone!.cutoffTime);
+    final bool isAlpha =
+        activeZone != null && DateTime.now().isAfter(activeZone!.cutoffTime);
     final bool canSubmit = isInRadius && !isAlpha && !isAttended;
 
     return Column(

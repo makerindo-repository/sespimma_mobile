@@ -80,8 +80,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   }
 
   void _showImagePickerOptions(UserEntity? user) {
-    final bool hasPhoto = _selectedImage != null || (user?.profilePhoto != null);
-    
+    final bool hasPhoto =
+        _selectedImage != null || (user?.profilePhoto != null);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -152,7 +153,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           color: (color ?? _primaryNavy).withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: color ?? _primaryNavy, size: AppDimensions.iconLg),
+        child: Icon(
+          icon,
+          color: color ?? _primaryNavy,
+          size: AppDimensions.iconLg,
+        ),
       ),
       title: Text(
         title,
@@ -162,10 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           fontSize: AppDimensions.fontLg + 1,
         ),
       ),
-      trailing: Icon(
-        AppIcons.caretRight,
-        color: Colors.grey.shade400,
-      ),
+      trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
       onTap: () {
         HapticFeedback.lightImpact();
         onTap();
@@ -175,7 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
   void _saveChanges() {
     HapticFeedback.heavyImpact();
-    
+
     context.read<AuthBloc>().add(
       UpdateProfilePhotoRequested(_selectedImage?.path),
     );
@@ -192,13 +194,18 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             const SizedBox(width: AppDimensions.md - 4),
             const Text(
               'Profil berhasil diperbarui',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: AppDimensions.fontLg),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: AppDimensions.fontLg,
+              ),
             ),
           ],
         ),
         backgroundColor: Colors.green.shade700,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        ),
         margin: const EdgeInsets.all(AppDimensions.lg),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         elevation: 10,
@@ -212,7 +219,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final user = state is AuthSuccess ? state.user : null;
-        
+
         if (user != null && !_isInitialized) {
           if (user.profilePhoto != null && user.profilePhoto!.isNotEmpty) {
             _selectedImage = File(user.profilePhoto!);
@@ -418,10 +425,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           _buildInfoRow('Nama Lengkap', user.name),
           if (_isValidValue(user.nrp)) ...[
             const SizedBox(height: AppDimensions.md),
-            _buildInfoRow(
-              'NRP',
-              user.nrp,
-            ),
+            _buildInfoRow('NRP', user.nrp),
           ],
           if (_isValidValue(user.pangkat)) ...[
             const SizedBox(height: AppDimensions.md),

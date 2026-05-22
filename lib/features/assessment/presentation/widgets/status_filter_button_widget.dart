@@ -42,8 +42,9 @@ class StatusFilterButtonWidget extends StatelessWidget {
       child: PopupMenuButton<String>(
         icon: Icon(
           Icons.filter_list_rounded,
-          color:
-              hasActiveFilter ? AppColors.primaryNavy : Colors.blueGrey.shade600,
+          color: hasActiveFilter
+              ? AppColors.primaryNavy
+              : Colors.blueGrey.shade600,
           size: AppDimensions.iconDefault,
         ),
         tooltip: 'Filter Status Penilaian',
@@ -62,9 +63,12 @@ class StatusFilterButtonWidget extends StatelessWidget {
                   Text(
                     filter,
                     style: TextStyle(
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? AppColors.primaryNavy : Colors.black87,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? AppColors.primaryNavy
+                          : Colors.black87,
                       fontSize: AppDimensions.fontDefault,
                     ),
                   ),

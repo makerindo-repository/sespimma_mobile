@@ -16,8 +16,9 @@ class AssignmentBottomActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color bgColor =
-        isExpired ? AppColors.dangerRed : AppColors.primaryNavy;
+    final Color bgColor = isExpired
+        ? AppColors.dangerRed
+        : AppColors.primaryNavy;
     return Container(
       padding: const EdgeInsets.all(AppDimensions.xxl),
       decoration: BoxDecoration(
@@ -26,10 +27,7 @@ class AssignmentBottomActionButton extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
             blurRadius: AppDimensions.xl,
-            offset: const Offset(
-              0,
-              -AppDimensions.bottomSheetHandle,
-            ),
+            offset: const Offset(0, -AppDimensions.bottomSheetHandle),
           ),
         ],
       ),
@@ -45,17 +43,12 @@ class AssignmentBottomActionButton extends StatelessWidget {
               disabledBackgroundColor: Colors.grey.shade200,
               disabledForegroundColor: Colors.grey.shade400,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  AppDimensions.radiusXl,
-                ),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
               ),
-              elevation:
-                  isFileAttached ? AppDimensions.elevationMd : 0,
+              elevation: isFileAttached ? AppDimensions.elevationMd : 0,
             ),
             child: Text(
-              isExpired
-                  ? 'KIRIM TERLAMBAT'
-                  : 'SELESAIKAN TUGAS',
+              isExpired ? 'KIRIM TERLAMBAT' : 'SELESAIKAN TUGAS',
               style: const TextStyle(
                 fontSize: AppDimensions.fontXl - 1,
                 fontWeight: FontWeight.w800,

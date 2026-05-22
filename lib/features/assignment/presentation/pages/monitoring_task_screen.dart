@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
-
 class MonitoringTaskScreen extends StatefulWidget {
   const MonitoringTaskScreen({super.key});
 
@@ -12,7 +11,8 @@ class MonitoringTaskScreen extends StatefulWidget {
   State<MonitoringTaskScreen> createState() => _MonitoringTaskScreenState();
 }
 
-class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with SingleTickerProviderStateMixin {
+class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
+    with SingleTickerProviderStateMixin {
   String _selectedFilter = 'Semua';
   String _selectedPokjar = 'Semua';
   String _searchQuery = '';
@@ -53,7 +53,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
   }
 
   void _showGradeDialog(Map<String, dynamic> submission) {
-    final scoreCtrl = TextEditingController(text: submission['score'] != null ? submission['score'].toString() : '');
+    final scoreCtrl = TextEditingController(
+      text: submission['score'] != null ? submission['score'].toString() : '',
+    );
     final noteCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
@@ -142,42 +144,72 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.visibility_rounded, color: _primaryNavy, size: AppDimensions.iconDefault),
+                            icon: const Icon(
+                              Icons.visibility_rounded,
+                              color: _primaryNavy,
+                              size: AppDimensions.iconDefault,
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onPressed: () {
-                              final filename = submission['file'] ?? 'document.pdf';
+                              final filename =
+                                  submission['file'] ?? 'document.pdf';
                               showDialog(
                                 context: context,
                                 builder: (ctx) => Dialog(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
-                                  insetPadding: const EdgeInsets.all(AppDimensions.xl - 4),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusLg,
+                                    ),
+                                  ),
+                                  insetPadding: const EdgeInsets.all(
+                                    AppDimensions.xl - 4,
+                                  ),
                                   clipBehavior: Clip.antiAlias,
                                   child: Container(
                                     width: double.infinity,
-                                    height: MediaQuery.of(context).size.height * 0.6,
+                                    height:
+                                        MediaQuery.of(context).size.height *
+                                        0.6,
                                     color: Colors.grey.shade100,
                                     child: Column(
                                       children: [
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 12,
+                                          ),
                                           color: _primaryNavy,
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Expanded(
                                                 child: Text(
                                                   'Pratinjau: $filename',
-                                                  style: const TextStyle(color: Colors.white, fontSize: AppDimensions.fontDefault, fontWeight: FontWeight.w700),
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: AppDimensions
+                                                        .fontDefault,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
                                                   maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                icon: const Icon(Icons.close_rounded, color: Colors.white, size: AppDimensions.iconDefault),
-                                                onPressed: () => Navigator.pop(ctx),
+                                                constraints:
+                                                    const BoxConstraints(),
+                                                icon: const Icon(
+                                                  Icons.close_rounded,
+                                                  color: Colors.white,
+                                                  size:
+                                                      AppDimensions.iconDefault,
+                                                ),
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx),
                                               ),
                                             ],
                                           ),
@@ -187,12 +219,26 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                const Icon(Icons.description_rounded, size: AppDimensions.iconDisplay, color: Colors.blueGrey),
-                                                const SizedBox(height: AppDimensions.md),
+                                                const Icon(
+                                                  Icons.description_rounded,
+                                                  size:
+                                                      AppDimensions.iconDisplay,
+                                                  color: Colors.blueGrey,
+                                                ),
+                                                const SizedBox(
+                                                  height: AppDimensions.md,
+                                                ),
                                                 Text(
                                                   'Simulasi Pratinjau Dokumen\n($filename)',
                                                   textAlign: TextAlign.center,
-                                                  style: TextStyle(color: Colors.blueGrey.shade600, fontSize: AppDimensions.fontLg, fontWeight: FontWeight.w600),
+                                                  style: TextStyle(
+                                                    color: Colors
+                                                        .blueGrey
+                                                        .shade600,
+                                                    fontSize:
+                                                        AppDimensions.fontLg,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -207,43 +253,99 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                           ),
                           const SizedBox(width: AppDimensions.sm),
                           IconButton(
-                            icon: const Icon(Icons.file_download_outlined, color: _primaryNavy, size: AppDimensions.iconDefault),
+                            icon: const Icon(
+                              Icons.file_download_outlined,
+                              color: _primaryNavy,
+                              size: AppDimensions.iconDefault,
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onPressed: () async {
-                              final filename = submission['file'] ?? 'document.pdf';
+                              final filename =
+                                  submission['file'] ?? 'document.pdf';
                               final scaffoldMsg = ScaffoldMessenger.of(context);
                               final navigator = Navigator.of(context);
 
-                              final String? selectedFolder = await showDialog<String>(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  surfaceTintColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
-                                  title: const Text('Pilih Lokasi Penyimpanan', style: TextStyle(fontSize: AppDimensions.fontXl, fontWeight: FontWeight.w700, color: _primaryNavy)),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ListTile(
-                                        leading: const Icon(Icons.folder_shared, color: _primaryNavy),
-                                        title: const Text('Internal Storage / SESPIMMA', style: TextStyle(fontSize: AppDimensions.fontLg, fontWeight: FontWeight.w600, color: _primaryNavy)),
-                                        onTap: () => Navigator.pop(ctx, '/storage/emulated/0/SESPIMMA'),
+                              final String? selectedFolder =
+                                  await showDialog<String>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      backgroundColor: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          AppDimensions.radiusLg,
+                                        ),
                                       ),
-                                      ListTile(
-                                        leading: const Icon(Icons.download_rounded, color: _primaryNavy),
-                                        title: const Text('Internal Storage / Download', style: TextStyle(fontSize: AppDimensions.fontLg, fontWeight: FontWeight.w600, color: _primaryNavy)),
-                                        onTap: () => Navigator.pop(ctx, '/storage/emulated/0/Download'),
+                                      title: const Text(
+                                        'Pilih Lokasi Penyimpanan',
+                                        style: TextStyle(
+                                          fontSize: AppDimensions.fontXl,
+                                          fontWeight: FontWeight.w700,
+                                          color: _primaryNavy,
+                                        ),
                                       ),
-                                      ListTile(
-                                        leading: const Icon(Icons.sd_storage_rounded, color: _primaryNavy),
-                                        title: const Text('SD Card / Documents', style: TextStyle(fontSize: AppDimensions.fontLg, fontWeight: FontWeight.w600, color: _primaryNavy)),
-                                        onTap: () => Navigator.pop(ctx, '/storage/extSdCard/Documents'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ListTile(
+                                            leading: const Icon(
+                                              Icons.folder_shared,
+                                              color: _primaryNavy,
+                                            ),
+                                            title: const Text(
+                                              'Internal Storage / SESPIMMA',
+                                              style: TextStyle(
+                                                fontSize: AppDimensions.fontLg,
+                                                fontWeight: FontWeight.w600,
+                                                color: _primaryNavy,
+                                              ),
+                                            ),
+                                            onTap: () => Navigator.pop(
+                                              ctx,
+                                              '/storage/emulated/0/SESPIMMA',
+                                            ),
+                                          ),
+                                          ListTile(
+                                            leading: const Icon(
+                                              Icons.download_rounded,
+                                              color: _primaryNavy,
+                                            ),
+                                            title: const Text(
+                                              'Internal Storage / Download',
+                                              style: TextStyle(
+                                                fontSize: AppDimensions.fontLg,
+                                                fontWeight: FontWeight.w600,
+                                                color: _primaryNavy,
+                                              ),
+                                            ),
+                                            onTap: () => Navigator.pop(
+                                              ctx,
+                                              '/storage/emulated/0/Download',
+                                            ),
+                                          ),
+                                          ListTile(
+                                            leading: const Icon(
+                                              Icons.sd_storage_rounded,
+                                              color: _primaryNavy,
+                                            ),
+                                            title: const Text(
+                                              'SD Card / Documents',
+                                              style: TextStyle(
+                                                fontSize: AppDimensions.fontLg,
+                                                fontWeight: FontWeight.w600,
+                                                color: _primaryNavy,
+                                              ),
+                                            ),
+                                            onTap: () => Navigator.pop(
+                                              ctx,
+                                              '/storage/extSdCard/Documents',
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                                    ),
+                                  );
 
                               if (selectedFolder == null) return;
                               if (!context.mounted) return;
@@ -254,29 +356,48 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                                 builder: (ctx) => AlertDialog(
                                   backgroundColor: Colors.white,
                                   surfaceTintColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusLg,
+                                    ),
+                                  ),
                                   content: Row(
                                     children: [
-                                      const CircularProgressIndicator(color: _primaryNavy),
+                                      const CircularProgressIndicator(
+                                        color: _primaryNavy,
+                                      ),
                                       const SizedBox(width: AppDimensions.xl),
-                                      Expanded(child: Text('Mengunduh $filename...')),
+                                      Expanded(
+                                        child: Text('Mengunduh $filename...'),
+                                      ),
                                     ],
                                   ),
                                 ),
                               );
 
                               await Future.delayed(const Duration(seconds: 2));
-                              
+
                               if (!context.mounted) return;
                               navigator.pop();
                               scaffoldMsg.showSnackBar(
                                 SnackBar(
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Text('✅ Unduhan Selesai', style: TextStyle(fontWeight: FontWeight.w800)),
-                                      Text('Tersimpan di: $selectedFolder/$filename', style: const TextStyle(fontSize: AppDimensions.fontMd)),
+                                      const Text(
+                                        '✅ Unduhan Selesai',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Tersimpan di: $selectedFolder/$filename',
+                                        style: const TextStyle(
+                                          fontSize: AppDimensions.fontMd,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   backgroundColor: _successGreen,
@@ -303,8 +424,14 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                 const SizedBox(height: AppDimensions.sm),
                 TextFormField(
                   controller: scoreCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(fontSize: AppDimensions.fontLg, fontWeight: FontWeight.w600, color: _primaryNavy),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontLg,
+                    fontWeight: FontWeight.w600,
+                    color: _primaryNavy,
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Nilai wajib diisi';
@@ -320,20 +447,35 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                   },
                   decoration: InputDecoration(
                     hintText: 'Contoh: 85.5',
-                    hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontDefault),
+                    hintStyle: TextStyle(
+                      color: Colors.blueGrey.shade300,
+                      fontSize: AppDimensions.fontDefault,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                      borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
+                      borderSide: const BorderSide(
+                        color: _primaryNavy,
+                        width: 1.5,
+                      ),
                     ),
                     errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(color: Colors.red.shade300),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                   ),
@@ -351,17 +493,31 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                 TextFormField(
                   controller: noteCtrl,
                   maxLines: 2,
-                  style: const TextStyle(fontSize: AppDimensions.fontLg, fontWeight: FontWeight.w600, color: _primaryNavy),
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontLg,
+                    fontWeight: FontWeight.w600,
+                    color: _primaryNavy,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Berikan masukan atau evaluasi untuk Serdik...',
-                    hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontDefault),
+                    hintStyle: TextStyle(
+                      color: Colors.blueGrey.shade300,
+                      fontSize: AppDimensions.fontDefault,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                      borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
+                      borderSide: const BorderSide(
+                        color: _primaryNavy,
+                        width: 1.5,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.all(AppDimensions.md),
                     filled: true,
@@ -373,31 +529,42 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          final double newScore = double.tryParse(scoreCtrl.text) ?? 0.0;
-                          
-                          setState(() {
-                            final subIndex = PimpinanMockData.sharedTaskSubmissions.indexWhere(
-                              (s) => s['nrp'] == submission['nrp'] && s['taskId'] == submission['taskId']
-                            );
-                            if (subIndex != -1) {
-                              PimpinanMockData.sharedTaskSubmissions[subIndex]['score'] = newScore;
-                              PimpinanMockData.sharedTaskSubmissions[subIndex]['status'] = 'dinilai';
-                            }
+                      if (formKey.currentState!.validate()) {
+                        final double newScore =
+                            double.tryParse(scoreCtrl.text) ?? 0.0;
 
-                            final serdikIndex = PimpinanMockData.sharedReportData.indexWhere(
-                              (r) => r.nrp == submission['nrp']
-                            );
-                            if (serdikIndex != -1) {
-                              final current = PimpinanMockData.sharedReportData[serdikIndex];
-                              PimpinanMockData.sharedReportData[serdikIndex] = current.copyWith(
-                                academicScore: (current.academicScore + newScore) / 2,
+                        setState(() {
+                          final subIndex = PimpinanMockData
+                              .sharedTaskSubmissions
+                              .indexWhere(
+                                (s) =>
+                                    s['nrp'] == submission['nrp'] &&
+                                    s['taskId'] == submission['taskId'],
                               );
-                            }
-                          });
+                          if (subIndex != -1) {
+                            PimpinanMockData
+                                    .sharedTaskSubmissions[subIndex]['score'] =
+                                newScore;
+                            PimpinanMockData
+                                    .sharedTaskSubmissions[subIndex]['status'] =
+                                'dinilai';
+                          }
 
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          final serdikIndex = PimpinanMockData.sharedReportData
+                              .indexWhere((r) => r.nrp == submission['nrp']);
+                          if (serdikIndex != -1) {
+                            final current =
+                                PimpinanMockData.sharedReportData[serdikIndex];
+                            PimpinanMockData.sharedReportData[serdikIndex] =
+                                current.copyWith(
+                                  academicScore:
+                                      (current.academicScore + newScore) / 2,
+                                );
+                          }
+                        });
+
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
                               'Nilai berhasil disimpan untuk ${submission['name']}',
@@ -405,7 +572,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                             backgroundColor: _successGreen,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusMd,
+                              ),
                             ),
                           ),
                         );
@@ -416,7 +585,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                       ),
                     ),
                     child: const Text(
@@ -501,7 +672,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
       final String q = _searchQuery.trim().toLowerCase();
       final String name = sub['name'].toString().toLowerCase();
       final String nrp = sub['nrp'].toString().toLowerCase();
-      
+
       if (q.isNotEmpty && !name.contains(q) && !nrp.contains(q)) {
         return false;
       }
@@ -550,13 +721,20 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
             child: filteredSubmissions.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
                     itemCount: filteredSubmissions.length,
                     itemBuilder: (context, index) {
                       final animation = CurvedAnimation(
                         parent: _animController,
                         curve: Interval(
-                          (index / (filteredSubmissions.isEmpty ? 1 : filteredSubmissions.length)).clamp(0.0, 1.0),
+                          (index /
+                                  (filteredSubmissions.isEmpty
+                                      ? 1
+                                      : filteredSubmissions.length))
+                              .clamp(0.0, 1.0),
                           1.0,
                           curve: Curves.easeOutCubic,
                         ),
@@ -564,7 +742,10 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                       return FadeTransition(
                         opacity: animation,
                         child: SlideTransition(
-                          position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(animation),
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.2),
+                            end: Offset.zero,
+                          ).animate(animation),
                           child: _buildSerdikItem(filteredSubmissions[index]),
                         ),
                       );
@@ -576,11 +757,18 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
     );
   }
 
-  Widget _buildTaskHeader(TugasModel task, List<Map<String, dynamic>> submissions) {
+  Widget _buildTaskHeader(
+    TugasModel task,
+    List<Map<String, dynamic>> submissions,
+  ) {
     final int total = submissions.length;
-    final int sudah = submissions.where((s) => s['status'] == 'sudah' || s['status'] == 'dinilai').length;
+    final int sudah = submissions
+        .where((s) => s['status'] == 'sudah' || s['status'] == 'dinilai')
+        .length;
     final int belum = submissions.where((s) => s['status'] == 'belum').length;
-    final int terlambat = submissions.where((s) => s['status'] == 'terlambat').length;
+    final int terlambat = submissions
+        .where((s) => s['status'] == 'terlambat')
+        .length;
 
     return Container(
       width: double.infinity,
@@ -627,7 +815,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                     const SizedBox(height: AppDimensions.sm),
                     Row(
                       children: [
-                        const Icon(Icons.access_time_rounded, size: AppDimensions.fontLg, color: _warningOrange),
+                        const Icon(
+                          Icons.access_time_rounded,
+                          size: AppDimensions.fontLg,
+                          color: _warningOrange,
+                        ),
                         const SizedBox(width: AppDimensions.xs),
                         Text(
                           'Batas Waktu: ${task.deadline.day.toString().padLeft(2, '0')}/${task.deadline.month.toString().padLeft(2, '0')}/${task.deadline.year} ${task.deadline.hour.toString().padLeft(2, '0')}:${task.deadline.minute.toString().padLeft(2, '0')} WIB',
@@ -644,7 +836,10 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
               ),
               IconButton(
                 onPressed: () => _showDeleteConfirmationDialog(context, task),
-                icon: const Icon(Icons.delete_outline_rounded, color: _dangerRed),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: _dangerRed,
+                ),
                 tooltip: 'Hapus Tugas',
                 style: IconButton.styleFrom(
                   backgroundColor: _dangerRed.withValues(alpha: 0.1),
@@ -664,13 +859,21 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStatItem('Total', total.toString(), Colors.blueGrey.shade600),
+                _buildStatItem(
+                  'Total',
+                  total.toString(),
+                  Colors.blueGrey.shade600,
+                ),
                 _buildDivider(),
                 _buildStatItem('Sudah', sudah.toString(), _successGreen),
                 _buildDivider(),
                 _buildStatItem('Belum', belum.toString(), _dangerRed),
                 _buildDivider(),
-                _buildStatItem('Terlambat', terlambat.toString(), _warningOrange),
+                _buildStatItem(
+                  'Terlambat',
+                  terlambat.toString(),
+                  _warningOrange,
+                ),
               ],
             ),
           ),
@@ -685,28 +888,52 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXl)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        ),
         title: const Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: _dangerRed, size: AppDimensions.iconXl),
+            Icon(
+              Icons.warning_amber_rounded,
+              color: _dangerRed,
+              size: AppDimensions.iconXl,
+            ),
             SizedBox(width: AppDimensions.md - 4),
-            Text('Hapus Tugas', style: TextStyle(fontWeight: FontWeight.w800, color: _primaryNavy)),
+            Text(
+              'Hapus Tugas',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: _primaryNavy,
+              ),
+            ),
           ],
         ),
         content: Text(
           'Anda yakin ingin menghapus tugas "${task.judul}"? Semua data pengumpulan siswa akan ikut terhapus.',
-          style: const TextStyle(fontSize: AppDimensions.fontLg, color: _primaryNavy, height: 1.5),
+          style: const TextStyle(
+            fontSize: AppDimensions.fontLg,
+            color: _primaryNavy,
+            height: 1.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal', style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w700)),
+            child: const Text(
+              'Batal',
+              style: TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               PimpinanMockData.sharedTasks.removeWhere((t) => t.id == task.id);
-              
-              PimpinanMockData.sharedTaskSubmissions.removeWhere((s) => s['taskId'] == task.id);
+
+              PimpinanMockData.sharedTaskSubmissions.removeWhere(
+                (s) => s['taskId'] == task.id,
+              );
 
               Navigator.pop(ctx);
               Navigator.pop(context);
@@ -720,10 +947,18 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: _dangerRed,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
+              ),
               elevation: 0,
             ),
-            child: const Text('Ya, Hapus', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            child: const Text(
+              'Ya, Hapus',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ],
       ),
@@ -756,11 +991,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
   }
 
   Widget _buildDivider() {
-    return Container(
-      height: 24,
-      width: 1,
-      color: Colors.grey.shade300,
-    );
+    return Container(height: 24, width: 1, color: Colors.grey.shade300);
   }
 
   Widget _buildSearchAndFilterRow() {
@@ -780,12 +1011,23 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Cari nama atau NRP serdik...',
-                  hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontDefault),
-                  prefixIcon: Icon(Icons.search_rounded, color: Colors.blueGrey.shade400, size: AppDimensions.iconDefault),
+                  hintStyle: TextStyle(
+                    color: Colors.blueGrey.shade300,
+                    fontSize: AppDimensions.fontDefault,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: Colors.blueGrey.shade400,
+                    size: AppDimensions.iconDefault,
+                  ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                style: const TextStyle(fontSize: AppDimensions.fontLg, color: _primaryNavy, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  color: _primaryNavy,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -808,7 +1050,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
         _animController.forward(from: 0.0);
       },
       offset: const Offset(0, 45),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+      ),
       itemBuilder: (context) {
         return ['Semua', 'Sudah', 'Belum', 'Terlambat'].map((item) {
           final bool isSel = _selectedFilter == item;
@@ -816,9 +1060,20 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
             value: item,
             child: Row(
               children: [
-                Icon(_resolveSelectionIcon(isSel), color: _resolveSelectionColor(isSel), size: AppDimensions.iconDefault),
+                Icon(
+                  _resolveSelectionIcon(isSel),
+                  color: _resolveSelectionColor(isSel),
+                  size: AppDimensions.iconDefault,
+                ),
                 const SizedBox(width: AppDimensions.sm + 2),
-                Text(item, style: TextStyle(fontSize: AppDimensions.fontDefault, color: _primaryNavy, fontWeight: isSel ? FontWeight.w700 : FontWeight.w500)),
+                Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontDefault,
+                    color: _primaryNavy,
+                    fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           );
@@ -827,18 +1082,33 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.sm + 2),
         decoration: BoxDecoration(
-          color: isFiltered ? _primaryNavy.withValues(alpha: 0.05) : Colors.white,
-          border: Border.all(color: isFiltered ? _primaryNavy : Colors.grey.shade300),
+          color: isFiltered
+              ? _primaryNavy.withValues(alpha: 0.05)
+              : Colors.white,
+          border: Border.all(
+            color: isFiltered ? _primaryNavy : Colors.grey.shade300,
+          ),
           borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
         ),
-        child: Icon(Icons.filter_list_rounded, color: isFiltered ? _primaryNavy : Colors.blueGrey.shade500, size: AppDimensions.iconDefault + 2),
+        child: Icon(
+          Icons.filter_list_rounded,
+          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade500,
+          size: AppDimensions.iconDefault + 2,
+        ),
       ),
     );
   }
 
   Widget _buildPokjarFilterDropdown() {
     final bool isFiltered = _selectedPokjar != 'Semua';
-    final pokjars = ['Semua', 'POKJAR 1', 'POKJAR 2', 'POKJAR 3', 'POKJAR 4', 'POKJAR 5'];
+    final pokjars = [
+      'Semua',
+      'POKJAR 1',
+      'POKJAR 2',
+      'POKJAR 3',
+      'POKJAR 4',
+      'POKJAR 5',
+    ];
     return PopupMenuButton<String>(
       onSelected: (value) {
         setState(() {
@@ -847,7 +1117,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
         _animController.forward(from: 0.0);
       },
       offset: const Offset(0, 45),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+      ),
       itemBuilder: (context) {
         return pokjars.map((item) {
           final bool isSel = _selectedPokjar == item;
@@ -855,9 +1127,20 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
             value: item,
             child: Row(
               children: [
-                Icon(_resolveSelectionIcon(isSel), color: _resolveSelectionColor(isSel), size: AppDimensions.iconDefault),
+                Icon(
+                  _resolveSelectionIcon(isSel),
+                  color: _resolveSelectionColor(isSel),
+                  size: AppDimensions.iconDefault,
+                ),
                 const SizedBox(width: AppDimensions.sm + 2),
-                Text(item, style: TextStyle(fontSize: AppDimensions.fontDefault, color: _primaryNavy, fontWeight: isSel ? FontWeight.w700 : FontWeight.w500)),
+                Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontDefault,
+                    color: _primaryNavy,
+                    fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           );
@@ -866,11 +1149,19 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.sm + 2),
         decoration: BoxDecoration(
-          color: isFiltered ? _primaryNavy.withValues(alpha: 0.05) : Colors.white,
-          border: Border.all(color: isFiltered ? _primaryNavy : Colors.grey.shade300),
+          color: isFiltered
+              ? _primaryNavy.withValues(alpha: 0.05)
+              : Colors.white,
+          border: Border.all(
+            color: isFiltered ? _primaryNavy : Colors.grey.shade300,
+          ),
           borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
         ),
-        child: Icon(Icons.groups_rounded, color: isFiltered ? _primaryNavy : Colors.blueGrey.shade500, size: AppDimensions.iconDefault + 2),
+        child: Icon(
+          Icons.groups_rounded,
+          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade500,
+          size: AppDimensions.iconDefault + 2,
+        ),
       ),
     );
   }
@@ -960,7 +1251,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen> with Single
                       const SizedBox(height: AppDimensions.sm),
                       Row(
                         children: [
-                          Icon(statusIcon, size: AppDimensions.fontLg, color: statusColor),
+                          Icon(
+                            statusIcon,
+                            size: AppDimensions.fontLg,
+                            color: statusColor,
+                          ),
                           const SizedBox(width: AppDimensions.xs),
                           Text(
                             statusText,

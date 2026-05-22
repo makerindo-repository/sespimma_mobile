@@ -11,8 +11,7 @@ void main() {
 
       test('mencakup tahap Pelajaran, Simulasi, dan Taskap', () {
         final items = AssessmentSubCategories.getAkademik();
-        final tahaps =
-            items.map((e) => e['tahap'] as String).toSet();
+        final tahaps = items.map((e) => e['tahap'] as String).toSet();
 
         expect(tahaps, containsAll(['Pelajaran', 'Simulasi', 'Taskap']));
       });
@@ -26,8 +25,7 @@ void main() {
 
       test('mencakup Sosiometri Awal dan Akhir', () {
         final items = AssessmentSubCategories.getMentalKepribadian();
-        final tahaps =
-            items.map((e) => e['tahap'] as String).toSet();
+        final tahaps = items.map((e) => e['tahap'] as String).toSet();
 
         expect(
           tahaps,
@@ -56,10 +54,7 @@ void main() {
         );
 
         for (final item in items) {
-          expect(
-            ['Tes Awal', 'Tes Akhir', 'Harian'],
-            contains(item['tahap']),
-          );
+          expect(['Tes Awal', 'Tes Akhir', 'Harian'], contains(item['tahap']));
         }
       });
 
@@ -83,10 +78,7 @@ void main() {
         final pullUpItem = items.firstWhere(
           (item) => (item['name'] as String).contains('Pull-up'),
         );
-        expect(
-          pullUpItem['name'] as String,
-          contains('Chinning'),
-        );
+        expect(pullUpItem['name'] as String, contains('Chinning'));
       });
     });
 

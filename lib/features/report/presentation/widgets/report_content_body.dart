@@ -24,7 +24,8 @@ class ReportContentBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nak = (user.nilaiAkademik * 0.70) +
+    final nak =
+        (user.nilaiAkademik * 0.70) +
         (user.nilaiMental * 0.20) +
         (user.nilaiJasmani * 0.10);
 
@@ -53,9 +54,7 @@ class ReportContentBody extends StatelessWidget {
               selectedCategory: selectedCategory,
               onCategoryChanged: onCategoryChanged,
             ),
-            const SizedBox(
-              height: AppDimensions.xxl + AppDimensions.md,
-            ),
+            const SizedBox(height: AppDimensions.xxl + AppDimensions.md),
             const ReportSectionHeader(
               judul: 'Tren Perkembangan Terpadu (IDMS)',
             ),
@@ -67,18 +66,12 @@ class ReportContentBody extends StatelessWidget {
               nilaiJasmani: user.nilaiJasmani,
               selectedCategory: selectedCategory,
             ),
-            const SizedBox(
-              height: AppDimensions.xxl + AppDimensions.md,
-            ),
-            const ReportSectionHeader(
-              judul: 'Rincian Kompetensi',
-            ),
+            const SizedBox(height: AppDimensions.xxl + AppDimensions.md),
+            const ReportSectionHeader(judul: 'Rincian Kompetensi'),
             const SizedBox(height: AppDimensions.md),
             _buildAnimatedChild(
               DetailedCompetencies(
-                key: ValueKey<String>(
-                  'details_$selectedCategory',
-                ),
+                key: ValueKey<String>('details_$selectedCategory'),
                 category: selectedCategory,
                 user: user,
               ),
@@ -86,9 +79,7 @@ class ReportContentBody extends StatelessWidget {
             const SizedBox(height: AppDimensions.xxl),
             _buildAnimatedChild(
               AiInsightCard(
-                key: ValueKey<String>(
-                  'insight_$selectedCategory',
-                ),
+                key: ValueKey<String>('insight_$selectedCategory'),
                 category: selectedCategory,
                 user: user,
               ),

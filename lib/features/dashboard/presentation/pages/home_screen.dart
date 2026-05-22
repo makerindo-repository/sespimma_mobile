@@ -319,10 +319,7 @@ class _HomeScreenState extends State<HomeScreen>
                     color: _primaryNavy,
                   ),
                 ),
-                Icon(
-                  AppIcons.chartBarFill,
-                  color: Colors.blueGrey.shade300,
-                ),
+                Icon(AppIcons.chartBarFill, color: Colors.blueGrey.shade300),
               ],
             ),
             const SizedBox(height: AppDimensions.xl),
@@ -576,7 +573,9 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                           decoration: BoxDecoration(
                             color: primaryIndigo,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusSm,
+                            ),
                           ),
                           child: const Text(
                             'ISI SEKARANG',
@@ -605,7 +604,9 @@ class _HomeScreenState extends State<HomeScreen>
                       children: [
                         Expanded(
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusXs,
+                            ),
                             child: LinearProgressIndicator(
                               value:
                                   SociometryPeriodConfig.getFilledCount() /
@@ -1003,9 +1004,7 @@ class _ActivityTile extends StatelessWidget {
 
     final IconData iconData = isTask
         ? AppIcons.clipboardTextFill
-        : (isReward
-              ? AppIcons.medalFill
-              : AppIcons.warningCircleFill);
+        : (isReward ? AppIcons.medalFill : AppIcons.warningCircleFill);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1046,7 +1045,11 @@ class _ActivityTile extends StatelessWidget {
                     color: iconColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(iconData, color: iconColor, size: AppDimensions.iconLg),
+                  child: Icon(
+                    iconData,
+                    color: iconColor,
+                    size: AppDimensions.iconLg,
+                  ),
                 ),
                 const SizedBox(width: AppDimensions.md),
                 Expanded(

@@ -4,7 +4,8 @@ import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart
 
 class PimpinanMockData {
   static const String pimpinanNrp = '75060001';
-  static const String pimpinanName = 'KOMBES POL. FAJAR NUGROHO, S.H., S.I.K., M.H.';
+  static const String pimpinanName =
+      'KOMBES POL. FAJAR NUGROHO, S.H., S.I.K., M.H.';
   static const String pimpinanJabatan = 'KA SESPIMMA LEMDIKLAT POLRI';
 
   static int attendanceReportCount = 158;
@@ -168,26 +169,25 @@ class PimpinanMockData {
 
     return pokjarGrades.entries.map((e) {
       final avg = e.value.reduce((a, b) => a + b) / e.value.length;
-      return {
-        'name': e.key,
-        'average': avg,
-      };
+      return {'name': e.key, 'average': avg};
     }).toList();
   }
 
   static Map<String, double> getGlobalComponentAverages() {
-    if (sharedReportData.isEmpty) return {'akademik': 0, 'mental': 0, 'jasmani': 0};
-    
+    if (sharedReportData.isEmpty) {
+      return {'akademik': 0, 'mental': 0, 'jasmani': 0};
+    }
+
     double totalAkad = 0;
     double totalMent = 0;
     double totalJasm = 0;
-    
+
     for (var r in sharedReportData) {
       totalAkad += r.academicScore;
       totalMent += r.mentalScore;
       totalJasm += r.physicalScore;
     }
-    
+
     final count = sharedReportData.length;
     return {
       'akademik': totalAkad / count,
@@ -323,7 +323,8 @@ class PimpinanMockData {
     TugasModel(
       id: 'TSK-001',
       judul: 'Naskah Karya Perseorangan (NKP) - Analisis Integritas',
-      deskripsi: 'Buatlah naskah analisis komprehensif mengenai implementasi integritas kepolisian di lapangan.',
+      deskripsi:
+          'Buatlah naskah analisis komprehensif mengenai implementasi integritas kepolisian di lapangan.',
       mapel: 'NKP (Naskah Karya Perseorangan)',
       deadline: DateTime.now().add(const Duration(minutes: 59)),
       status: 'Aktif',
@@ -333,7 +334,8 @@ class PimpinanMockData {
     TugasModel(
       id: 'TSK-002',
       judul: 'Naskah Program Transformasi Teknis (Taskap)',
-      deskripsi: 'Kumpulkan draf lengkap naskah program transformasi teknis organisasi untuk ditinjau oleh Patun.',
+      deskripsi:
+          'Kumpulkan draf lengkap naskah program transformasi teknis organisasi untuk ditinjau oleh Patun.',
       mapel: 'NKKP (Naskah Kuliah Kerja Profesi)',
       deadline: DateTime.now().add(const Duration(hours: 23, minutes: 15)),
       status: 'Aktif',
@@ -343,7 +345,8 @@ class PimpinanMockData {
     TugasModel(
       id: 'TSK-003',
       judul: 'Ujian MP - Pengendalian Diri & Emosi',
-      deskripsi: 'Kumpulkan berkas lembar jawaban ujian MP / Esai tentang pengendalian diri dan emosi kepemimpinan.',
+      deskripsi:
+          'Kumpulkan berkas lembar jawaban ujian MP / Esai tentang pengendalian diri dan emosi kepemimpinan.',
       mapel: 'Ujian MP / Esai',
       deadline: DateTime.now().subtract(const Duration(days: 1)),
       status: 'Selesai',
@@ -353,7 +356,8 @@ class PimpinanMockData {
     TugasModel(
       id: 'TSK-004',
       judul: 'Resume Kuliah Umum - Transparansi Digital SESPIMMA',
-      deskripsi: 'Resume materi kuliah umum tentang transparansi digital di lingkungan Polri.',
+      deskripsi:
+          'Resume materi kuliah umum tentang transparansi digital di lingkungan Polri.',
       mapel: 'Sistem Informasi Publik',
       deadline: DateTime.now().subtract(const Duration(days: 3)),
       status: 'Selesai',
@@ -364,8 +368,29 @@ class PimpinanMockData {
 
   static String _getFormattedDate(int daysAgo) {
     final target = DateTime.now().subtract(Duration(days: daysAgo));
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    const days = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
     final dayIndex = target.weekday == 7 ? 0 : target.weekday;
     return '${days[dayIndex]}, ${target.day} ${months[target.month - 1]} ${target.year}';
   }

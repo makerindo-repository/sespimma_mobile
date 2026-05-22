@@ -7,11 +7,7 @@ class NakSummaryCard extends StatelessWidget {
   final UserEntity user;
   final double nak;
 
-  const NakSummaryCard({
-    super.key,
-    required this.user,
-    required this.nak,
-  });
+  const NakSummaryCard({super.key, required this.user, required this.nak});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +19,7 @@ class NakSummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.blueGrey.shade50.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-          border: Border.all(
-            color: Colors.blueGrey.shade200,
-            width: 1.2,
-          ),
+          border: Border.all(color: Colors.blueGrey.shade200, width: 1.2),
         ),
         child: Row(
           children: [

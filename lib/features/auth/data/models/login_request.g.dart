@@ -1,6 +1,4 @@
-
 part of 'login_request.dart';
-
 
 LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) => LoginRequest(
   nrp: json['nrp'] as String,

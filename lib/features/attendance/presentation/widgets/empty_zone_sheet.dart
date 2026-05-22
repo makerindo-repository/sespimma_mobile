@@ -6,10 +6,7 @@ import 'package:sespimma_mobile/core/theme/app_colors.dart';
 class EmptyZoneSheet extends StatelessWidget {
   final ValueChanged<bool> onToggleMakerindo;
 
-  const EmptyZoneSheet({
-    super.key,
-    required this.onToggleMakerindo,
-  });
+  const EmptyZoneSheet({super.key, required this.onToggleMakerindo});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +14,16 @@ class EmptyZoneSheet extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXxl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusXxl),
+        ),
       ),
-      padding: const EdgeInsets.fromLTRB(AppDimensions.xxl, AppDimensions.lg, AppDimensions.xxl, AppDimensions.xxxl + 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.xxl,
+        AppDimensions.lg,
+        AppDimensions.xxl,
+        AppDimensions.xxxl + 8,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -33,7 +37,11 @@ class EmptyZoneSheet extends StatelessWidget {
                   opacity: 0.15,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: AppDimensions.sm),
-                    child: Icon(Icons.arrow_left_rounded, size: AppDimensions.iconSm, color: Colors.grey),
+                    child: Icon(
+                      Icons.arrow_left_rounded,
+                      size: AppDimensions.iconSm,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -52,7 +60,11 @@ class EmptyZoneSheet extends StatelessWidget {
                   opacity: 0.15,
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: AppDimensions.sm),
-                    child: Icon(Icons.arrow_right_rounded, size: AppDimensions.iconSm, color: Colors.grey),
+                    child: Icon(
+                      Icons.arrow_right_rounded,
+                      size: AppDimensions.iconSm,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
@@ -89,7 +101,7 @@ class EmptyZoneSheet extends StatelessWidget {
                       color: AppColors.dangerRed,
                       blurRadius: 15,
                       spreadRadius: -2,
-                    )
+                    ),
                   ],
                 ),
                 child: const Icon(
@@ -135,7 +147,9 @@ class EmptyZoneSheet extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
+                  borderRadius: BorderRadius.circular(
+                    AppDimensions.radiusLg + 2,
+                  ),
                 ),
               ),
               child: const Text(

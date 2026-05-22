@@ -208,7 +208,8 @@ class _ProfileScreenState extends State<ProfileScreen>
             color: Colors.white,
             borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
             image: DecorationImage(
-              image: (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
+              image:
+                  (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
                   ? FileImage(File(user.profilePhoto!)) as ImageProvider
                   : const AssetImage('assets/images/default_avatar.png'),
               fit: BoxFit.cover,
@@ -313,11 +314,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: Column(
         children: [
           if (isSiswa) ...[
-            _buildDetailRow(
-              AppIcons.medal,
-              'ANGKATAN',
-              user.angkatan,
-            ),
+            _buildDetailRow(AppIcons.medal, 'ANGKATAN', user.angkatan),
             Divider(height: 1, color: Colors.grey.shade100, indent: 64),
           ],
           _buildDetailRow(
@@ -328,11 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Divider(height: 1, color: Colors.grey.shade100, indent: 64),
           _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
           Divider(height: 1, color: Colors.grey.shade100, indent: 64),
-          _buildDetailRow(
-            AppIcons.cake,
-            'UMUR',
-            '${user.displayUmur} Tahun',
-          ),
+          _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
         ],
       ),
     );
@@ -451,15 +444,14 @@ class _ProfileScreenState extends State<ProfileScreen>
           color: _primaryNavy,
         ),
       ),
-      trailing: Icon(
-        AppIcons.caretRight,
-        color: Colors.grey.shade400,
-      ),
+      trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
       onTap: () {
         HapticFeedback.lightImpact();
         onTap();
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXl)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+      ),
     );
   }
 
@@ -512,7 +504,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 width: 40,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
+                  borderRadius: BorderRadius.circular(
+                    AppDimensions.radiusMd + 2,
+                  ),
                 ),
               ),
               const SizedBox(height: AppDimensions.lg),
@@ -560,7 +554,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         side: BorderSide(color: Colors.grey.shade300),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusLg,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -591,7 +587,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusLg,
+                          ),
                         ),
                       ),
                       child: const Text(

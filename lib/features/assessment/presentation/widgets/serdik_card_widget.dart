@@ -65,10 +65,7 @@ class SerdikCardWidget extends StatelessWidget {
       child: CircleAvatar(
         radius: AppDimensions.avatarSm,
         backgroundColor: Colors.blueGrey.shade50,
-        child: Icon(
-          Icons.person_rounded,
-          color: Colors.blueGrey.shade300,
-        ),
+        child: Icon(Icons.person_rounded, color: Colors.blueGrey.shade300),
       ),
     );
   }

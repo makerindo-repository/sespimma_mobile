@@ -1,6 +1,4 @@
-
 part of 'login_response.dart';
-
 
 LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
     LoginResponse(

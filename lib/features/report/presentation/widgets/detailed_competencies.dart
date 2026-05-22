@@ -37,41 +37,116 @@ class DetailedCompetencies extends StatelessWidget {
     if (category == 'Mental Kepribadian') {
       return Column(
         children: [
-          _CompetencyItem(title: 'Moral (20%)', score: calc(isWarning ? -1.0 : 0.5)),
-          _CompetencyItem(title: 'Disiplin (15%)', score: calc(isWarning ? -2.0 : -1.0)),
-          _CompetencyItem(title: 'Kepemimpinan (20%)', score: calc(isWarning ? 1.5 : 1.2)),
-          _CompetencyItem(title: 'Pengendalian Diri (15%)', score: calc(isWarning ? -0.5 : 0.0)),
-          _CompetencyItem(title: 'Penampilan (15%)', score: calc(isWarning ? 2.0 : 1.8)),
-          _CompetencyItem(title: 'Sosiometri Awal (7.5%)', score: calc(isWarning ? 0.5 : -0.5)),
-          _CompetencyItem(title: 'Sosiometri Akhir (7.5%)', score: calc(isWarning ? 1.0 : 0.8)),
+          _CompetencyItem(
+            title: 'Moral (20%)',
+            score: calc(isWarning ? -1.0 : 0.5),
+          ),
+          _CompetencyItem(
+            title: 'Disiplin (15%)',
+            score: calc(isWarning ? -2.0 : -1.0),
+          ),
+          _CompetencyItem(
+            title: 'Kepemimpinan (20%)',
+            score: calc(isWarning ? 1.5 : 1.2),
+          ),
+          _CompetencyItem(
+            title: 'Pengendalian Diri (15%)',
+            score: calc(isWarning ? -0.5 : 0.0),
+          ),
+          _CompetencyItem(
+            title: 'Penampilan (15%)',
+            score: calc(isWarning ? 2.0 : 1.8),
+          ),
+          _CompetencyItem(
+            title: 'Sosiometri Awal (7.5%)',
+            score: calc(isWarning ? 0.5 : -0.5),
+          ),
+          _CompetencyItem(
+            title: 'Sosiometri Akhir (7.5%)',
+            score: calc(isWarning ? 1.0 : 0.8),
+          ),
         ],
       );
     } else if (category == 'Akademik') {
       return Column(
         children: [
-          _CompetencyItem(title: 'Ujian MP (30% - Pelajaran)', score: calc(isWarning ? -1.2 : -0.5)),
-          _CompetencyItem(title: 'NKKP (5% - Pelajaran)', score: calc(isWarning ? 2.0 : 2.0)),
-          _CompetencyItem(title: 'NPKP (5% - Pelajaran)', score: calc(isWarning ? 1.5 : 1.0)),
-          _CompetencyItem(title: 'NKP (60% - Pelajaran)', score: calc(isWarning ? -0.8 : -0.8)),
-          _CompetencyItem(title: 'Keaktifan (60% - Simulasi)', score: calc(isWarning ? 2.5 : 1.5)),
-          _CompetencyItem(title: 'Produk (20% - Simulasi)', score: calc(isWarning ? 0.5 : 0.0)),
-          _CompetencyItem(title: 'Tata Ruang (20% - Simulasi)', score: calc(isWarning ? 1.0 : 0.5)),
-          _CompetencyItem(title: 'Materi (40% - Taskap)', score: calc(isWarning ? 3.0 : 0.5)),
-          _CompetencyItem(title: 'Menulis (30% - Taskap)', score: calc(isWarning ? 1.0 : -0.2)),
-          _CompetencyItem(title: 'Paparan (30% - Taskap)', score: calc(isWarning ? 2.5 : 0.8)),
+          _CompetencyItem(
+            title: 'Ujian MP (30% - Pelajaran)',
+            score: calc(isWarning ? -1.2 : -0.5),
+          ),
+          _CompetencyItem(
+            title: 'NKKP (5% - Pelajaran)',
+            score: calc(isWarning ? 2.0 : 2.0),
+          ),
+          _CompetencyItem(
+            title: 'NPKP (5% - Pelajaran)',
+            score: calc(isWarning ? 1.5 : 1.0),
+          ),
+          _CompetencyItem(
+            title: 'NKP (60% - Pelajaran)',
+            score: calc(isWarning ? -0.8 : -0.8),
+          ),
+          _CompetencyItem(
+            title: 'Keaktifan (60% - Simulasi)',
+            score: calc(isWarning ? 2.5 : 1.5),
+          ),
+          _CompetencyItem(
+            title: 'Produk (20% - Simulasi)',
+            score: calc(isWarning ? 0.5 : 0.0),
+          ),
+          _CompetencyItem(
+            title: 'Tata Ruang (20% - Simulasi)',
+            score: calc(isWarning ? 1.0 : 0.5),
+          ),
+          _CompetencyItem(
+            title: 'Materi (40% - Taskap)',
+            score: calc(isWarning ? 3.0 : 0.5),
+          ),
+          _CompetencyItem(
+            title: 'Menulis (30% - Taskap)',
+            score: calc(isWarning ? 1.0 : -0.2),
+          ),
+          _CompetencyItem(
+            title: 'Paparan (30% - Taskap)',
+            score: calc(isWarning ? 2.5 : 0.8),
+          ),
         ],
       );
     } else {
       return Column(
         children: [
-          _CompetencyItem(title: 'Tes Kesehatan Awal', score: calc(isWarning ? -1.5 : -1.2)),
-          _CompetencyItem(title: 'Tes Kesehatan Akhir', score: calc(isWarning ? -0.8 : 0.2)),
-          _CompetencyItem(title: 'Status Kesehatan', score: calc(isWarning ? 0.0 : 0.5)),
-          _CompetencyItem(title: 'Samapta A (Lari 12 Menit)', score: calc(isWarning ? 2.5 : 0.8)),
-          _CompetencyItem(title: 'Samapta B (Pull-up)', score: calc(isWarning ? 1.2 : 1.0)),
-          _CompetencyItem(title: 'Samapta B (Sit-up)', score: calc(isWarning ? 2.0 : 1.5)),
-          _CompetencyItem(title: 'Samapta B (Push-up)', score: calc(isWarning ? 1.5 : 1.2)),
-          _CompetencyItem(title: 'Samapta B (Shuttle Run)', score: calc(isWarning ? 0.5 : 0.5)),
+          _CompetencyItem(
+            title: 'Tes Kesehatan Awal',
+            score: calc(isWarning ? -1.5 : -1.2),
+          ),
+          _CompetencyItem(
+            title: 'Tes Kesehatan Akhir',
+            score: calc(isWarning ? -0.8 : 0.2),
+          ),
+          _CompetencyItem(
+            title: 'Status Kesehatan',
+            score: calc(isWarning ? 0.0 : 0.5),
+          ),
+          _CompetencyItem(
+            title: 'Samapta A (Lari 12 Menit)',
+            score: calc(isWarning ? 2.5 : 0.8),
+          ),
+          _CompetencyItem(
+            title: 'Samapta B (Pull-up)',
+            score: calc(isWarning ? 1.2 : 1.0),
+          ),
+          _CompetencyItem(
+            title: 'Samapta B (Sit-up)',
+            score: calc(isWarning ? 2.0 : 1.5),
+          ),
+          _CompetencyItem(
+            title: 'Samapta B (Push-up)',
+            score: calc(isWarning ? 1.5 : 1.2),
+          ),
+          _CompetencyItem(
+            title: 'Samapta B (Shuttle Run)',
+            score: calc(isWarning ? 0.5 : 0.5),
+          ),
         ],
       );
     }
@@ -82,10 +157,7 @@ class _CompetencyItem extends StatelessWidget {
   final String title;
   final double score;
 
-  const _CompetencyItem({
-    required this.title,
-    required this.score,
-  });
+  const _CompetencyItem({required this.title, required this.score});
 
   String get _status {
     if (score == 0) return '-';
@@ -169,7 +241,11 @@ class _CompetencyItem extends StatelessWidget {
                     color: _iconBgColor,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(_iconData, color: _iconColor, size: AppDimensions.iconMd),
+                  child: Icon(
+                    _iconData,
+                    color: _iconColor,
+                    size: AppDimensions.iconMd,
+                  ),
                 ),
                 const SizedBox(width: AppDimensions.lg),
                 Expanded(

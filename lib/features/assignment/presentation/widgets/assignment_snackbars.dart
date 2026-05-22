@@ -25,8 +25,7 @@ abstract final class AssignmentSnackbars {
         backgroundColor: AppColors.successGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         ),
         margin: const EdgeInsets.all(AppDimensions.xxl),
       ),
@@ -40,8 +39,7 @@ abstract final class AssignmentSnackbars {
         backgroundColor: AppColors.dangerRed,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         ),
       ),
     );

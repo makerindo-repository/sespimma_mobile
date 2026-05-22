@@ -33,7 +33,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               index: safeIndex,
               children: navItems.map((item) {
                 return KeyedSubtree(
-                  key: ValueKey('nav_screen_${item.label}_${state.user.roleId}'),
+                  key: ValueKey(
+                    'nav_screen_${item.label}_${state.user.roleId}',
+                  ),
                   child: item.screen,
                 );
               }).toList(),

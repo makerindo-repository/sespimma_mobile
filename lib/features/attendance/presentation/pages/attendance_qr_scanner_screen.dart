@@ -9,10 +9,12 @@ class AttendanceQrScannerScreen extends StatefulWidget {
   const AttendanceQrScannerScreen({super.key});
 
   @override
-  State<AttendanceQrScannerScreen> createState() => _AttendanceQrScannerScreenState();
+  State<AttendanceQrScannerScreen> createState() =>
+      _AttendanceQrScannerScreenState();
 }
 
-class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> with SingleTickerProviderStateMixin {
+class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
+    with SingleTickerProviderStateMixin {
   bool _isScanned = false;
   late AnimationController _animationController;
 
@@ -40,7 +42,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
           MobileScanner(
             onDetect: (capture) {
               if (_isScanned) return;
-              
+
               final List<Barcode> barcodes = capture.barcodes;
               for (final barcode in barcodes) {
                 final String? code = barcode.rawValue;
@@ -52,7 +54,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
             },
           ),
           _buildOverlay(),
-          
+
           Positioned(
             top: 50,
             left: 20,
@@ -68,7 +70,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
                     'Pindai QR Presensi',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white, 
+                      color: Colors.white,
                       fontSize: AppDimensions.fontXxl,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.0,
@@ -86,7 +88,10 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
             right: 0,
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
@@ -102,7 +107,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
               ),
             ),
           ),
-          
+
           Positioned(
             bottom: 60,
             left: 0,
@@ -135,9 +140,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
           child: Stack(
             children: [
               Container(
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                ),
+                decoration: const BoxDecoration(color: Colors.transparent),
               ),
               Center(
                 child: Container(
@@ -145,7 +148,9 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
                   height: 260,
                   decoration: BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                    borderRadius: BorderRadius.circular(
+                      AppDimensions.radiusFull,
+                    ),
                   ),
                 ),
               ),
@@ -178,7 +183,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
                               color: Colors.blueAccent.withValues(alpha: 0.5),
                               blurRadius: 10,
                               spreadRadius: 2,
-                            )
+                            ),
                           ],
                           gradient: LinearGradient(
                             colors: [
@@ -200,7 +205,12 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
     );
   }
 
-  Widget _buildCorner(double? top, double? right, double? bottom, double? left) {
+  Widget _buildCorner(
+    double? top,
+    double? right,
+    double? bottom,
+    double? left,
+  ) {
     return Positioned(
       top: top,
       right: right,
@@ -212,10 +222,18 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
         decoration: BoxDecoration(
           color: Colors.transparent,
           border: Border(
-            top: top == 0 ? const BorderSide(color: Colors.white, width: 4) : BorderSide.none,
-            left: left == 0 ? const BorderSide(color: Colors.white, width: 4) : BorderSide.none,
-            right: right == 0 ? const BorderSide(color: Colors.white, width: 4) : BorderSide.none,
-            bottom: bottom == 0 ? const BorderSide(color: Colors.white, width: 4) : BorderSide.none,
+            top: top == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+            left: left == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+            right: right == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+            bottom: bottom == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
           ),
         ),
       ),
@@ -228,7 +246,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
 
     try {
       final Map<String, dynamic> data = json.decode(code);
-      
+
       if (data['type'] == 'attendance_sespimma' && data['zoneId'] != null) {
         Navigator.pop(context, data);
       } else {
@@ -241,10 +259,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen> w
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _isScanned = false);

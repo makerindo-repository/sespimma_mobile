@@ -87,11 +87,6 @@ class LookupModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'tipe': type,
-      'deskripsi': description,
-      'poin': point,
-    };
+    return {'id': id, 'tipe': type, 'deskripsi': description, 'poin': point};
   }
 }

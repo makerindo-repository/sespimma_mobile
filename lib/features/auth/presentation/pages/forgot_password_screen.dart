@@ -24,7 +24,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   static const Color _waColor = Color(0xFF25D366);
 
   static const String _adminWaNumber = '628123456789';
-  static const String _adminWaText = 'Halo Admin Makerindo, saya di akun SESPIMMA ingin meminta token reset password.';
+  static const String _adminWaText =
+      'Halo Admin Makerindo, saya di akun SESPIMMA ingin meminta token reset password.';
   static const String _validResetToken = 'MAKERINDO75';
 
   bool _isLoading = false;
@@ -61,7 +62,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
   Future<void> _contactAdminWA() async {
     final String encodedText = Uri.encodeComponent(_adminWaText);
-    final Uri url = Uri.parse('https://wa.me/$_adminWaNumber?text=$encodedText');
+    final Uri url = Uri.parse(
+      'https://wa.me/$_adminWaNumber?text=$encodedText',
+    );
 
     try {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -87,7 +90,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       setState(() {
         _isLoading = true;
       });
-      
+
       await Future.delayed(const Duration(milliseconds: 1500));
 
       if (!mounted) return;

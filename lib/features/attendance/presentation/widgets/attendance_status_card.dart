@@ -9,11 +9,7 @@ class AttendanceStatusCard extends StatelessWidget {
   final AttendanceSummaryModel? summary;
   final bool isLoading;
 
-  const AttendanceStatusCard({
-    super.key,
-    this.summary,
-    this.isLoading = false,
-  });
+  const AttendanceStatusCard({super.key, this.summary, this.isLoading = false});
 
   static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _warningOrange = Color(0xFFF57C00);
@@ -23,7 +19,8 @@ class AttendanceStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLoading) return _buildShimmer();
 
-    final data = summary ??
+    final data =
+        summary ??
         const AttendanceSummaryModel(
           presentCount: 0,
           permissionCount: 0,

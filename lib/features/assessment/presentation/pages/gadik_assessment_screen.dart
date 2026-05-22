@@ -31,8 +31,20 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
   late AnimationController _animController;
   Timer? _debounce;
 
-  final List<String> _statuses = ['Semua Status', 'Sudah Dinilai', 'Belum Dinilai'];
-  final List<String> _pokjars = ['Semua Pokjar', 'POKJAR 1', 'POKJAR 2', 'POKJAR 3', 'POKJAR 4', 'POKJAR 5', 'POKJAR 6'];
+  final List<String> _statuses = [
+    'Semua Status',
+    'Sudah Dinilai',
+    'Belum Dinilai',
+  ];
+  final List<String> _pokjars = [
+    'Semua Pokjar',
+    'POKJAR 1',
+    'POKJAR 2',
+    'POKJAR 3',
+    'POKJAR 4',
+    'POKJAR 5',
+    'POKJAR 6',
+  ];
 
   @override
   void initState() {
@@ -54,8 +66,8 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
 
   List<Map<String, String>> get _mockSerdikList {
     return PimpinanMockData.sharedReportData.map((report) {
-      final bool sudahDinilai =
-          PimpinanMockData.ratedSerdikForAssessment.contains(report.nrp);
+      final bool sudahDinilai = PimpinanMockData.ratedSerdikForAssessment
+          .contains(report.nrp);
       return {
         'name': report.name,
         'nrp': report.nrp,
@@ -78,17 +90,24 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
       if (roleId.contains('patun')) return 'Patun';
       if (roleId.contains('medis')) return 'Tim Medis';
       if (roleId.contains('korsis')) return 'Korsis';
-      if (roleId.contains('pimpinan') || roleId.contains('admin')) return 'Admin';
+      if (roleId.contains('pimpinan') || roleId.contains('admin')) {
+        return 'Admin';
+      }
     }
     return 'Gadik';
   }
 
-  void _showAssessmentActionSheet(BuildContext context, Map<String, String> serdik) {
+  void _showAssessmentActionSheet(
+    BuildContext context,
+    Map<String, String> serdik,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusRound)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusRound),
+        ),
       ),
       builder: (_) => AssessmentActionSheet(
         serdik: serdik,
@@ -103,17 +122,28 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
         },
         onReward: () {
           Navigator.pop(context);
-          Navigator.pushNamed(context, '/lookup-selection', arguments: {'type': 'reward', 'serdik': serdik});
+          Navigator.pushNamed(
+            context,
+            '/lookup-selection',
+            arguments: {'type': 'reward', 'serdik': serdik},
+          );
         },
         onPunishment: () {
           Navigator.pop(context);
-          Navigator.pushNamed(context, '/lookup-selection', arguments: {'type': 'punishment', 'serdik': serdik});
+          Navigator.pushNamed(
+            context,
+            '/lookup-selection',
+            arguments: {'type': 'punishment', 'serdik': serdik},
+          );
         },
       ),
     );
   }
 
-  void _showMedicalDeductionDialog(BuildContext context, Map<String, String> serdik) {
+  void _showMedicalDeductionDialog(
+    BuildContext context,
+    Map<String, String> serdik,
+  ) {
     showDialog(
       context: context,
       builder: (_) => MedicalDeductionDialog(
@@ -123,7 +153,10 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
     );
   }
 
-  void _showNumericInputDialog(BuildContext context, Map<String, String> serdik) {
+  void _showNumericInputDialog(
+    BuildContext context,
+    Map<String, String> serdik,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -136,9 +169,18 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
     );
   }
 
-  void _onSaveScore(double averageScore, String localCategory, Map<String, String> serdik, List<Map<String, dynamic>> subCategories, TextEditingController justificationController) {
+  void _onSaveScore(
+    double averageScore,
+    String localCategory,
+    Map<String, String> serdik,
+    List<Map<String, dynamic>> subCategories,
+    TextEditingController justificationController,
+  ) {
     if (averageScore > 90.00 && justificationController.text.trim().isEmpty) {
-      _showSnackbar('Justifikasi Gagal! Wajib mengisi Berita Acara khusus untuk nilai > 90,00.', Colors.red.shade700);
+      _showSnackbar(
+        'Justifikasi Gagal! Wajib mengisi Berita Acara khusus untuk nilai > 90,00.',
+        Colors.red.shade700,
+      );
       return;
     }
     setState(() {
@@ -150,8 +192,15 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
     _showResultSnackbar(averageScore);
   }
 
-  void _updateMockData(String localCategory, double averageScore, Map<String, String> serdik, List<Map<String, dynamic>> subCategories) {
-    final index = PimpinanMockData.sharedReportData.indexWhere((r) => r.nrp == serdik['nrp']);
+  void _updateMockData(
+    String localCategory,
+    double averageScore,
+    Map<String, String> serdik,
+    List<Map<String, dynamic>> subCategories,
+  ) {
+    final index = PimpinanMockData.sharedReportData.indexWhere(
+      (r) => r.nrp == serdik['nrp'],
+    );
     if (index == -1) return;
 
     final current = PimpinanMockData.sharedReportData[index];
@@ -176,11 +225,20 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
 
   void _showResultSnackbar(double averageScore) {
     if (averageScore > 90.01) {
-      _showSnackbar('Skor ${averageScore.toStringAsFixed(2)} (>90.01) memerlukan Berita Acara khusus sebagai bentuk verifikasi.', Colors.amber.shade800);
+      _showSnackbar(
+        'Skor ${averageScore.toStringAsFixed(2)} (>90.01) memerlukan Berita Acara khusus sebagai bentuk verifikasi.',
+        Colors.amber.shade800,
+      );
     } else if (averageScore <= 70.0) {
-      _showSnackbar('PERINGATAN: Skor ${averageScore.toStringAsFixed(2)} di bawah passing grade! Serdik dinyatakan Tidak Lulus.', Colors.red.shade800);
+      _showSnackbar(
+        'PERINGATAN: Skor ${averageScore.toStringAsFixed(2)} di bawah passing grade! Serdik dinyatakan Tidak Lulus.',
+        Colors.red.shade800,
+      );
     } else {
-      _showSnackbar('Nilai rata-rata ${averageScore.toStringAsFixed(2)} berhasil disimpan.', AppColors.successGreen);
+      _showSnackbar(
+        'Nilai rata-rata ${averageScore.toStringAsFixed(2)} berhasil disimpan.',
+        AppColors.successGreen,
+      );
     }
   }
 
@@ -190,7 +248,9 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
         content: Text(msg),
         backgroundColor: bgColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        ),
       ),
     );
   }
@@ -199,9 +259,15 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
   Widget build(BuildContext context) {
     final filteredList = _mockSerdikList.where((serdik) {
       final q = _searchQuery.toLowerCase();
-      final matchSearch = serdik['name']!.toLowerCase().contains(q) || serdik['nrp']!.toLowerCase().contains(q);
-      final matchPokjar = _selectedPokjar == 'Semua Pokjar' || serdik['pokjar'] == _selectedPokjar;
-      final matchStatus = _selectedStatus == 'Semua Status' || serdik['status'] == _selectedStatus;
+      final matchSearch =
+          serdik['name']!.toLowerCase().contains(q) ||
+          serdik['nrp']!.toLowerCase().contains(q);
+      final matchPokjar =
+          _selectedPokjar == 'Semua Pokjar' ||
+          serdik['pokjar'] == _selectedPokjar;
+      final matchStatus =
+          _selectedStatus == 'Semua Status' ||
+          serdik['status'] == _selectedStatus;
       return matchSearch && matchPokjar && matchStatus;
     }).toList();
 
@@ -212,14 +278,21 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
         centerTitle: true,
         title: const Text(
           'Input Penilaian Serdik',
-          style: TextStyle(color: AppColors.textOnPrimary, fontWeight: FontWeight.w700, fontSize: AppDimensions.fontXxl),
+          style: TextStyle(
+            color: AppColors.textOnPrimary,
+            fontWeight: FontWeight.w700,
+            fontSize: AppDimensions.fontXxl,
+          ),
         ),
       ),
       body: Column(
         children: [
           Container(
             color: AppColors.surface,
-            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl, vertical: AppDimensions.lg),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.xl,
+              vertical: AppDimensions.lg,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -229,7 +302,10 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
                     searchQuery: _searchQuery,
                     onChanged: (val) {
                       _debounce?.cancel();
-                      _debounce = Timer(const Duration(milliseconds: 300), () => setState(() => _searchQuery = val));
+                      _debounce = Timer(
+                        const Duration(milliseconds: 300),
+                        () => setState(() => _searchQuery = val),
+                      );
                     },
                     onClear: () {
                       _searchController.clear();
@@ -238,26 +314,49 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
                   ),
                 ),
                 const SizedBox(width: AppDimensions.md),
-                Expanded(child: PokjarDropdownWidget(selectedPokjar: _selectedPokjar, pokjars: _pokjars, onChanged: (val) {
-                  setState(() => _selectedPokjar = val);
-                  _animController.forward(from: 0.0);
-                })),
+                Expanded(
+                  child: PokjarDropdownWidget(
+                    selectedPokjar: _selectedPokjar,
+                    pokjars: _pokjars,
+                    onChanged: (val) {
+                      setState(() => _selectedPokjar = val);
+                      _animController.forward(from: 0.0);
+                    },
+                  ),
+                ),
                 const SizedBox(width: AppDimensions.sm),
-                StatusFilterButtonWidget(selectedStatus: _selectedStatus, statuses: _statuses, onSelected: (val) {
-                  setState(() => _selectedStatus = val);
-                  _animController.forward(from: 0.0);
-                }),
+                StatusFilterButtonWidget(
+                  selectedStatus: _selectedStatus,
+                  statuses: _statuses,
+                  onSelected: (val) {
+                    setState(() => _selectedStatus = val);
+                    _animController.forward(from: 0.0);
+                  },
+                ),
               ],
             ),
           ),
-          Divider(height: AppDimensions.dividerHeight, color: Colors.grey.shade200, thickness: AppDimensions.dividerHeight),
+          Divider(
+            height: AppDimensions.dividerHeight,
+            color: Colors.grey.shade200,
+            thickness: AppDimensions.dividerHeight,
+          ),
           Expanded(
             child: filteredList.isEmpty
                 ? const AssessmentEmptyStateWidget()
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl, vertical: AppDimensions.lg),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.xl,
+                      vertical: AppDimensions.lg,
+                    ),
                     itemCount: filteredList.length,
-                    itemBuilder: (context, index) => SerdikCardWidget(serdik: filteredList[index], onTap: () => _showAssessmentActionSheet(context, filteredList[index])),
+                    itemBuilder: (context, index) => SerdikCardWidget(
+                      serdik: filteredList[index],
+                      onTap: () => _showAssessmentActionSheet(
+                        context,
+                        filteredList[index],
+                      ),
+                    ),
                   ),
           ),
         ],

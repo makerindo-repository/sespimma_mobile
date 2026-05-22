@@ -51,10 +51,7 @@ class PdfReportService {
           'LEMBAGA PENDIDIKAN DAN PELATIHAN',
           style: pw.TextStyle(font: bold, fontSize: 10),
         ),
-        pw.Container(
-          width: 200,
-          child: pw.Divider(thickness: 1),
-        ),
+        pw.Container(width: 200, child: pw.Divider(thickness: 1)),
       ],
     );
   }
@@ -83,7 +80,10 @@ class PdfReportService {
   }
 
   static pw.Widget _buildTable(
-      List<FinalRecapModel> data, pw.Font bold, pw.Font regular) {
+    List<FinalRecapModel> data,
+    pw.Font bold,
+    pw.Font regular,
+  ) {
     final headers = [
       'NO',
       'NAMA / NRP',
@@ -92,7 +92,7 @@ class PdfReportService {
       'MENTAL',
       'JAS',
       'RATA2',
-      'STATUS'
+      'STATUS',
     ];
 
     return pw.TableHelper.fromTextArray(
@@ -111,7 +111,11 @@ class PdfReportService {
           isLulus ? 'LULUS' : 'TIDAK LULUS',
         ];
       }),
-      headerStyle: pw.TextStyle(font: bold, fontSize: 9, color: PdfColors.white),
+      headerStyle: pw.TextStyle(
+        font: bold,
+        fontSize: 9,
+        color: PdfColors.white,
+      ),
       headerDecoration: const pw.BoxDecoration(color: PdfColors.blueGrey800),
       cellStyle: pw.TextStyle(font: regular, fontSize: 8),
       columnWidths: {
@@ -125,14 +129,15 @@ class PdfReportService {
         7: const pw.FixedColumnWidth(60),
       },
       cellAlignment: pw.Alignment.center,
-      cellAlignments: {
-        1: pw.Alignment.centerLeft,
-      },
+      cellAlignments: {1: pw.Alignment.centerLeft},
     );
   }
 
   static pw.Widget _buildSummary(
-      List<FinalRecapModel> data, pw.Font bold, pw.Font regular) {
+    List<FinalRecapModel> data,
+    pw.Font bold,
+    pw.Font regular,
+  ) {
     final int lulus = data.where((r) => r.average >= 70.0).length;
     final int tidakLulus = data.length - lulus;
 
@@ -142,11 +147,23 @@ class PdfReportService {
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('RINGKASAN KELULUSAN:', style: pw.TextStyle(font: bold, fontSize: 10)),
+            pw.Text(
+              'RINGKASAN KELULUSAN:',
+              style: pw.TextStyle(font: bold, fontSize: 10),
+            ),
             pw.SizedBox(height: 5),
-            pw.Text('Total Serdik Terpilih : ${data.length} Orang', style: pw.TextStyle(font: regular, fontSize: 9)),
-            pw.Text('Memenuhi Syarat (Lulus) : $lulus Orang', style: pw.TextStyle(font: regular, fontSize: 9)),
-            pw.Text('Peringatan Khusus      : $tidakLulus Orang', style: pw.TextStyle(font: regular, fontSize: 9)),
+            pw.Text(
+              'Total Serdik Terpilih : ${data.length} Orang',
+              style: pw.TextStyle(font: regular, fontSize: 9),
+            ),
+            pw.Text(
+              'Memenuhi Syarat (Lulus) : $lulus Orang',
+              style: pw.TextStyle(font: regular, fontSize: 9),
+            ),
+            pw.Text(
+              'Peringatan Khusus      : $tidakLulus Orang',
+              style: pw.TextStyle(font: regular, fontSize: 9),
+            ),
           ],
         ),
       ],
@@ -156,8 +173,18 @@ class PdfReportService {
   static pw.Widget _buildFooter(pw.Font bold, pw.Font regular) {
     final date = DateTime.now();
     final months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     final dateStr = '${date.day} ${months[date.month - 1]} ${date.year}';
 
@@ -166,12 +193,21 @@ class PdfReportService {
       children: [
         pw.Column(
           children: [
-            pw.Text('Lembang, $dateStr', style: pw.TextStyle(font: regular, fontSize: 10)),
+            pw.Text(
+              'Lembang, $dateStr',
+              style: pw.TextStyle(font: regular, fontSize: 10),
+            ),
             pw.SizedBox(height: 5),
-            pw.Text('KA SESPIMMA LEMDIKLAT POLRI', style: pw.TextStyle(font: bold, fontSize: 10)),
+            pw.Text(
+              'KA SESPIMMA LEMDIKLAT POLRI',
+              style: pw.TextStyle(font: bold, fontSize: 10),
+            ),
             pw.SizedBox(height: 60),
             pw.Container(width: 150, child: pw.Divider(thickness: 1)),
-            pw.Text('INSPEKTUR JENDERAL POLISI', style: pw.TextStyle(font: regular, fontSize: 9)),
+            pw.Text(
+              'INSPEKTUR JENDERAL POLISI',
+              style: pw.TextStyle(font: regular, fontSize: 9),
+            ),
           ],
         ),
       ],

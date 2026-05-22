@@ -28,8 +28,9 @@ void main() {
         announcements: ['Jadwal ujian dipercepat'],
       );
 
-      when(() => mockRepository.getDashboardSummary())
-          .thenAnswer((_) async => expected);
+      when(
+        () => mockRepository.getDashboardSummary(),
+      ).thenAnswer((_) async => expected);
 
       final usecase = GetDashboardSummary(mockRepository);
       final result = await usecase(const NoParams());

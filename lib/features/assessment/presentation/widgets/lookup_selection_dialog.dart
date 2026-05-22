@@ -10,7 +10,8 @@ class LookupSelectionDialog extends StatefulWidget {
   State<LookupSelectionDialog> createState() => _LookupSelectionDialogState();
 }
 
-class _LookupSelectionDialogState extends State<LookupSelectionDialog> with SingleTickerProviderStateMixin {
+class _LookupSelectionDialogState extends State<LookupSelectionDialog>
+    with SingleTickerProviderStateMixin {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   late AnimationController _animController;
@@ -31,69 +32,379 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
   static const Color _dangerRed = Color(0xFFD32F2F);
 
   final List<Map<String, dynamic>> _mockRewards = [
-    {'id': 'R1', 'tipe': 'Moral', 'deskripsi': 'Menjadi Imam Shalat', 'poin': 0.50},
-    {'id': 'R2', 'tipe': 'Moral', 'deskripsi': 'Menjadi Khotib / Memimpin Kebaktian / Dharma Wacana', 'poin': 0.40},
-    {'id': 'R3', 'tipe': 'Moral', 'deskripsi': 'Membaca Doa Apel / Mengumandangkan Adzan', 'poin': 0.25},
-    {'id': 'R4', 'tipe': 'Moral', 'deskripsi': 'Bakti Lembaga', 'poin': 0.25, 'limit': 3, 'usage': 3},
-    {'id': 'R5', 'tipe': 'Moral', 'deskripsi': 'Memberikan Santunan (Panti Asuhan/Warga)', 'poin': 0.40, 'limit': 3, 'usage': 1},
-    {'id': 'R6', 'tipe': 'Moral', 'deskripsi': 'Sumbangan Ke Tempat Ibadah', 'poin': 0.38, 'limit': 3, 'usage': 0},
-    {'id': 'R7', 'tipe': 'Moral', 'deskripsi': 'Menyumbang Buku ke Perpustakaan', 'poin': 0.30, 'limit': 3, 'usage': 2},
-    {'id': 'R8', 'tipe': 'Moral', 'deskripsi': 'Menjadi Pejabat Upacara', 'poin': 0.30},
-    {'id': 'R9', 'tipe': 'Moral', 'deskripsi': 'Pengucap Tri Brata / Catur Prasetya dengan Benar', 'poin': 0.30},
-    {'id': 'R10', 'tipe': 'Disiplin', 'deskripsi': 'Satu Bulan Tanpa Pelanggaran', 'poin': 0.25},
-    {'id': 'R11', 'tipe': 'Disiplin', 'deskripsi': 'Menjadi Danki Harian', 'poin': 0.35},
-    {'id': 'R12', 'tipe': 'Disiplin', 'deskripsi': 'Menjadi Danton Harian', 'poin': 0.30},
-    {'id': 'R13', 'tipe': 'Disiplin', 'deskripsi': 'Menjadi Pengibar Bendera', 'poin': 0.25},
-    {'id': 'R14', 'tipe': 'Kepemimpinan', 'deskripsi': 'Menjabat Perangkat Senat', 'poin': 0.25},
-    {'id': 'R15', 'tipe': 'Kepemimpinan', 'deskripsi': 'Menyelesaikan Tugas Dinas sesuai Sprin secara tuntas', 'poin': 0.25},
-    {'id': 'R16', 'tipe': 'Kepemimpinan', 'deskripsi': 'Menjadi Tim Perumus / Pelapor Seminar Sekolah', 'poin': 0.25},
-    {'id': 'R17', 'tipe': 'Kepemimpinan', 'deskripsi': 'Kunjungan Perpustakaan', 'poin': 0.15, 'limitWeek': 2, 'usageWeek': 2},
-    {'id': 'R18', 'tipe': 'Kepemimpinan', 'deskripsi': 'Menyelesaikan Masalah di Kelompok/POKJAR', 'poin': 0.30},
-    {'id': 'R19', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Loyalitas Mendukung Kegiatan Kelompok/POKJAR', 'poin': 0.30},
-    {'id': 'R20', 'tipe': 'Penampilan', 'deskripsi': 'Peduli dan Merawat Lingkungan Lembaga', 'poin': 0.40},
+    {
+      'id': 'R1',
+      'tipe': 'Moral',
+      'deskripsi': 'Menjadi Imam Shalat',
+      'poin': 0.50,
+    },
+    {
+      'id': 'R2',
+      'tipe': 'Moral',
+      'deskripsi': 'Menjadi Khotib / Memimpin Kebaktian / Dharma Wacana',
+      'poin': 0.40,
+    },
+    {
+      'id': 'R3',
+      'tipe': 'Moral',
+      'deskripsi': 'Membaca Doa Apel / Mengumandangkan Adzan',
+      'poin': 0.25,
+    },
+    {
+      'id': 'R4',
+      'tipe': 'Moral',
+      'deskripsi': 'Bakti Lembaga',
+      'poin': 0.25,
+      'limit': 3,
+      'usage': 3,
+    },
+    {
+      'id': 'R5',
+      'tipe': 'Moral',
+      'deskripsi': 'Memberikan Santunan (Panti Asuhan/Warga)',
+      'poin': 0.40,
+      'limit': 3,
+      'usage': 1,
+    },
+    {
+      'id': 'R6',
+      'tipe': 'Moral',
+      'deskripsi': 'Sumbangan Ke Tempat Ibadah',
+      'poin': 0.38,
+      'limit': 3,
+      'usage': 0,
+    },
+    {
+      'id': 'R7',
+      'tipe': 'Moral',
+      'deskripsi': 'Menyumbang Buku ke Perpustakaan',
+      'poin': 0.30,
+      'limit': 3,
+      'usage': 2,
+    },
+    {
+      'id': 'R8',
+      'tipe': 'Moral',
+      'deskripsi': 'Menjadi Pejabat Upacara',
+      'poin': 0.30,
+    },
+    {
+      'id': 'R9',
+      'tipe': 'Moral',
+      'deskripsi': 'Pengucap Tri Brata / Catur Prasetya dengan Benar',
+      'poin': 0.30,
+    },
+    {
+      'id': 'R10',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Satu Bulan Tanpa Pelanggaran',
+      'poin': 0.25,
+    },
+    {
+      'id': 'R11',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Menjadi Danki Harian',
+      'poin': 0.35,
+    },
+    {
+      'id': 'R12',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Menjadi Danton Harian',
+      'poin': 0.30,
+    },
+    {
+      'id': 'R13',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Menjadi Pengibar Bendera',
+      'poin': 0.25,
+    },
+    {
+      'id': 'R14',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Menjabat Perangkat Senat',
+      'poin': 0.25,
+    },
+    {
+      'id': 'R15',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Menyelesaikan Tugas Dinas sesuai Sprin secara tuntas',
+      'poin': 0.25,
+    },
+    {
+      'id': 'R16',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Menjadi Tim Perumus / Pelapor Seminar Sekolah',
+      'poin': 0.25,
+    },
+    {
+      'id': 'R17',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Kunjungan Perpustakaan',
+      'poin': 0.15,
+      'limitWeek': 2,
+      'usageWeek': 2,
+    },
+    {
+      'id': 'R18',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Menyelesaikan Masalah di Kelompok/POKJAR',
+      'poin': 0.30,
+    },
+    {
+      'id': 'R19',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Loyalitas Mendukung Kegiatan Kelompok/POKJAR',
+      'poin': 0.30,
+    },
+    {
+      'id': 'R20',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Peduli dan Merawat Lingkungan Lembaga',
+      'poin': 0.40,
+    },
   ];
 
   final List<Map<String, dynamic>> _mockPunishments = [
-    {'id': 'P1', 'tipe': 'Moral', 'deskripsi': 'Tidak Mau Mengakui Kesalahan / Kekurangan', 'poin': -0.70},
-    {'id': 'P2', 'tipe': 'Moral', 'deskripsi': 'Berbohong / Tidak Memberikan Keterangan Benar', 'poin': -0.30},
-    {'id': 'P3', 'tipe': 'Moral', 'deskripsi': 'Tidak Melaksanakan Giat Agama Mingguan', 'poin': -0.20},
-    {'id': 'P4', 'tipe': 'Moral', 'deskripsi': 'Melanggar Norma Agama (Penistaan)', 'poin': -0.30},
-    {'id': 'P5', 'tipe': 'Moral', 'deskripsi': 'Tidak Tertib / Tidak Mengikuti Upacara', 'poin': -0.50},
-    {'id': 'P6', 'tipe': 'Moral', 'deskripsi': 'Tidak Melaksanakan Perintah Pimpinan', 'poin': -0.50},
-    {'id': 'P7', 'tipe': 'Moral', 'deskripsi': 'Menjadi Provokator / Memperkeruh Suasana', 'poin': -0.30},
-    {'id': 'P8', 'tipe': 'Moral', 'deskripsi': 'Pembiaran terhadap Perselisihan Kelompok', 'poin': -0.30},
-    {'id': 'P9', 'tipe': 'Disiplin', 'deskripsi': 'Tidak Mengisi Absensi (Face ID) tepat waktu', 'poin': -0.50},
-    {'id': 'P10', 'tipe': 'Disiplin', 'deskripsi': 'Terlambat Kuliah / Kegiatan (Tanpa Alasan)', 'poin': -0.53},
-    {'id': 'P11', 'tipe': 'Disiplin', 'deskripsi': 'Terlambat Kembali Izin / IBL', 'poin': -0.50},
-    {'id': 'P12', 'tipe': 'Disiplin', 'deskripsi': 'Terlambat Apel Pagi, Malam, atau Olahraga Pagi', 'poin': -0.50},
-    {'id': 'P13', 'tipe': 'Disiplin', 'deskripsi': 'Sengaja Tidak Ikut Kegiatan / Bolos', 'poin': -0.90},
-    {'id': 'P14', 'tipe': 'Disiplin', 'deskripsi': 'Meninggalkan Kuliah saat Berlangsung', 'poin': -0.30},
-    {'id': 'P15', 'tipe': 'Disiplin', 'deskripsi': 'Melanggar Ketentuan Izin / Tamu / Parkir / Dormitori', 'poin': -0.30},
-    {'id': 'P16', 'tipe': 'Disiplin', 'deskripsi': 'Merokok Sambil Berjalan / Tidak pada Tempatnya', 'poin': -0.30},
-    {'id': 'P17', 'tipe': 'Disiplin', 'deskripsi': 'Tidak Mengikuti Kegiatan Pelatihan', 'poin': -0.80},
-    {'id': 'P18', 'tipe': 'Disiplin', 'deskripsi': 'Pakaian / Gampol Tidak Sesuai Ketentuan', 'poin': -0.50},
-    {'id': 'P19', 'tipe': 'Disiplin', 'deskripsi': 'Tidak Membuat/Mengumpulkan Resume Mata Pelajaran', 'poin': -0.50},
-    {'id': 'P20', 'tipe': 'Disiplin', 'deskripsi': 'Gagal Perbaikan Resume (Remedial)', 'poin': -0.50},
-    {'id': 'P21', 'tipe': 'Kepemimpinan', 'deskripsi': 'Membiarkan / Mengajak Kelompok Melanggar', 'poin': -0.50},
-    {'id': 'P22', 'tipe': 'Kepemimpinan', 'deskripsi': 'Mengkritisi Tidak Proporsional (Asal Bunyi)', 'poin': -1.00},
-    {'id': 'P23', 'tipe': 'Kepemimpinan', 'deskripsi': 'Menyuruh Orang Lain Mengerjakan Tugasnya', 'poin': -0.50},
-    {'id': 'P24', 'tipe': 'Kepemimpinan', 'deskripsi': 'Jam Belajar Digunakan untuk Hal Tidak Bermanfaat', 'poin': -0.40},
-    {'id': 'P25', 'tipe': 'Kepemimpinan', 'deskripsi': 'Menggunakan Gadget/Laptop tidak terkait Pelajaran', 'poin': -0.30},
-    {'id': 'P26', 'tipe': 'Kepemimpinan', 'deskripsi': 'Posting Konten Tidak Pantas di Medsos', 'poin': -0.50},
-    {'id': 'P27', 'tipe': 'Kepemimpinan', 'deskripsi': 'Acuh Tak Acuh / Tidak Mau Bekerja Sama', 'poin': -0.31},
-    {'id': 'P28', 'tipe': 'Kepemimpinan', 'deskripsi': 'Melempar Tanggung Jawab', 'poin': -0.50},
-    {'id': 'P29', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Tidak Mampu Kendali Amarah / Mudah Tersinggung', 'poin': -0.90},
-    {'id': 'P30', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Berbicara Tidak Sopan / Celometan / Arogan', 'poin': -0.53},
-    {'id': 'P31', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Sering Mengantuk / Tidur saat Kuliah', 'poin': -0.60},
-    {'id': 'P32', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Membawa Kendaraan Pribadi', 'poin': -0.50},
-    {'id': 'P33', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Menolak Kritik / Saran yang Baik', 'poin': -0.30},
-    {'id': 'P34', 'tipe': 'Pengendalian Diri', 'deskripsi': 'Boros Sarpras Dinas / Tidak Mandiri', 'poin': -0.15},
-    {'id': 'P35', 'tipe': 'Penampilan', 'deskripsi': 'Rambut, Kumis, Jambang, Jenggot Tidak Rapi', 'poin': -0.25},
-    {'id': 'P36', 'tipe': 'Penampilan', 'deskripsi': 'Atribut Kotor / Tidak Lengkap', 'poin': -0.20},
-    {'id': 'P37', 'tipe': 'Penampilan', 'deskripsi': 'Memakai Aksesoris Berlebihan', 'poin': -0.30},
-    {'id': 'P38', 'tipe': 'Penampilan', 'deskripsi': 'Kamar / Dormitori Kotor dan Tidak Terawat', 'poin': -0.53},
-    {'id': 'P39', 'tipe': 'Penampilan', 'deskripsi': 'Menjemur Pakaian Tidak pada Tempatnya', 'poin': -0.25},
-    {'id': 'P40', 'tipe': 'Penampilan', 'deskripsi': 'Buang Sampah / Puntung Rokok Sembarangan', 'poin': -0.40},
+    {
+      'id': 'P1',
+      'tipe': 'Moral',
+      'deskripsi': 'Tidak Mau Mengakui Kesalahan / Kekurangan',
+      'poin': -0.70,
+    },
+    {
+      'id': 'P2',
+      'tipe': 'Moral',
+      'deskripsi': 'Berbohong / Tidak Memberikan Keterangan Benar',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P3',
+      'tipe': 'Moral',
+      'deskripsi': 'Tidak Melaksanakan Giat Agama Mingguan',
+      'poin': -0.20,
+    },
+    {
+      'id': 'P4',
+      'tipe': 'Moral',
+      'deskripsi': 'Melanggar Norma Agama (Penistaan)',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P5',
+      'tipe': 'Moral',
+      'deskripsi': 'Tidak Tertib / Tidak Mengikuti Upacara',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P6',
+      'tipe': 'Moral',
+      'deskripsi': 'Tidak Melaksanakan Perintah Pimpinan',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P7',
+      'tipe': 'Moral',
+      'deskripsi': 'Menjadi Provokator / Memperkeruh Suasana',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P8',
+      'tipe': 'Moral',
+      'deskripsi': 'Pembiaran terhadap Perselisihan Kelompok',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P9',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Tidak Mengisi Absensi (Face ID) tepat waktu',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P10',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Terlambat Kuliah / Kegiatan (Tanpa Alasan)',
+      'poin': -0.53,
+    },
+    {
+      'id': 'P11',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Terlambat Kembali Izin / IBL',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P12',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Terlambat Apel Pagi, Malam, atau Olahraga Pagi',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P13',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Sengaja Tidak Ikut Kegiatan / Bolos',
+      'poin': -0.90,
+    },
+    {
+      'id': 'P14',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Meninggalkan Kuliah saat Berlangsung',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P15',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Melanggar Ketentuan Izin / Tamu / Parkir / Dormitori',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P16',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Merokok Sambil Berjalan / Tidak pada Tempatnya',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P17',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Tidak Mengikuti Kegiatan Pelatihan',
+      'poin': -0.80,
+    },
+    {
+      'id': 'P18',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Pakaian / Gampol Tidak Sesuai Ketentuan',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P19',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Tidak Membuat/Mengumpulkan Resume Mata Pelajaran',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P20',
+      'tipe': 'Disiplin',
+      'deskripsi': 'Gagal Perbaikan Resume (Remedial)',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P21',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Membiarkan / Mengajak Kelompok Melanggar',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P22',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Mengkritisi Tidak Proporsional (Asal Bunyi)',
+      'poin': -1.00,
+    },
+    {
+      'id': 'P23',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Menyuruh Orang Lain Mengerjakan Tugasnya',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P24',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Jam Belajar Digunakan untuk Hal Tidak Bermanfaat',
+      'poin': -0.40,
+    },
+    {
+      'id': 'P25',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Menggunakan Gadget/Laptop tidak terkait Pelajaran',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P26',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Posting Konten Tidak Pantas di Medsos',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P27',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Acuh Tak Acuh / Tidak Mau Bekerja Sama',
+      'poin': -0.31,
+    },
+    {
+      'id': 'P28',
+      'tipe': 'Kepemimpinan',
+      'deskripsi': 'Melempar Tanggung Jawab',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P29',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Tidak Mampu Kendali Amarah / Mudah Tersinggung',
+      'poin': -0.90,
+    },
+    {
+      'id': 'P30',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Berbicara Tidak Sopan / Celometan / Arogan',
+      'poin': -0.53,
+    },
+    {
+      'id': 'P31',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Sering Mengantuk / Tidur saat Kuliah',
+      'poin': -0.60,
+    },
+    {
+      'id': 'P32',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Membawa Kendaraan Pribadi',
+      'poin': -0.50,
+    },
+    {
+      'id': 'P33',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Menolak Kritik / Saran yang Baik',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P34',
+      'tipe': 'Pengendalian Diri',
+      'deskripsi': 'Boros Sarpras Dinas / Tidak Mandiri',
+      'poin': -0.15,
+    },
+    {
+      'id': 'P35',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Rambut, Kumis, Jambang, Jenggot Tidak Rapi',
+      'poin': -0.25,
+    },
+    {
+      'id': 'P36',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Atribut Kotor / Tidak Lengkap',
+      'poin': -0.20,
+    },
+    {
+      'id': 'P37',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Memakai Aksesoris Berlebihan',
+      'poin': -0.30,
+    },
+    {
+      'id': 'P38',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Kamar / Dormitori Kotor dan Tidak Terawat',
+      'poin': -0.53,
+    },
+    {
+      'id': 'P39',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Menjemur Pakaian Tidak pada Tempatnya',
+      'poin': -0.25,
+    },
+    {
+      'id': 'P40',
+      'tipe': 'Penampilan',
+      'deskripsi': 'Buang Sampah / Puntung Rokok Sembarangan',
+      'poin': -0.40,
+    },
   ];
 
   @override
@@ -222,7 +533,11 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
                       final animation = CurvedAnimation(
                         parent: _animController,
                         curve: Interval(
-                          (index / (filteredList.isEmpty ? 1 : filteredList.length)).clamp(0.0, 1.0),
+                          (index /
+                                  (filteredList.isEmpty
+                                      ? 1
+                                      : filteredList.length))
+                              .clamp(0.0, 1.0),
                           1.0,
                           curve: Curves.easeOutCubic,
                         ),
@@ -264,7 +579,10 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
         style: const TextStyle(fontSize: AppDimensions.fontDefault),
         decoration: InputDecoration(
           hintText: 'Cari indikator perilaku...',
-          hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontDefault),
+          hintStyle: TextStyle(
+            color: Colors.blueGrey.shade300,
+            fontSize: AppDimensions.fontDefault,
+          ),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: Colors.blueGrey.shade400,
@@ -405,8 +723,12 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
                           style: TextStyle(
                             fontSize: AppDimensions.fontLg,
                             fontWeight: FontWeight.w700,
-                            color: isBlocked ? Colors.blueGrey.shade400 : _primaryNavy,
-                            decoration: isBlocked ? TextDecoration.lineThrough : null,
+                            color: isBlocked
+                                ? Colors.blueGrey.shade400
+                                : _primaryNavy,
+                            decoration: isBlocked
+                                ? TextDecoration.lineThrough
+                                : null,
                           ),
                         ),
                         const SizedBox(height: AppDimensions.radiusSm),
@@ -421,10 +743,16 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: isBlocked ? Colors.grey.shade200 : Colors.blueGrey.shade50,
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                                color: isBlocked
+                                    ? Colors.grey.shade200
+                                    : Colors.blueGrey.shade50,
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusSm,
+                                ),
                                 border: Border.all(
-                                  color: isBlocked ? Colors.grey.shade300 : Colors.blueGrey.shade100,
+                                  color: isBlocked
+                                      ? Colors.grey.shade300
+                                      : Colors.blueGrey.shade100,
                                 ),
                               ),
                               child: Text(
@@ -432,7 +760,9 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
                                 style: TextStyle(
                                   fontSize: AppDimensions.fontSm,
                                   fontWeight: FontWeight.w800,
-                                  color: isBlocked ? Colors.grey.shade600 : Colors.blueGrey.shade600,
+                                  color: isBlocked
+                                      ? Colors.grey.shade600
+                                      : Colors.blueGrey.shade600,
                                   letterSpacing: 0.5,
                                 ),
                               ),
@@ -447,7 +777,9 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
                                   color: isBlocked
                                       ? Colors.red.shade50
                                       : Colors.amber.shade50,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusSm,
+                                  ),
                                   border: Border.all(
                                     color: isBlocked
                                         ? Colors.red.shade100
@@ -458,19 +790,27 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog> with Sing
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(
-                                      isBlocked ? Icons.error_outline : Icons.info_outline,
+                                      isBlocked
+                                          ? Icons.error_outline
+                                          : Icons.info_outline,
                                       size: 10,
-                                      color: isBlocked ? Colors.red.shade700 : Colors.amber.shade800,
+                                      color: isBlocked
+                                          ? Colors.red.shade700
+                                          : Colors.amber.shade800,
                                     ),
                                     const SizedBox(width: AppDimensions.xs),
                                     Flexible(
                                       child: Text(
-                                        isBlocked ? "BATAS TERCAPAI ($usageLabel)" : usageLabel,
+                                        isBlocked
+                                            ? "BATAS TERCAPAI ($usageLabel)"
+                                            : usageLabel,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: AppDimensions.fontSm,
                                           fontWeight: FontWeight.w800,
-                                          color: isBlocked ? Colors.red.shade700 : Colors.amber.shade800,
+                                          color: isBlocked
+                                              ? Colors.red.shade700
+                                              : Colors.amber.shade800,
                                         ),
                                       ),
                                     ),
@@ -513,7 +853,8 @@ class _ConfirmSelectionDialog extends StatefulWidget {
   });
 
   @override
-  State<_ConfirmSelectionDialog> createState() => _ConfirmSelectionDialogState();
+  State<_ConfirmSelectionDialog> createState() =>
+      _ConfirmSelectionDialogState();
 }
 
 class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
@@ -643,7 +984,9 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
               onTap: () async {
                 try {
                   final picker = ImagePicker();
-                  final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                  final pickedFile = await picker.pickImage(
+                    source: ImageSource.camera,
+                  );
                   if (pickedFile != null) {
                     setState(() {
                       _selectedImagePath = pickedFile.path;
@@ -656,7 +999,10 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
               borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   color: _selectedImagePath != null
                       ? _successGreen.withValues(alpha: 0.1)
@@ -723,7 +1069,8 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
                   color: _primaryNavy,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Masukkan detail kejadian, waktu, lokasi, atau kronologi singkat...',
+                  hintText:
+                      'Masukkan detail kejadian, waktu, lokasi, atau kronologi singkat...',
                   hintStyle: TextStyle(
                     fontSize: AppDimensions.fontMd,
                     color: Colors.blueGrey.shade400,
@@ -755,10 +1102,13 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
               ? null
               : () {
                   final double pointChange = (item['poin'] as num).toDouble();
-                  final index = PimpinanMockData.sharedReportData.indexWhere((r) => r.nrp == serdik['nrp']);
+                  final index = PimpinanMockData.sharedReportData.indexWhere(
+                    (r) => r.nrp == serdik['nrp'],
+                  );
                   if (index != -1) {
                     final current = PimpinanMockData.sharedReportData[index];
-                    final double newScore = (current.mentalScore + pointChange).clamp(0.0, 100.0);
+                    final double newScore = (current.mentalScore + pointChange)
+                        .clamp(0.0, 100.0);
                     PimpinanMockData.sharedReportData[index] = current.copyWith(
                       mentalScore: newScore,
                     );
@@ -766,13 +1116,16 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
 
                   final typeString = isReward ? 'reward' : 'punishment';
                   final titlePrefix = isReward ? 'Reward:' : 'Punishment:';
-                  final pointStr = pointChange > 0 ? '+${pointChange.toStringAsFixed(2)}' : pointChange.toStringAsFixed(2);
+                  final pointStr = pointChange > 0
+                      ? '+${pointChange.toStringAsFixed(2)}'
+                      : pointChange.toStringAsFixed(2);
                   PimpinanMockData.customActivities.add({
                     'id': 'dyn_${DateTime.now().millisecondsSinceEpoch}',
                     'nrp': serdik['nrp'],
                     'title': '$titlePrefix ${item['tipe']}',
                     'subtitle': item['deskripsi'],
-                    'timeRaw': '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}',
+                    'timeRaw':
+                        '${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}',
                     'dateTime': DateTime.now(),
                     'points': pointStr,
                     'type': typeString,
@@ -789,7 +1142,9 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
                       backgroundColor: isReward ? _successGreen : _dangerRed,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                       ),
                     ),
                   );
