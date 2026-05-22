@@ -44,6 +44,8 @@ jobs:
           echo "========================================="
           echo "Starting analysis and testing..."
           echo "========================================="
+          # Create dummy .env file to prevent 'asset_does_not_exist' warning
+          touch .env
           flutter analyze --no-fatal-infos
           flutter test
 
