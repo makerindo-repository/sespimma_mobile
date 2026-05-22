@@ -34,6 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
       roleId: loginResponse.roleId,
       pokjar: loginResponse.pokjar,
       nrp: loginResponse.nrp,
+      nosis: loginResponse.nosis,
       pangkat: loginResponse.pangkat,
       angkatan: loginResponse.angkatan,
       agama: loginResponse.agama,

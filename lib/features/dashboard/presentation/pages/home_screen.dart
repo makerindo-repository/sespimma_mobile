@@ -11,6 +11,8 @@ import '../../../activity/presentation/pages/activity_history_screen.dart';
 import '../../../attendance/presentation/pages/attendance_history_screen.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
 import '../../../assessment/data/models/sociometry_period_config.dart';
+import '../../../auth/domain/entities/user_entity.dart';
+import '../../../leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,13 +46,10 @@ class _HomeScreenState extends State<HomeScreen>
   static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _warningOrange = Color(0xFFF57C00);
   static const Color _dangerRed = Color(0xFFD32F2F);
+  static const Color _warningYellow = Color(0xFFFBC02D);
 
   final double _rewardPoints = 4.50;
   final double _punishmentPoints = -1.25;
-
-  final int _attendanceHadir = 3;
-  final int _attendanceIzin = 1;
-  final int _attendanceAlpha = 1;
 
   final List<Map<String, dynamic>> _mockActivities = [
     {
@@ -110,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     _buildAnimatedSection(
                       context: context,
-                      child: _buildHeader(context, user.name, user.nrp),
+                      child: _buildHeader(context, user),
                       beginInterval: 0.0,
                       endInterval: 0.3,
                     ),
@@ -168,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildHeader(BuildContext context, String name, String nrp) {
+  Widget _buildHeader(BuildContext context, UserEntity user) {
     final double statusBarHeight = MediaQuery.paddingOf(context).top;
     return Container(
       width: double.infinity,
@@ -211,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
-                  name.toUpperCase(),
+                  user.name.toUpperCase(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: AppDimensions.fontXl,
@@ -220,7 +219,6 @@ class _HomeScreenState extends State<HomeScreen>
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppDimensions.xs),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -231,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen>
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
                   child: Text(
-                    'NRP: $nrp',
+                    user.roleId == 'siswa' ? 'NOSIS: ${user.nosis}' : 'NRP: ${user.nrp}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: AppDimensions.fontMd,
@@ -639,6 +637,12 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildAttendanceRecap(BuildContext context) {
+    final history = PimpinanMockData.serdikAttendanceHistory;
+    final int hadir = history.where((e) => e['type'] == 'hadir').length;
+    final int telat = history.where((e) => e['type'] == 'telat').length;
+    final int izin = history.where((e) => e['type'] == 'izin').length;
+    final int alpha = history.where((e) => e['type'] == 'alpha').length;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -704,15 +708,23 @@ class _HomeScreenState extends State<HomeScreen>
                 Expanded(
                   child: _buildAttendanceItem(
                     'Hadir',
-                    _attendanceHadir.toString(),
+                    hadir.toString(),
                     _successGreen,
                   ),
                 ),
                 Container(width: 1, height: 40, color: Colors.grey.shade200),
                 Expanded(
                   child: _buildAttendanceItem(
+                    'Telat',
+                    telat.toString(),
+                    _warningYellow,
+                  ),
+                ),
+                Container(width: 1, height: 40, color: Colors.grey.shade200),
+                Expanded(
+                  child: _buildAttendanceItem(
                     'Izin',
-                    _attendanceIzin.toString(),
+                    izin.toString(),
                     _warningOrange,
                   ),
                 ),
@@ -720,7 +732,7 @@ class _HomeScreenState extends State<HomeScreen>
                 Expanded(
                   child: _buildAttendanceItem(
                     'Alpha',
-                    _attendanceAlpha.toString(),
+                    alpha.toString(),
                     _dangerRed,
                   ),
                 ),
@@ -734,22 +746,29 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildAttendanceItem(String label, String value, Color color) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: AppDimensions.fontHuge + 2,
-            fontWeight: FontWeight.w800,
-            color: color,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: AppDimensions.fontHuge + 2,
+              fontWeight: FontWeight.w800,
+              color: color,
+            ),
           ),
         ),
         const SizedBox(height: AppDimensions.xs),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: AppDimensions.fontMd,
-            fontWeight: FontWeight.w600,
-            color: Colors.blueGrey.shade500,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: AppDimensions.fontMd,
+              fontWeight: FontWeight.w600,
+              color: Colors.blueGrey.shade500,
+            ),
           ),
         ),
       ],

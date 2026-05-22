@@ -15,6 +15,8 @@ class LoginResponse {
   final String pokjar;
 
   final String nrp;
+  @JsonKey(name: 'nosis', defaultValue: '-')
+  final String nosis;
   final String pangkat;
   final String angkatan;
   final String agama;
@@ -50,6 +52,7 @@ class LoginResponse {
     required this.roleId,
     required this.pokjar,
     required this.nrp,
+    required this.nosis,
     required this.pangkat,
     required this.angkatan,
     required this.agama,

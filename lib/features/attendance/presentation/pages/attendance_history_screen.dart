@@ -37,7 +37,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
   }
 
   String _selectedFilter = 'Semua';
-  final List<String> _filters = ['Semua', 'Hadir', 'Izin', 'Alpha'];
+  final List<String> _filters = ['Semua', 'Hadir', 'Telat', 'Izin', 'Alpha'];
   DateTimeRange? _selectedDateRange;
 
   Future<void> _pickDateRange() async {
@@ -162,6 +162,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
         ? currentAttendances
         : currentAttendances.where((a) {
             if (_selectedFilter == 'Hadir') return a['type'] == 'hadir';
+            if (_selectedFilter == 'Telat') return a['type'] == 'telat';
             if (_selectedFilter == 'Izin') return a['type'] == 'izin';
             if (_selectedFilter == 'Alpha') return a['type'] == 'alpha';
             return true;
@@ -445,11 +446,14 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
   void _showAttendanceDetails(BuildContext context, Map<String, dynamic> item) {
     final type = item['type'] as String;
     final bool isHadir = type == 'hadir';
+    final bool isTelat = type == 'telat';
     final bool isIzin = type == 'izin';
 
     final Color iconColor = isHadir
         ? AppColors.successGreen
-        : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
+        : isTelat 
+            ? const Color(0xFFFBC02D)
+            : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
 
     showModalBottomSheet(
       context: context,
@@ -498,7 +502,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                   ),
                 ),
                 child: ClipOval(
-                  child: isHadir && item['image'].toString().isNotEmpty
+                  child: (isHadir || isTelat) && item['image'].toString().isNotEmpty
                       ? Image.asset(
                           item['image'],
                           fit: BoxFit.cover,
@@ -509,9 +513,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                           ),
                         )
                       : Icon(
-                          !isHadir
-                              ? AppIcons.xCircleFill
-                              : AppIcons.userFocusFill,
+                          (isHadir || isTelat)
+                              ? AppIcons.userFocusFill
+                              : AppIcons.xCircleFill,
                           size: 44,
                           color: iconColor,
                         ),
@@ -697,15 +701,20 @@ class _AnimatedAttendanceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isHadir = type == 'hadir';
+    final bool isTelat = type == 'telat';
     final bool isIzin = type == 'izin';
 
     final Color iconColor = isHadir
         ? AppColors.successGreen
-        : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
+        : isTelat 
+            ? const Color(0xFFFBC02D)
+            : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
 
     final IconData iconData = isHadir
         ? AppIcons.checkCircleFill
-        : (isIzin ? AppIcons.warningCircleFill : AppIcons.xCircleFill);
+        : isTelat
+            ? AppIcons.clockFill
+            : (isIzin ? AppIcons.warningCircleFill : AppIcons.xCircleFill);
 
     return FadeTransition(
       opacity: animation,

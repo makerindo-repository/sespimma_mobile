@@ -6,6 +6,7 @@ class UserEntity extends Equatable {
   final String roleId;
   final String pokjar;
   final String nrp;
+  final String nosis;
   final String pangkat;
   final String angkatan;
   final String agama;
@@ -25,6 +26,7 @@ class UserEntity extends Equatable {
     required this.roleId,
     required this.pokjar,
     required this.nrp,
+    required this.nosis,
     required this.pangkat,
     required this.angkatan,
     required this.agama,
@@ -65,6 +67,7 @@ class UserEntity extends Equatable {
     String? roleId,
     String? pokjar,
     String? nrp,
+    String? nosis,
     String? pangkat,
     String? angkatan,
     String? agama,
@@ -85,6 +88,7 @@ class UserEntity extends Equatable {
       roleId: roleId ?? this.roleId,
       pokjar: pokjar ?? this.pokjar,
       nrp: nrp ?? this.nrp,
+      nosis: nosis ?? this.nosis,
       pangkat: pangkat ?? this.pangkat,
       angkatan: angkatan ?? this.angkatan,
       agama: agama ?? this.agama,
@@ -109,6 +113,7 @@ class UserEntity extends Equatable {
     roleId,
     pokjar,
     nrp,
+    nosis,
     pangkat,
     angkatan,
     agama,

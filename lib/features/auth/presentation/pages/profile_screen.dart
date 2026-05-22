@@ -185,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
           const SizedBox(height: AppDimensions.sm),
           Text(
-            'NRP: ${user.nrp}',
+            user.roleId == 'siswa' ? 'NOSIS: ${user.nosis}' : 'NRP: ${user.nrp}',
             style: TextStyle(
               color: Colors.blueGrey.shade200,
               fontSize: AppDimensions.fontDefault,
@@ -433,24 +433,27 @@ class _ProfileScreenState extends State<ProfileScreen>
     String title,
     VoidCallback onTap,
   ) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: Icon(icon, color: _primaryNavy, size: AppDimensions.iconLg),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: AppDimensions.fontLg,
-          fontWeight: FontWeight.w600,
-          color: _primaryNavy,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        leading: Icon(icon, color: _primaryNavy, size: AppDimensions.iconLg),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: AppDimensions.fontLg,
+            fontWeight: FontWeight.w600,
+            color: _primaryNavy,
+          ),
         ),
-      ),
-      trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        ),
       ),
     );
   }

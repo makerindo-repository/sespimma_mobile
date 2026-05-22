@@ -427,6 +427,10 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('NRP', user.nrp),
           ],
+          if (user.roleId == 'siswa' && _isValidValue(user.nosis)) ...[
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('NOSIS', user.nosis),
+          ],
           if (_isValidValue(user.pangkat)) ...[
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Pangkat', user.pangkat),

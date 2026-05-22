@@ -32,52 +32,34 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
 
   final List<Map<String, dynamic>> _indicators = const [
     {
-      'pillar': 'Integritas',
-      'title': 'Integritas dan Kejujuran',
+      'pillar': 'Moral',
+      'title': 'Etika dan Integritas',
       'desc':
-          'Penyelarasan antara ucapan, tindakan, serta kejujuran akademik dan perilaku sehari-hari.',
-    },
-    {
-      'pillar': 'Disiplin',
-      'title': 'Ketaatan Aturan dan SOP',
-      'desc':
-          'Ketepatan waktu, kepatuhan terhadap tata tertib lembaga, dan pengawasan mandiri.',
+          'Penerapan nilai-nilai etika, kejujuran, dan keluhuran budi pekerti dalam keseharian.',
     },
     {
       'pillar': 'Kepemimpinan',
       'title': 'Kemampuan Memimpin',
       'desc':
-          'Keberanian mengambil inisiatif, mengarahkan anggota kelompok, dan memberikan solusi inovatif.',
+          'Kapasitas dalam mengarahkan, mengambil keputusan, dan memberikan pengaruh positif bagi rekan.',
     },
     {
-      'pillar': 'Kerjasama',
-      'title': 'Kolaborasi Aktif Tim',
+      'pillar': 'Pengendalian Diri',
+      'title': 'Kematangan Emosional',
       'desc':
-          'Kemampuan berkolaborasi aktif dalam dinamika Pokjar serta menekan ego pribadi demi tim.',
+          'Kemampuan menjaga stabilitas emosi, ketenangan dalam tekanan, dan bersikap bijaksana.',
     },
     {
-      'pillar': 'Tanggung Jawab',
-      'title': 'Penyelesaian Tugas',
+      'pillar': 'Disiplin',
+      'title': 'Ketaatan Aturan',
       'desc':
-          'Komitmen penuh dalam menuntaskan seluruh penugasan secara tuntas, tepat, dan bertanggung jawab.',
+          'Kepatuhan terhadap tata tertib, ketepatan waktu, dan konsistensi pelaksanaan tugas.',
     },
     {
-      'pillar': 'Komunikasi',
-      'title': 'Efektivitas Penyampaian Ide',
+      'pillar': 'Penampilan',
+      'title': 'Sikap dan Kerapian',
       'desc':
-          'Kemampuan menyampaikan argumen, gagasan, dan instruksi secara jelas, sopan, serta empatik.',
-    },
-    {
-      'pillar': 'Adaptabilitas',
-      'title': 'Kemampuan Menyesuaikan Diri',
-      'desc':
-          'Resiliensi dan kelenturan dalam menghadapi perubahan situasi, tekanan tugas, atau lingkungan.',
-    },
-    {
-      'pillar': 'Etika Profesi',
-      'title': 'Sikap Profesional Perwira',
-      'desc':
-          'Penerapan nilai-nilai Tribrata dan Catur Prasetya serta menjaga marwah kehormatan institusi.',
+          'Kerapian seragam, kebersihan diri, dan sikap jasmani yang mencerminkan kewibawaan.',
     },
   ];
 
@@ -100,21 +82,27 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
   }
 
   Map<String, dynamic> _getQualitativeRating(double value) {
-    if (value > 85.0) {
+    if (value > 90.00) {
+      return {
+        'label': 'Istimewa',
+        'code': 'I',
+        'color': const Color(0xFF8B5CF6),
+      };
+    } else if (value > 85.00) {
       return {
         'label': 'Sangat Memuaskan',
         'code': 'SM',
         'color': const Color(0xFF10B981),
       };
-    } else if (value > 80.0) {
+    } else if (value > 80.00) {
       return {
         'label': 'Memuaskan',
         'code': 'M',
         'color': const Color(0xFF3B82F6),
       };
-    } else if (value > 75.0) {
+    } else if (value > 75.00) {
       return {'label': 'Baik', 'code': 'B', 'color': const Color(0xFF84CC16)};
-    } else if (value > 70.0) {
+    } else if (value > 70.00) {
       return {'label': 'Cukup', 'code': 'C', 'color': const Color(0xFFF59E0B)};
     } else {
       return {'label': 'Kurang', 'code': 'K', 'color': const Color(0xFFEF4444)};

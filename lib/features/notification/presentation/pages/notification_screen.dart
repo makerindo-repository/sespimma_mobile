@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
-import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
 
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -74,42 +73,52 @@ class _NotificationScreenState extends State<NotificationScreen>
     final List<Map<String, dynamic>> list = [];
 
     if (role == 'siswa') {
-      if (user.isNakApproved == true) {
-        list.add({
-          'id': 'notif_nak_approved',
-          'title': 'Nilai Akhir Disetujui',
-          'body':
-              'Nilai Akhir Keseluruhan (NAK) Anda telah disetujui dan divalidasi oleh Pimpinan Sespimma.',
-          'date': _getDynamicDateStr(0),
-          'time': 'Baru saja',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'info',
-        });
-      }
-
       if (SociometryPeriodConfig.isAnyActive()) {
         final count = SociometryPeriodConfig.getFilledCount();
         final total = SociometryPeriodConfig.getTotalCount();
+        final remaining = total - count;
+        
         list.add({
-          'id': 'notif_sosiometri_active',
-          'title': 'Pengisian Sosiometri Peleton',
-          'body':
-              'Periode evaluasi sedang aktif! Anda baru mengisi $count / $total rekan peleton.',
+          'id': 'notif_sosio_start',
+          'title': 'Sosiometri Peleton Dimulai',
+          'body': 'Hari ini sosiometri telah dimulai. Silakan isi penilaian untuk seluruh rekan peleton Anda.',
           'date': _getDynamicDateStr(0),
-          'time': 'Hari ini',
+          'time': '07:00 WIB',
           'dateTime': today,
           'isRead': false,
-          'type': 'task',
+          'type': 'sosiometri_start',
         });
+
+        if (remaining > 0) {
+          list.add({
+            'id': 'notif_sosio_remind',
+            'title': 'Pengingat Sosiometri',
+            'body': '$remaining rekan lagi belum Anda isi sosiometrinya. Tenggat waktu hampir habis, segera lengkapi.',
+            'date': _getDynamicDateStr(0),
+            'time': '12:00 WIB',
+            'dateTime': today,
+            'isRead': false,
+            'type': 'sosiometri_reminder',
+          });
+        } else {
+          list.add({
+            'id': 'notif_sosio_done',
+            'title': 'Sosiometri Selesai',
+            'body': 'Terima kasih, Anda telah mengisi sosiometri untuk seluruh rekan peleton Anda dengan lengkap.',
+            'date': _getDynamicDateStr(0),
+            'time': '14:00 WIB',
+            'dateTime': today,
+            'isRead': false,
+            'type': 'sosiometri_done',
+          });
+        }
       }
 
       list.addAll([
         {
-          'id': 'notif_001',
+          'id': 'n_reward',
           'title': 'Reward: Menjadi Imam Shalat',
-          'body':
-              'Selamat! Anda mendapatkan reward +0.50 nilai mental dari Patun A.',
+          'body': 'Selamat! Anda mendapatkan reward +0.50 nilai mental dari Patun A.',
           'date': _getDynamicDateStr(0),
           'time': '18:30 WIB',
           'dateTime': today,
@@ -117,37 +126,94 @@ class _NotificationScreenState extends State<NotificationScreen>
           'type': 'reward',
         },
         {
-          'id': 'notif_002',
-          'title': 'Tugas Baru: Resume Kepemimpinan',
-          'body':
-              'Tugas baru telah ditambahkan ke dalam sprint Anda. Tenggat waktu: besok 14:00 WIB.',
+          'id': 'n_punish',
+          'title': 'Punishment: Terlambat Apel',
+          'body': 'Tercatat keterlambatan apel pagi via geofencing. Pengurangan nilai -0.50.',
           'date': _getDynamicDateStr(0),
-          'time': '14:00 WIB',
+          'time': '07:15 WIB',
           'dateTime': today,
           'isRead': false,
-          'type': 'task',
-        },
-        {
-          'id': 'notif_003',
-          'title': 'Pengingat Apel Sore',
-          'body':
-              'Apel sore akan dimulai dalam 30 menit. Harap segera menuju lapangan apel.',
-          'date': _getDynamicDateStr(1),
-          'time': '15:30 WIB',
-          'dateTime': yesterday,
-          'isRead': true,
-          'type': 'info',
-        },
-        {
-          'id': 'notif_004',
-          'title': 'Punishment: Terlambat Apel Pagi',
-          'body':
-              'Tercatat keterlambatan apel pagi via geofencing. Pengurangan nilai -0.50.',
-          'date': _getDynamicDateStr(1),
-          'time': '07:15 WIB',
-          'dateTime': yesterday,
-          'isRead': true,
           'type': 'punishment',
+        },
+        {
+          'id': 'n_task_done',
+          'title': 'Tugas: Naskah Karya Perseorangan',
+          'body': 'Tugas Anda telah selesai dinilai oleh Patun. Nilai Anda: 88.5.',
+          'date': _getDynamicDateStr(1),
+          'time': '09:00 WIB',
+          'dateTime': yesterday,
+          'isRead': true,
+          'type': 'task_dinilai',
+        },
+        {
+          'id': 'n_task_wait',
+          'title': 'Tugas: Resume Kepemimpinan',
+          'body': 'Berhasil mengumpulkan tepat waktu. Status saat ini: Sedang dinilai oleh Patun.',
+          'date': _getDynamicDateStr(1),
+          'time': '14:00 WIB',
+          'dateTime': yesterday,
+          'isRead': true,
+          'type': 'task_sedang_dinilai',
+        },
+        {
+          'id': 'n_task_late',
+          'title': 'Tugas Terlambat: Esai Pengendalian Diri',
+          'body': 'Anda mengumpulkan tugas melewati batas waktu yang ditentukan. Menunggu penilaian.',
+          'date': _getDynamicDateStr(2),
+          'time': '16:00 WIB',
+          'dateTime': today.subtract(const Duration(days: 2)),
+          'isRead': true,
+          'type': 'task_telat',
+        },
+        {
+          'id': 'n_task_miss',
+          'title': 'Tugas Tidak Dikumpulkan: Sistem Informasi',
+          'body': 'Batas waktu telah habis dan Anda belum mengumpulkan tugas ini.',
+          'date': _getDynamicDateStr(2),
+          'time': '23:59 WIB',
+          'dateTime': today.subtract(const Duration(days: 2)),
+          'isRead': true,
+          'type': 'task_alpha',
+        },
+        {
+          'id': 'n_att_hadir',
+          'title': 'Kehadiran: Kelas Kepemimpinan',
+          'body': 'Status kehadiran Anda tercatat: Hadir.',
+          'date': _getDynamicDateStr(3),
+          'time': '08:30 WIB',
+          'dateTime': today.subtract(const Duration(days: 3)),
+          'isRead': true,
+          'type': 'hadir',
+        },
+        {
+          'id': 'n_att_telat',
+          'title': 'Kehadiran: Apel Pagi',
+          'body': 'Status kehadiran Anda tercatat: Telat (Terlambat 15 menit).',
+          'date': _getDynamicDateStr(3),
+          'time': '07:15 WIB',
+          'dateTime': today.subtract(const Duration(days: 3)),
+          'isRead': true,
+          'type': 'telat',
+        },
+        {
+          'id': 'n_att_izin',
+          'title': 'Kehadiran: Kelas Manajemen',
+          'body': 'Status kehadiran Anda tercatat: Izin. Surat sakit telah divalidasi.',
+          'date': _getDynamicDateStr(4),
+          'time': '08:30 WIB',
+          'dateTime': today.subtract(const Duration(days: 4)),
+          'isRead': true,
+          'type': 'izin',
+        },
+        {
+          'id': 'n_att_alpha',
+          'title': 'Kehadiran: Olahraga Bersama',
+          'body': 'Status kehadiran Anda tercatat: Alpha (Tanpa keterangan).',
+          'date': _getDynamicDateStr(4),
+          'time': '06:00 WIB',
+          'dateTime': today.subtract(const Duration(days: 4)),
+          'isRead': true,
+          'type': 'alpha',
         },
       ]);
     } else if (role == 'gadik' || role == 'patun' || role == 'instruktur') {
@@ -538,25 +604,6 @@ class _NotificationScreenState extends State<NotificationScreen>
                                         true;
                                   }
                                 });
-
-                                final String type = notif['type'] as String;
-                                final String title = notif['title'] as String;
-                                if ((type == 'reward' ||
-                                        type == 'punishment') &&
-                                    (title.startsWith('Reward:') ||
-                                        title.startsWith('Punishment:'))) {
-                                  String pts = type == 'reward'
-                                      ? '+0.50'
-                                      : '-0.50';
-                                  EvidenceBottomSheet.show(
-                                    context,
-                                    title: notif['title'] as String,
-                                    subtitle:
-                                        'Diberikan oleh Patun A - ${notif['time']}',
-                                    points: pts,
-                                    type: type,
-                                  );
-                                }
                               },
                             ),
                           );
@@ -628,29 +675,42 @@ class _AnimatedNotificationTile extends StatelessWidget {
 
   IconData _getIcon() {
     switch (notification['type']) {
-      case 'reward':
-        return AppIcons.medalFill;
-      case 'punishment':
-        return AppIcons.warningCircleFill;
-      case 'task':
-        return AppIcons.clipboardTextFill;
-      default:
-        return AppIcons.infoFill;
+      case 'reward': return AppIcons.medalFill;
+      case 'punishment': return AppIcons.warningCircleFill;
+      case 'task_dinilai': return AppIcons.checkCircleFill;
+      case 'task_sedang_dinilai': return AppIcons.clipboardTextFill;
+      case 'task_telat': return AppIcons.clockFill;
+      case 'task_alpha': return AppIcons.xCircleFill;
+      case 'sosiometri_start': return AppIcons.usersThreeFill;
+      case 'sosiometri_reminder': return AppIcons.usersThreeFill;
+      case 'sosiometri_done': return AppIcons.checkCircleFill;
+      case 'hadir': return AppIcons.userFocusFill;
+      case 'telat': return AppIcons.clockFill;
+      case 'izin': return AppIcons.filePdfFill;
+      case 'alpha': return AppIcons.warningOctagonFill;
+      case 'task': return AppIcons.clipboardTextFill;
+      default: return AppIcons.infoFill;
     }
   }
 
   Color _getColor() {
     switch (notification['type']) {
-      case 'reward':
-        return const Color(0xFF2E7D32);
-      case 'punishment':
-        return const Color(0xFFD32F2F);
-      case 'task':
-        return Colors.blue.shade600;
-      case 'info':
-        return Colors.amber.shade700;
-      default:
-        return Colors.blueGrey.shade600;
+      case 'reward': return const Color(0xFF2E7D32);
+      case 'punishment': return const Color(0xFFD32F2F);
+      case 'task_dinilai': return const Color(0xFF2E7D32);
+      case 'task_sedang_dinilai': return Colors.blue.shade600;
+      case 'task_telat': return const Color(0xFFFBC02D);
+      case 'task_alpha': return const Color(0xFFD32F2F);
+      case 'sosiometri_start': return const Color(0xFF4F46E5);
+      case 'sosiometri_reminder': return const Color(0xFFF57C00);
+      case 'sosiometri_done': return const Color(0xFF2E7D32);
+      case 'hadir': return const Color(0xFF2E7D32);
+      case 'telat': return const Color(0xFFFBC02D);
+      case 'izin': return const Color(0xFFF57C00);
+      case 'alpha': return const Color(0xFFD32F2F);
+      case 'task': return Colors.blue.shade600;
+      case 'info': return Colors.amber.shade700;
+      default: return Colors.blueGrey.shade600;
     }
   }
 
