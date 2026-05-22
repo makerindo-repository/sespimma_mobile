@@ -1,0 +1,1097 @@
+import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../notification/presentation/pages/notification_screen.dart';
+import '../../../activity/presentation/pages/activity_history_screen.dart';
+import '../../../attendance/presentation/pages/attendance_history_screen.dart';
+import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
+import '../../../assessment/data/models/sociometry_period_config.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _lightGrey = Color(0xFFF8F9FA);
+  static const Color _successGreen = Color(0xFF2E7D32);
+  static const Color _warningOrange = Color(0xFFF57C00);
+  static const Color _dangerRed = Color(0xFFD32F2F);
+
+  final double _rewardPoints = 4.50;
+  final double _punishmentPoints = -1.25;
+
+  final int _attendanceHadir = 3;
+  final int _attendanceIzin = 1;
+  final int _attendanceAlpha = 1;
+
+  final List<Map<String, dynamic>> _mockActivities = [
+    {
+      'title': 'Reward: Menjadi Imam Shalat',
+      'subtitle': 'Diberikan oleh Patun A - Hari ini, 18:30 WIB',
+      'points': '+0.50',
+      'isReward': true,
+      'isTask': false,
+    },
+    {
+      'title': 'Tugas: Resume Kepemimpinan',
+      'subtitle': 'Selesai dan telah dikumpulkan - Kemarin, 14:00 WIB',
+      'points': '',
+      'isReward': true,
+      'isTask': true,
+    },
+    {
+      'title': 'Punishment: Terlambat Apel Pagi',
+      'subtitle': 'Sistem Geofencing - 2 Hari lalu, 07:15 WIB',
+      'points': '-0.50',
+      'isReward': false,
+      'isTask': false,
+    },
+  ];
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 11) {
+      return 'Selamat Pagi';
+    } else if (hour < 15) {
+      return 'Selamat Siang';
+    } else if (hour < 18) {
+      return 'Selamat Sore';
+    } else {
+      return 'Selamat Malam';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _lightGrey,
+      body: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthSuccess) {
+            final user = state.user;
+            final double nilaiAkademik = user.nilaiAkademik;
+            final double nilaiMental = user.nilaiMental;
+            final double nilaiJasmani = user.nilaiJasmani;
+
+            return SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildAnimatedSection(
+                      context: context,
+                      child: _buildHeader(context, user.name, user.nrp),
+                      beginInterval: 0.0,
+                      endInterval: 0.3,
+                    ),
+                    Transform.translate(
+                      offset: const Offset(0, -30),
+                      child: Column(
+                        children: [
+                          _buildAnimatedSection(
+                            context: context,
+                            child: _buildScoreOverview(
+                              context,
+                              nilaiAkademik,
+                              nilaiMental,
+                              nilaiJasmani,
+                            ),
+                            beginInterval: 0.2,
+                            endInterval: 0.5,
+                          ),
+                          if (SociometryPeriodConfig.isAnyActive()) ...[
+                            const SizedBox(height: AppDimensions.md),
+                            _buildAnimatedSection(
+                              context: context,
+                              child: _buildSosiometriBanner(context),
+                              beginInterval: 0.3,
+                              endInterval: 0.6,
+                            ),
+                          ],
+                          const SizedBox(height: AppDimensions.md),
+                          _buildAnimatedSection(
+                            context: context,
+                            child: _buildAttendanceRecap(context),
+                            beginInterval: 0.4,
+                            endInterval: 0.7,
+                          ),
+                          const SizedBox(height: AppDimensions.md),
+                          _buildAnimatedSection(
+                            context: context,
+                            child: _buildActivityFeed(context),
+                            beginInterval: 0.5,
+                            endInterval: 1.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(color: _primaryNavy),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, String name, String nrp) {
+    final double statusBarHeight = MediaQuery.paddingOf(context).top;
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(24, statusBarHeight + 16, 24, 60),
+      decoration: const BoxDecoration(
+        color: _primaryNavy,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppDimensions.xs - 1),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const CircleAvatar(
+              radius: 28,
+              backgroundColor: _lightGrey,
+              backgroundImage: AssetImage('assets/images/default_avatar.png'),
+            ),
+          ),
+          const SizedBox(width: AppDimensions.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${_getGreeting()},',
+                  style: TextStyle(
+                    color: Colors.blueGrey.shade200,
+                    fontSize: AppDimensions.fontDefault,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.xs),
+                Text(
+                  name.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: AppDimensions.fontXl,
+                    fontWeight: FontWeight.w800,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: AppDimensions.xs),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                  ),
+                  child: Text(
+                    'NRP: $nrp',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppDimensions.fontMd,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationScreen(),
+                  ),
+                );
+              },
+              child: Badge(
+                backgroundColor: _dangerRed,
+                label: const Text(
+                  '2',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppDimensions.fontSm,
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(AppDimensions.sm + 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    AppIcons.bell,
+                    color: Colors.white,
+                    size: AppDimensions.iconLg,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreOverview(
+    BuildContext context,
+    double akademik,
+    double mental,
+    double jasmani,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.lg),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Akumulasi Penilaian',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontXl,
+                    fontWeight: FontWeight.w800,
+                    color: _primaryNavy,
+                  ),
+                ),
+                Icon(
+                  AppIcons.chartBarFill,
+                  color: Colors.blueGrey.shade300,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.xl),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _AnimatedCircularScore(
+                  label: 'Akademik',
+                  value: akademik,
+                  delay: 400,
+                ),
+                _AnimatedCircularScore(
+                  label: 'Mental',
+                  value: mental,
+                  delay: 600,
+                ),
+                _AnimatedCircularScore(
+                  label: 'Jasmani',
+                  value: jasmani,
+                  delay: 800,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.xl),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildRewardPunishmentCard(
+                    context,
+                    title: 'Reward',
+                    points: _rewardPoints > 0
+                        ? '+${_rewardPoints.toStringAsFixed(2)}'
+                        : '0',
+                    icon: AppIcons.medalFill,
+                    color: _successGreen,
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.md),
+                Expanded(
+                  child: _buildRewardPunishmentCard(
+                    context,
+                    title: 'Punishment',
+                    points: _punishmentPoints != 0
+                        ? _punishmentPoints.toStringAsFixed(2)
+                        : '0',
+                    icon: AppIcons.warningCircleFill,
+                    color: _dangerRed,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.lg),
+            _buildAiRecommendation(akademik, mental, jasmani),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRewardPunishmentCard(
+    BuildContext context, {
+    required String title,
+    required String points,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ActivityHistoryScreen(initialFilter: title),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: AppDimensions.iconXl),
+              const SizedBox(height: AppDimensions.sm),
+              Text(
+                points,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontHuge,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xs),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontMd,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blueGrey.shade700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAiRecommendation(double ak, double ment, double jas) {
+    String title = 'Rekomendasi';
+    String message = '';
+
+    if (ak >= 85 && ment >= 85 && jas >= 85) {
+      message =
+          'Luar biasa! Seluruh pilar penilaian Anda seimbang dan berada di kategori prima. Teruskan disiplin kepemimpinan ini.';
+    } else if (jas <= ak && jas <= ment) {
+      message =
+          'Pertahankan tren positif Anda di aspek teoritis. Fokus tingkatkan intensitas latihan Jasmani berkala untuk mengamankan ketahanan fisik.';
+    } else if (ment <= ak && ment <= jas) {
+      message =
+          'Pilar Akademik Anda sudah sangat baik. Tingkatkan aspek kepemimpinan, etika, dan kedisiplinan harian untuk mendongkrak Nilai Mental.';
+    } else if (ak <= jas && ak <= ment) {
+      message =
+          'Ketahanan Jasmani dan Mental Anda sangat prima. Fokus maksimalkan pilar Akademik dengan pengumpulan tugas mendalam tepat waktu.';
+    } else {
+      message =
+          'Pertahankan keseimbangan ini. Pastikan untuk terus mengevaluasi capaian mingguan agar tetap berada di batas atas standar kelulusan.';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.md),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        border: Border.all(color: Colors.blue.shade100),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppDimensions.sm),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              AppIcons.sparkleFill,
+              color: Colors.blue.shade700,
+              size: AppDimensions.iconDefault,
+            ),
+          ),
+          const SizedBox(width: AppDimensions.md - 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: Colors.blue.shade900,
+                    fontSize: AppDimensions.fontLg,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.xs),
+                Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.blueGrey.shade700,
+                    fontSize: AppDimensions.fontMd,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSosiometriBanner(BuildContext context) {
+    const Color primaryIndigo = Color(0xFF4F46E5);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: InkWell(
+        onTap: () async {
+          HapticFeedback.lightImpact();
+          await Navigator.pushNamed(context, '/serdik-sosiometri');
+          if (mounted) {
+            setState(() {});
+          }
+        },
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.xl - 4),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                primaryIndigo.withValues(alpha: 0.08),
+                primaryIndigo.withValues(alpha: 0.03),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+            border: Border.all(color: primaryIndigo.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimensions.md),
+                decoration: BoxDecoration(
+                  color: primaryIndigo.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  AppIcons.usersThreeFill,
+                  color: primaryIndigo,
+                  size: AppDimensions.iconLg,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          SociometryPeriodConfig.isAkhirActive()
+                              ? 'Sosiometri Akhir Peleton'
+                              : 'Sosiometri Awal Peleton',
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontLg,
+                            fontWeight: FontWeight.w800,
+                            color: _primaryNavy,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: primaryIndigo,
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                          ),
+                          child: const Text(
+                            'ISI SEKARANG',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontXs,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppDimensions.radiusSm),
+                    Text(
+                      'Evaluasi 8 Kompetensi Inti mental kepribadian rekan satu Pokjar Anda secara anonim.',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontSm + 1,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                        color: Colors.blueGrey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: AppDimensions.sm),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
+                            child: LinearProgressIndicator(
+                              value:
+                                  SociometryPeriodConfig.getFilledCount() /
+                                  SociometryPeriodConfig.getTotalCount(),
+                              backgroundColor: Colors.black12,
+                              color: primaryIndigo,
+                              minHeight: 5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppDimensions.sm + 2),
+                        Text(
+                          '${SociometryPeriodConfig.getFilledCount()} / ${SociometryPeriodConfig.getTotalCount()} Rekan',
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w800,
+                            color: primaryIndigo,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttendanceRecap(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Rekapitulasi Kehadiran',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXl,
+                  fontWeight: FontWeight.w800,
+                  color: _primaryNavy,
+                ),
+              ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AttendanceHistoryScreen(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 4.0,
+                    ),
+                    child: Text(
+                      'Lihat Semua',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontDefault,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.md),
+          Container(
+            padding: const EdgeInsets.all(AppDimensions.xl - 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildAttendanceItem(
+                    'Hadir',
+                    _attendanceHadir.toString(),
+                    _successGreen,
+                  ),
+                ),
+                Container(width: 1, height: 40, color: Colors.grey.shade200),
+                Expanded(
+                  child: _buildAttendanceItem(
+                    'Izin',
+                    _attendanceIzin.toString(),
+                    _warningOrange,
+                  ),
+                ),
+                Container(width: 1, height: 40, color: Colors.grey.shade200),
+                Expanded(
+                  child: _buildAttendanceItem(
+                    'Alpha',
+                    _attendanceAlpha.toString(),
+                    _dangerRed,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAttendanceItem(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: AppDimensions.fontHuge + 2,
+            fontWeight: FontWeight.w800,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: AppDimensions.xs),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: AppDimensions.fontMd,
+            fontWeight: FontWeight.w600,
+            color: Colors.blueGrey.shade500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActivityFeed(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Riwayat Aktivitas',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXl,
+                  fontWeight: FontWeight.w800,
+                  color: _primaryNavy,
+                ),
+              ),
+              if (_mockActivities.isNotEmpty)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ActivityHistoryScreen(),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
+                      child: Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontDefault,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.md),
+          _mockActivities.isEmpty
+              ? _buildEmptyActivityState()
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  itemCount: _mockActivities.length,
+                  itemBuilder: (context, index) {
+                    final item = _mockActivities[index];
+                    return _ActivityTile(
+                      title: item['title'] as String,
+                      subtitle: item['subtitle'] as String,
+                      points: item['points'] as String,
+                      isReward: item['isReward'] as bool,
+                      isTask: item['isTask'] as bool? ?? false,
+                    );
+                  },
+                ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyActivityState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        border: Border.all(color: Colors.blueGrey.shade50),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppDimensions.xl - 4),
+            decoration: BoxDecoration(
+              color: Colors.blueGrey.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              AppIcons.calendarBlankFill,
+              size: AppDimensions.iconHuge,
+              color: Colors.blueGrey.shade300,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.lg),
+          const Text(
+            'Belum Ada Riwayat Aktivitas',
+            style: TextStyle(
+              fontSize: AppDimensions.fontXl,
+              fontWeight: FontWeight.w800,
+              color: _primaryNavy,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.sm),
+          Text(
+            'Seluruh catatan tugas, pujian, dan teguran harian Anda akan otomatis tampil di sini.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: AppDimensions.fontMd,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+              color: Colors.blueGrey.shade400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedSection({
+    required BuildContext context,
+    required Widget child,
+    required double beginInterval,
+    required double endInterval,
+  }) {
+    final animation = CurvedAnimation(
+      parent: _animController,
+      curve: Interval(beginInterval, endInterval, curve: Curves.easeOutCubic),
+    );
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.2),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _AnimatedCircularScore extends StatelessWidget {
+  final String label;
+  final double value;
+  final int delay;
+
+  const _AnimatedCircularScore({
+    required this.label,
+    required this.value,
+    required this.delay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color displayColor;
+    if (value >= 80.0) {
+      displayColor = const Color(0xFF2E7D32);
+    } else if (value >= 70.0) {
+      displayColor = const Color(0xFFF57C00);
+    } else {
+      displayColor = const Color(0xFFD32F2F);
+    }
+
+    final double targetValue = value > 0 ? value / 100 : 0;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 64,
+          width: 64,
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0.0, end: targetValue),
+            duration: const Duration(milliseconds: 1500),
+            curve: Curves.easeOutCubic,
+            builder: (context, animValue, child) {
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  CircularProgressIndicator(
+                    value: animValue,
+                    strokeWidth: 8,
+                    backgroundColor: Colors.grey.shade100,
+                    color: displayColor,
+                    strokeCap: StrokeCap.round,
+                  ),
+                  Center(
+                    child: Text(
+                      value > 0 ? (animValue * 100).toStringAsFixed(1) : '-',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLg,
+                        fontWeight: FontWeight.w800,
+                        color: displayColor,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: AppDimensions.md),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: AppDimensions.fontDefault,
+            fontWeight: FontWeight.w700,
+            color: Colors.blueGrey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActivityTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String points;
+  final bool isReward;
+  final bool isTask;
+
+  const _ActivityTile({
+    required this.title,
+    required this.subtitle,
+    required this.points,
+    required this.isReward,
+    this.isTask = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color iconColor = isTask
+        ? Colors.blue.shade600
+        : (isReward ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F));
+
+    final IconData iconData = isTask
+        ? AppIcons.clipboardTextFill
+        : (isReward
+              ? AppIcons.medalFill
+              : AppIcons.warningCircleFill);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+          onTap: isTask
+              ? null
+              : () {
+                  EvidenceBottomSheet.show(
+                    context,
+                    title: title,
+                    subtitle: subtitle,
+                    points: points,
+                    type: isReward ? 'reward' : 'punishment',
+                  );
+                },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppDimensions.md),
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(iconData, color: iconColor, size: AppDimensions.iconLg),
+                ),
+                const SizedBox(width: AppDimensions.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontLg,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF001C40),
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.xs),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontMd,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueGrey.shade400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (points.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      points,
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLg + 1,
+                        fontWeight: FontWeight.w800,
+                        color: isReward
+                            ? const Color(0xFF2E7D32)
+                            : const Color(0xFFD32F2F),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,0 +1,174 @@
+import '../models/login_request.dart';
+import '../models/login_response.dart';
+import 'auth_remote_data_source.dart';
+
+class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
+  @override
+  Future<LoginResponse> login(LoginRequest request) async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    const String dummyPassword = 'password123';
+
+    if (request.password != dummyPassword) {
+      throw Exception('NRP atau Password salah!');
+    }
+
+    if (request.nrp == '85055678') {
+      return LoginResponse(
+        userId: 'USR-001',
+        name: 'Rangga Saputra, S.H.',
+        roleId: 'siswa',
+        pokjar: '1',
+        nrp: '85055678',
+        pangkat: 'AKP',
+        angkatan: '75',
+        agama: 'Islam',
+        jenisKelamin: 'Laki-laki',
+        jabatan: '-',
+        tanggalLahir: '1985-05-15',
+        isNakApproved: true,
+        nilaiAkademik: 82.5,
+        nilaiMental: 85.0,
+        nilaiJasmani: 78.0,
+        accessToken: 'dummy_token_siswa',
+        refreshToken: 'dummy_refresh_siswa',
+      );
+    }
+
+    if (request.nrp == '99999999') {
+      return LoginResponse(
+        userId: 'USR-EWS',
+        name: 'Serdik Dummy EWS',
+        roleId: 'siswa',
+        pokjar: 'POKJAR 2',
+        nrp: '99999999',
+        pangkat: 'AKP',
+        angkatan: 'KE-75',
+        agama: 'Kristen',
+        jenisKelamin: 'Laki-laki',
+        jabatan: '-',
+        tanggalLahir: '1990-07-20',
+        isNakApproved: false,
+        nilaiAkademik: 65.0,
+        nilaiMental: 68.0,
+        nilaiJasmani: 70.0,
+        accessToken: 'dummy_token_siswa_ews',
+        refreshToken: 'dummy_refresh_siswa_ews',
+      );
+    }
+
+    if (request.nrp == '80101234') {
+      return LoginResponse(
+        userId: 'USR-002',
+        name: 'KOMPOL Reza Mahendra, S.T., M.M.',
+        roleId: 'pengajar',
+        pokjar: '-',
+        nrp: '80101234',
+        pangkat: 'KOMPOL',
+        angkatan: '-',
+        agama: 'Islam',
+        jenisKelamin: 'Laki-laki',
+        jabatan: 'KABAG JARLAT SESPIMMA',
+        tanggalLahir: '1980-10-10',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_pengajar',
+        refreshToken: 'dummy_refresh_pengajar',
+      );
+    }
+
+    if (request.nrp == '80102222') {
+      return LoginResponse(
+        userId: 'USR-PATUN',
+        name: 'KOMPOL Budi Prakoso, S.I.K., M.H.',
+        roleId: 'pengajar_patun',
+        pokjar: '-',
+        nrp: '80102222',
+        pangkat: 'KOMPOL',
+        angkatan: '-',
+        agama: 'Islam',
+        jenisKelamin: 'Laki-laki',
+        jabatan: 'PATUN UTAMA SESPIMMA',
+        tanggalLahir: '1980-02-14',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_patun',
+        refreshToken: 'dummy_refresh_patun',
+      );
+    }
+
+    if (request.nrp == '80103333') {
+      return LoginResponse(
+        userId: 'USR-MEDIS',
+        name: 'dr. Siti Aminah, Sp.PD.',
+        roleId: 'pengajar_medis',
+        pokjar: '-',
+        nrp: '80103333',
+        pangkat: 'PENATA TK.I',
+        angkatan: '-',
+        agama: 'Islam',
+        jenisKelamin: 'Perempuan',
+        jabatan: 'KA POLIKLINIK SESPIMMA',
+        tanggalLahir: '1983-04-04',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_medis',
+        refreshToken: 'dummy_refresh_medis',
+      );
+    }
+
+    if (request.nrp == '75060001') {
+      return LoginResponse(
+        userId: 'USR-003',
+        name: 'KOMBES POL. FAJAR NUGROHO, S.H., S.I.K., M.H.',
+        roleId: 'pimpinan',
+        pokjar: '-',
+        nrp: '75060001',
+        pangkat: 'KOMBES POL',
+        angkatan: '-',
+        agama: 'Islam',
+        jenisKelamin: 'Laki-laki',
+        jabatan: 'KA SESPIMPOLRI',
+        tanggalLahir: '1975-06-01',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_pimpinan',
+        refreshToken: 'dummy_refresh_pimpinan',
+      );
+    }
+
+    if (request.nrp == '80104444') {
+      return LoginResponse(
+        userId: 'USR-KORSIS',
+        name: 'AKBP Rudi Haryanto, S.I.K.',
+        roleId: 'pengajar_korsis',
+        pokjar: '-',
+        nrp: '80104444',
+        pangkat: 'AKBP',
+        angkatan: '-',
+        agama: 'Islam',
+        jenisKelamin: 'Laki-laki',
+        jabatan: 'KASENAT KORSIS SESPIMMA',
+        tanggalLahir: '1982-05-10',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_korsis',
+        refreshToken: 'dummy_refresh_korsis',
+      );
+    }
+
+    throw Exception(
+      'Personel dengan NRP ${request.nrp} tidak ditemukan di database lokal.',
+    );
+  }
+}
