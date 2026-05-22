@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const String _nrpStorageKey = 'saved_nrp';
 
@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen>
     return Column(
       children: [
         Image.asset(
-          'assets/images/app_icon.png',
+          'assets/images/icon.png',
           height: 140,
           errorBuilder: (context, error, stackTrace) =>
               const Icon(Icons.local_police, size: 120, color: _primaryNavy),
@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         const SizedBox(height: AppDimensions.sm),
         Text(
-          'SISTEM MONITORING PENDIDIKAN',
+          'SISTEM EVALUASI DAN PENGAWASAN INDIVIDU MEMBENTUK SUMBER DAYA MANUSIA MAJU',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: AppDimensions.fontMd,

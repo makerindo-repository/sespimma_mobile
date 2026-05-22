@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 
 class AttendanceHistoryScreen extends StatefulWidget {
   const AttendanceHistoryScreen({super.key});
@@ -15,6 +17,7 @@ class AttendanceHistoryScreen extends StatefulWidget {
 class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
+  String _appInfo = 'Mengambil info perangkat...';
 
   @override
   void initState() {
@@ -24,6 +27,29 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
       duration: const Duration(milliseconds: 600),
     );
     _animController.forward();
+    
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      deviceInfo.androidInfo.then((info) {
+        if (mounted) {
+          setState(() {
+            _appInfo = '${info.manufacturer} ${info.model}';
+          });
+        }
+      });
+    } else if (Platform.isIOS) {
+      deviceInfo.iosInfo.then((info) {
+        if (mounted) {
+          setState(() {
+            _appInfo = info.name;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        _appInfo = 'Unknown Device';
+      });
+    }
   }
 
   List<Map<String, dynamic>> _getAttendances() {
@@ -489,38 +515,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                   letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: AppDimensions.lg),
-              Container(
-                height: 120,
-                width: 120,
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.05),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: iconColor.withValues(alpha: 0.2),
-                    width: 3,
-                  ),
-                ),
-                child: ClipOval(
-                  child: (isHadir || isTelat) && item['image'].toString().isNotEmpty
-                      ? Image.asset(
-                          item['image'],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(
-                            AppIcons.userFocusFill,
-                            size: 44,
-                            color: iconColor,
-                          ),
-                        )
-                      : Icon(
-                          (isHadir || isTelat)
-                              ? AppIcons.userFocusFill
-                              : AppIcons.xCircleFill,
-                          size: 44,
-                          color: iconColor,
-                        ),
-                ),
-              ),
               const SizedBox(height: AppDimensions.md),
               Text(
                 item['title'],
@@ -572,20 +566,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 ),
               const SizedBox(height: AppDimensions.md),
               _buildDetailRow(
-                item['verification'] == 'Valid' ||
-                        item['verification'].toString().contains('Valid')
-                    ? AppIcons.shieldCheckFill
-                    : AppIcons.shieldWarningFill,
-                'Status Validasi',
-                item['verification'] ?? 'Sedang Diproses',
-                valueColor:
-                    item['verification'] == 'Valid' ||
-                        item['verification'].toString().contains('Valid')
-                    ? const Color(0xFF2E7D32)
-                    : const Color(0xFFD32F2F),
-              ),
-              const SizedBox(height: AppDimensions.md),
-              _buildDetailRow(
                 AppIcons.mapPinLineFill,
                 'Lokasi Terdeteksi',
                 item['location'] ?? 'Sespimma Lembang',
@@ -594,7 +574,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
               _buildDetailRow(
                 AppIcons.deviceMobileSpeakerFill,
                 'Informasi Perangkat',
-                item['device'] ?? '-',
+                _appInfo,
               ),
               const SizedBox(height: AppDimensions.xl),
               SizedBox(

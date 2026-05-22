@@ -82,13 +82,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
   }
 
   Map<String, dynamic> _getQualitativeRating(double value) {
-    if (value > 90.00) {
-      return {
-        'label': 'Istimewa',
-        'code': 'I',
-        'color': const Color(0xFF8B5CF6),
-      };
-    } else if (value > 85.00) {
+    if (value > 85.00) {
       return {
         'label': 'Sangat Memuaskan',
         'code': 'SM',
@@ -101,7 +95,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
         'color': const Color(0xFF3B82F6),
       };
     } else if (value > 75.00) {
-      return {'label': 'Baik', 'code': 'B', 'color': const Color(0xFF84CC16)};
+      return {'label': 'Baik', 'code': 'B', 'color': const Color(0xFF8B5CF6)};
     } else if (value > 70.00) {
       return {'label': 'Cukup', 'code': 'C', 'color': const Color(0xFFF59E0B)};
     } else {
@@ -112,7 +106,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
   bool get _requiresJustification {
     return _scoreControllers.any((controller) {
       final val = double.tryParse(controller.text) ?? 0.0;
-      return val > 90.01;
+      return val > 90.00;
     });
   }
 
@@ -520,7 +514,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
           ),
           const SizedBox(height: AppDimensions.sm),
           Text(
-            'Nilai di atas 90.01 tergolong Kategori Istimewa. Harap cantumkan dasar atau pertimbangan objektif Anda untuk validasi audit sistem.',
+            'Nilai di atas 90.00 memerlukan justifikasi. Harap cantumkan dasar atau pertimbangan objektif Anda untuk validasi audit sistem.',
             style: TextStyle(
               fontSize: AppDimensions.fontMd,
               height: 1.5,
