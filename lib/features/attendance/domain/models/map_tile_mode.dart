@@ -55,6 +55,7 @@ class AttendanceZone {
   final double longitude;
   final double radiusMeters;
   final String activityName;
+  final String creator;
   final DateTime startTime;
   final DateTime endTime;
 
@@ -65,6 +66,7 @@ class AttendanceZone {
     required this.longitude,
     required this.radiusMeters,
     required this.activityName,
+    required this.creator,
     required this.startTime,
     required this.endTime,
   });
@@ -99,6 +101,7 @@ class AttendanceZones {
           longitude: 107.659083,
           radiusMeters: 50.0,
           activityName: 'Apel Pagi',
+          creator: 'Korsis',
           startTime: DateTime.now().subtract(const Duration(hours: 1)),
           endTime: DateTime.now().add(const Duration(hours: 4)),
         ),
@@ -113,6 +116,7 @@ class AttendanceZones {
         longitude: 106.817500,
         radiusMeters: 45.0,
         activityName: 'Rapat Akademik Bulanan',
+        creator: 'Korsis',
         startTime: DateTime.now().subtract(const Duration(minutes: 30)),
         endTime: DateTime.now().add(const Duration(hours: 2)),
       ),
@@ -123,6 +127,7 @@ class AttendanceZones {
         longitude: 106.816000,
         radiusMeters: 60.0,
         activityName: 'Kuliah Umum Kebangsaan',
+        creator: 'Binkar Sespimma',
         startTime: DateTime.now().subtract(const Duration(minutes: 50)),
         endTime: DateTime.now().add(const Duration(minutes: 10)),
       ),
@@ -133,6 +138,7 @@ class AttendanceZones {
         longitude: 106.816300,
         radiusMeters: 40.0,
         activityName: 'Kajian Siang Serdik',
+        creator: 'Pokjar',
         startTime: DateTime.now().add(const Duration(minutes: 30)),
         endTime: DateTime.now().add(const Duration(hours: 2, minutes: 30)),
       ),
@@ -143,6 +149,7 @@ class AttendanceZones {
         longitude: 106.815500,
         radiusMeters: 70.0,
         activityName: 'Latihan Menembak Presisi',
+        creator: 'Instruktur',
         startTime: DateTime.now().subtract(const Duration(hours: 1)),
         endTime: DateTime.now().add(const Duration(hours: 5)),
       ),

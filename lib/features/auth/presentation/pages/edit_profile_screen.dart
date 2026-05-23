@@ -369,12 +369,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     );
   }
 
-  bool _isValidValue(String? val) {
-    if (val == null) return false;
-    final cleaned = val.trim();
-    return cleaned.isNotEmpty && cleaned != '-';
-  }
-
   Widget _buildIdentityCard(UserEntity? user) {
     if (user == null) return const SizedBox.shrink();
 
@@ -422,33 +416,51 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             ],
           ),
           const Divider(height: 32, thickness: 1),
+          _buildInfoRow('No Serdik', user.noSerdik),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('NIK', user.nik),
+          const SizedBox(height: AppDimensions.md),
           _buildInfoRow('Nama Lengkap', user.name),
-          if (_isValidValue(user.nrp)) ...[
+          const SizedBox(height: AppDimensions.md),
+          if (user.roleId == 'siswa') ...[
+            _buildInfoRow('Jabatan Senat', user.jabatanSenat),
             const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('NRP', user.nrp),
-          ],
-          if (user.roleId == 'siswa' && _isValidValue(user.nosis)) ...[
+            _buildInfoRow('Angkatan', user.angkatan),
             const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('NOSIS', user.nosis),
           ],
-          if (_isValidValue(user.pangkat)) ...[
-            const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('Pangkat', user.pangkat),
-          ],
-          if (_isValidValue(user.jabatan)) ...[
-            const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('Jabatan', user.jabatan),
-          ],
-          if (_isValidValue(user.pokjar)) ...[
-            const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('Pokjar', user.pokjar),
-          ],
+          _buildInfoRow('Tempat Lahir', user.tempatLahir),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Tanggal Lahir', user.tanggalLahir ?? '-'),
           const SizedBox(height: AppDimensions.md),
           _buildInfoRow('Jenis Kelamin', user.jenisKelamin),
           const SizedBox(height: AppDimensions.md),
           _buildInfoRow('Agama', user.agama),
           const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Umur', '${user.displayUmur} Tahun'),
+          _buildInfoRow('No Handphone', user.noHandphone),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Pendidikan Terakhir', user.pendidikanTerakhir),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Alamat Lengkap', user.alamatLengkap),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Email', user.email),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('No Telepon', user.noTelepon),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Kelompok', user.kelompok),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Diktuk Awal', user.diktukAwal),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Tahun Diktuk', user.tahunDiktuk),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Personel (Ya/Tidak)', user.personel),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('NRP', user.nrp),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Pangkat', user.pangkat),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Jabatan', user.jabatan),
+          const SizedBox(height: AppDimensions.md),
+          _buildInfoRow('Satker', user.satker),
           const Divider(height: 32, thickness: 1),
           Row(
             children: [

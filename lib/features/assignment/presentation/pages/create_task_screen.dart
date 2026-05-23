@@ -20,6 +20,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
   final _judulController = TextEditingController();
   final _deskripsiController = TextEditingController();
   String? _selectedSubject;
+  String? _selectedKompetensi;
+  String? _selectedMental;
 
   late AnimationController _animController;
   late Animation<double> _formAnimation;
@@ -70,6 +72,27 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
     'Etika & Kepemimpinan',
     'Manajemen Strategis',
     'Sistem Informasi Publik',
+  ];
+
+  final List<String> _kompetensiList = [
+    'Kemampuan Membuat Keputusan Strategis',
+    'Kecerdasan Emosional (EQ)',
+    'Komunikasi Efektif',
+    'Kemampuan Membangun dan Memimpin',
+    'Adaptabilitas & Pembelajaran Kontinu',
+    'Visi & Strategic Thinking',
+    'Integritas & Etika',
+    'Kemampuan Mendayagunakan Teknologi',
+    'Empati & Pelayanan',
+    'Resilience & Ketahanan Mental',
+  ];
+
+  final List<String> _mentalList = [
+    'Aspek Moral (Taat Beragama, dll)',
+    'Aspek Disiplin',
+    'Aspek Kepemimpinan',
+    'Aspek Pengendalian Diri',
+    'Aspek Penampilan',
   ];
 
   @override
@@ -177,6 +200,31 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         return;
       }
 
+      if (_selectedSubject == 'NKP (Naskah Karya Perseorangan)' &&
+          _selectedKompetensi == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Silahkan pilih kompetensi inti untuk NKP'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
+      if (_selectedSubject == 'Mental Kepribadian' && _selectedMental == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Silahkan pilih aspek penilaian untuk Mental Kepribadian',
+            ),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       if (_selectedPokjar == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -212,7 +260,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         id: 'TSK-${DateTime.now().millisecondsSinceEpoch}',
         judul: _judulController.text.trim(),
         deskripsi: _deskripsiController.text.trim(),
-        mapel: _selectedSubject!,
+        mapel: _selectedSubject == 'NKP (Naskah Karya Perseorangan)'
+            ? 'NKP - $_selectedKompetensi'
+            : _selectedSubject == 'Mental Kepribadian'
+            ? 'Mental - $_selectedMental'
+            : _selectedSubject!,
         deadline: _selectedDeadline!,
         status: 'Aktif',
         createdBy: currentNrp,
@@ -312,6 +364,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
 
                           _buildSubjectDropdownField(),
                           const SizedBox(height: AppDimensions.md),
+
+                          if (_selectedSubject ==
+                              'NKP (Naskah Karya Perseorangan)') ...[
+                            _buildKompetensiDropdownField(),
+                            const SizedBox(height: AppDimensions.md),
+                          ] else if (_selectedSubject ==
+                              'Mental Kepribadian') ...[
+                            _buildMentalDropdownField(),
+                            const SizedBox(height: AppDimensions.md),
+                          ],
 
                           _buildDropdownField(),
                           const SizedBox(height: AppDimensions.md),
@@ -521,6 +583,190 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
             onChanged: (newValue) {
               setState(() {
                 _selectedSubject = newValue;
+                if (_selectedSubject != 'NKP (Naskah Karya Perseorangan)') {
+                  _selectedKompetensi = null;
+                }
+                if (_selectedSubject != 'Mental Kepribadian') {
+                  _selectedMental = null;
+                }
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildKompetensiDropdownField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Kompetensi Inti Kepemimpinan (NKP)',
+          style: TextStyle(
+            fontSize: AppDimensions.fontDefault,
+            fontWeight: FontWeight.w700,
+            color: _primaryNavy,
+          ),
+        ),
+        const SizedBox(height: AppDimensions.sm),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            initialValue: _selectedKompetensi,
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Colors.blueGrey.shade400,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.psychology_rounded,
+                color: Colors.blueGrey.shade400,
+                size: AppDimensions.iconDefault,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+            ),
+            hint: Text(
+              'Pilih 10 kompetensi inti',
+              style: TextStyle(
+                color: Colors.blueGrey.shade300,
+                fontSize: AppDimensions.fontLg,
+              ),
+            ),
+            items: _kompetensiList.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontLg,
+                    fontWeight: FontWeight.w600,
+                    color: _primaryNavy,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              setState(() {
+                _selectedKompetensi = newValue;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMentalDropdownField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Aspek Penilaian Mental Kepribadian',
+          style: TextStyle(
+            fontSize: AppDimensions.fontDefault,
+            fontWeight: FontWeight.w700,
+            color: _primaryNavy,
+          ),
+        ),
+        const SizedBox(height: AppDimensions.sm),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            initialValue: _selectedMental,
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Colors.blueGrey.shade400,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: Icon(
+                Icons.psychology_alt_rounded,
+                color: Colors.blueGrey.shade400,
+                size: AppDimensions.iconDefault,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+            ),
+            hint: Text(
+              'Pilih Aspek Penilaian Mental',
+              style: TextStyle(
+                color: Colors.blueGrey.shade300,
+                fontSize: AppDimensions.fontLg,
+              ),
+            ),
+            items: _mentalList.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontLg,
+                    fontWeight: FontWeight.w600,
+                    color: _primaryNavy,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              setState(() {
+                _selectedMental = newValue;
               });
             },
           ),

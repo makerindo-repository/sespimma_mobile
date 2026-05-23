@@ -27,7 +27,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
       duration: const Duration(milliseconds: 600),
     );
     _animController.forward();
-    
+
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       deviceInfo.androidInfo.then((info) {
@@ -477,9 +477,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
 
     final Color iconColor = isHadir
         ? AppColors.successGreen
-        : isTelat 
-            ? const Color(0xFFFBC02D)
-            : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
+        : isTelat
+        ? const Color(0xFFFBC02D)
+        : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
 
     showModalBottomSheet(
       context: context,
@@ -686,15 +686,15 @@ class _AnimatedAttendanceTile extends StatelessWidget {
 
     final Color iconColor = isHadir
         ? AppColors.successGreen
-        : isTelat 
-            ? const Color(0xFFFBC02D)
-            : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
+        : isTelat
+        ? const Color(0xFFFBC02D)
+        : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
 
     final IconData iconData = isHadir
         ? AppIcons.checkCircleFill
         : isTelat
-            ? AppIcons.clockFill
-            : (isIzin ? AppIcons.warningCircleFill : AppIcons.xCircleFill);
+        ? AppIcons.clockFill
+        : (isIzin ? AppIcons.warningCircleFill : AppIcons.xCircleFill);
 
     return FadeTransition(
       opacity: animation,

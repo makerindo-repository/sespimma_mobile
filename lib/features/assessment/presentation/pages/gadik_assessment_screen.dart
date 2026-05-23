@@ -71,6 +71,7 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
       return {
         'name': report.name,
         'nrp': report.nrp,
+        'nosis': report.nosis,
         'pokjar': report.pokjar.toUpperCase(),
         'status': sudahDinilai ? 'Sudah Dinilai' : 'Belum Dinilai',
         if (sudahDinilai) 'lookupPoints': '+0.50',

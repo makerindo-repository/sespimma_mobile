@@ -102,13 +102,9 @@ class ZoneInfoSheet extends StatelessWidget {
                 : AppColors.successGreen,
           ),
           _InfoRow(
-            icon: Icons.lock_clock_rounded,
-            label: 'Batas Toleransi Alpha',
-            value:
-                '${zone.cutoffTime.hour.toString().padLeft(2, '0')}:${zone.cutoffTime.minute.toString().padLeft(2, '0')} WIB',
-            valueColor: DateTime.now().isAfter(zone.cutoffTime)
-                ? AppColors.dangerRed
-                : AppColors.primaryNavy,
+            icon: Icons.person_pin_rounded,
+            label: 'Pembuat Kegiatan',
+            value: zone.creator,
           ),
           _InfoRow(
             icon: Icons.location_on_rounded,

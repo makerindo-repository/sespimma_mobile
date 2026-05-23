@@ -22,6 +22,48 @@ class LoginResponse {
   final String agama;
   final String jabatan;
 
+  @JsonKey(name: 'no_serdik', defaultValue: '-')
+  final String noSerdik;
+
+  @JsonKey(name: 'nik', defaultValue: '-')
+  final String nik;
+
+  @JsonKey(name: 'jabatan_senat', defaultValue: '-')
+  final String jabatanSenat;
+
+  @JsonKey(name: 'tempat_lahir', defaultValue: '-')
+  final String tempatLahir;
+
+  @JsonKey(name: 'no_handphone', defaultValue: '-')
+  final String noHandphone;
+
+  @JsonKey(name: 'pendidikan_terakhir', defaultValue: '-')
+  final String pendidikanTerakhir;
+
+  @JsonKey(name: 'alamat_lengkap', defaultValue: '-')
+  final String alamatLengkap;
+
+  @JsonKey(name: 'email', defaultValue: '-')
+  final String email;
+
+  @JsonKey(name: 'no_telepon', defaultValue: '-')
+  final String noTelepon;
+
+  @JsonKey(name: 'kelompok', defaultValue: '-')
+  final String kelompok;
+
+  @JsonKey(name: 'diktuk_awal', defaultValue: '-')
+  final String diktukAwal;
+
+  @JsonKey(name: 'tahun_diktuk', defaultValue: '-')
+  final String tahunDiktuk;
+
+  @JsonKey(name: 'personel', defaultValue: '-')
+  final String personel;
+
+  @JsonKey(name: 'satker', defaultValue: '-')
+  final String satker;
+
   @JsonKey(name: 'tanggal_lahir', defaultValue: '1990-01-01')
   final String tanggalLahir;
 
@@ -58,6 +100,20 @@ class LoginResponse {
     required this.agama,
     required this.jenisKelamin,
     required this.jabatan,
+    required this.noSerdik,
+    required this.nik,
+    required this.jabatanSenat,
+    required this.tempatLahir,
+    required this.noHandphone,
+    required this.pendidikanTerakhir,
+    required this.alamatLengkap,
+    required this.email,
+    required this.noTelepon,
+    required this.kelompok,
+    required this.diktukAwal,
+    required this.tahunDiktuk,
+    required this.personel,
+    required this.satker,
     required this.tanggalLahir,
     required this.isNakApproved,
     required this.nilaiAkademik,

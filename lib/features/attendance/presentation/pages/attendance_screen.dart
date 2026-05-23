@@ -408,7 +408,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       builder: (ctx) => LeaveFormSheet(
         onSuccess: () {
           _showSnackBar(
-            'Permohonan Izin Berhasil Diajukan ke Pimpinan.',
+            'Permohonan Izin Berhasil Diajukan ke Korsis.',
             AppColors.successGreen,
             AppIcons.checkCircleFill,
           );

@@ -16,6 +16,20 @@ class UserEntity extends Equatable {
   final String? umur;
   final bool? isNakApproved;
   final String? profilePhoto;
+  final String noSerdik;
+  final String nik;
+  final String jabatanSenat;
+  final String tempatLahir;
+  final String noHandphone;
+  final String pendidikanTerakhir;
+  final String alamatLengkap;
+  final String email;
+  final String noTelepon;
+  final String kelompok;
+  final String diktukAwal;
+  final String tahunDiktuk;
+  final String personel;
+  final String satker;
   final double nilaiAkademik;
   final double nilaiMental;
   final double nilaiJasmani;
@@ -36,6 +50,20 @@ class UserEntity extends Equatable {
     this.umur,
     this.isNakApproved,
     this.profilePhoto,
+    required this.noSerdik,
+    required this.nik,
+    required this.jabatanSenat,
+    required this.tempatLahir,
+    required this.noHandphone,
+    required this.pendidikanTerakhir,
+    required this.alamatLengkap,
+    required this.email,
+    required this.noTelepon,
+    required this.kelompok,
+    required this.diktukAwal,
+    required this.tahunDiktuk,
+    required this.personel,
+    required this.satker,
     required this.nilaiAkademik,
     required this.nilaiMental,
     required this.nilaiJasmani,
@@ -78,6 +106,20 @@ class UserEntity extends Equatable {
     bool? isNakApproved,
     String? profilePhoto,
     bool clearProfilePhoto = false,
+    String? noSerdik,
+    String? nik,
+    String? jabatanSenat,
+    String? tempatLahir,
+    String? noHandphone,
+    String? pendidikanTerakhir,
+    String? alamatLengkap,
+    String? email,
+    String? noTelepon,
+    String? kelompok,
+    String? diktukAwal,
+    String? tahunDiktuk,
+    String? personel,
+    String? satker,
     double? nilaiAkademik,
     double? nilaiMental,
     double? nilaiJasmani,
@@ -100,6 +142,20 @@ class UserEntity extends Equatable {
       profilePhoto: clearProfilePhoto
           ? null
           : (profilePhoto ?? this.profilePhoto),
+      noSerdik: noSerdik ?? this.noSerdik,
+      nik: nik ?? this.nik,
+      jabatanSenat: jabatanSenat ?? this.jabatanSenat,
+      tempatLahir: tempatLahir ?? this.tempatLahir,
+      noHandphone: noHandphone ?? this.noHandphone,
+      pendidikanTerakhir: pendidikanTerakhir ?? this.pendidikanTerakhir,
+      alamatLengkap: alamatLengkap ?? this.alamatLengkap,
+      email: email ?? this.email,
+      noTelepon: noTelepon ?? this.noTelepon,
+      kelompok: kelompok ?? this.kelompok,
+      diktukAwal: diktukAwal ?? this.diktukAwal,
+      tahunDiktuk: tahunDiktuk ?? this.tahunDiktuk,
+      personel: personel ?? this.personel,
+      satker: satker ?? this.satker,
       nilaiAkademik: nilaiAkademik ?? this.nilaiAkademik,
       nilaiMental: nilaiMental ?? this.nilaiMental,
       nilaiJasmani: nilaiJasmani ?? this.nilaiJasmani,
@@ -123,6 +179,20 @@ class UserEntity extends Equatable {
     umur,
     isNakApproved,
     profilePhoto,
+    noSerdik,
+    nik,
+    jabatanSenat,
+    tempatLahir,
+    noHandphone,
+    pendidikanTerakhir,
+    alamatLengkap,
+    email,
+    noTelepon,
+    kelompok,
+    diktukAwal,
+    tahunDiktuk,
+    personel,
+    satker,
     nilaiAkademik,
     nilaiMental,
     nilaiJasmani,

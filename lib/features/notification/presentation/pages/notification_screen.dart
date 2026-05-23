@@ -77,11 +77,12 @@ class _NotificationScreenState extends State<NotificationScreen>
         final count = SociometryPeriodConfig.getFilledCount();
         final total = SociometryPeriodConfig.getTotalCount();
         final remaining = total - count;
-        
+
         list.add({
           'id': 'notif_sosio_start',
           'title': 'Sosiometri Peleton Dimulai',
-          'body': 'Hari ini sosiometri telah dimulai. Silakan isi penilaian untuk seluruh rekan peleton Anda.',
+          'body':
+              'Hari ini sosiometri telah dimulai. Silakan isi penilaian untuk seluruh rekan peleton Anda.',
           'date': _getDynamicDateStr(0),
           'time': '07:00 WIB',
           'dateTime': today,
@@ -93,7 +94,8 @@ class _NotificationScreenState extends State<NotificationScreen>
           list.add({
             'id': 'notif_sosio_remind',
             'title': 'Pengingat Sosiometri',
-            'body': '$remaining rekan lagi belum Anda isi sosiometrinya. Tenggat waktu hampir habis, segera lengkapi.',
+            'body':
+                '$remaining rekan lagi belum Anda isi sosiometrinya. Tenggat waktu hampir habis, segera lengkapi.',
             'date': _getDynamicDateStr(0),
             'time': '12:00 WIB',
             'dateTime': today,
@@ -104,7 +106,8 @@ class _NotificationScreenState extends State<NotificationScreen>
           list.add({
             'id': 'notif_sosio_done',
             'title': 'Sosiometri Selesai',
-            'body': 'Terima kasih, Anda telah mengisi sosiometri untuk seluruh rekan peleton Anda dengan lengkap.',
+            'body':
+                'Terima kasih, Anda telah mengisi sosiometri untuk seluruh rekan peleton Anda dengan lengkap.',
             'date': _getDynamicDateStr(0),
             'time': '14:00 WIB',
             'dateTime': today,
@@ -118,7 +121,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_reward',
           'title': 'Reward: Menjadi Imam Shalat',
-          'body': 'Selamat! Anda mendapatkan reward +0.50 nilai mental dari Patun A.',
+          'body':
+              'Selamat! Anda mendapatkan reward +0.50 nilai mental dari Patun A.',
           'date': _getDynamicDateStr(0),
           'time': '18:30 WIB',
           'dateTime': today,
@@ -128,7 +132,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_punish',
           'title': 'Punishment: Terlambat Apel',
-          'body': 'Tercatat keterlambatan apel pagi via geofencing. Pengurangan nilai -0.50.',
+          'body':
+              'Tercatat keterlambatan apel pagi via geofencing. Pengurangan nilai -0.50.',
           'date': _getDynamicDateStr(0),
           'time': '07:15 WIB',
           'dateTime': today,
@@ -138,7 +143,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_task_done',
           'title': 'Tugas: Naskah Karya Perseorangan',
-          'body': 'Tugas Anda telah selesai dinilai oleh Patun. Nilai Anda: 88.5.',
+          'body':
+              'Tugas Anda telah selesai dinilai oleh Patun. Nilai Anda: 88.5.',
           'date': _getDynamicDateStr(1),
           'time': '09:00 WIB',
           'dateTime': yesterday,
@@ -148,7 +154,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_task_wait',
           'title': 'Tugas: Resume Kepemimpinan',
-          'body': 'Berhasil mengumpulkan tepat waktu. Status saat ini: Sedang dinilai oleh Patun.',
+          'body':
+              'Berhasil mengumpulkan tepat waktu. Status saat ini: Sedang dinilai oleh Patun.',
           'date': _getDynamicDateStr(1),
           'time': '14:00 WIB',
           'dateTime': yesterday,
@@ -158,7 +165,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_task_late',
           'title': 'Tugas Terlambat: Esai Pengendalian Diri',
-          'body': 'Anda mengumpulkan tugas melewati batas waktu yang ditentukan. Menunggu penilaian.',
+          'body':
+              'Anda mengumpulkan tugas melewati batas waktu yang ditentukan. Menunggu penilaian.',
           'date': _getDynamicDateStr(2),
           'time': '16:00 WIB',
           'dateTime': today.subtract(const Duration(days: 2)),
@@ -168,7 +176,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_task_miss',
           'title': 'Tugas Tidak Dikumpulkan: Sistem Informasi',
-          'body': 'Batas waktu telah habis dan Anda belum mengumpulkan tugas ini.',
+          'body':
+              'Batas waktu telah habis dan Anda belum mengumpulkan tugas ini.',
           'date': _getDynamicDateStr(2),
           'time': '23:59 WIB',
           'dateTime': today.subtract(const Duration(days: 2)),
@@ -198,7 +207,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         {
           'id': 'n_att_izin',
           'title': 'Kehadiran: Kelas Manajemen',
-          'body': 'Status kehadiran Anda tercatat: Izin. Surat sakit telah divalidasi.',
+          'body':
+              'Status kehadiran Anda tercatat: Izin. Surat sakit telah divalidasi.',
           'date': _getDynamicDateStr(4),
           'time': '08:30 WIB',
           'dateTime': today.subtract(const Duration(days: 4)),
@@ -675,42 +685,73 @@ class _AnimatedNotificationTile extends StatelessWidget {
 
   IconData _getIcon() {
     switch (notification['type']) {
-      case 'reward': return AppIcons.medalFill;
-      case 'punishment': return AppIcons.warningCircleFill;
-      case 'task_dinilai': return AppIcons.checkCircleFill;
-      case 'task_sedang_dinilai': return AppIcons.clipboardTextFill;
-      case 'task_telat': return AppIcons.clockFill;
-      case 'task_alpha': return AppIcons.xCircleFill;
-      case 'sosiometri_start': return AppIcons.usersThreeFill;
-      case 'sosiometri_reminder': return AppIcons.usersThreeFill;
-      case 'sosiometri_done': return AppIcons.checkCircleFill;
-      case 'hadir': return AppIcons.userFocusFill;
-      case 'telat': return AppIcons.clockFill;
-      case 'izin': return AppIcons.filePdfFill;
-      case 'alpha': return AppIcons.warningOctagonFill;
-      case 'task': return AppIcons.clipboardTextFill;
-      default: return AppIcons.infoFill;
+      case 'reward':
+        return AppIcons.medalFill;
+      case 'punishment':
+        return AppIcons.warningCircleFill;
+      case 'task_dinilai':
+        return AppIcons.checkCircleFill;
+      case 'task_sedang_dinilai':
+        return AppIcons.clipboardTextFill;
+      case 'task_telat':
+        return AppIcons.clockFill;
+      case 'task_alpha':
+        return AppIcons.xCircleFill;
+      case 'sosiometri_start':
+        return AppIcons.usersThreeFill;
+      case 'sosiometri_reminder':
+        return AppIcons.usersThreeFill;
+      case 'sosiometri_done':
+        return AppIcons.checkCircleFill;
+      case 'hadir':
+        return AppIcons.userFocusFill;
+      case 'telat':
+        return AppIcons.clockFill;
+      case 'izin':
+        return AppIcons.filePdfFill;
+      case 'alpha':
+        return AppIcons.warningOctagonFill;
+      case 'task':
+        return AppIcons.clipboardTextFill;
+      default:
+        return AppIcons.infoFill;
     }
   }
 
   Color _getColor() {
     switch (notification['type']) {
-      case 'reward': return const Color(0xFF2E7D32);
-      case 'punishment': return const Color(0xFFD32F2F);
-      case 'task_dinilai': return const Color(0xFF2E7D32);
-      case 'task_sedang_dinilai': return Colors.blue.shade600;
-      case 'task_telat': return const Color(0xFFFBC02D);
-      case 'task_alpha': return const Color(0xFFD32F2F);
-      case 'sosiometri_start': return const Color(0xFF4F46E5);
-      case 'sosiometri_reminder': return const Color(0xFFF57C00);
-      case 'sosiometri_done': return const Color(0xFF2E7D32);
-      case 'hadir': return const Color(0xFF2E7D32);
-      case 'telat': return const Color(0xFFFBC02D);
-      case 'izin': return const Color(0xFFF57C00);
-      case 'alpha': return const Color(0xFFD32F2F);
-      case 'task': return Colors.blue.shade600;
-      case 'info': return Colors.amber.shade700;
-      default: return Colors.blueGrey.shade600;
+      case 'reward':
+        return const Color(0xFF2E7D32);
+      case 'punishment':
+        return const Color(0xFFD32F2F);
+      case 'task_dinilai':
+        return const Color(0xFF2E7D32);
+      case 'task_sedang_dinilai':
+        return Colors.blue.shade600;
+      case 'task_telat':
+        return const Color(0xFFFBC02D);
+      case 'task_alpha':
+        return const Color(0xFFD32F2F);
+      case 'sosiometri_start':
+        return const Color(0xFF4F46E5);
+      case 'sosiometri_reminder':
+        return const Color(0xFFF57C00);
+      case 'sosiometri_done':
+        return const Color(0xFF2E7D32);
+      case 'hadir':
+        return const Color(0xFF2E7D32);
+      case 'telat':
+        return const Color(0xFFFBC02D);
+      case 'izin':
+        return const Color(0xFFF57C00);
+      case 'alpha':
+        return const Color(0xFFD32F2F);
+      case 'task':
+        return Colors.blue.shade600;
+      case 'info':
+        return Colors.amber.shade700;
+      default:
+        return Colors.blueGrey.shade600;
     }
   }
 

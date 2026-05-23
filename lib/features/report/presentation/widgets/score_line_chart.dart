@@ -132,7 +132,7 @@ class ScoreLineChart extends StatelessWidget {
               ),
               const SizedBox(height: AppDimensions.xs / 2),
               Text(
-                'Evaluasi Komprehensif Tahap I - IV',
+                'Evaluasi Komprehensif Periode I - IV',
                 style: TextStyle(
                   fontSize: AppDimensions.fontXs + 1,
                   fontWeight: FontWeight.w600,
@@ -207,10 +207,10 @@ class ScoreLineChart extends StatelessWidget {
                   fontSize: AppDimensions.fontSm,
                 );
                 String text = '';
-                if (value == 0.0) text = 'Tahap I';
-                if (value == 1.0) text = 'Tahap II';
-                if (value == 2.0) text = 'Tahap III';
-                if (value == 3.0) text = 'Tahap IV';
+                if (value == 0.0) text = 'Periode I';
+                if (value == 1.0) text = 'Periode II';
+                if (value == 2.0) text = 'Periode III';
+                if (value == 3.0) text = 'Periode IV';
                 if (text.isEmpty) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 10.0),

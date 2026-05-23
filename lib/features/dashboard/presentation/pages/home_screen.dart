@@ -229,7 +229,9 @@ class _HomeScreenState extends State<HomeScreen>
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
                   child: Text(
-                    user.roleId == 'siswa' ? 'NOSIS: ${user.nosis}' : 'NRP: ${user.nrp}',
+                    user.roleId == 'siswa'
+                        ? 'NOSIS: ${user.nosis}'
+                        : 'NRP: ${user.nrp}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: AppDimensions.fontMd,

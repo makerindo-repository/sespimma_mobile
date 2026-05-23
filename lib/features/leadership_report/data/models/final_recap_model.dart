@@ -2,6 +2,7 @@ class FinalRecapModel {
   final String id;
   final String name;
   final String nrp;
+  final String nosis;
   final String pokjar;
   final double academicScore;
   final double mentalScore;
@@ -15,6 +16,7 @@ class FinalRecapModel {
     required this.id,
     required this.name,
     required this.nrp,
+    required this.nosis,
     required this.pokjar,
     required this.academicScore,
     required this.mentalScore,
@@ -44,6 +46,7 @@ class FinalRecapModel {
       id: json['id'] as String? ?? '',
       name: json['name'] as String? ?? '',
       nrp: json['nrp'] as String? ?? '',
+      nosis: json['nosis'] as String? ?? '',
       pokjar: json['pokjar'] as String? ?? '',
       academicScore: (json['academic_score'] as num?)?.toDouble() ?? 0.0,
       mentalScore: (json['mental_score'] as num?)?.toDouble() ?? 0.0,
@@ -64,6 +67,7 @@ class FinalRecapModel {
       'id': id,
       'name': name,
       'nrp': nrp,
+      'nosis': nosis,
       'pokjar': pokjar,
       'academic_score': academicScore,
       'mental_score': mentalScore,
@@ -79,6 +83,7 @@ class FinalRecapModel {
     String? id,
     String? name,
     String? nrp,
+    String? nosis,
     String? pokjar,
     double? academicScore,
     double? mentalScore,
@@ -92,6 +97,7 @@ class FinalRecapModel {
       id: id ?? this.id,
       name: name ?? this.name,
       nrp: nrp ?? this.nrp,
+      nosis: nosis ?? this.nosis,
       pokjar: pokjar ?? this.pokjar,
       academicScore: academicScore ?? this.academicScore,
       mentalScore: mentalScore ?? this.mentalScore,

@@ -58,12 +58,8 @@ class DetailedCompetencies extends StatelessWidget {
             score: calc(isWarning ? 2.0 : 1.8),
           ),
           _CompetencyItem(
-            title: 'Sosiometri Awal (7.5%)',
-            score: calc(isWarning ? 0.5 : -0.5),
-          ),
-          _CompetencyItem(
-            title: 'Sosiometri Akhir (7.5%)',
-            score: calc(isWarning ? 1.0 : 0.8),
+            title: 'Sosiometri (15%)',
+            score: calc(isWarning ? 0.75 : 0.15),
           ),
         ],
       );

@@ -84,7 +84,7 @@ class SerdikCardWidget extends StatelessWidget {
         ),
         const SizedBox(height: AppDimensions.xs),
         Text(
-          'NRP: ${serdik['nrp']} • ${serdik['pokjar']}',
+          'NOSIS: ${serdik['nosis'] ?? serdik['nrp']} • ${serdik['pokjar']}',
           style: TextStyle(
             fontSize: AppDimensions.fontMd,
             fontWeight: FontWeight.w600,

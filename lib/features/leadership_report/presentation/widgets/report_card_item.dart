@@ -61,8 +61,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
     final meKepemimpinan = _clampScore(me + 1.2);
     final meDiri = _clampScore(me);
     final mePenampilan = _clampScore(me + 1.8);
-    final meSosioAwal = _clampScore(me - 0.5);
-    final meSosioAkhir = _clampScore(me + 0.8);
+    final meSosio = _clampScore(me + 0.15);
 
     final phKesAwal = _clampScore(ph - 1.2);
     final phKesAkhir = _clampScore(ph + 0.2);
@@ -251,8 +250,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
                   _buildSubRow('Kepemimpinan', meKepemimpinan, '20%'),
                   _buildSubRow('Pengendalian Diri', meDiri, '15%'),
                   _buildSubRow('Penampilan', mePenampilan, '15%'),
-                  _buildSubRow('Sosiometri Awal', meSosioAwal, '30%'),
-                  _buildSubRow('Sosiometri Akhir', meSosioAkhir, '30%'),
+                  _buildSubRow('Sosiometri', meSosio, '60%'),
                   const SizedBox(height: AppDimensions.md),
                   _buildRincianHeader(
                     'JASMANI (10%)',

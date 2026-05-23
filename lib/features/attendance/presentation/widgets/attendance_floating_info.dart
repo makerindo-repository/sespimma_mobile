@@ -65,11 +65,22 @@ class AttendanceFloatingInfo extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    activeZone.name,
+                    activeZone.activityName,
                     style: const TextStyle(
                       fontSize: AppDimensions.fontSm,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primaryNavy,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    activeZone.name,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontXs,
+                      color: Colors.blueGrey.shade600,
+                      fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
