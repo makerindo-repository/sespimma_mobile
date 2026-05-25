@@ -16,7 +16,9 @@ class AttendanceQrScannerScreen extends StatefulWidget {
 class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
     with SingleTickerProviderStateMixin {
   bool _isScanned = false;
+  bool _isFlashOn = false;
   late AnimationController _animationController;
+  final MobileScannerController _scannerController = MobileScannerController();
 
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _scannerController.dispose();
     super.dispose();
   }
 
@@ -40,6 +43,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
       body: Stack(
         children: [
           MobileScanner(
+            controller: _scannerController,
             onDetect: (capture) {
               if (_isScanned) return;
 
@@ -112,16 +116,43 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
             bottom: 60,
             left: 0,
             right: 0,
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Container(
-                padding: const EdgeInsets.all(AppDimensions.md),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    _scannerController.toggleTorch();
+                    setState(() {
+                      _isFlashOn = !_isFlashOn;
+                    });
+                  },
+                  icon: Container(
+                    padding: const EdgeInsets.all(AppDimensions.md),
+                    decoration: BoxDecoration(
+                      color: _isFlashOn
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _isFlashOn ? Icons.flash_on : Icons.flash_off,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-                child: const Icon(AppIcons.xBold, color: Colors.white),
-              ),
+                const SizedBox(width: AppDimensions.xxl),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Container(
+                    padding: const EdgeInsets.all(AppDimensions.md),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(AppIcons.xBold, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -134,7 +165,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
       children: [
         ColorFiltered(
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.8),
+            Colors.black.withValues(alpha: 0.95),
             BlendMode.srcOut,
           ),
           child: Stack(
