@@ -64,7 +64,7 @@ class AssignmentDeadlineCardWidget extends StatelessWidget {
         statusIcon = AppIcons.hourglassHighFill;
       } else {
         cardColor = AppColors.successGreen;
-        statusValue = 'Telah Selesai & Dinilai';
+        statusValue = 'Telah Dinilai';
         statusIcon = AppIcons.checkCircleFill;
       }
     }

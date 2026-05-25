@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
   @override
@@ -140,6 +140,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     return const Color(0xFF7F8C8D);
   }
 
+  String _getFullPangkat(String pangkat) {
+    if (pangkat.toUpperCase() == 'AKP') return 'AJUN KOMISARIS POLISI';
+    return pangkat;
+  }
+
   Widget _buildTopHeader(UserEntity user) {
     final roleLabel = _getRoleLabel(user.roleId);
     final badgeColor = _getRoleBadgeColor(user.roleId);
@@ -186,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           const SizedBox(height: AppDimensions.sm),
           Text(
             user.roleId == 'siswa'
-                ? 'NOSIS: ${user.nosis}'
+                ? 'NO. SERDIK: ${user.noSerdik}'
                 : 'NRP: ${user.nrp}',
             style: TextStyle(
               color: Colors.blueGrey.shade200,
@@ -200,44 +205,26 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildAvatar(UserEntity user) {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        Container(
-          height: 100,
-          width: 100,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
-            image: DecorationImage(
-              image:
-                  (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
-                  ? FileImage(File(user.profilePhoto!)) as ImageProvider
-                  : const AssetImage('assets/images/default_avatar.png'),
-              fit: BoxFit.cover,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
+    return Container(
+      height: 100,
+      width: 100,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+        image: DecorationImage(
+          image: (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
+              ? FileImage(File(user.profilePhoto!)) as ImageProvider
+              : const AssetImage('assets/images/default_avatar.png'),
+          fit: BoxFit.cover,
         ),
-        Container(
-          padding: const EdgeInsets.all(AppDimensions.xs / 2),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
-          child: Icon(
-            AppIcons.sealCheckFill,
-            color: _primaryNavy,
-            size: AppDimensions.iconXl,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -246,10 +233,12 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Row(
       children: [
-        Expanded(child: _buildStatCard('PANGKAT', user.pangkat)),
+        Expanded(
+          child: _buildStatCard('PANGKAT', _getFullPangkat(user.pangkat)),
+        ),
         const SizedBox(width: AppDimensions.md),
         if (isSiswa)
-          Expanded(child: _buildStatCard('POKJAR', user.pokjar))
+          Expanded(child: _buildStatCard('KELOMPOK', 'POKJAR ${user.pokjar}'))
         else
           Expanded(child: _buildStatCard('JABATAN', user.jabatan)),
       ],
@@ -283,15 +272,16 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ),
           const SizedBox(height: AppDimensions.radiusSm),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: AppDimensions.fontLg + 1,
-              fontWeight: FontWeight.w800,
-              color: _primaryNavy,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: AppDimensions.fontLg + 1,
+                fontWeight: FontWeight.w800,
+                color: _primaryNavy,
+              ),
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -301,53 +291,84 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildFormalDataCard(UserEntity user) {
     final isSiswa = user.roleId == 'siswa';
 
-    List<Widget> rows = [
-      _buildDetailRow(AppIcons.identificationCard, 'NO SERDIK', user.noSerdik),
-      _buildDetailRow(AppIcons.identificationCard, 'NIK', user.nik),
-      _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
-      if (isSiswa) ...[
-        _buildDetailRow(AppIcons.medal, 'JABATAN SENAT', user.jabatanSenat),
-        _buildDetailRow(AppIcons.medal, 'ANGKATAN', user.angkatan),
-      ],
-      _buildDetailRow(AppIcons.mapPin, 'TEMPAT LAHIR', user.tempatLahir),
-      _buildDetailRow(
-        AppIcons.calendarBlank,
-        'TANGGAL LAHIR',
-        user.tanggalLahir ?? '-',
-      ),
-      _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
-      _buildDetailRow(
-        AppIcons.identificationCard,
-        'JENIS KELAMIN',
-        user.jenisKelamin,
-      ),
-      _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
-      _buildDetailRow(
-        AppIcons.deviceMobileSpeakerFill,
-        'NO HANDPHONE',
-        user.noHandphone,
-      ),
-      _buildDetailRow(
-        AppIcons.bookOpen,
-        'PENDIDIKAN TERAKHIR',
-        user.pendidikanTerakhir,
-      ),
-      _buildDetailRow(AppIcons.mapPin, 'ALAMAT LENGKAP', user.alamatLengkap),
-      _buildDetailRow(AppIcons.paperPlaneTiltFill, 'EMAIL', user.email),
-      _buildDetailRow(
-        AppIcons.deviceMobileSpeakerFill,
-        'NO TELEPON',
-        user.noTelepon,
-      ),
-      _buildDetailRow(AppIcons.usersFill, 'KELOMPOK', user.kelompok),
-      _buildDetailRow(AppIcons.bookOpen, 'DIKTUK AWAL', user.diktukAwal),
-      _buildDetailRow(AppIcons.calendarBlank, 'TAHUN DIKTUK', user.tahunDiktuk),
-      _buildDetailRow(AppIcons.user, 'PERSONEL (YA/TIDAK)', user.personel),
-      _buildDetailRow(AppIcons.identificationCard, 'NRP', user.nrp),
-      _buildDetailRow(AppIcons.medal, 'PANGKAT', user.pangkat),
-      _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
-      _buildDetailRow(AppIcons.buildingsFill, 'SATKER', user.satker),
-    ];
+    List<Widget> rows = isSiswa
+        ? [
+            _buildDetailRow(AppIcons.medal, 'ANGKATAN', user.angkatan),
+            _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
+            _buildDetailRow(
+              AppIcons.identificationCard,
+              'JENIS KELAMIN',
+              user.jenisKelamin,
+            ),
+            _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
+          ]
+        : [
+            _buildDetailRow(
+              AppIcons.identificationCard,
+              'NO SERDIK',
+              user.noSerdik,
+            ),
+            _buildDetailRow(AppIcons.identificationCard, 'NIK', user.nik),
+            _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
+            _buildDetailRow(AppIcons.mapPin, 'TEMPAT LAHIR', user.tempatLahir),
+            _buildDetailRow(
+              AppIcons.calendarBlank,
+              'TANGGAL LAHIR',
+              user.tanggalLahir ?? '-',
+            ),
+            _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
+            _buildDetailRow(
+              AppIcons.identificationCard,
+              'JENIS KELAMIN',
+              user.jenisKelamin,
+            ),
+            _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
+            _buildDetailRow(
+              AppIcons.deviceMobileSpeakerFill,
+              'NO HANDPHONE',
+              user.noHandphone,
+            ),
+            _buildDetailRow(
+              AppIcons.bookOpen,
+              'PENDIDIKAN TERAKHIR',
+              user.pendidikanTerakhir,
+            ),
+            _buildDetailRow(
+              AppIcons.mapPin,
+              'ALAMAT LENGKAP',
+              user.alamatLengkap,
+            ),
+            _buildDetailRow(AppIcons.paperPlaneTiltFill, 'EMAIL', user.email),
+            _buildDetailRow(
+              AppIcons.deviceMobileSpeakerFill,
+              'NO TELEPON',
+              user.noTelepon,
+            ),
+            _buildDetailRow(
+              AppIcons.usersFill,
+              'KELOMPOK',
+              'POKJAR ${user.kelompok}',
+            ),
+            _buildDetailRow(AppIcons.bookOpen, 'DIKTUK AWAL', user.diktukAwal),
+            _buildDetailRow(
+              AppIcons.calendarBlank,
+              'TAHUN DIKTUK',
+              user.tahunDiktuk,
+            ),
+            _buildDetailRow(
+              AppIcons.user,
+              'PERSONEL (YA/TIDAK)',
+              user.personel,
+            ),
+            _buildDetailRow(AppIcons.identificationCard, 'NRP', user.nrp),
+            _buildDetailRow(
+              AppIcons.medal,
+              'PANGKAT',
+              _getFullPangkat(user.pangkat),
+            ),
+            _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
+            _buildDetailRow(AppIcons.buildingsFill, 'SATKER', user.satker),
+          ];
 
     List<Widget> children = [];
     for (int i = 0; i < rows.length; i++) {

@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
@@ -718,39 +719,56 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
           _buildTaskHeader(task, allSubmissions),
           _buildSearchAndFilterRow(),
           Expanded(
-            child: filteredSubmissions.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
+            child: RefreshIndicator(
+              color: _primaryNavy,
+              backgroundColor: Colors.white,
+              onRefresh: () async {
+                HapticFeedback.mediumImpact();
+                await Future.delayed(const Duration(seconds: 1));
+                if (mounted) setState(() {});
+              },
+              child: filteredSubmissions.isEmpty
+                  ? SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.4,
+                        alignment: Alignment.center,
+                        child: _buildEmptyState(),
+                      ),
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      itemCount: filteredSubmissions.length,
+                      itemBuilder: (context, index) {
+                        final animation = CurvedAnimation(
+                          parent: _animController,
+                          curve: Interval(
+                            (index /
+                                    (filteredSubmissions.isEmpty
+                                        ? 1
+                                        : filteredSubmissions.length))
+                                .clamp(0.0, 1.0),
+                            1.0,
+                            curve: Curves.easeOutCubic,
+                          ),
+                        );
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0, 0.2),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: _buildSerdikItem(filteredSubmissions[index]),
+                          ),
+                        );
+                      },
                     ),
-                    itemCount: filteredSubmissions.length,
-                    itemBuilder: (context, index) {
-                      final animation = CurvedAnimation(
-                        parent: _animController,
-                        curve: Interval(
-                          (index /
-                                  (filteredSubmissions.isEmpty
-                                      ? 1
-                                      : filteredSubmissions.length))
-                              .clamp(0.0, 1.0),
-                          1.0,
-                          curve: Curves.easeOutCubic,
-                        ),
-                      );
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.2),
-                            end: Offset.zero,
-                          ).animate(animation),
-                          child: _buildSerdikItem(filteredSubmissions[index]),
-                        ),
-                      );
-                    },
-                  ),
+            ),
           ),
         ],
       ),
@@ -1002,6 +1020,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         children: [
           Expanded(
             child: Container(
+              height: 48.0,
               decoration: BoxDecoration(
                 color: _lightGrey,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
@@ -1080,7 +1099,8 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         }).toList();
       },
       child: Container(
-        padding: const EdgeInsets.all(AppDimensions.sm + 2),
+        height: 48.0,
+        width: 48.0,
         decoration: BoxDecoration(
           color: isFiltered
               ? _primaryNavy.withValues(alpha: 0.05)
@@ -1108,6 +1128,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
       'POKJAR 3',
       'POKJAR 4',
       'POKJAR 5',
+      'Simulasi Kesatuan',
     ];
     return PopupMenuButton<String>(
       onSelected: (value) {
@@ -1147,7 +1168,8 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         }).toList();
       },
       child: Container(
-        padding: const EdgeInsets.all(AppDimensions.sm + 2),
+        height: 48.0,
+        width: 48.0,
         decoration: BoxDecoration(
           color: isFiltered
               ? _primaryNavy.withValues(alpha: 0.05)

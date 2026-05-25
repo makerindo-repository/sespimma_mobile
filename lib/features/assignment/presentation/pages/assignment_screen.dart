@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../data/models/assignment_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import '../widgets/task_card.dart';
 
 class AssignmentScreen extends StatefulWidget {
@@ -14,14 +15,17 @@ class AssignmentScreen extends StatefulWidget {
 
 class _AssignmentScreenState extends State<AssignmentScreen>
     with SingleTickerProviderStateMixin {
-  static const Color _primaryNavy = Color(0xFF001C40);
-  static const Color _lightGrey = Color(0xFFF8F9FA);
+  static const Color _primaryNavy = AppColors.primaryNavy;
+  static const Color _lightGrey = AppColors.background;
 
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String _selectedSubject = 'Semua Mapel / Rumpun';
+  String _selectedSubject = 'Semua Kategori';
+  List<AssignmentModel>? __mockAssignments;
   List<AssignmentModel> get _mockAssignments {
+    if (__mockAssignments != null) return __mockAssignments!;
+
     final List<AssignmentModel> base = [
       AssignmentModel(
         id: 'TSK-001',
@@ -42,7 +46,7 @@ class _AssignmentScreenState extends State<AssignmentScreen>
       AssignmentModel(
         id: 'TSK-003',
         judul: 'Ujian MP - Pengendalian Diri & Emosi',
-        mapel: 'Ujian MP / Esai',
+        mapel: 'Ujian MP/Esai',
         pengajar: 'Kombes Pol. Fajar Nugroho',
         deadline: DateTime.now().subtract(const Duration(days: 1)),
         status: 'diperiksa',
@@ -51,7 +55,7 @@ class _AssignmentScreenState extends State<AssignmentScreen>
       AssignmentModel(
         id: 'TSK-004',
         judul: 'Resume Kuliah Umum - Transparansi Digital SESPIMMA',
-        mapel: 'Sistem Informasi Publik',
+        mapel: 'Resume Mata Pelajaran',
         pengajar: 'AKBP Rina Kartika',
         deadline: DateTime.now().subtract(const Duration(days: 3)),
         status: 'selesai',
@@ -76,7 +80,8 @@ class _AssignmentScreenState extends State<AssignmentScreen>
         .where((dt) => !base.any((b) => b.id == dt.id))
         .toList();
 
-    return [...dynamicTasks, ...base];
+    __mockAssignments = [...dynamicTasks, ...base];
+    return __mockAssignments!;
   }
 
   @override
@@ -100,20 +105,26 @@ class _AssignmentScreenState extends State<AssignmentScreen>
 
   List<String> get _allSubjects {
     return const [
-      'Semua Mapel / Rumpun',
-      'NKP (Naskah Karya Perseorangan)',
+      'Semua Kategori',
+      'Resume Mata Pelajaran',
+      'Ujian Mata Pelajaran atau Esai',
       'NKKP (Naskah Kuliah Kerja Profesi)',
       'NPKP (Naskah Praktek Kerja Profesi)',
-      'Ujian MP / Esai',
-      'Mental Kepribadian',
-      'Etika & Kepemimpinan',
-      'Manajemen Strategis',
-      'Sistem Informasi Publik',
+      'NKP (Naskah Karya Perseorangan)',
+      'NPTT (Naskah Program Transformasi Teknis)',
+      'NAC (Neuro Associative Conditioning)',
+      'MTL II (Manajemen Training Level II)',
+      'BCS (Bina Cendekia Samapta)',
+      'Simulasi Manajemen Penanggulangan Bencana',
+      'KKP (Kuliah Kerja Profesi)',
+      'PKP (Praktek Kerja Profesi)',
+      'Simulasi Kepemimpinan Kontemporer',
+      'Seminar Sekolah',
     ];
   }
 
   Widget _buildFilterDropdown() {
-    final bool isFiltered = _selectedSubject != 'Semua Mapel / Rumpun';
+    final bool isFiltered = _selectedSubject != 'Semua Kategori';
     return PopupMenuButton<String>(
       onSelected: (String value) {
         setState(() {
@@ -121,6 +132,7 @@ class _AssignmentScreenState extends State<AssignmentScreen>
         });
       },
       offset: const Offset(0, 56),
+      constraints: const BoxConstraints(maxHeight: 280),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
       ),
@@ -137,12 +149,20 @@ class _AssignmentScreenState extends State<AssignmentScreen>
                   size: AppDimensions.iconDefault,
                 ),
                 const SizedBox(width: AppDimensions.md - 4),
-                Text(
-                  subject,
-                  style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? _primaryNavy : Colors.blueGrey.shade700,
-                    fontSize: AppDimensions.fontDefault,
+                Expanded(
+                  child: Text(
+                    subject,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? _primaryNavy
+                          : Colors.blueGrey.shade700,
+                      fontSize: AppDimensions.fontDefault,
+                    ),
                   ),
                 ),
               ],
@@ -206,8 +226,7 @@ class _AssignmentScreenState extends State<AssignmentScreen>
     final List<AssignmentModel> searchedAssignments = _mockAssignments.where((
       t,
     ) {
-      if (_selectedSubject != 'Semua Mapel / Rumpun' &&
-          t.mapel != _selectedSubject) {
+      if (_selectedSubject != 'Semua Kategori' && t.mapel != _selectedSubject) {
         return false;
       }
       if (query.isEmpty) return true;
@@ -254,7 +273,7 @@ class _AssignmentScreenState extends State<AssignmentScreen>
                       hintText: 'Cari judul tugas atau mata pelajaran...',
                       hintStyle: TextStyle(
                         color: Colors.blueGrey.shade300,
-                        fontSize: AppDimensions.fontLg,
+                        fontSize: AppDimensions.fontSm,
                         fontWeight: FontWeight.w500,
                       ),
                       prefixIcon: Icon(
@@ -300,7 +319,7 @@ class _AssignmentScreenState extends State<AssignmentScreen>
                       ),
                     ),
                     style: const TextStyle(
-                      fontSize: AppDimensions.fontLg,
+                      fontSize: AppDimensions.fontDefault,
                       color: _primaryNavy,
                       fontWeight: FontWeight.w600,
                     ),
@@ -356,29 +375,22 @@ class _AssignmentScreenState extends State<AssignmentScreen>
             ),
           ),
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                setState(() {});
-              },
-              color: _primaryNavy,
-              child: TabBarView(
-                controller: _tabController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  _buildTaskList(
-                    activeTasks,
-                    'Tidak Ada Tugas Aktif',
-                    'Anda sudah menyelesaikan semua kewajiban tugas saat ini.',
-                    AppIcons.clipboardText,
-                  ),
-                  _buildTaskList(
-                    historyTasks,
-                    'Belum Ada Riwayat',
-                    'Belum ada tugas yang diselesaikan atau kadaluarsa.',
-                    AppIcons.archive,
-                  ),
-                ],
-              ),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildTaskList(
+                  activeTasks,
+                  'Tidak Ada Tugas Aktif',
+                  'Anda sudah menyelesaikan semua kewajiban tugas saat ini.',
+                  AppIcons.clipboardText,
+                ),
+                _buildTaskList(
+                  historyTasks,
+                  'Belum Ada Riwayat',
+                  'Belum ada tugas yang diselesaikan atau kadaluarsa.',
+                  AppIcons.archive,
+                ),
+              ],
             ),
           ),
         ],
@@ -393,49 +405,64 @@ class _AssignmentScreenState extends State<AssignmentScreen>
     IconData iconData,
   ) {
     if (tasks.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 600),
-              tween: Tween(begin: 0.8, end: 1.0),
-              curve: Curves.easeOutBack,
-              builder: (context, scale, child) {
-                return Transform.scale(
-                  scale: scale,
-                  child: Container(
-                    padding: const EdgeInsets.all(AppDimensions.lg),
-                    decoration: BoxDecoration(
-                      color: Colors.blueGrey.shade50,
-                      shape: BoxShape.circle,
+      return RefreshIndicator(
+        onRefresh: () async {
+          setState(() {});
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        color: _primaryNavy,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 600),
+                      tween: Tween(begin: 0.8, end: 1.0),
+                      curve: Curves.easeOutBack,
+                      builder: (context, scale, child) {
+                        return Transform.scale(
+                          scale: scale,
+                          child: Container(
+                            padding: const EdgeInsets.all(AppDimensions.lg),
+                            decoration: BoxDecoration(
+                              color: Colors.blueGrey.shade50,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              iconData,
+                              size: AppDimensions.iconDisplay,
+                              color: Colors.blueGrey.shade300,
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    child: Icon(
-                      iconData,
-                      size: AppDimensions.iconDisplay,
-                      color: Colors.blueGrey.shade300,
+                    const SizedBox(height: AppDimensions.lg),
+                    Text(
+                      emptyTitle,
+                      style: const TextStyle(
+                        fontSize: AppDimensions.fontXxl,
+                        fontWeight: FontWeight.w800,
+                        color: _primaryNavy,
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: AppDimensions.lg),
-            Text(
-              emptyTitle,
-              style: const TextStyle(
-                fontSize: AppDimensions.fontXxl,
-                fontWeight: FontWeight.w800,
-                color: _primaryNavy,
-              ),
-            ),
-            const SizedBox(height: AppDimensions.sm),
-            Text(
-              emptyMessage,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: AppDimensions.fontLg,
-                color: Colors.blueGrey.shade400,
-                height: 1.5,
+                    const SizedBox(height: AppDimensions.sm),
+                    Text(
+                      emptyMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLg,
+                        color: Colors.blueGrey.shade400,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -443,27 +470,34 @@ class _AssignmentScreenState extends State<AssignmentScreen>
       );
     }
 
-    return ListView.builder(
-      key: ValueKey('list_$_searchQuery'),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      physics: const ClampingScrollPhysics(),
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        final task = tasks[index];
-        return TweenAnimationBuilder<double>(
-          key: ValueKey(task.id),
-          duration: Duration(milliseconds: 400 + (index * 100)),
-          tween: Tween(begin: 0.0, end: 1.0),
-          curve: Curves.easeOutCubic,
-          builder: (context, value, child) {
-            return Transform.translate(
-              offset: Offset(0, 50 * (1 - value)),
-              child: Opacity(opacity: value, child: child),
-            );
-          },
-          child: TaskCard(assignment: task),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+        await Future.delayed(const Duration(milliseconds: 500));
       },
+      color: _primaryNavy,
+      child: ListView.builder(
+        key: ValueKey('list_$_searchQuery'),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: tasks.length,
+        itemBuilder: (context, index) {
+          final task = tasks[index];
+          return TweenAnimationBuilder<double>(
+            key: ValueKey(task.id),
+            duration: Duration(milliseconds: 400 + (index * 100)),
+            tween: Tween(begin: 0.0, end: 1.0),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, 50 * (1 - value)),
+                child: Opacity(opacity: value, child: child),
+              );
+            },
+            child: TaskCard(assignment: task),
+          );
+        },
+      ),
     );
   }
 }

@@ -18,132 +18,143 @@ class ZoneInfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.xxl,
-        AppDimensions.xl,
-        AppDimensions.xxl,
-        AppDimensions.xxxl + 8,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onToggleMakerindo(false),
-                child: Opacity(
-                  opacity: 0.15,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppDimensions.sm),
-                    child: Icon(
-                      Icons.arrow_left_rounded,
-                      size: AppDimensions.iconSm,
-                      color: Colors.grey,
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppDimensions.xxl,
+          AppDimensions.xl,
+          AppDimensions.xxl,
+          AppDimensions.xxxl + 32 + bottomPadding,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onToggleMakerindo(false),
+                  child: Opacity(
+                    opacity: 0.15,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.sm,
+                      ),
+                      child: Icon(
+                        Icons.arrow_left_rounded,
+                        size: AppDimensions.iconSm,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
+                  ),
                 ),
-              ),
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => onToggleMakerindo(true),
-                child: Opacity(
-                  opacity: 0.15,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppDimensions.sm),
-                    child: Icon(
-                      Icons.arrow_right_rounded,
-                      size: AppDimensions.iconSm,
-                      color: Colors.grey,
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onToggleMakerindo(true),
+                  child: Opacity(
+                    opacity: 0.15,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppDimensions.sm,
+                      ),
+                      child: Icon(
+                        Icons.arrow_right_rounded,
+                        size: AppDimensions.iconSm,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.xl),
-          const Text(
-            'Informasi Zona dan Kegiatan',
-            style: TextStyle(
-              fontSize: AppDimensions.fontLg - 1,
-              fontWeight: FontWeight.w800,
-              color: AppColors.primaryNavy,
+              ],
             ),
-          ),
-          const SizedBox(height: AppDimensions.lg),
-          _InfoRow(
-            icon: Icons.event_available_rounded,
-            label: 'Kegiatan Aktif',
-            value: zone.activityName,
-          ),
-          _InfoRow(
-            icon: Icons.access_time_filled_rounded,
-            label: 'Waktu Pelaksanaan',
-            value: zone.timeString,
-          ),
-          _InfoRow(
-            icon: Icons.timer_off_rounded,
-            label: 'Batas Waktu Absen',
-            value:
-                '${zone.deadline.hour.toString().padLeft(2, '0')}:${zone.deadline.minute.toString().padLeft(2, '0')} WIB',
-            valueColor: DateTime.now().isAfter(zone.deadline)
-                ? AppColors.dangerRed
-                : AppColors.successGreen,
-          ),
-          _InfoRow(
-            icon: Icons.person_pin_rounded,
-            label: 'Pembuat Kegiatan',
-            value: zone.creator,
-          ),
-          _InfoRow(
-            icon: Icons.location_on_rounded,
-            label: 'Lokasi Zona',
-            value: zone.name,
-          ),
-          _InfoRow(
-            icon: Icons.straighten_rounded,
-            label: 'Radius Absensi',
-            value: '${zone.radiusMeters.toInt()} meter',
-          ),
-          const SizedBox(height: AppDimensions.xxl),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: onLeaveRequest,
-              icon: const Icon(
-                AppIcons.fileTextBold,
-                size: AppDimensions.iconSm,
-              ),
-              label: const Text(
-                'AJUKAN IZIN KHUSUS',
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.warningOrange,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: AppDimensions.lg),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                ),
-                elevation: 0,
+            const SizedBox(height: AppDimensions.xl),
+            const Text(
+              'Informasi Zona dan Kegiatan',
+              style: TextStyle(
+                fontSize: AppDimensions.fontLg - 1,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primaryNavy,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: AppDimensions.lg),
+            _InfoRow(
+              icon: Icons.event_available_rounded,
+              label: 'Kegiatan Aktif',
+              value: zone.activityName,
+            ),
+            _InfoRow(
+              icon: Icons.access_time_filled_rounded,
+              label: 'Waktu Pelaksanaan',
+              value: zone.timeString,
+            ),
+            _InfoRow(
+              icon: Icons.timer_off_rounded,
+              label: 'Batas Waktu Absen',
+              value:
+                  '${zone.deadline.hour.toString().padLeft(2, '0')}:${zone.deadline.minute.toString().padLeft(2, '0')} WIB',
+              valueColor: DateTime.now().isAfter(zone.deadline)
+                  ? AppColors.dangerRed
+                  : AppColors.successGreen,
+            ),
+            _InfoRow(
+              icon: Icons.person_pin_rounded,
+              label: 'Pembuat Kegiatan',
+              value: zone.creator,
+            ),
+            _InfoRow(
+              icon: Icons.location_on_rounded,
+              label: 'Lokasi Zona',
+              value: zone.name,
+            ),
+            _InfoRow(
+              icon: Icons.straighten_rounded,
+              label: 'Radius Absensi',
+              value: '${zone.radiusMeters.toInt()} meter',
+            ),
+            const SizedBox(height: AppDimensions.xxl),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onLeaveRequest,
+                icon: const Icon(
+                  AppIcons.fileTextBold,
+                  size: AppDimensions.iconSm,
+                ),
+                label: const Text(
+                  'AJUKAN IZIN KHUSUS',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.warningOrange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppDimensions.lg,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

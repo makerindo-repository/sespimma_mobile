@@ -584,7 +584,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
               ),
               const SizedBox(height: AppDimensions.xl),
               const Text(
-                'Jenis peta',
+                'Jenis Peta',
                 style: TextStyle(
                   fontSize: AppDimensions.fontXl + 1,
                   fontWeight: FontWeight.w800,

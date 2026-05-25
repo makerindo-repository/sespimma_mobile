@@ -62,23 +62,20 @@ class ScoreLineChart extends StatelessWidget {
               children: [
                 _buildLegendItem(
                   'Akademik',
-                  colorAka,
+                  _getScoreColor(nilaiAkademik, colorAka),
                   selectedCategory == 'Akademik',
-                  nilaiAkademik,
                 ),
                 const SizedBox(width: AppDimensions.sm),
                 _buildLegendItem(
-                  'Mental',
-                  colorMen,
+                  'Mental Kepribadian',
+                  _getScoreColor(nilaiMental, colorMen),
                   selectedCategory == 'Mental Kepribadian',
-                  nilaiMental,
                 ),
                 const SizedBox(width: AppDimensions.sm),
                 _buildLegendItem(
                   'Jasmani',
-                  colorJas,
+                  _getScoreColor(nilaiJasmani, colorJas),
                   selectedCategory == 'Jasmani',
-                  nilaiJasmani,
                 ),
               ],
             ),
@@ -154,6 +151,10 @@ class ScoreLineChart extends StatelessWidget {
     Color cMen,
     Color cJas,
   ) {
+    Color dynAka = _getScoreColor(nilaiAkademik, cAka);
+    Color dynMen = _getScoreColor(nilaiMental, cMen);
+    Color dynJas = _getScoreColor(nilaiJasmani, cJas);
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(
@@ -183,7 +184,7 @@ class ScoreLineChart extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
                 ),
-                labelResolver: (_) => 'EWS LIMIT (70)',
+                labelResolver: (_) => 'AMM (70)',
               ),
             ),
           ],
@@ -242,9 +243,9 @@ class ScoreLineChart extends StatelessWidget {
         minY: 0,
         maxY: 100,
         lineBarsData: [
-          _buildLineBar(sAka, cAka, 'Akademik'),
-          _buildLineBar(sMen, cMen, 'Mental Kepribadian'),
-          _buildLineBar(sJas, cJas, 'Jasmani'),
+          _buildLineBar(sAka, dynAka, 'Akademik'),
+          _buildLineBar(sMen, dynMen, 'Mental Kepribadian'),
+          _buildLineBar(sJas, dynJas, 'Jasmani'),
         ],
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
@@ -252,7 +253,7 @@ class ScoreLineChart extends StatelessWidget {
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 return LineTooltipItem(
-                  '${_resolveLabel(spot.barIndex)}: ${spot.y.toStringAsFixed(1)}',
+                  '${_resolveLabel(spot.barIndex)} - ${spot.y.toStringAsFixed(1)}',
                   const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
@@ -268,9 +269,16 @@ class ScoreLineChart extends StatelessWidget {
   }
 
   String _resolveLabel(int barIndex) {
-    if (barIndex == 0) return 'Aka';
-    if (barIndex == 1) return 'Men';
-    return 'Jas';
+    if (barIndex == 0) return 'Akademik';
+    if (barIndex == 1) return 'Mental';
+    return 'Jasmani';
+  }
+
+  Color _getScoreColor(double score, Color defaultColor) {
+    if (score == 0) return defaultColor;
+    if (score >= 80.0) return Colors.green.shade700;
+    if (score >= 70.0) return Colors.amber.shade700;
+    return Colors.red.shade700;
   }
 
   LineChartBarData _buildLineBar(List<FlSpot> spots, Color color, String cat) {
@@ -336,12 +344,7 @@ class ScoreLineChart extends StatelessWidget {
     }
   }
 
-  Widget _buildLegendItem(
-    String label,
-    Color color,
-    bool isSelected,
-    double score,
-  ) {
+  Widget _buildLegendItem(String label, Color color, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.sm + 2,
@@ -370,7 +373,7 @@ class ScoreLineChart extends StatelessWidget {
           ),
           const SizedBox(width: AppDimensions.xs + 2),
           Text(
-            '$label (${score > 0 ? score.toStringAsFixed(1) : "-"})',
+            label,
             style: TextStyle(
               fontSize: AppDimensions.fontXs,
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,

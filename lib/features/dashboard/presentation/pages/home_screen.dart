@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _warningOrange = Color(0xFFF57C00);
@@ -102,59 +102,73 @@ class _HomeScreenState extends State<HomeScreen>
 
             return SafeArea(
               top: false,
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildAnimatedSection(
-                      context: context,
-                      child: _buildHeader(context, user),
-                      beginInterval: 0.0,
-                      endInterval: 0.3,
-                    ),
-                    Transform.translate(
-                      offset: const Offset(0, -30),
+              child: RefreshIndicator(
+                color: _primaryNavy,
+                backgroundColor: Colors.white,
+                onRefresh: () async {
+                  HapticFeedback.mediumImpact();
+                  await Future.delayed(const Duration(seconds: 1));
+                  if (mounted) setState(() {});
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildAnimatedSection(
                             context: context,
-                            child: _buildScoreOverview(
-                              context,
-                              nilaiAkademik,
-                              nilaiMental,
-                              nilaiJasmani,
-                            ),
-                            beginInterval: 0.2,
-                            endInterval: 0.5,
+                            child: _buildHeader(context, user),
+                            beginInterval: 0.0,
+                            endInterval: 0.3,
                           ),
-                          if (SociometryPeriodConfig.isAnyActive()) ...[
-                            const SizedBox(height: AppDimensions.md),
-                            _buildAnimatedSection(
-                              context: context,
-                              child: _buildSosiometriBanner(context),
-                              beginInterval: 0.3,
-                              endInterval: 0.6,
+                          Transform.translate(
+                            offset: const Offset(0, -30),
+                            child: Column(
+                              children: [
+                                _buildAnimatedSection(
+                                  context: context,
+                                  child: _buildScoreOverview(
+                                    context,
+                                    nilaiAkademik,
+                                    nilaiMental,
+                                    nilaiJasmani,
+                                  ),
+                                  beginInterval: 0.2,
+                                  endInterval: 0.5,
+                                ),
+                                if (SociometryPeriodConfig.isAnyActive()) ...[
+                                  const SizedBox(height: AppDimensions.md),
+                                  _buildAnimatedSection(
+                                    context: context,
+                                    child: _buildSosiometriBanner(context),
+                                    beginInterval: 0.3,
+                                    endInterval: 0.6,
+                                  ),
+                                ],
+                                const SizedBox(height: AppDimensions.md),
+                                _buildAnimatedSection(
+                                  context: context,
+                                  child: _buildAttendanceRecap(context),
+                                  beginInterval: 0.4,
+                                  endInterval: 0.7,
+                                ),
+                                const SizedBox(height: AppDimensions.md),
+                                _buildAnimatedSection(
+                                  context: context,
+                                  child: _buildActivityFeed(context),
+                                  beginInterval: 0.5,
+                                  endInterval: 1.0,
+                                ),
+                              ],
                             ),
-                          ],
-                          const SizedBox(height: AppDimensions.md),
-                          _buildAnimatedSection(
-                            context: context,
-                            child: _buildAttendanceRecap(context),
-                            beginInterval: 0.4,
-                            endInterval: 0.7,
-                          ),
-                          const SizedBox(height: AppDimensions.md),
-                          _buildAnimatedSection(
-                            context: context,
-                            child: _buildActivityFeed(context),
-                            beginInterval: 0.5,
-                            endInterval: 1.0,
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
             );
@@ -230,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   child: Text(
                     user.roleId == 'siswa'
-                        ? 'NOSIS: ${user.nosis}'
+                        ? 'NO. SERDIK: ${user.noSerdik}'
                         : 'NRP: ${user.nrp}',
                     style: const TextStyle(
                       color: Colors.white,
@@ -591,7 +605,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     const SizedBox(height: AppDimensions.radiusSm),
                     Text(
-                      'Evaluasi 8 Kompetensi Inti mental kepribadian rekan satu Pokjar Anda secara anonim.',
+                      'Evaluasi 5 Kompetensi Inti mental kepribadian rekan satu Pokjar Anda secara anonim.',
                       style: TextStyle(
                         fontSize: AppDimensions.fontSm + 1,
                         fontWeight: FontWeight.w500,

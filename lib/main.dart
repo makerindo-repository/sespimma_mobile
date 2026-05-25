@@ -63,6 +63,15 @@ class MyApp extends StatelessWidget {
           ),
           scaffoldBackgroundColor: const Color(0xFFF8F9FA),
           fontFamily: 'Roboto',
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.light,
+              systemNavigationBarColor: Colors.white,
+              systemNavigationBarIconBrightness: Brightness.dark,
+              systemNavigationBarDividerColor: Colors.transparent,
+            ),
+          ),
         ),
         home: const SplashScreen(),
         routes: {

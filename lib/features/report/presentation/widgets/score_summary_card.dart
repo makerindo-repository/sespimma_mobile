@@ -126,15 +126,16 @@ class ScoreSummaryCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppDimensions.sm),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontSm,
-                    fontWeight: FontWeight.w600,
-                    color: labelColor,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontSm,
+                      fontWeight: FontWeight.w600,
+                      color: labelColor,
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

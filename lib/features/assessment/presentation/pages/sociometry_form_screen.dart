@@ -83,23 +83,15 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
 
   Map<String, dynamic> _getQualitativeRating(double value) {
     if (value > 85.00) {
-      return {
-        'label': 'Sangat Memuaskan',
-        'code': 'SM',
-        'color': const Color(0xFF10B981),
-      };
+      return {'label': 'Sangat Memuaskan', 'code': 'SM', 'color': Colors.green};
     } else if (value > 80.00) {
-      return {
-        'label': 'Memuaskan',
-        'code': 'M',
-        'color': const Color(0xFF3B82F6),
-      };
+      return {'label': 'Memuaskan', 'code': 'M', 'color': Colors.lightGreen};
     } else if (value > 75.00) {
-      return {'label': 'Baik', 'code': 'B', 'color': const Color(0xFF8B5CF6)};
+      return {'label': 'Baik', 'code': 'B', 'color': Colors.orange};
     } else if (value > 70.00) {
-      return {'label': 'Cukup', 'code': 'C', 'color': const Color(0xFFF59E0B)};
+      return {'label': 'Cukup', 'code': 'C', 'color': Colors.amber};
     } else {
-      return {'label': 'Kurang', 'code': 'K', 'color': const Color(0xFFEF4444)};
+      return {'label': 'Kurang', 'code': 'K', 'color': Colors.red};
     }
   }
 
@@ -231,7 +223,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
-                  'NRP: ${widget.peerNrp}',
+                  'NO. SERDIK: ${widget.peerNrp}',
                   style: TextStyle(
                     fontSize: AppDimensions.fontMd,
                     fontWeight: FontWeight.w600,

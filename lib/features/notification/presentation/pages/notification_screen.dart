@@ -326,7 +326,7 @@ class _NotificationScreenState extends State<NotificationScreen>
     super.dispose();
   }
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
   DateTimeRange? _selectedDateRange;
@@ -512,116 +512,125 @@ class _NotificationScreenState extends State<NotificationScreen>
               const SizedBox(width: AppDimensions.sm),
             ],
           ),
-          body: filteredNotifs.isEmpty
-              ? _buildEmptyState()
-              : ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  itemCount: groupedNotifs.length,
-                  itemBuilder: (context, index) {
-                    final dateKey = groupedNotifs.keys.elementAt(index);
-                    final items = groupedNotifs[dateKey]!;
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: filteredNotifs.isEmpty
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
+                      itemCount: groupedNotifs.length,
+                      itemBuilder: (context, index) {
+                        final dateKey = groupedNotifs.keys.elementAt(index);
+                        final items = groupedNotifs[dateKey]!;
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                            bottom: 12,
-                            top: index == 0 ? 0 : 16,
-                          ),
-                          child: Text(
-                            dateKey,
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontLg,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.blueGrey.shade700,
-                            ),
-                          ),
-                        ),
-                        ...items.map((notif) {
-                          final itemIndex = filteredNotifs.indexOf(notif);
-                          final animation = CurvedAnimation(
-                            parent: _animController,
-                            curve: Interval(
-                              (itemIndex / filteredNotifs.length).clamp(
-                                0.0,
-                                1.0,
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: 12,
+                                top: index == 0 ? 0 : 16,
                               ),
-                              1.0,
-                              curve: Curves.easeOutCubic,
-                            ),
-                          );
-                          return Dismissible(
-                            key: ValueKey(notif['id']),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 20.0),
-                              margin: const EdgeInsets.only(bottom: 12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFD32F2F),
-                                borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusLg,
+                              child: Text(
+                                dateKey,
+                                style: TextStyle(
+                                  fontSize: AppDimensions.fontLg,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.blueGrey.shade700,
                                 ),
                               ),
-                              child: const Icon(
-                                AppIcons.trashFill,
-                                color: Colors.white,
-                                size: AppDimensions.iconDefault + 2,
-                              ),
                             ),
-                            onDismissed: (direction) {
-                              HapticFeedback.mediumImpact();
-                              final String deletedId = notif['id'] as String;
-                              setState(() {
-                                _mockNotifications.removeWhere(
-                                  (item) => item['id'] == deletedId,
-                                );
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    'Notifikasi berhasil dihapus',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: AppDimensions.fontDefault,
-                                    ),
+                            ...items.map((notif) {
+                              final itemIndex = filteredNotifs.indexOf(notif);
+                              final animation = CurvedAnimation(
+                                parent: _animController,
+                                curve: Interval(
+                                  (itemIndex / filteredNotifs.length).clamp(
+                                    0.0,
+                                    1.0,
                                   ),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.radiusMd,
-                                    ),
-                                  ),
-                                  duration: const Duration(seconds: 2),
+                                  1.0,
+                                  curve: Curves.easeOutCubic,
                                 ),
                               );
-                            },
-                            child: _AnimatedNotificationTile(
-                              notification: notif,
-                              animation: animation,
-                              onTap: () {
-                                final String currentId = notif['id'] as String;
-                                setState(() {
-                                  final foundIndex = _mockNotifications
-                                      .indexWhere((n) => n['id'] == currentId);
-                                  if (foundIndex != -1) {
-                                    _mockNotifications[foundIndex]['isRead'] =
-                                        true;
-                                  }
-                                });
-                              },
-                            ),
-                          );
-                        }),
-                      ],
-                    );
-                  },
-                ),
+                              return Dismissible(
+                                key: ValueKey(notif['id']),
+                                direction: DismissDirection.endToStart,
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20.0),
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFD32F2F),
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusLg,
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    AppIcons.trashFill,
+                                    color: Colors.white,
+                                    size: AppDimensions.iconDefault + 2,
+                                  ),
+                                ),
+                                onDismissed: (direction) {
+                                  HapticFeedback.mediumImpact();
+                                  final String deletedId =
+                                      notif['id'] as String;
+                                  setState(() {
+                                    _mockNotifications.removeWhere(
+                                      (item) => item['id'] == deletedId,
+                                    );
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        'Notifikasi berhasil dihapus',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: AppDimensions.fontDefault,
+                                        ),
+                                      ),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          AppDimensions.radiusMd,
+                                        ),
+                                      ),
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                                child: _AnimatedNotificationTile(
+                                  notification: notif,
+                                  animation: animation,
+                                  onTap: () {
+                                    final String currentId =
+                                        notif['id'] as String;
+                                    setState(() {
+                                      final foundIndex = _mockNotifications
+                                          .indexWhere(
+                                            (n) => n['id'] == currentId,
+                                          );
+                                      if (foundIndex != -1) {
+                                        _mockNotifications[foundIndex]['isRead'] =
+                                            true;
+                                      }
+                                    });
+                                  },
+                                ),
+                              );
+                            }),
+                          ],
+                        );
+                      },
+                    ),
+            ),
+          ),
         );
       },
     );

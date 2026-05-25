@@ -55,9 +55,7 @@ class ReportContentBody extends StatelessWidget {
               onCategoryChanged: onCategoryChanged,
             ),
             const SizedBox(height: AppDimensions.xxl + AppDimensions.md),
-            const ReportSectionHeader(
-              judul: 'Tren Perkembangan Terpadu (IDMS)',
-            ),
+            const ReportSectionHeader(judul: 'Tren Perkembangan Terpadu'),
             const SizedBox(height: AppDimensions.md),
             ScoreLineChart(
               key: const ValueKey('integrated_trend_chart'),
@@ -84,7 +82,6 @@ class ReportContentBody extends StatelessWidget {
                 user: user,
               ),
             ),
-            const SizedBox(height: AppDimensions.xxl * 2),
           ],
         ),
       ),

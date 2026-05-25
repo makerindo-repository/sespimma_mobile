@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'login_screen.dart';
@@ -20,6 +21,18 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     FlutterNativeSplash.remove();
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top],
+    );
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Color(0xFF000B1D),
+        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
 
     _controller = AnimationController(
       vsync: this,
@@ -62,14 +75,14 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF003366),
+      backgroundColor: const Color(0xFF000B1D),
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: ScaleTransition(
             scale: _scaleAnimation,
             child: Image.asset(
-              'assets/images/app_icon.png',
+              'assets/images/icon.png',
               width: 160,
               height: 160,
             ),

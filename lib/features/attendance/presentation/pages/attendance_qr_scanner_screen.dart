@@ -134,24 +134,21 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
       children: [
         ColorFiltered(
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.7),
+            Colors.black.withValues(alpha: 0.8),
             BlendMode.srcOut,
           ),
           child: Stack(
             children: [
               Container(
+                width: double.infinity,
+                height: double.infinity,
                 decoration: const BoxDecoration(color: Colors.transparent),
               ),
               Center(
                 child: Container(
                   width: 260,
                   height: 260,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(
-                      AppDimensions.radiusFull,
-                    ),
-                  ),
+                  decoration: const BoxDecoration(color: Colors.black),
                 ),
               ),
             ],

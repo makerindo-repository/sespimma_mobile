@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
+import 'package:sespimma_mobile/core/theme/app_colors.dart';
 
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -290,8 +291,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
     super.dispose();
   }
 
-  static const Color _primaryNavy = Color(0xFF001C40);
-  static const Color _lightGrey = Color(0xFFF8F9FA);
+  static const Color _primaryNavy = AppColors.primaryNavy;
+  static const Color _lightGrey = AppColors.background;
 
   late String _selectedFilter;
   final List<String> _filters = ['Semua', 'Reward', 'Punishment', 'Tugas'];
@@ -610,112 +611,118 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
               ),
             ],
           ),
-          body: Column(
-            children: [
-              _buildActiveFiltersBar(),
-              Expanded(
-                child: filteredActivities.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(AppDimensions.lg),
-                              decoration: BoxDecoration(
-                                color: Colors.blueGrey.shade50,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                AppIcons.archive,
-                                size: AppDimensions.iconDisplay,
-                                color: Colors.blueGrey.shade300,
-                              ),
-                            ),
-                            const SizedBox(height: AppDimensions.lg),
-                            const Text(
-                              'Tidak Ada Riwayat',
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontXxl,
-                                fontWeight: FontWeight.w800,
-                                color: _primaryNavy,
-                              ),
-                            ),
-                            const SizedBox(height: AppDimensions.sm),
-                            Text(
-                              'Belum ada aktivitas yang tercatat.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontLg,
-                                color: Colors.blueGrey.shade400,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        itemCount: groupedActivities.length,
-                        itemBuilder: (context, index) {
-                          final dateKey = groupedActivities.keys.elementAt(
-                            index,
-                          );
-                          final items = groupedActivities[dateKey]!;
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  bottom: 12,
-                                  top: index == 0 ? 0 : 16,
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Column(
+                children: [
+                  _buildActiveFiltersBar(),
+                  Expanded(
+                    child: filteredActivities.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(
+                                    AppDimensions.lg,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueGrey.shade50,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    AppIcons.archive,
+                                    size: AppDimensions.iconDisplay,
+                                    color: Colors.blueGrey.shade300,
+                                  ),
                                 ),
-                                child: Text(
-                                  dateKey,
+                                const SizedBox(height: AppDimensions.lg),
+                                const Text(
+                                  'Tidak Ada Riwayat',
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontXxl,
+                                    fontWeight: FontWeight.w800,
+                                    color: _primaryNavy,
+                                  ),
+                                ),
+                                const SizedBox(height: AppDimensions.sm),
+                                Text(
+                                  'Belum ada aktivitas yang tercatat.',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: AppDimensions.fontLg,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.blueGrey.shade700,
+                                    color: Colors.blueGrey.shade400,
+                                    height: 1.5,
                                   ),
                                 ),
-                              ),
-                              ...items.map((item) {
-                                final itemIndex = filteredActivities.indexOf(
-                                  item,
-                                );
-                                final animation = CurvedAnimation(
-                                  parent: _animController,
-                                  curve: Interval(
-                                    (itemIndex / filteredActivities.length)
-                                        .clamp(0.0, 1.0),
-                                    1.0,
-                                    curve: Curves.easeOutCubic,
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            itemCount: groupedActivities.length,
+                            itemBuilder: (context, index) {
+                              final dateKey = groupedActivities.keys.elementAt(
+                                index,
+                              );
+                              final items = groupedActivities[dateKey]!;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom: 12,
+                                      top: index == 0 ? 0 : 16,
+                                    ),
+                                    child: Text(
+                                      dateKey,
+                                      style: TextStyle(
+                                        fontSize: AppDimensions.fontLg,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.blueGrey.shade700,
+                                      ),
+                                    ),
                                   ),
-                                );
-                                final formattedTime = _formatDynamicTime(
-                                  item['timeRaw'],
-                                  _selectedTimezone,
-                                );
-                                return _AnimatedActivityTile(
-                                  key: ValueKey(item['id']),
-                                  title: item['title'],
-                                  subtitle: item['subtitle'],
-                                  time: formattedTime,
-                                  points: item['points'],
-                                  type: item['type'],
-                                  animation: animation,
-                                );
-                              }),
-                            ],
-                          );
-                        },
-                      ),
+                                  ...items.map((item) {
+                                    final itemIndex = filteredActivities
+                                        .indexOf(item);
+                                    final animation = CurvedAnimation(
+                                      parent: _animController,
+                                      curve: Interval(
+                                        (itemIndex / filteredActivities.length)
+                                            .clamp(0.0, 1.0),
+                                        1.0,
+                                        curve: Curves.easeOutCubic,
+                                      ),
+                                    );
+                                    final formattedTime = _formatDynamicTime(
+                                      item['timeRaw'],
+                                      _selectedTimezone,
+                                    );
+                                    return _AnimatedActivityTile(
+                                      key: ValueKey(item['id']),
+                                      title: item['title'],
+                                      subtitle: item['subtitle'],
+                                      time: formattedTime,
+                                      points: item['points'],
+                                      type: item['type'],
+                                      animation: animation,
+                                    );
+                                  }),
+                                ],
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -831,7 +838,7 @@ class _AnimatedActivityTile extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: AppDimensions.fontLg,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF001C40),
+                              color: AppColors.primaryNavy,
                             ),
                           ),
                           const SizedBox(height: AppDimensions.xs),

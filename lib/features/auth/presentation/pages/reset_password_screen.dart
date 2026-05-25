@@ -34,7 +34,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
   @override
@@ -509,7 +509,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
       hintText: hint,
       hintStyle: TextStyle(
         color: Colors.blueGrey.shade300,
-        fontSize: AppDimensions.fontLg,
+        fontSize: AppDimensions.fontDefault,
       ),
       prefixIcon: Icon(
         icon,

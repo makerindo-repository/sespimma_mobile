@@ -37,6 +37,19 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
+
     _loadSavedNrp();
     _animationController = AnimationController(
       vsync: this,
@@ -130,60 +143,78 @@ class _LoginScreenState extends State<LoginScreen>
           }
         },
         child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 32.0,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 420),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Spacer(),
-                          _buildHeader(),
-                          const SizedBox(height: AppDimensions.avatarMd),
-                          FadeTransition(
-                            opacity: _fadeAnimation,
-                            child: SlideTransition(
-                              position: _slideAnimation,
-                              child: _buildFormCard(),
-                            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isSmallScreen = constraints.maxHeight < 700;
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                          vertical: isSmallScreen ? 16.0 : 32.0,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 420),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildHeader(isSmallScreen),
+                              SizedBox(
+                                height: isSmallScreen
+                                    ? AppDimensions.lg
+                                    : AppDimensions.avatarMd,
+                              ),
+                              FadeTransition(
+                                opacity: _fadeAnimation,
+                                child: SlideTransition(
+                                  position: _slideAnimation,
+                                  child: _buildFormCard(isSmallScreen),
+                                ),
+                              ),
+                              SizedBox(
+                                height: isSmallScreen
+                                    ? AppDimensions.xl
+                                    : AppDimensions.xxl + 16,
+                              ),
+                              _buildFooter(isSmallScreen),
+                              const SizedBox(height: 16),
+                            ],
                           ),
-                          const Spacer(),
-                          _buildFooter(),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isSmallScreen) {
     return Column(
       children: [
         Image.asset(
           'assets/images/icon.png',
-          height: 140,
-          errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.local_police, size: 120, color: _primaryNavy),
+          height: isSmallScreen ? 100 : 140,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Icons.local_police,
+            size: isSmallScreen ? 80 : 120,
+            color: _primaryNavy,
+          ),
         ),
-        const SizedBox(height: AppDimensions.lg),
-        const Text(
+        SizedBox(height: isSmallScreen ? AppDimensions.md : AppDimensions.lg),
+        Text(
           'SESPIMMA',
           style: TextStyle(
-            fontSize: AppDimensions.fontDisplayXl,
+            fontSize: isSmallScreen
+                ? AppDimensions.fontDisplay
+                : AppDimensions.fontDisplayXl,
             fontWeight: FontWeight.w800,
             color: _primaryNavy,
             letterSpacing: 0.5,
@@ -194,19 +225,23 @@ class _LoginScreenState extends State<LoginScreen>
           'SISTEM EVALUASI DAN PENGAWASAN INDIVIDU MEMBENTUK SUMBER DAYA MANUSIA MAJU',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: AppDimensions.fontMd,
+            fontSize: isSmallScreen
+                ? AppDimensions.fontSm + 1
+                : AppDimensions.fontMd,
             fontWeight: FontWeight.w600,
             color: Colors.blueGrey.shade400,
-            letterSpacing: 1.2,
+            letterSpacing: isSmallScreen ? 0.5 : 1.2,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFormCard() {
+  Widget _buildFormCard(bool isSmallScreen) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.xxl + 4),
+      padding: EdgeInsets.all(
+        isSmallScreen ? AppDimensions.lg : AppDimensions.xxl + 4,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
@@ -264,7 +299,9 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
             ),
-            const SizedBox(height: AppDimensions.xl),
+            SizedBox(
+              height: isSmallScreen ? AppDimensions.lg : AppDimensions.xl,
+            ),
             _buildTextFieldLabel('Password'),
             const SizedBox(height: AppDimensions.sm),
             TextFormField(
@@ -300,7 +337,9 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
             ),
-            const SizedBox(height: AppDimensions.md),
+            SizedBox(
+              height: isSmallScreen ? AppDimensions.sm : AppDimensions.md,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -364,7 +403,9 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
               ],
             ),
-            const SizedBox(height: AppDimensions.xxl + 4),
+            SizedBox(
+              height: isSmallScreen ? AppDimensions.lg : AppDimensions.xxl + 4,
+            ),
             BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
                 final isLoading = state is AuthLoading;
@@ -401,7 +442,9 @@ class _LoginScreenState extends State<LoginScreen>
                 );
               },
             ),
-            const SizedBox(height: AppDimensions.xl),
+            SizedBox(
+              height: isSmallScreen ? AppDimensions.lg : AppDimensions.xl,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -439,11 +482,13 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(bool isSmallScreen) {
     return Text(
-      '© ${DateTime.now().year} SESPIMMA POLRI. ALL RIGHTS RESERVED.',
+      '© ${DateTime.now().year} SESPIMMA LEMDIKLAT POLRI. ALL RIGHTS RESERVED.',
       style: TextStyle(
-        fontSize: AppDimensions.fontSm + 1,
+        fontSize: isSmallScreen
+            ? AppDimensions.fontSm
+            : AppDimensions.fontSm + 1,
         fontWeight: FontWeight.w600,
         color: Colors.grey.shade500,
         letterSpacing: 0.5,

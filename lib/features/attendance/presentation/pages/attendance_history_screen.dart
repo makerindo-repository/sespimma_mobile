@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../auth/domain/entities/user_entity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 
@@ -364,122 +369,150 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
           const SizedBox(width: AppDimensions.sm),
         ],
       ),
-      body: Column(
-        children: [
-          _buildActiveFiltersBar(),
-          Expanded(
-            child: filteredActivities.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppDimensions.lg),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey.shade50,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            AppIcons.archive,
-                            size: AppDimensions.iconDisplay,
-                            color: Colors.blueGrey.shade300,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.lg),
-                        const Text(
-                          'Tidak Ada Riwayat',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontXxl,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primaryNavy,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.sm),
-                        Text(
-                          'Belum ada kehadiran yang tercatat untuk filter ini.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontLg,
-                            color: Colors.blueGrey.shade400,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    itemCount: groupedActivities.length,
-                    itemBuilder: (context, index) {
-                      final dateKey = groupedActivities.keys.elementAt(index);
-                      final items = groupedActivities[dateKey]!;
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(
-                              bottom: 12,
-                              top: index == 0 ? 0 : 16,
-                            ),
-                            child: Text(
-                              dateKey,
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontLg,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.blueGrey.shade700,
-                              ),
-                            ),
-                          ),
-                          ...items.map((item) {
-                            final itemIndex = filteredActivities.indexOf(item);
-                            final animation = CurvedAnimation(
-                              parent: _animController,
-                              curve: Interval(
-                                (itemIndex / filteredActivities.length).clamp(
-                                  0.0,
-                                  1.0,
+      body: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          final user = state is AuthSuccess ? state.user : null;
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Column(
+                children: [
+                  _buildActiveFiltersBar(),
+                  Expanded(
+                    child: filteredActivities.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(
+                                    AppDimensions.lg,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blueGrey.shade50,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    AppIcons.archive,
+                                    size: AppDimensions.iconDisplay,
+                                    color: Colors.blueGrey.shade300,
+                                  ),
                                 ),
-                                1.0,
-                                curve: Curves.easeOutCubic,
-                              ),
-                            );
-                            return _AnimatedAttendanceTile(
-                              key: ValueKey(item['id']),
-                              title: item['title'],
-                              time: item['time'],
-                              status: item['status'],
-                              type: item['type'],
-                              animation: animation,
-                              onTap: () =>
-                                  _showAttendanceDetails(context, item),
-                            );
-                          }),
-                        ],
-                      );
-                    },
+                                const SizedBox(height: AppDimensions.lg),
+                                const Text(
+                                  'Tidak Ada Riwayat',
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontXxl,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primaryNavy,
+                                  ),
+                                ),
+                                const SizedBox(height: AppDimensions.sm),
+                                Text(
+                                  'Belum ada kehadiran yang tercatat untuk filter ini.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontLg,
+                                    color: Colors.blueGrey.shade400,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            itemCount: groupedActivities.length,
+                            itemBuilder: (context, index) {
+                              final dateKey = groupedActivities.keys.elementAt(
+                                index,
+                              );
+                              final items = groupedActivities[dateKey]!;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom: 12,
+                                      top: index == 0 ? 0 : 16,
+                                    ),
+                                    child: Text(
+                                      dateKey,
+                                      style: TextStyle(
+                                        fontSize: AppDimensions.fontLg,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.blueGrey.shade700,
+                                      ),
+                                    ),
+                                  ),
+                                  ...items.map((item) {
+                                    final itemIndex = filteredActivities
+                                        .indexOf(item);
+                                    final animation = CurvedAnimation(
+                                      parent: _animController,
+                                      curve: Interval(
+                                        (itemIndex / filteredActivities.length)
+                                            .clamp(0.0, 1.0),
+                                        1.0,
+                                        curve: Curves.easeOutCubic,
+                                      ),
+                                    );
+                                    return _AnimatedAttendanceTile(
+                                      key: ValueKey(item['id']),
+                                      title: item['title'],
+                                      time: item['time'],
+                                      status: item['status'],
+                                      type: item['type'],
+                                      animation: animation,
+                                      onTap: () => _showAttendanceDetails(
+                                        context,
+                                        item,
+                                        user,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              );
+                            },
+                          ),
                   ),
-          ),
-        ],
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  void _showAttendanceDetails(BuildContext context, Map<String, dynamic> item) {
+  void _showAttendanceDetails(
+    BuildContext context,
+    Map<String, dynamic> item,
+    UserEntity? user,
+  ) {
     final type = item['type'] as String;
     final bool isHadir = type == 'hadir';
     final bool isTelat = type == 'telat';
     final bool isIzin = type == 'izin';
+    final bool isAlpha = type == 'alpha';
 
     final Color iconColor = isHadir
         ? AppColors.successGreen
         : isTelat
         ? const Color(0xFFFBC02D)
         : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
+
+    final String waktuLabel = isIzin
+        ? 'Waktu Izin'
+        : (isAlpha ? 'Waktu Kegiatan' : 'Waktu Presensi');
+    final String lokasiLabel = isAlpha
+        ? 'Lokasi Kegiatan'
+        : 'Lokasi Terdeteksi';
 
     showModalBottomSheet(
       context: context,
@@ -511,17 +544,29 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 style: TextStyle(
                   fontSize: AppDimensions.fontXl,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF001C40),
+                  color: AppColors.primaryNavy,
                   letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: AppDimensions.md),
+              if (user != null) ...[
+                Center(
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.grey.shade200,
+                    backgroundImage: const AssetImage(
+                      'assets/images/default_avatar.png',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.lg),
+              ],
               Text(
                 item['title'],
                 style: const TextStyle(
                   fontSize: AppDimensions.fontXxl,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF001C40),
+                  color: AppColors.primaryNavy,
                 ),
               ),
               const SizedBox(height: AppDimensions.sm),
@@ -547,28 +592,64 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
               const SizedBox(height: AppDimensions.xxl + 4),
               _buildDetailRow(
                 AppIcons.clockFill,
-                'Waktu Presensi',
+                waktuLabel,
                 '${item['date'].toString().split(', ')[1]} • ${item['time']}',
               ),
               const SizedBox(height: AppDimensions.md),
               if (isIzin)
-                _buildDetailRow(
-                  AppIcons.filePdfFill,
-                  'Bukti Lampiran',
-                  item['attachment'] ?? 'Surat_Izin.pdf',
-                  valueColor: Colors.blue.shade800,
+                InkWell(
+                  onTap: () async {
+                    try {
+                      String? selectedDirectory =
+                          await FilePicker.getDirectoryPath();
+
+                      if (selectedDirectory != null) {
+                        final fileName = item['attachment'] ?? 'Surat_Izin.pdf';
+                        final file = File('$selectedDirectory/$fileName');
+
+                        await file.writeAsString(
+                          'Simulasi dokumen surat izin Sespimma.',
+                        );
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'File berhasil disimpan ke:\n$selectedDirectory',
+                              ),
+                              duration: const Duration(seconds: 4),
+                            ),
+                          );
+                        }
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Gagal menyimpan file: $e')),
+                        );
+                      }
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  child: _buildDetailRow(
+                    AppIcons.filePdfFill,
+                    'Bukti Lampiran',
+                    item['attachment'] ?? 'Surat_Izin.pdf',
+                    valueColor: Colors.blue.shade800,
+                  ),
                 )
-              else
+              else if (!isAlpha)
                 _buildDetailRow(
                   AppIcons.fingerprintFill,
                   'Metode Verifikasi',
-                  item['method'] ?? 'Sistem Otomatis',
+                  item['method'] ?? 'Geofencing',
                 ),
-              const SizedBox(height: AppDimensions.md),
+              if (isIzin || !isAlpha) const SizedBox(height: AppDimensions.md),
               _buildDetailRow(
                 AppIcons.mapPinLineFill,
-                'Lokasi Terdeteksi',
-                item['location'] ?? 'Sespimma Lembang',
+                lokasiLabel,
+                item['location'] ??
+                    (isIzin ? '-6.815234, 107.618645' : 'Sespimma Lembang'),
               ),
               const SizedBox(height: AppDimensions.md),
               _buildDetailRow(
@@ -583,7 +664,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF001C40),
+                    backgroundColor: AppColors.primaryNavy,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -620,13 +701,13 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
         Container(
           padding: const EdgeInsets.all(AppDimensions.sm),
           decoration: BoxDecoration(
-            color: const Color(0xFF001C40).withValues(alpha: 0.05),
+            color: AppColors.primaryNavy.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
           ),
           child: Icon(
             icon,
             size: AppDimensions.iconMd,
-            color: const Color(0xFF001C40),
+            color: AppColors.primaryNavy,
           ),
         ),
         const SizedBox(width: AppDimensions.md + 2),
@@ -648,7 +729,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                 value,
                 style: TextStyle(
                   fontSize: AppDimensions.fontDefault,
-                  color: valueColor ?? const Color(0xFF001C40),
+                  color: valueColor ?? AppColors.primaryNavy,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -751,7 +832,7 @@ class _AnimatedAttendanceTile extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: AppDimensions.fontLg,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF001C40),
+                              color: AppColors.primaryNavy,
                             ),
                           ),
                           const SizedBox(height: AppDimensions.xs),

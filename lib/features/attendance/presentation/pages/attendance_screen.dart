@@ -486,34 +486,44 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           ),
           Positioned(
             bottom: AppDimensions.xxxl,
-            left: AppDimensions.lg,
-            right: AppDimensions.lg,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child:
-                      (_activeZone != null &&
-                          !_isGpsLoading &&
-                          _isInRadius &&
-                          !_isFakeGps)
-                      ? AttendanceFloatingInfo(
-                          activeZone: _activeZone!,
-                          isInRadius: _isInRadius,
-                          onTapInfo: () => _showZoneInfo(context),
-                        )
-                      : const SizedBox.shrink(),
+            left: 0,
+            right: 0,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.lg,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child:
+                            (_activeZone != null &&
+                                !_isGpsLoading &&
+                                _isInRadius &&
+                                !_isFakeGps)
+                            ? AttendanceFloatingInfo(
+                                activeZone: _activeZone!,
+                                isInRadius: _isInRadius,
+                                onTapInfo: () => _showZoneInfo(context),
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                      const SizedBox(width: AppDimensions.lg),
+                      AttendanceActionButtons(
+                        isAttended: _isAttended,
+                        isInRadius: _isInRadius,
+                        isSubmitting: _isSubmitting,
+                        activeZone: _activeZone,
+                        onOpenQr: _openQRScanner,
+                        onSubmit: _submitAttendance,
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(width: AppDimensions.lg),
-                AttendanceActionButtons(
-                  isAttended: _isAttended,
-                  isInRadius: _isInRadius,
-                  isSubmitting: _isSubmitting,
-                  activeZone: _activeZone,
-                  onOpenQr: _openQRScanner,
-                  onSubmit: _submitAttendance,
-                ),
-              ],
+              ),
             ),
           ),
         ],

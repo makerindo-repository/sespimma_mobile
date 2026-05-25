@@ -88,7 +88,7 @@ class NakSummaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Nilai Akhir Keseluruhan (NAK)',
+                'Nilai Akhir Keseluruhan',
                 style: TextStyle(
                   color: _getTextHeaderColor().withValues(alpha: 0.85),
                   fontSize: AppDimensions.fontMd - 1,

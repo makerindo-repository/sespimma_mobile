@@ -112,60 +112,67 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
         children: [
           _buildPhaseSelector(),
           Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildProgressBanner(progressPercent),
-                  const SizedBox(height: AppDimensions.lg),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Seluruh Rekan Peleton',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontXl,
-                          fontWeight: FontWeight.w800,
-                          color: _primaryNavy,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _primaryNavy.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusSm,
-                          ),
-                        ),
-                        child: Text(
-                          'Total: $_totalCount',
-                          style: const TextStyle(
-                            fontSize: AppDimensions.fontSm + 1,
+            child: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {});
+                await Future.delayed(const Duration(milliseconds: 500));
+              },
+              color: _primaryNavy,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildProgressBanner(progressPercent),
+                    const SizedBox(height: AppDimensions.lg),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Seluruh Rekan Peleton',
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontXl,
                             fontWeight: FontWeight.w800,
                             color: _primaryNavy,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppDimensions.md),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _currentPeers.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: AppDimensions.md),
-                    itemBuilder: (context, index) {
-                      return _buildPeerTile(context, index);
-                    },
-                  ),
-                  const SizedBox(height: AppDimensions.xl),
-                ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _primaryNavy.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusSm,
+                            ),
+                          ),
+                          child: Text(
+                            'Total: $_totalCount',
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontSm + 1,
+                              fontWeight: FontWeight.w800,
+                              color: _primaryNavy,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppDimensions.md),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _currentPeers.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: AppDimensions.md),
+                      itemBuilder: (context, index) {
+                        return _buildPeerTile(context, index);
+                      },
+                    ),
+                    const SizedBox(height: AppDimensions.xl),
+                  ],
+                ),
               ),
             ),
           ),
@@ -487,7 +494,7 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
                       ),
                       const SizedBox(height: AppDimensions.xs),
                       Text(
-                        'NRP: ${peer.nrp}',
+                        'NO. SERDIK: ${peer.nrp}',
                         style: TextStyle(
                           fontSize: AppDimensions.fontSm + 1,
                           fontWeight: FontWeight.w600,

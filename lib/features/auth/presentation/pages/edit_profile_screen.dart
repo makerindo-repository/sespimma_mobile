@@ -28,7 +28,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   File? _selectedImage;
   bool _isInitialized = false;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
   @override
@@ -77,6 +77,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   void _removePhoto() {
     Navigator.pop(context);
     setState(() => _selectedImage = null);
+  }
+
+  String _getFullPangkat(String pangkat) {
+    if (pangkat.toUpperCase() == 'AKP') return 'AJUN KOMISARIS POLISI';
+    return pangkat;
   }
 
   void _showImagePickerOptions(UserEntity? user) {
@@ -257,26 +262,31 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildProfileAvatar(user),
-                      const SizedBox(height: AppDimensions.xl),
-                      const Text(
-                        'Ketuk ikon kamera di atas untuk mengubah\nfoto profil resmi Anda.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontDefault,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueGrey,
-                          height: 1.5,
-                        ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildProfileAvatar(user),
+                          const SizedBox(height: AppDimensions.xl),
+                          const Text(
+                            'Ketuk ikon kamera di atas untuk mengubah\nfoto profil resmi Anda.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontDefault,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: AppDimensions.xl),
+                          _buildIdentityCard(user),
+                          const SizedBox(height: AppDimensions.avatarMd),
+                          _buildSaveButton(),
+                        ],
                       ),
-                      const SizedBox(height: AppDimensions.xl),
-                      _buildIdentityCard(user),
-                      const SizedBox(height: AppDimensions.avatarMd),
-                      _buildSaveButton(),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -416,51 +426,57 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             ],
           ),
           const Divider(height: 32, thickness: 1),
-          _buildInfoRow('No Serdik', user.noSerdik),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('NIK', user.nik),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Nama Lengkap', user.name),
-          const SizedBox(height: AppDimensions.md),
           if (user.roleId == 'siswa') ...[
-            _buildInfoRow('Jabatan Senat', user.jabatanSenat),
+            _buildInfoRow('No. Serdik', user.noSerdik),
             const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('Angkatan', user.angkatan),
+            _buildInfoRow('NIK', user.nik),
             const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Nama Lengkap', user.name),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Alamat Lengkap', user.alamatLengkap),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Tempat Lahir', user.tempatLahir),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Jenis Kelamin', user.jenisKelamin),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Agama', user.agama),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Email', user.email),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('No. Telepon', user.noTelepon),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('No. Handphone', user.noHandphone),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Pendidikan Terakhir', user.pendidikanTerakhir),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Kelompok', 'POKJAR ${user.pokjar}'),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Diktuk Awal', user.diktukAwal),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Tahun Diktuk', user.tahunDiktuk),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Personel', user.personel),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('NRP', user.nrp),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Pangkat', _getFullPangkat(user.pangkat)),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Jabatan', user.jabatan),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Satker', user.satker),
+          ] else ...[
+            _buildInfoRow('NRP / NIK', user.nrp),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Nama Lengkap', user.name),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Pangkat', _getFullPangkat(user.pangkat)),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Jabatan', user.jabatan),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Email', user.email),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('No. Handphone', user.noHandphone),
           ],
-          _buildInfoRow('Tempat Lahir', user.tempatLahir),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Tanggal Lahir', user.tanggalLahir ?? '-'),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Jenis Kelamin', user.jenisKelamin),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Agama', user.agama),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('No Handphone', user.noHandphone),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Pendidikan Terakhir', user.pendidikanTerakhir),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Alamat Lengkap', user.alamatLengkap),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Email', user.email),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('No Telepon', user.noTelepon),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Kelompok', user.kelompok),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Diktuk Awal', user.diktukAwal),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Tahun Diktuk', user.tahunDiktuk),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Personel (Ya/Tidak)', user.personel),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('NRP', user.nrp),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Pangkat', user.pangkat),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Jabatan', user.jabatan),
-          const SizedBox(height: AppDimensions.md),
-          _buildInfoRow('Satker', user.satker),
           const Divider(height: 32, thickness: 1),
           Row(
             children: [

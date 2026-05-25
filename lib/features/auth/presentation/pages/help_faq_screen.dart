@@ -19,7 +19,7 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
 
   final TextEditingController _searchController = TextEditingController();
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const Color _waColor = Color(0xFF25D366);
 
@@ -169,49 +169,54 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
             opacity: _fadeAnimation,
             child: SlideTransition(
               position: _slideAnimation,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppDimensions.sm),
-                  const Text(
-                    'Pusat Panduan Digital',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontDisplay,
-                      fontWeight: FontWeight.w800,
-                      color: _primaryNavy,
-                    ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: AppDimensions.sm),
+                      const Text(
+                        'Pusat Panduan Digital',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontDisplay,
+                          fontWeight: FontWeight.w800,
+                          color: _primaryNavy,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.sm),
+                      Text(
+                        'Temukan jawaban atas pertanyaan umum terkait fitur dan operasional pendidikan di sistem SESPIMMA.',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontLg,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueGrey.shade600,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.md),
+                      _buildSearchBar(),
+                      const SizedBox(height: AppDimensions.xl),
+                      if (_filteredFaqs.isEmpty)
+                        _buildEmptyState()
+                      else
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _filteredFaqs.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: AppDimensions.md),
+                          itemBuilder: (context, index) {
+                            final faq = _filteredFaqs[index];
+                            return _buildFaqItem(faq['q']!, faq['a']!);
+                          },
+                        ),
+                      const SizedBox(height: AppDimensions.avatarMd),
+                      _buildContactAdminCard(context),
+                      const SizedBox(height: AppDimensions.xl),
+                    ],
                   ),
-                  const SizedBox(height: AppDimensions.sm),
-                  Text(
-                    'Temukan jawaban atas pertanyaan umum terkait fitur dan operasional pendidikan di sistem SESPIMMA.',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontLg,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blueGrey.shade600,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.md),
-                  _buildSearchBar(),
-                  const SizedBox(height: AppDimensions.xl),
-                  if (_filteredFaqs.isEmpty)
-                    _buildEmptyState()
-                  else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _filteredFaqs.length,
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: AppDimensions.md),
-                      itemBuilder: (context, index) {
-                        final faq = _filteredFaqs[index];
-                        return _buildFaqItem(faq['q']!, faq['a']!);
-                      },
-                    ),
-                  const SizedBox(height: AppDimensions.avatarMd),
-                  _buildContactAdminCard(context),
-                  const SizedBox(height: AppDimensions.xl),
-                ],
+                ),
               ),
             ),
           ),
