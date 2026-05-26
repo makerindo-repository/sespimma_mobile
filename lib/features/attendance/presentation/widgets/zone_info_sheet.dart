@@ -18,17 +18,9 @@ class ZoneInfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
+    return SafeArea(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          AppDimensions.xxl,
-          AppDimensions.xl,
-          AppDimensions.xxl,
-          AppDimensions.xxxl + 32 + bottomPadding,
-        ),
+        padding: const EdgeInsets.all(AppDimensions.xxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

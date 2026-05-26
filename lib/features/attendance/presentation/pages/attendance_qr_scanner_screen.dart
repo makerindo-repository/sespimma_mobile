@@ -163,28 +163,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
   Widget _buildOverlay() {
     return Stack(
       children: [
-        ColorFiltered(
-          colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.95),
-            BlendMode.srcOut,
-          ),
-          child: Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration: const BoxDecoration(color: Colors.transparent),
-              ),
-              Center(
-                child: Container(
-                  width: 260,
-                  height: 260,
-                  decoration: const BoxDecoration(color: Colors.black),
-                ),
-              ),
-            ],
-          ),
-        ),
+        Positioned.fill(child: CustomPaint(painter: _ScannerOverlayPainter())),
         Center(
           child: SizedBox(
             width: 260,
@@ -293,4 +272,25 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
       if (mounted) setState(() => _isScanned = false);
     });
   }
+}
+
+class _ScannerOverlayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.black.withValues(alpha: 0.85);
+    final path = Path()
+      ..addRect(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..addRect(
+        Rect.fromCenter(
+          center: Offset(size.width / 2, size.height / 2),
+          width: 260,
+          height: 260,
+        ),
+      )
+      ..fillType = PathFillType.evenOdd;
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
