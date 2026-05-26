@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
@@ -103,14 +104,7 @@ class _MedicalDeductionDialogState extends State<MedicalDeductionDialog> {
     final msg = pengurangan > 0
         ? 'Berhasil mencatat rawat inap ${hariController.text} hari. Sanksi -$pengurangan poin diterapkan.'
         : 'Berhasil mencatat riwayat kunjungan poliklinik.';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: pengurangan > 0
-            ? Colors.red.shade700
-            : Colors.green.shade700,
-      ),
-    );
+    AppNotifier.showError(context, msg);
     widget.onSaved();
   }
 

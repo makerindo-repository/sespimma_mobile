@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
@@ -409,13 +410,7 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
     } catch (e) {
       if (context.mounted) Navigator.pop(context);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal membuat laporan: $e'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppNotifier.showError(context, 'Gagal membuat laporan: $e');
       }
     }
   }

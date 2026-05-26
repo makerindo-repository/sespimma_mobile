@@ -734,7 +734,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                 const SizedBox(height: AppDimensions.xs),
                 Text(
                   hasRisk
-                      ? 'Pokjar ${lowest.namaPokjar} memerlukan atensi khusus karena capaian rata-rata berada di bawah standar kelulusan.'
+                      ? '${lowest.namaPokjar} memerlukan atensi khusus karena capaian rata-rata berada di bawah standar kelulusan.'
                       : 'Kualitas pembelajaran angkatan ini sangat stabil. Fokus pada pemeliharaan performa hingga evaluasi akhir.',
                   style: TextStyle(
                     fontSize: AppDimensions.fontMd,

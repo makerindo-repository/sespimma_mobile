@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
@@ -105,36 +106,9 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  AppIcons.warningCircleFill,
-                  color: Colors.white,
-                  size: AppDimensions.iconLg,
-                ),
-                const SizedBox(width: AppDimensions.md - 4),
-                const Expanded(
-                  child: Text(
-                    'Gagal membuka WhatsApp. Pastikan aplikasi terinstal.',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppDimensions.fontDefault,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.red.shade800,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-            ),
-            margin: const EdgeInsets.all(AppDimensions.lg),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            elevation: 10,
-          ),
+        AppNotifier.showError(
+          context,
+          'Gagal membuka WhatsApp. Pastikan aplikasi terinstal.',
         );
       }
     }

@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
@@ -566,16 +567,9 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
                 onSelected: (value) {
                   if (value == 'refresh') {
                     _animController.forward(from: 0.0);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Data berhasil diperbarui'),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusMd + 2,
-                          ),
-                        ),
-                      ),
+                    AppNotifier.showSuccess(
+                      context,
+                      'Data berhasil diperbarui',
                     );
                   } else if (value == 'clear_filter') {
                     setState(() {

@@ -21,7 +21,7 @@ class GeofenceMapWidget extends StatefulWidget {
     bool isFakeGps,
   )
   onLocationDetected;
-  final Function(String message, bool isPermissionError)? onGpsError;
+  final ValueChanged<bool>? onGpsStateChanged;
   final VoidCallback? onReload;
   final Function(AttendanceZone tappedZone)? onRadiusTap;
 
@@ -29,7 +29,7 @@ class GeofenceMapWidget extends StatefulWidget {
     super.key,
     required this.zones,
     required this.onLocationDetected,
-    this.onGpsError,
+    this.onGpsStateChanged,
     this.onReload,
     this.onRadiusTap,
   });
@@ -39,15 +39,18 @@ class GeofenceMapWidget extends StatefulWidget {
 }
 
 class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   bool _isInRadius = false;
   bool _isLoading = true;
   bool _isRefreshingMap = false;
+  String? _gpsErrorMessage;
+  bool _isPermissionError = false;
   LatLng? _userLatLng;
 
   MapTileMode _tileMode = MapTileMode.normal;
 
   StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
   late final MapController _mapController;
   late final AnimationController _pulseController;
   late final Animation<double> _pulseAnimation;
@@ -65,9 +68,39 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _mapController = MapController();
     _setupPulseAnimation();
+
+    _serviceStatusSubscription = Geolocator.getServiceStatusStream().listen((
+      status,
+    ) {
+      if (!mounted) return;
+      if (status == ServiceStatus.disabled) {
+        setState(() {
+          _gpsErrorMessage =
+              'Layanan GPS dimatikan. Harap aktifkan kembali lokasi di pengaturan HP agar dapat melakukan presensi.';
+          _isPermissionError = false;
+          _isLoading = false;
+        });
+        widget.onGpsStateChanged?.call(true);
+      } else if (status == ServiceStatus.enabled) {
+        _setLoadingState(true);
+        _checkPermissionsAndStartTracking();
+      }
+    });
+
     _checkPermissionsAndStartTracking();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_gpsErrorMessage != null || _userLatLng == null) {
+        _setLoadingState(true);
+        _checkPermissionsAndStartTracking();
+      }
+    }
   }
 
   void _setupPulseAnimation() {
@@ -84,6 +117,8 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _serviceStatusSubscription?.cancel();
     _positionStreamSubscription?.cancel();
     _pulseController.dispose();
     _mapController.dispose();
@@ -96,10 +131,12 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       _setLoadingState(false);
-      widget.onGpsError?.call(
-        'Layanan GPS mati. Harap aktifkan lokasi di pengaturan HP.',
-        false,
-      );
+      setState(() {
+        _gpsErrorMessage =
+            'Layanan GPS mati. Harap aktifkan lokasi di pengaturan HP agar dapat melakukan presensi.';
+        _isPermissionError = false;
+      });
+      widget.onGpsStateChanged?.call(true);
       return;
     }
 
@@ -108,18 +145,32 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         _setLoadingState(false);
-        widget.onGpsError?.call('Izin akses lokasi ditolak.', true);
+        setState(() {
+          _gpsErrorMessage =
+              'Izin akses lokasi ditolak. Aplikasi tidak dapat memverifikasi presensi Anda.';
+          _isPermissionError = true;
+        });
+        widget.onGpsStateChanged?.call(true);
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       _setLoadingState(false);
-      widget.onGpsError?.call(
-        'Izin lokasi ditolak permanen. Silakan aktifkan melalui Pengaturan HP.',
-        true,
-      );
+      setState(() {
+        _gpsErrorMessage =
+            'Izin lokasi ditolak permanen. Silakan izinkan akses lokasi melalui Pengaturan HP.';
+        _isPermissionError = true;
+      });
+      widget.onGpsStateChanged?.call(true);
       return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _gpsErrorMessage = null;
+      });
+      widget.onGpsStateChanged?.call(false);
     }
 
     const locationSettings = LocationSettings(
@@ -164,7 +215,14 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
       }
     } catch (_) {
       _setLoadingState(false);
-      widget.onGpsError?.call('Gagal mendapatkan posisi GPS.', false);
+      if (mounted) {
+        setState(() {
+          _gpsErrorMessage =
+              'Gagal mendapatkan posisi GPS. Pastikan sinyal GPS stabil.';
+          _isPermissionError = false;
+        });
+        widget.onGpsStateChanged?.call(true);
+      }
     }
   }
 
@@ -250,7 +308,87 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
         _buildCenterFab(),
         if (_isLoading) _buildLoadingOverlay(),
         _buildAuditDebugPanel(),
+        if (_gpsErrorMessage != null) _buildGpsErrorOverlay(),
       ],
+    );
+  }
+
+  Widget _buildGpsErrorOverlay() {
+    return Positioned.fill(
+      child: Container(
+        color: _primaryNavy.withValues(alpha: 0.98),
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xxl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppDimensions.xxl),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                AppIcons.mapPinLine,
+                size: AppDimensions.iconDisplay,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.xxxl),
+            const Text(
+              'Akses Lokasi Dibutuhkan',
+              style: TextStyle(
+                fontSize: AppDimensions.fontDisplay,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppDimensions.lg),
+            Text(
+              _gpsErrorMessage ?? '',
+              style: TextStyle(
+                fontSize: AppDimensions.fontLg,
+                fontWeight: FontWeight.w500,
+                color: Colors.white70,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppDimensions.xxxl + AppDimensions.lg),
+            ElevatedButton.icon(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                if (_isPermissionError) {
+                  Geolocator.openAppSettings();
+                } else {
+                  Geolocator.openLocationSettings();
+                }
+              },
+              icon: const Icon(AppIcons.gearFill, color: _primaryNavy),
+              label: const Text(
+                'BUKA PENGATURAN',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontLg,
+                  letterSpacing: 1.0,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: _primaryNavy,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.xxl,
+                  vertical: AppDimensions.lg,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                ),
+                elevation: 4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
@@ -565,19 +566,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                         });
 
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Nilai berhasil disimpan untuk ${submission['name']}',
-                            ),
-                            backgroundColor: _successGreen,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppDimensions.radiusMd,
-                              ),
-                            ),
-                          ),
+                        AppNotifier.showSuccess(
+                          context,
+                          'Nilai berhasil disimpan untuk ${submission['name']}',
                         );
                       }
                     },
@@ -955,12 +946,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
 
               Navigator.pop(ctx);
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('✅ Tugas "${task.judul}" berhasil dihapus!'),
-                  backgroundColor: _successGreen,
-                  behavior: SnackBarBehavior.floating,
-                ),
+              AppNotifier.showSuccess(
+                context,
+                '✅ Tugas "${task.judul}" berhasil dihapus!',
               );
             },
             style: ElevatedButton.styleFrom(

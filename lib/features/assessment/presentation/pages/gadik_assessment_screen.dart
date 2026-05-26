@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
@@ -244,16 +245,7 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
   }
 
   void _showSnackbar(String msg, Color bgColor) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: bgColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        ),
-      ),
-    );
+    AppNotifier.showInfo(context, msg);
   }
 
   @override

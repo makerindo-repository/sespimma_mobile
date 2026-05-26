@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'sociometry_form_screen.dart';
@@ -711,29 +712,7 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
               });
               Navigator.pop(context);
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      const Icon(AppIcons.cloudCheckFill, color: Colors.white),
-                      const SizedBox(width: AppDimensions.md - 4),
-                      Expanded(
-                        child: Text(
-                          _isPhaseAwal
-                              ? 'Sosiometri Awal Peleton Berhasil Dikunci'
-                              : 'Sosiometri Akhir Peleton Berhasil Dikunci',
-                        ),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: _primaryNavy,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                  ),
-                  margin: const EdgeInsets.all(AppDimensions.xl - 4),
-                ),
-              );
+              AppNotifier.showSuccess(context, 'Notifikasi');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryNavy,

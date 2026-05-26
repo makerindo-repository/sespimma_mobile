@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
@@ -597,23 +598,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                                       (item) => item['id'] == deletedId,
                                     );
                                   });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: const Text(
-                                        'Notifikasi berhasil dihapus',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: AppDimensions.fontDefault,
-                                        ),
-                                      ),
-                                      behavior: SnackBarBehavior.floating,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          AppDimensions.radiusMd,
-                                        ),
-                                      ),
-                                      duration: const Duration(seconds: 2),
-                                    ),
+                                  AppNotifier.showSuccess(
+                                    context,
+                                    'Notifikasi berhasil dihapus',
                                   );
                                 },
                                 child: _AnimatedNotificationTile(

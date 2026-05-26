@@ -117,4 +117,6 @@ abstract final class AppIcons {
   static const IconData houseFill = Icons.home;
   static const IconData mapPin = Icons.location_on_outlined;
   static const IconData chartBar = Icons.bar_chart;
+  static const IconData gearFill = Icons.settings;
+  static const IconData mapPinLine = Icons.pin_drop_outlined;
 }

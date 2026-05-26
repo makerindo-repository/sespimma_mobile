@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -70,14 +71,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Gagal membuka WhatsApp. Pastikan aplikasi terinstal.',
-            ),
-            backgroundColor: Colors.red.shade800,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotifier.showError(
+          context,
+          'Gagal membuka WhatsApp. Pastikan aplikasi terinstal.',
         );
       }
     }
@@ -102,13 +98,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       if (_tokenController.text.trim() == _validResetToken) {
         Navigator.pushReplacementNamed(context, '/reset-password');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Token verifikasi tidak valid!'),
-            backgroundColor: Colors.red.shade800,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppNotifier.showError(context, 'Token verifikasi tidak valid!');
       }
     }
   }

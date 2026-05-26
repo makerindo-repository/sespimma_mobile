@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
@@ -13,6 +12,7 @@ import 'package:sespimma_mobile/features/attendance/presentation/widgets/leave_f
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_status_chip.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_floating_info.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_action_buttons.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
 class AttendanceScreen extends StatefulWidget {
@@ -26,6 +26,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     with SingleTickerProviderStateMixin {
   bool _isInRadius = false;
   bool _isGpsLoading = true;
+  bool _hasGpsError = false;
   bool _isSubmitting = false;
   bool _isFakeGps = false;
   bool _isAttended = false;
@@ -67,10 +68,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
     if (isFakeGps && !_isFakeGps) {
       HapticFeedback.heavyImpact();
-      _showSnackBar(
+      AppNotifier.showError(
+        context,
         'Terdeteksi Manipulasi Lokasi (Fake GPS). Absensi diblokir!',
-        AppColors.dangerRed,
-        AppIcons.warningOctagonFill,
       );
     } else if (changed && !_isGpsLoading && !isFakeGps) {
       HapticFeedback.mediumImpact();
@@ -86,52 +86,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     if (changed && !isFakeGps) {
       _chipController.forward(from: 0.0);
     }
-  }
-
-  void _onGpsError(String message, bool isPermissionError) {
-    setState(() => _isGpsLoading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(
-              AppIcons.warningCircleFill,
-              color: Colors.white,
-              size: AppDimensions.iconSm,
-            ),
-            const SizedBox(width: AppDimensions.md),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: AppDimensions.fontXs + 1,
-                ),
-              ),
-            ),
-          ],
-        ),
-        action: SnackBarAction(
-          label: 'PENGATURAN',
-          textColor: Colors.yellowAccent,
-          onPressed: () => isPermissionError
-              ? Geolocator.openAppSettings()
-              : Geolocator.openLocationSettings(),
-        ),
-        backgroundColor: AppColors.dangerRed.withValues(alpha: 0.95),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4),
-        ),
-        margin: const EdgeInsets.fromLTRB(
-          AppDimensions.lg,
-          0,
-          AppDimensions.lg,
-          AppDimensions.xxl,
-        ),
-        duration: const Duration(seconds: 6),
-      ),
-    );
   }
 
   Future<void> _openQRScanner() async {
@@ -150,18 +104,16 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           .firstOrNull;
 
       if (matchedZone != null) {
-        _showSnackBar(
+        AppNotifier.showSuccess(
+          context,
           'QR Code Valid: ${matchedZone.activityName}. Mengirim presensi...',
-          AppColors.successGreen,
-          AppIcons.checkCircleFill,
         );
         setState(() => _activeZone = matchedZone);
         _submitAttendance(fromQr: true);
       } else {
-        _showSnackBar(
+        AppNotifier.showError(
+          context,
           'Kegiatan tidak ditemukan atau tidak aktif saat ini.',
-          AppColors.dangerRed,
-          AppIcons.warningOctagonFill,
         );
       }
     }
@@ -176,10 +128,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     }
 
     if (_isAttended) {
-      _showSnackBar(
+      AppNotifier.showWarning(
+        context,
         'Anda sudah melakukan presensi untuk sesi ini.',
-        AppColors.warningOrange,
-        AppIcons.infoFill,
       );
       return;
     }
@@ -242,16 +193,14 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         _activeZone != null && now.isAfter(_activeZone!.deadline);
 
     if (isLate) {
-      _showSnackBar(
+      AppNotifier.showWarning(
+        context,
         'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.',
-        AppColors.warningOrange,
-        AppIcons.clockClockwiseFill,
       );
     } else {
-      _showSnackBar(
+      AppNotifier.showSuccess(
+        context,
         'Berhasil absen di jam $timeStr untuk kegiatan $activityName.',
-        AppColors.successGreen,
-        AppIcons.checkCircleFill,
       );
     }
   }
@@ -292,41 +241,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showSnackBar(String message, Color color, IconData icon) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: AppDimensions.iconSm),
-            const SizedBox(width: AppDimensions.md),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: AppDimensions.fontSm,
-                ),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: color.withValues(alpha: 0.95),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4),
-        ),
-        margin: const EdgeInsets.fromLTRB(
-          AppDimensions.lg,
-          0,
-          AppDimensions.lg,
-          AppDimensions.xxl,
-        ),
-        elevation: 8,
-        duration: const Duration(seconds: 4),
       ),
     );
   }
@@ -374,26 +288,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       _zones = AttendanceZones.activeZones;
     });
     HapticFeedback.mediumImpact();
-    _showSnackBar(
-      'Simulasi Zona Makerindo ${_resolveMakerindoStatusText(val)}!',
-      _resolveMakerindoStatusColor(val),
-      _resolveMakerindoStatusIcon(val),
-    );
-  }
-
-  String _resolveMakerindoStatusText(bool val) {
-    if (val) return "Diaktifkan";
-    return "Dinonaktifkan";
-  }
-
-  Color _resolveMakerindoStatusColor(bool val) {
-    if (val) return AppColors.successGreen;
-    return AppColors.warningOrange;
-  }
-
-  IconData _resolveMakerindoStatusIcon(bool val) {
-    if (val) return AppIcons.checkCircleFill;
-    return AppIcons.infoFill;
+    final status = val ? 'Diaktifkan' : 'Dinonaktifkan';
+    if (val) {
+      AppNotifier.showSuccess(context, 'Simulasi Zona Makerindo $status!');
+    } else {
+      AppNotifier.showWarning(context, 'Simulasi Zona Makerindo $status!');
+    }
   }
 
   void _showLeaveForm(BuildContext context) {
@@ -408,10 +308,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       ),
       builder: (ctx) => LeaveFormSheet(
         onSuccess: () {
-          _showSnackBar(
+          AppNotifier.showSuccess(
+            context,
             'Permohonan Izin Berhasil Diajukan ke Korsis.',
-            AppColors.successGreen,
-            AppIcons.checkCircleFill,
           );
         },
       ),
@@ -430,9 +329,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           'Zona Apel',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w800,
-            fontSize: AppDimensions.fontLg,
-            letterSpacing: 0.5,
+            fontWeight: FontWeight.w700,
+            fontSize: AppDimensions.fontXxl,
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -458,75 +356,80 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             child: GeofenceMapWidget(
               zones: _zones,
               onLocationDetected: _onLocationDetected,
-              onGpsError: _onGpsError,
+              onGpsStateChanged: (hasError) {
+                if (mounted && _hasGpsError != hasError) {
+                  setState(() => _hasGpsError = hasError);
+                }
+              },
               onReload: () {
                 setState(() => _zones = AttendanceZones.activeZones);
-                _showSnackBar(
+                AppNotifier.showSuccess(
+                  context,
                   'Daftar Radius dan Geofence berhasil diperbarui!',
-                  AppColors.successGreen,
-                  AppIcons.checkCircleFill,
                 );
               },
               onRadiusTap: (tappedZone) => _showZoneInfo(context, tappedZone),
             ),
           ),
-          Positioned(
-            top: AppDimensions.lg,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: AttendanceStatusChip(
-                zones: _zones,
-                activeZone: _activeZone,
-                isGpsLoading: _isGpsLoading,
-                isFakeGps: _isFakeGps,
-                isInRadius: _isInRadius,
-                chipScale: _chipScale,
+          if (!_hasGpsError)
+            Positioned(
+              top: AppDimensions.lg,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: AttendanceStatusChip(
+                  zones: _zones,
+                  activeZone: _activeZone,
+                  isGpsLoading: _isGpsLoading,
+                  isFakeGps: _isFakeGps,
+                  isInRadius: _isInRadius,
+                  chipScale: _chipScale,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: AppDimensions.xxxl,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.lg,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child:
-                            (_activeZone != null &&
-                                !_isGpsLoading &&
-                                _isInRadius &&
-                                !_isFakeGps)
-                            ? AttendanceFloatingInfo(
-                                activeZone: _activeZone!,
-                                isInRadius: _isInRadius,
-                                onTapInfo: () => _showZoneInfo(context),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      const SizedBox(width: AppDimensions.lg),
-                      AttendanceActionButtons(
-                        isAttended: _isAttended,
-                        isInRadius: _isInRadius,
-                        isSubmitting: _isSubmitting,
-                        activeZone: _activeZone,
-                        onOpenQr: _openQRScanner,
-                        onSubmit: _submitAttendance,
-                      ),
-                    ],
+          if (!_hasGpsError)
+            Positioned(
+              bottom: AppDimensions.xxxl,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.lg,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child:
+                              (_activeZone != null &&
+                                  !_isGpsLoading &&
+                                  _isInRadius &&
+                                  !_isFakeGps)
+                              ? AttendanceFloatingInfo(
+                                  activeZone: _activeZone!,
+                                  isInRadius: _isInRadius,
+                                  onTapInfo: () => _showZoneInfo(context),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(width: AppDimensions.lg),
+                        AttendanceActionButtons(
+                          isAttended: _isAttended,
+                          isInRadius: _isInRadius,
+                          isSubmitting: _isSubmitting,
+                          activeZone: _activeZone,
+                          onOpenQr: _openQRScanner,
+                          onSubmit: _submitAttendance,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

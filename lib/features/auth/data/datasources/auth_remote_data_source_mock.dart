@@ -1,6 +1,7 @@
 import '../models/login_request.dart';
 import '../models/login_response.dart';
 import 'auth_remote_data_source.dart';
+import 'serdik_real_data.dart';
 
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
   @override
@@ -13,34 +14,38 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       throw Exception('NRP atau Password salah!');
     }
 
-    if (request.nrp == '85055678') {
+    final serdikRecord = SerdikRealData.records
+        .where((r) => r['nrp'] == request.nrp)
+        .firstOrNull;
+
+    if (serdikRecord != null) {
       return LoginResponse(
-        userId: 'USR-001',
-        name: 'Rangga Saputra, S.H.',
+        userId: 'USR-${serdikRecord['nrp']}',
+        name: serdikRecord['nama_lengkap'] ?? '-',
         roleId: 'siswa',
-        pokjar: '1',
-        nrp: '85055678',
-        nosis: '2026030208',
-        pangkat: 'AKP',
+        pokjar: serdikRecord['kelompok_kelas'] ?? '-',
+        nrp: serdikRecord['nrp'] ?? '-',
+        nosis: serdikRecord['no_serdik'] ?? '-',
+        pangkat: serdikRecord['pangkat'] ?? '-',
         angkatan: '75',
-        agama: 'Islam',
-        jenisKelamin: 'Laki-laki',
-        jabatan: '-',
-        tanggalLahir: '1985-05-15',
-        noSerdik: 'SD-001',
-        nik: '3201012345678901',
-        jabatanSenat: 'Ketua Senat',
-        tempatLahir: 'Jakarta',
-        noHandphone: '081234567890',
-        pendidikanTerakhir: 'S1 Hukum',
-        alamatLengkap: 'Jl. Merdeka No. 1, Jakarta Selatan',
-        email: 'rangga@example.com',
-        noTelepon: '021-123456',
-        kelompok: 'A',
-        diktukAwal: 'AKPOL',
-        tahunDiktuk: '2005',
-        personel: 'Ya',
-        satker: 'Polda Metro Jaya',
+        agama: serdikRecord['agama'] ?? '-',
+        jenisKelamin: serdikRecord['jenis_kelamin'] ?? '-',
+        jabatan: serdikRecord['jabatan'] ?? '-',
+        tanggalLahir: serdikRecord['tanggal_lahir'] ?? '1990-01-01',
+        noSerdik: serdikRecord['no_serdik'] ?? '-',
+        nik: serdikRecord['nik'] ?? '-',
+        jabatanSenat: '-',
+        tempatLahir: serdikRecord['tempat_lahir'] ?? '-',
+        noHandphone: serdikRecord['no_handphone'] ?? '-',
+        pendidikanTerakhir: serdikRecord['pendidikan_terakhir'] ?? '-',
+        alamatLengkap: serdikRecord['alamat'] ?? '-',
+        email: serdikRecord['email'] ?? '-',
+        noTelepon: serdikRecord['no_telepon'] ?? '-',
+        kelompok: '-',
+        diktukAwal: serdikRecord['diktuk_awal'] ?? '-',
+        tahunDiktuk: serdikRecord['tahun_diktuk']?.toString() ?? '-',
+        personel: (serdikRecord['is_personel'] == true) ? 'Ya' : 'Tidak',
+        satker: serdikRecord['satker'] ?? '-',
         isNakApproved: true,
         nilaiAkademik: 82.5,
         nilaiMental: 85.0,

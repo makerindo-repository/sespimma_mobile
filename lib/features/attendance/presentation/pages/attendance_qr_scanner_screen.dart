@@ -1,6 +1,7 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:flutter/services.dart';
@@ -265,9 +266,7 @@ class _AttendanceQrScannerScreenState extends State<AttendanceQrScannerScreen>
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    AppNotifier.showError(context, message);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _isScanned = false);
     });

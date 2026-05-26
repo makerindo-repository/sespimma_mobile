@@ -36,8 +36,7 @@ class _ReportScreenState extends State<ReportScreen> {
           style: TextStyle(
             color: AppColors.textOnPrimary,
             fontWeight: FontWeight.w700,
-            fontSize: AppDimensions.fontLg,
-            letterSpacing: 0.5,
+            fontSize: AppDimensions.fontXxl,
           ),
         ),
         iconTheme: const IconThemeData(color: AppColors.textOnPrimary),

@@ -238,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
         const SizedBox(width: AppDimensions.md),
         if (isSiswa)
-          Expanded(child: _buildStatCard('KELOMPOK', 'POKJAR ${user.pokjar}'))
+          Expanded(child: _buildStatCard('KELOMPOK', user.pokjar))
         else
           Expanded(child: _buildStatCard('JABATAN', user.jabatan)),
       ],
@@ -344,11 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               'NO TELEPON',
               user.noTelepon,
             ),
-            _buildDetailRow(
-              AppIcons.usersFill,
-              'KELOMPOK',
-              'POKJAR ${user.kelompok}',
-            ),
+            _buildDetailRow(AppIcons.usersFill, 'KELOMPOK', user.pokjar),
             _buildDetailRow(AppIcons.bookOpen, 'DIKTUK AWAL', user.diktukAwal),
             _buildDetailRow(
               AppIcons.calendarBlank,

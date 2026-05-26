@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
@@ -654,22 +655,9 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context, true);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Icon(AppIcons.checkCircleFill, color: Colors.white),
-                      SizedBox(width: AppDimensions.md - 4),
-                      Text('Evaluasi berhasil disimpan secara anonim'),
-                    ],
-                  ),
-                  backgroundColor: const Color(0xFF059669),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                  ),
-                  margin: const EdgeInsets.all(AppDimensions.xl - 4),
-                ),
+              AppNotifier.showSuccess(
+                context,
+                'Evaluasi berhasil disimpan secara anonim',
               );
             },
             style: ElevatedButton.styleFrom(

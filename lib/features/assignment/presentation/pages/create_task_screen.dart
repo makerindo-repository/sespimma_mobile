@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
@@ -118,11 +119,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Gagal memilih file. Silakan coba lagi.'),
-            backgroundColor: Colors.red.shade600,
-          ),
+        AppNotifier.showError(
+          context,
+          'Gagal memilih file. Silakan coba lagi.',
         );
       }
     } finally {
@@ -188,62 +187,40 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
   void _publishTask() {
     if (_formKey.currentState!.validate()) {
       if (_selectedSubject == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Silahkan pilih mata pelajaran terlebih dahulu',
-            ),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotifier.showError(
+          context,
+          'Silahkan pilih mata pelajaran terlebih dahulu',
         );
         return;
       }
 
       if (_selectedSubject == 'NKP (Naskah Karya Perseorangan)' &&
           _selectedKompetensi == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Silahkan pilih kompetensi inti untuk NKP'),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotifier.showError(
+          context,
+          'Silahkan pilih kompetensi inti untuk NKP',
         );
         return;
       }
 
       if (_selectedSubject == 'Mental Kepribadian' && _selectedMental == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Silahkan pilih aspek penilaian untuk Mental Kepribadian',
-            ),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotifier.showError(
+          context,
+          'Silahkan pilih aspek penilaian untuk Mental Kepribadian',
         );
         return;
       }
 
       if (_selectedPokjar == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Silahkan pilih target POKJAR terlebih dahulu'),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotifier.showError(
+          context,
+          'Silahkan pilih target POKJAR terlebih dahulu',
         );
         return;
       }
 
       if (_selectedDeadline == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Silahkan tentukan tenggat waktu tugas'),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppNotifier.showError(context, 'Silahkan tentukan tenggat waktu tugas');
         return;
       }
 
@@ -287,22 +264,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         }
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(Icons.check_circle_outline, color: Colors.white),
-              SizedBox(width: AppDimensions.sm),
-              Expanded(child: Text('Tugas berhasil dipublikasikan ke Serdik.')),
-            ],
-          ),
-          backgroundColor: _successGreen,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-          ),
-          margin: const EdgeInsets.all(AppDimensions.lg),
-        ),
+      AppNotifier.showSuccess(
+        context,
+        'Tugas berhasil dipublikasikan ke Serdik.',
       );
       Navigator.pop(context);
     }

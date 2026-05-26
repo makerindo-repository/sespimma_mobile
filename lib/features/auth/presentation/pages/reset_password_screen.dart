@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
@@ -85,26 +86,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
 
     if (!_hasMinLength || !_hasCapital || !_hasNumber) {
       HapticFeedback.mediumImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(AppIcons.warningCircleFill, color: Colors.white),
-              SizedBox(width: AppDimensions.md - 4),
-              Expanded(
-                child: Text(
-                  'Mohon lengkapi kriteria keamanan password baru Anda.',
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-          ),
-          margin: const EdgeInsets.all(AppDimensions.lg),
-        ),
+      AppNotifier.showError(
+        context,
+        'Mohon lengkapi kriteria keamanan password baru Anda.',
       );
       return;
     }
@@ -119,28 +103,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
         ),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Row(
-            children: [
-              Icon(AppIcons.checkCircleFill, color: Colors.white),
-              SizedBox(width: AppDimensions.md - 4),
-              Expanded(
-                child: Text(
-                  'Password berhasil diperbarui!',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green.shade700,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-          ),
-          margin: const EdgeInsets.all(AppDimensions.lg),
-        ),
-      );
+      AppNotifier.showSuccess(context, 'Password berhasil diperbarui!');
 
       if (isAuthenticated) {
         Navigator.pop(context);
@@ -156,23 +119,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
       listener: (context, state) {
         if (state is AuthFailure) {
           HapticFeedback.vibrate();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(AppIcons.warningCircleFill, color: Colors.white),
-                  const SizedBox(width: AppDimensions.md - 4),
-                  Expanded(child: Text(state.message)),
-                ],
-              ),
-              backgroundColor: Colors.red.shade700,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-              ),
-              margin: const EdgeInsets.all(AppDimensions.lg),
-            ),
-          );
+          AppNotifier.showError(context, state.message);
         }
       },
       child: BlocBuilder<AuthBloc, AuthState>(

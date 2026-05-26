@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:ui';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+import 'package:talker_bloc_logger/talker_bloc_logger.dart';
 
+import 'core/utils/app_logger.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/pages/forgot_password_screen.dart';
 import 'features/auth/presentation/pages/login_screen.dart';
@@ -26,6 +30,17 @@ import 'injection_container.dart' as di;
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterError.onError = (details) {
+    talker.handle(details.exception, details.stack);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    talker.handle(error, stack);
+    return true;
+  };
+
+  Bloc.observer = TalkerBlocObserver(talker: talker);
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   SystemChrome.setSystemUIOverlayStyle(
@@ -73,7 +88,13 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const SplashScreen(),
+        home: TalkerWrapper(talker: talker, child: const SplashScreen()),
+        builder: (context, child) {
+          return TalkerWrapper(
+            talker: talker,
+            child: child ?? const SizedBox(),
+          );
+        },
         routes: {
           '/login': (context) => const LoginScreen(),
           '/forgot-password': (context) => const ForgotPasswordScreen(),

@@ -2,6 +2,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -187,35 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       UpdateProfilePhotoRequested(_selectedImage?.path),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(
-              AppIcons.checkCircleFill,
-              color: Colors.white,
-              size: AppDimensions.iconLg,
-            ),
-            const SizedBox(width: AppDimensions.md - 4),
-            const Text(
-              'Profil berhasil diperbarui',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: AppDimensions.fontLg,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green.shade700,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        ),
-        margin: const EdgeInsets.all(AppDimensions.lg),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        elevation: 10,
-      ),
-    );
+    AppNotifier.showSuccess(context, 'Profil berhasil diperbarui');
     Navigator.pop(context);
   }
 

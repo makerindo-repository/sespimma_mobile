@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
@@ -324,17 +325,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
             onSelected: (value) {
               if (value == 'refresh') {
                 _animController.forward(from: 0.0);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Data berhasil diperbarui'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd + 2,
-                      ),
-                    ),
-                  ),
-                );
+                AppNotifier.showSuccess(context, 'Data berhasil diperbarui');
               } else if (value == 'clear_filter') {
                 setState(() {
                   _selectedFilter = 'Semua';
@@ -612,20 +603,17 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                         );
 
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'File berhasil disimpan ke:\n$selectedDirectory',
-                              ),
-                              duration: const Duration(seconds: 4),
-                            ),
+                          AppNotifier.showSuccess(
+                            context,
+                            'File berhasil disimpan ke:\n$selectedDirectory',
                           );
                         }
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Gagal menyimpan file: $e')),
+                        AppNotifier.showError(
+                          context,
+                          'Gagal menyimpan file: $e',
                         );
                       }
                     }

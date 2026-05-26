@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -133,13 +134,7 @@ class _LoginScreenState extends State<LoginScreen>
             if (!context.mounted) return;
             Navigator.pushReplacementNamed(context, '/main');
           } else if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red.shade800,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            AppNotifier.showError(context, state.message);
           }
         },
         child: SafeArea(

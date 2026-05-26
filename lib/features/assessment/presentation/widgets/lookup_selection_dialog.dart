@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
@@ -1134,19 +1135,9 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
 
                   Navigator.pop(context);
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Tindakan beserta bukti berhasil dicatat. Nilai Mental diperbarui: ${pointChange > 0 ? '+' : ''}$pointChange',
-                      ),
-                      backgroundColor: isReward ? _successGreen : _dangerRed,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusMd,
-                        ),
-                      ),
-                    ),
+                  AppNotifier.showSuccess(
+                    context,
+                    'Tindakan beserta bukti berhasil dicatat. Nilai Mental diperbarui: ${pointChange > 0 ? '+' : ''}$pointChange',
                   );
                 },
           style: ElevatedButton.styleFrom(

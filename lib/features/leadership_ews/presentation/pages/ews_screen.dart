@@ -1,5 +1,6 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
@@ -854,12 +855,9 @@ class _EwsScreenState extends State<EwsScreen>
   }
 
   void _notifyPatun(BuildContext context, String name) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Notifikasi telah dikirim ke Patun untuk $name'),
-        backgroundColor: _primaryNavy,
-        behavior: SnackBarBehavior.floating,
-      ),
+    AppNotifier.showInfo(
+      context,
+      'Notifikasi telah dikirim ke Patun untuk $name',
     );
   }
 }

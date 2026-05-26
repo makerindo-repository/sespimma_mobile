@@ -3,7 +3,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
+import 'package:talker_dio_logger/talker_dio_logger.dart';
 import 'core/local_database_helper.dart';
+import 'core/utils/app_logger.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
 import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/datasources/auth_remote_data_source_mock.dart';
@@ -54,6 +56,16 @@ Future<void> _initExternal() async {
           }
           return handler.next(e);
         },
+      ),
+    );
+    dio.interceptors.add(
+      TalkerDioLogger(
+        talker: talker,
+        settings: const TalkerDioLoggerSettings(
+          printRequestHeaders: true,
+          printResponseMessage: true,
+          printErrorMessage: true,
+        ),
       ),
     );
 
