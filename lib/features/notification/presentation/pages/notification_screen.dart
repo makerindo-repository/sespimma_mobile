@@ -119,6 +119,17 @@ class _NotificationScreenState extends State<NotificationScreen>
 
       list.addAll([
         {
+          'id': 'n_kegiatan_baru',
+          'title': 'Kegiatan Baru dari Korsis',
+          'body':
+              'Korsis telah membuat kegiatan "Apel Pagi Gabungan". Harap bersiap dan pastikan kehadiran Anda.',
+          'date': _getDynamicDateStr(0),
+          'time': '06:00 WIB',
+          'dateTime': today,
+          'isRead': false,
+          'type': 'info',
+        },
+        {
           'id': 'n_reward',
           'title': 'Reward: Menjadi Imam Shalat',
           'body':
