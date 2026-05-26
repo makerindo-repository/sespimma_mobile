@@ -2,6 +2,7 @@ import '../models/login_request.dart';
 import '../models/login_response.dart';
 import 'auth_remote_data_source.dart';
 import 'serdik_real_data.dart';
+import 'patun_real_data.dart';
 
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
   @override
@@ -89,6 +90,47 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         nilaiJasmani: 70.0,
         accessToken: 'dummy_token_siswa_ews',
         refreshToken: 'dummy_refresh_siswa_ews',
+      );
+    }
+
+    final patunRecord = PatunRealData.records
+        .where((r) => r['nrp_nip'] == request.nrp)
+        .firstOrNull;
+
+    if (patunRecord != null) {
+      return LoginResponse(
+        userId: 'USR-${patunRecord['nrp_nip']}',
+        name: patunRecord['nama'] ?? '-',
+        roleId: 'pengajar_patun',
+        pokjar: patunRecord['pokjar'] ?? '-',
+        nrp: patunRecord['nrp_nip'] ?? '-',
+        nosis: '-',
+        pangkat: patunRecord['pangkat'] ?? '-',
+        angkatan: '-',
+        agama: '-',
+        jenisKelamin: '-',
+        jabatan: patunRecord['jabatan_struktural'] ?? '-',
+        tanggalLahir: '-',
+        noSerdik: '-',
+        nik: '-',
+        jabatanSenat: patunRecord['peran_pengasuhan'] ?? '-',
+        tempatLahir: '-',
+        noHandphone: '-',
+        pendidikanTerakhir: '-',
+        alamatLengkap: '-',
+        email: '-',
+        noTelepon: '-',
+        kelompok: '-',
+        diktukAwal: '-',
+        tahunDiktuk: '-',
+        personel: 'Ya',
+        satker: 'Korsis Sespimma',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_patun_real',
+        refreshToken: 'dummy_refresh_patun_real',
       );
     }
 

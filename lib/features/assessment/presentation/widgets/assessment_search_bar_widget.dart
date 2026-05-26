@@ -7,6 +7,7 @@ class AssessmentSearchBarWidget extends StatelessWidget {
   final String searchQuery;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
+  final String? hintText;
 
   const AssessmentSearchBarWidget({
     super.key,
@@ -14,6 +15,7 @@ class AssessmentSearchBarWidget extends StatelessWidget {
     required this.searchQuery,
     required this.onChanged,
     required this.onClear,
+    this.hintText,
   });
 
   @override
@@ -35,13 +37,14 @@ class AssessmentSearchBarWidget extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        textAlignVertical: TextAlignVertical.center,
         style: const TextStyle(
           fontSize: AppDimensions.fontDefault,
           fontWeight: FontWeight.w600,
           color: AppColors.primaryNavy,
         ),
         decoration: InputDecoration(
-          hintText: 'Cari nama / NRP...',
+          hintText: hintText ?? 'Cari nama / NRP...',
           hintStyle: TextStyle(
             color: Colors.blueGrey.shade300,
             fontWeight: FontWeight.w500,
@@ -61,9 +64,10 @@ class AssessmentSearchBarWidget extends StatelessWidget {
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.lg,
-            vertical: AppDimensions.fontLg,
+          contentPadding: const EdgeInsets.only(
+            left: AppDimensions.lg,
+            right: AppDimensions.lg,
+            bottom: AppDimensions.fontLg / 2, // Fine-tuned centering
           ),
         ),
       ),

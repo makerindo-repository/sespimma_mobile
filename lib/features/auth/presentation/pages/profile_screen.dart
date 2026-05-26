@@ -94,8 +94,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildStatCards(user),
-                              const SizedBox(height: AppDimensions.lg),
-                              _buildFormalDataCard(user),
+                              if (user.roleId != 'pengajar_patun') ...[
+                                const SizedBox(height: AppDimensions.lg),
+                                _buildFormalDataCard(user),
+                              ],
                               const SizedBox(height: AppDimensions.xl),
                               _buildSectionTitle('PENGATURAN AKUN'),
                               const SizedBox(height: AppDimensions.md),
@@ -122,12 +124,27 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  String _getRoleLabel(String roleId) {
-    if (roleId == 'pimpinan') return 'PIMPINAN';
-    if (roleId == 'pengajar_patun') return 'PATUN';
-    if (roleId == 'pengajar_medis') return 'MEDIS';
-    if (roleId == 'pengajar_korsis') return 'KORSIS';
-    if (roleId.startsWith('pengajar')) return 'GADIK';
+  String _getRoleLabel(UserEntity user) {
+    if (user.roleId == 'pengajar_patun' &&
+        user.jabatanSenat.isNotEmpty &&
+        user.jabatanSenat != '-') {
+      return user.jabatanSenat.toUpperCase();
+    }
+    if (user.roleId == 'pimpinan') {
+      return 'PIMPINAN';
+    }
+    if (user.roleId == 'pengajar_patun') {
+      return 'PATUN';
+    }
+    if (user.roleId == 'pengajar_medis') {
+      return 'MEDIS';
+    }
+    if (user.roleId == 'pengajar_korsis') {
+      return 'KORSIS';
+    }
+    if (user.roleId.startsWith('pengajar')) {
+      return 'GADIK';
+    }
     return 'SERDIK';
   }
 
@@ -146,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildTopHeader(UserEntity user) {
-    final roleLabel = _getRoleLabel(user.roleId);
+    final roleLabel = _getRoleLabel(user);
     final badgeColor = _getRoleBadgeColor(user.roleId);
 
     return Container(
@@ -192,7 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Text(
             user.roleId == 'siswa'
                 ? 'NO. SERDIK: ${user.noSerdik}'
-                : 'NRP: ${user.nrp}',
+                : '${user.nrp.length > 10 ? 'NIP' : 'NRP'}: ${user.nrp}',
             style: TextStyle(
               color: Colors.blueGrey.shade200,
               fontSize: AppDimensions.fontDefault,
@@ -231,22 +248,26 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildStatCards(UserEntity user) {
     final isSiswa = user.roleId == 'siswa';
 
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard('PANGKAT', _getFullPangkat(user.pangkat)),
-        ),
-        const SizedBox(width: AppDimensions.md),
-        if (isSiswa)
-          Expanded(child: _buildStatCard('KELOMPOK', user.pokjar))
-        else
-          Expanded(child: _buildStatCard('JABATAN', user.jabatan)),
-      ],
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _buildStatCard('PANGKAT', _getFullPangkat(user.pangkat)),
+          ),
+          const SizedBox(width: AppDimensions.md),
+          if (isSiswa)
+            Expanded(child: _buildStatCard('KELOMPOK', user.pokjar))
+          else
+            Expanded(child: _buildStatCard('JABATAN', user.jabatan)),
+        ],
+      ),
     );
   }
 
   Widget _buildStatCard(String label, String value) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -272,14 +293,17 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ),
           const SizedBox(height: AppDimensions.radiusSm),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: AppDimensions.fontLg + 1,
-                fontWeight: FontWeight.w800,
-                color: _primaryNavy,
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  fontWeight: FontWeight.w800,
+                  color: _primaryNavy,
+                  height: 1.3,
+                ),
               ),
             ),
           ),

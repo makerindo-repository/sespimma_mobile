@@ -34,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen>
   static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const String _nrpStorageKey = 'saved_nrp';
+  bool _isNip = false;
 
   @override
   void initState() {
@@ -52,6 +53,16 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     _loadSavedNrp();
+
+    _nrpController.addListener(() {
+      final isNipNow = _nrpController.text.length > 10;
+      if (isNipNow != _isNip) {
+        setState(() {
+          _isNip = isNipNow;
+        });
+      }
+    });
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -141,10 +152,10 @@ class _LoginScreenState extends State<LoginScreen>
           child: LayoutBuilder(
             builder: (context, constraints) {
               final isSmallScreen = constraints.maxHeight < 700;
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
+              return CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.symmetric(
@@ -175,14 +186,13 @@ class _LoginScreenState extends State<LoginScreen>
                                     : AppDimensions.xxl + 16,
                               ),
                               _buildFooter(isSmallScreen),
-                              const SizedBox(height: 16),
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                ],
               );
             },
           ),
@@ -254,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildTextFieldLabel('NRP'),
+            _buildTextFieldLabel(_isNip ? 'NIP' : 'NRP'),
             const SizedBox(height: AppDimensions.sm),
             TextFormField(
               controller: _nrpController,
@@ -263,16 +273,16 @@ class _LoginScreenState extends State<LoginScreen>
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'NRP tidak boleh kosong';
+                  return '${_isNip ? 'NIP' : 'NRP'} tidak boleh kosong';
                 }
                 if (value.length < 5) {
-                  return 'NRP tidak valid';
+                  return '${_isNip ? 'NIP' : 'NRP'} tidak valid';
                 }
                 return null;
               },
               decoration:
                   _inputDecoration(
-                    hint: 'Masukkan NRP',
+                    hint: 'Masukkan ${_isNip ? 'NIP' : 'NRP'}',
                     icon: AppIcons.user,
                   ).copyWith(
                     suffixIcon: ValueListenableBuilder<TextEditingValue>(

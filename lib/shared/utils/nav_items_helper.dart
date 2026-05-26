@@ -8,6 +8,7 @@ import '../../features/assignment/presentation/pages/assignment_screen.dart';
 import '../../features/dashboard/presentation/pages/home_screen.dart';
 import '../../features/assignment/presentation/pages/gadik_task_list_screen.dart';
 import '../../features/assessment/presentation/pages/gadik_assessment_screen.dart';
+import '../../features/assessment/presentation/pages/patun_academic_monitoring_screen.dart';
 import '../../features/leadership_report/presentation/pages/leadership_report_screen.dart';
 import '../../features/leadership_ews/presentation/pages/ews_screen.dart';
 import '../../features/leadership_dashboard/presentation/pages/pimpinan_home_screen.dart';
@@ -59,6 +60,12 @@ List<NavItem> getNavItemsByRole(String roleId) {
     case 'pengajar_patun':
       return const [
         NavItem(
+          label: 'Akademik',
+          icon: AppIcons.bookOpen,
+          activeIcon: AppIcons.bookOpenFill,
+          screen: PatunAcademicMonitoringScreen(),
+        ),
+        NavItem(
           label: 'Penilaian',
           icon: AppIcons.pencilSimple,
           activeIcon: AppIcons.pencilSimpleFill,
@@ -80,6 +87,12 @@ List<NavItem> getNavItemsByRole(String roleId) {
     case 'pengajar_medis':
       return const [
         NavItem(
+          label: 'Akademik',
+          icon: AppIcons.bookOpen,
+          activeIcon: AppIcons.bookOpenFill,
+          screen: PatunAcademicMonitoringScreen(),
+        ),
+        NavItem(
           label: 'Penilaian',
           icon: AppIcons.pencilSimple,
           activeIcon: AppIcons.pencilSimpleFill,
@@ -94,6 +107,12 @@ List<NavItem> getNavItemsByRole(String roleId) {
       ];
     case 'pengajar_korsis':
       return const [
+        NavItem(
+          label: 'Akademik',
+          icon: AppIcons.bookOpen,
+          activeIcon: AppIcons.bookOpenFill,
+          screen: PatunAcademicMonitoringScreen(),
+        ),
         NavItem(
           label: 'Penilaian',
           icon: AppIcons.pencilSimple,
