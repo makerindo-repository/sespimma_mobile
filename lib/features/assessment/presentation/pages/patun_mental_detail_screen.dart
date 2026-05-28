@@ -48,9 +48,12 @@ class PatunMentalDetailScreen extends StatelessWidget {
 
     return [
       {
-        'title': rewards.isNotEmpty ? rewards[0].description : 'Pujian Tertulis',
+        'title': rewards.isNotEmpty
+            ? rewards[0].description
+            : 'Pujian Tertulis',
         'desc': 'Diberikan oleh Patun Kelas',
-        'justification': 'Serdik menunjukkan inisiatif tinggi dengan sukarela membantu rekan seangkatannya yang mengalami kesulitan selama masa perkuliahan tanpa diminta.',
+        'justification':
+            'Serdik menunjukkan inisiatif tinggi dengan sukarela membantu rekan seangkatannya yang mengalami kesulitan selama masa perkuliahan tanpa diminta.',
         'sender': 'Patun Kelas',
         'time': fmt(d1),
         'dateStr': dateStr(d1),
@@ -63,7 +66,8 @@ class PatunMentalDetailScreen extends StatelessWidget {
             ? punishments[0].description
             : 'Teguran Lisan',
         'desc': 'Diberikan oleh Piket Batalyon',
-        'justification': 'Serdik tidak mengindahkan peringatan dari piket terkait kerapian seragam dan tata rambut saat pelaksanaan apel pagi.',
+        'justification':
+            'Serdik tidak mengindahkan peringatan dari piket terkait kerapian seragam dan tata rambut saat pelaksanaan apel pagi.',
         'sender': 'Piket Batalyon',
         'time': fmt(d2),
         'dateStr': dateStr(d2),
@@ -74,7 +78,8 @@ class PatunMentalDetailScreen extends StatelessWidget {
       {
         'title': rewards.length > 2 ? rewards[2].description : 'Pujian Lisan',
         'desc': 'Diberikan oleh Gadik',
-        'justification': 'Serdik memberikan kontribusi yang signifikan melalui gagasan visioner saat simulasi pemecahan masalah operasional kepolisian.',
+        'justification':
+            'Serdik memberikan kontribusi yang signifikan melalui gagasan visioner saat simulasi pemecahan masalah operasional kepolisian.',
         'sender': 'Gadik',
         'time': fmt(d3),
         'dateStr': dateStr(d3),
@@ -87,7 +92,8 @@ class PatunMentalDetailScreen extends StatelessWidget {
             ? punishments[1].description
             : 'Teguran Tertulis',
         'desc': 'Diberikan oleh Patun Kelas',
-        'justification': 'Serdik mengulangi kesalahan fatal terkait pelanggaran batas waktu kehadiran setelah sebelumnya sudah mendapat teguran lisan.',
+        'justification':
+            'Serdik mengulangi kesalahan fatal terkait pelanggaran batas waktu kehadiran setelah sebelumnya sudah mendapat teguran lisan.',
         'sender': 'Patun Kelas',
         'time': fmt(d4),
         'dateStr': dateStr(d4),
@@ -302,8 +308,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
   }
 
   Widget _buildMentalTrendChart() {
-    final double score =
-        (serdik['_mock_score'] as num?)?.toDouble() ?? 80.0;
+    final double score = (serdik['_mock_score'] as num?)?.toDouble() ?? 80.0;
 
     String insightText = '';
     String badgeText = '';
@@ -410,7 +415,9 @@ class PatunMentalDetailScreen extends StatelessWidget {
                         horizontalInterval: 10,
                         getDrawingHorizontalLine: (value) {
                           return FlLine(
-                              color: Colors.grey.shade200, strokeWidth: 1);
+                            color: Colors.grey.shade200,
+                            strokeWidth: 1,
+                          );
                         },
                       ),
                       titlesData: FlTitlesData(
@@ -475,8 +482,10 @@ class PatunMentalDetailScreen extends StatelessWidget {
                             label: HorizontalLineLabel(
                               show: true,
                               alignment: Alignment.topRight,
-                              padding:
-                                  const EdgeInsets.only(right: 5, bottom: 5),
+                              padding: const EdgeInsets.only(
+                                right: 5,
+                                bottom: 5,
+                              ),
                               style: TextStyle(
                                 color: Colors.red.shade600,
                                 fontSize: 10,
@@ -528,10 +537,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        insightIcon,
-                        color: insightColor,
-                      ),
+                      Icon(insightIcon, color: insightColor),
                       const SizedBox(width: AppDimensions.sm),
                       Expanded(
                         child: Text(
@@ -551,8 +557,9 @@ class PatunMentalDetailScreen extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: insightColor,
-                          borderRadius:
-                              BorderRadius.circular(AppDimensions.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusSm,
+                          ),
                         ),
                         child: Text(
                           badgeText,
@@ -751,75 +758,81 @@ class PatunMentalDetailScreen extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-              child: Icon(
-                iconData,
-                color: iconColor,
-                size: AppDimensions.iconLg,
-              ),
-            ),
-            const SizedBox(width: AppDimensions.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: AppDimensions.fontLg,
-                      fontWeight: FontWeight.w700,
-                      color: _primaryNavy,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$desc · $sender',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontMd,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blueGrey.shade400,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Icon(
+                    iconData,
+                    color: iconColor,
+                    size: AppDimensions.iconLg,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    time,
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontSm,
-                      color: Colors.blueGrey.shade300,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppDimensions.sm),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-              ),
-              child: Text(
-                pointsStr,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontLg,
-                  fontWeight: FontWeight.w900,
-                  color: iconColor,
                 ),
-              ),
+                const SizedBox(width: AppDimensions.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontLg,
+                          fontWeight: FontWeight.w700,
+                          color: _primaryNavy,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$desc · $sender',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontMd,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueGrey.shade400,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        time,
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontSm,
+                          color: Colors.blueGrey.shade300,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.sm),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  ),
+                  child: Text(
+                    pointsStr,
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontLg,
+                      fontWeight: FontWeight.w900,
+                      color: iconColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
-    ),
-    ),
     );
   }
 

@@ -165,7 +165,9 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
               color: Colors.blueGrey.shade50,
               shape: BoxShape.circle,
               image: DecorationImage(
-                image: (member['profile_photo'] != null && member['profile_photo'].toString().isNotEmpty)
+                image:
+                    (member['profile_photo'] != null &&
+                        member['profile_photo'].toString().isNotEmpty)
                     ? FileImage(File(member['profile_photo'])) as ImageProvider
                     : const AssetImage('assets/images/default_avatar.png'),
                 fit: BoxFit.cover,

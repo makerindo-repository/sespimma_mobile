@@ -446,7 +446,9 @@ class _PatunMentalActivityHistoryScreenState
                                         (item['title'] as String?) ??
                                         'Aktivitas Mental',
                                     desc: (item['desc'] as String?) ?? '-',
-                                    justification: (item['justification'] as String?) ?? '-',
+                                    justification:
+                                        (item['justification'] as String?) ??
+                                        '-',
                                     sender: (item['sender'] as String?) ?? '-',
                                     time: (item['time'] as String?) ?? '-',
                                     isReward:

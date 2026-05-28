@@ -250,114 +250,123 @@ class _PatunKakorsisOutboxScreenState extends State<PatunKakorsisOutboxScreen> {
           borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-            onTap: () {
-              // Interactive feedback
-            },
+            onTap: () {},
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey.shade50,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey.shade200),
-                  image: DecorationImage(
-                    image: (item['profile_photo'] != null && item['profile_photo'].toString().isNotEmpty)
-                        ? FileImage(File(item['profile_photo'])) as ImageProvider
-                        : const AssetImage('assets/images/default_avatar.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item['nama_lengkap'] ?? '-',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  color: _primaryNavy,
-                                  fontSize: AppDimensions.fontMd,
-                                ),
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey.shade50,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey.shade200),
+                      image: DecorationImage(
+                        image:
+                            (item['profile_photo'] != null &&
+                                item['profile_photo'].toString().isNotEmpty)
+                            ? FileImage(File(item['profile_photo']))
+                                  as ImageProvider
+                            : const AssetImage(
+                                'assets/images/default_avatar.png',
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${item['pangkat'] ?? '-'} · ${item['no_serdik'] ?? '-'}',
-                                style: TextStyle(
-                                  fontSize: AppDimensions.fontSm,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.blueGrey.shade400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.1),
-                            borderRadius:
-                                BorderRadius.circular(AppDimensions.radiusMd),
-                          ),
-                          child: Text(
-                            '${isReward ? "+" : ""}${item['point']}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: color,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      item['indikator'] ?? '-',
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontMd,
-                        color: Colors.blueGrey.shade700,
-                        height: 1.4,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.access_time_rounded,
-                            size: 14, color: Colors.grey.shade500),
-                        const SizedBox(width: 4),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item['nama_lengkap'] ?? '-',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: _primaryNavy,
+                                      fontSize: AppDimensions.fontMd,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${item['pangkat'] ?? '-'} · ${item['no_serdik'] ?? '-'}',
+                                    style: TextStyle(
+                                      fontSize: AppDimensions.fontSm,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.blueGrey.shade400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusMd,
+                                ),
+                              ),
+                              child: Text(
+                                '${isReward ? "+" : ""}${item['point']}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: color,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
                         Text(
-                          item['waktu'] ?? '-',
+                          item['indikator'] ?? '-',
                           style: TextStyle(
-                            fontSize: AppDimensions.fontSm,
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w600,
+                            fontSize: AppDimensions.fontMd,
+                            color: Colors.blueGrey.shade700,
+                            height: 1.4,
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time_rounded,
+                              size: 14,
+                              color: Colors.grey.shade500,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              item['waktu'] ?? '-',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontSm,
+                                color: Colors.grey.shade500,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
-    ),
-  ),
-);
+    );
   }
 
   Widget _buildBottomBar() {

@@ -22,7 +22,6 @@ class EvidenceBottomSheet {
     String imageUrl = "assets/images/images.jpeg";
     bool isLocalAsset = true;
 
-    // Temporary mock image logic until real images are hooked up
     if (isReward) {
       if (cleanTitle.toLowerCase().contains("imam")) {
         imageUrl = "assets/images/kheldoun-imad-IqsenI0kT1I-unsplash.jpg";

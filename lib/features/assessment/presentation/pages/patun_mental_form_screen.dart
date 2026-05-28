@@ -688,7 +688,8 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
             child: _selectedSerdik == null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: AppDimensions.lg),
+                      vertical: AppDimensions.lg,
+                    ),
                     child: Center(
                       child: Text(
                         'Pilih target serdik terlebih dahulu',
