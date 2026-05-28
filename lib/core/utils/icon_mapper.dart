@@ -17,7 +17,7 @@ abstract final class AppIcons {
   static const IconData calendarBlankFill = Icons.calendar_today;
   static const IconData lockFill = Icons.lock;
   static const IconData caretRightBold = Icons.chevron_right;
-  static const IconData shieldCheckFill = Icons.security;
+  static const IconData shieldCheckFill = Icons.health_and_safety;
   static const IconData lockKeyFill = Icons.lock;
   static const IconData cloudCheckFill = Icons.cloud_done;
   static const IconData camera = Icons.camera_alt_outlined;
@@ -119,4 +119,8 @@ abstract final class AppIcons {
   static const IconData chartBar = Icons.bar_chart;
   static const IconData gearFill = Icons.settings;
   static const IconData mapPinLine = Icons.pin_drop_outlined;
+  static const IconData thumbUp = Icons.thumb_up_rounded;
+  static const IconData thumbUpOutline = Icons.thumb_up_outlined;
+  static const IconData thumbDown = Icons.thumb_down_rounded;
+  static const IconData thumbDownOutline = Icons.thumb_down_outlined;
 }

@@ -429,6 +429,17 @@ class _CompetencyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String displayTitle = title;
+    String? weight;
+    if (title.contains('(') && title.contains(')')) {
+      final start = title.lastIndexOf('(');
+      final end = title.lastIndexOf(')');
+      if (start < end && title.substring(start + 1, end).contains('%')) {
+        weight = title.substring(start + 1, end);
+        displayTitle = title.substring(0, start).trim();
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.md),
       decoration: BoxDecoration(
@@ -470,14 +481,56 @@ class _CompetencyItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: AppDimensions.fontSm,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF001C40),
+                      if (weight != null)
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF001C40,
+                                ).withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusSm,
+                                ),
+                              ),
+                              child: Text(
+                                weight,
+                                style: const TextStyle(
+                                  fontSize: AppDimensions.fontXs,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF001C40),
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppDimensions.sm),
+                            Expanded(
+                              child: Text(
+                                displayTitle,
+                                style: const TextStyle(
+                                  fontSize: AppDimensions.fontSm,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF001C40),
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Text(
+                          displayTitle,
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF001C40),
+                          ),
                         ),
-                      ),
                       const SizedBox(height: AppDimensions.xs),
                       Text(
                         _status,
@@ -580,6 +633,17 @@ class _ExpandableCompetencyGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String displayTitle = title;
+    String? weight;
+    if (title.contains('(') && title.contains(')')) {
+      final start = title.lastIndexOf('(');
+      final end = title.lastIndexOf(')');
+      if (start < end && title.substring(start + 1, end).contains('%')) {
+        weight = title.substring(start + 1, end);
+        displayTitle = title.substring(0, start).trim();
+      }
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.md),
       decoration: BoxDecoration(
@@ -635,14 +699,56 @@ class _ExpandableCompetencyGroup extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: AppDimensions.fontSm,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF001C40),
+                      if (weight != null)
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF001C40,
+                                ).withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusSm,
+                                ),
+                              ),
+                              child: Text(
+                                weight,
+                                style: const TextStyle(
+                                  fontSize: AppDimensions.fontXs,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF001C40),
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: AppDimensions.sm),
+                            Expanded(
+                              child: Text(
+                                displayTitle,
+                                style: const TextStyle(
+                                  fontSize: AppDimensions.fontSm,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF001C40),
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Text(
+                          displayTitle,
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF001C40),
+                          ),
                         ),
-                      ),
                       const SizedBox(height: AppDimensions.xs),
                       Text(
                         _status,
@@ -712,6 +818,17 @@ class _SubCompetencyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String displayTitle = title;
+    String? weight;
+    if (title.contains('(') && title.contains(')')) {
+      final start = title.lastIndexOf('(');
+      final end = title.lastIndexOf(')');
+      if (start < end && title.substring(start + 1, end).contains('%')) {
+        weight = title.substring(start + 1, end);
+        displayTitle = title.substring(0, start).trim();
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.sm),
       child: Row(
@@ -727,13 +844,42 @@ class _SubCompetencyItem extends StatelessWidget {
                 ),
                 const SizedBox(width: AppDimensions.md),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontSm,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blueGrey.shade700,
-                    ),
+                  child: Row(
+                    children: [
+                      if (weight != null) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(
+                              0xFF001C40,
+                            ).withValues(alpha: 0.06),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            weight,
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontXs - 1,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF001C40),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppDimensions.sm),
+                      ],
+                      Expanded(
+                        child: Text(
+                          displayTitle,
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueGrey.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -779,6 +925,18 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _color;
+
+    String displayTitle = title;
+    String? weight;
+    if (title.contains('(') && title.contains(')')) {
+      final start = title.lastIndexOf('(');
+      final end = title.lastIndexOf(')');
+      if (start < end && title.substring(start + 1, end).contains('%')) {
+        weight = title.substring(start + 1, end);
+        displayTitle = title.substring(0, start).trim();
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.xs,
@@ -790,13 +948,43 @@ class _SectionTitle extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: AppDimensions.fontMd,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF001C40),
-              ),
+            child: Row(
+              children: [
+                if (weight != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF001C40).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusSm,
+                      ),
+                    ),
+                    child: Text(
+                      weight,
+                      style: const TextStyle(
+                        fontSize: AppDimensions.fontXs,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF001C40),
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.sm),
+                ],
+                Expanded(
+                  child: Text(
+                    displayTitle,
+                    style: const TextStyle(
+                      fontSize: AppDimensions.fontMd,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF001C40),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Container(

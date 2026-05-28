@@ -5,7 +5,9 @@ class EvidenceBottomSheet {
   static void show(
     BuildContext context, {
     required String title,
-    required String subtitle,
+    required String description,
+    required String evaluatorName,
+    required String timeText,
     required String points,
     required String type,
   }) {
@@ -16,40 +18,19 @@ class EvidenceBottomSheet {
         .replaceAll(RegExp(r'^Punishment:\s*', caseSensitive: false), '')
         .trim();
 
-    String detailTitle = "";
-    String description = "";
-    String evaluatorName = "";
+    String detailTitle = isReward ? "Bukti Penghargaan" : "Bukti Pelanggaran";
+    String imageUrl = "assets/images/images.jpeg";
+    bool isLocalAsset = true;
 
-    String timeText = subtitle;
-    if (subtitle.contains(' - ')) {
-      timeText = subtitle.split(' - ').last;
-    }
-
-    String imageUrl = "";
-    bool isLocalAsset = false;
-
+    // Temporary mock image logic until real images are hooked up
     if (isReward) {
-      detailTitle = "Bukti Penghargaan";
       if (cleanTitle.toLowerCase().contains("imam")) {
-        description =
-            "Serdik berinisiatif secara sukarela untuk menjadi Imam Shalat berjamaah di Masjid Sespimma dan memimpin doa bersama secara khidmat.";
-        evaluatorName = "AKBP Patun A";
         imageUrl = "assets/images/kheldoun-imad-IqsenI0kT1I-unsplash.jpg";
-        isLocalAsset = true;
       } else {
-        description =
-            "Serdik aktif berpartisipasi menyampaikan gagasan visioner saat sesi simulasi pemecahan konflik siber di ruang kelas.";
-        evaluatorName = "Dosen Pembimbing B";
         imageUrl =
             "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800";
+        isLocalAsset = false;
       }
-    } else {
-      detailTitle = "Bukti Pelanggaran";
-      description =
-          "Serdik terdeteksi melanggar batas radius zona Geofencing digital pada saat pelaporan apel harian dimulai pukul 07:00 WIB.";
-      evaluatorName = "Sistem Presensi Geofence Sespimma";
-      imageUrl = "assets/images/images.jpeg";
-      isLocalAsset = true;
     }
 
     final Color mainColor = isReward

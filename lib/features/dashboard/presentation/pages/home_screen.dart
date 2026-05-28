@@ -854,9 +854,10 @@ class _HomeScreenState extends State<HomeScreen>
                     return _ActivityTile(
                       title: item['title'] as String,
                       subtitle: item['subtitle'] as String,
+                      time: item['timeRaw'] as String? ?? '',
                       points: item['points'] as String,
-                      isReward: item['isReward'] as bool,
-                      isTask: item['isTask'] as bool? ?? false,
+                      isReward: item['type'] == 'reward',
+                      isTask: item['type'] == 'task',
                     );
                   },
                 ),
@@ -1021,6 +1022,7 @@ class _AnimatedCircularScore extends StatelessWidget {
 class _ActivityTile extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String time;
   final String points;
   final bool isReward;
   final bool isTask;
@@ -1028,6 +1030,7 @@ class _ActivityTile extends StatelessWidget {
   const _ActivityTile({
     required this.title,
     required this.subtitle,
+    required this.time,
     required this.points,
     required this.isReward,
     this.isTask = false,
@@ -1067,7 +1070,9 @@ class _ActivityTile extends StatelessWidget {
                   EvidenceBottomSheet.show(
                     context,
                     title: title,
-                    subtitle: subtitle,
+                    description: title,
+                    evaluatorName: subtitle,
+                    timeText: time,
                     points: points,
                     type: isReward ? 'reward' : 'punishment',
                   );

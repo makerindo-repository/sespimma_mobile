@@ -798,7 +798,9 @@ class _AnimatedActivityTile extends StatelessWidget {
                       EvidenceBottomSheet.show(
                         context,
                         title: title,
-                        subtitle: '$subtitle - $time',
+                        description: title,
+                        evaluatorName: subtitle,
+                        timeText: time,
                         points: points,
                         type: type,
                       );

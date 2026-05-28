@@ -8,31 +8,65 @@ import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
-import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_academic_detail_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_form_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_detail_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/patun_senat_validation_sheet.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_kakorsis_outbox_screen.dart';
 
-class PatunAcademicMonitoringScreen extends StatefulWidget {
-  const PatunAcademicMonitoringScreen({super.key});
+class PatunMentalMonitoringScreen extends StatefulWidget {
+  const PatunMentalMonitoringScreen({super.key});
 
   @override
-  State<PatunAcademicMonitoringScreen> createState() =>
-      _PatunAcademicMonitoringScreenState();
+  State<PatunMentalMonitoringScreen> createState() =>
+      _PatunMentalMonitoringScreenState();
 }
 
-class _PatunAcademicMonitoringScreenState
-    extends State<PatunAcademicMonitoringScreen> {
+class _PatunMentalMonitoringScreenState
+    extends State<PatunMentalMonitoringScreen> {
   static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
+  bool _isSenatBannerVisible = true;
+
   String _searchQuery = '';
-  String _selectedFilter = 'Semua';
   final TextEditingController _searchController = TextEditingController();
 
+  String _selectedFilter = 'Semua';
   final List<String> _filterOptions = ['Semua', 'Aman', 'Warning', 'Kritis'];
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _showInputBottomSheet(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _InputTypeSheet(
+        onReward: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const PatunMentalFormScreen(isReward: true),
+            ),
+          );
+        },
+        onPunishment: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const PatunMentalFormScreen(isReward: false),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -45,11 +79,67 @@ class _PatunAcademicMonitoringScreenState
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Monitoring Akademik',
+          'Monitoring Mental',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: AppDimensions.fontXxl,
+          ),
+        ),
+        actions: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(
+                  Icons.description_rounded,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PatunKakorsisOutboxScreen(),
+                    ),
+                  );
+                },
+                tooltip: 'Draft Penilaian',
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text(
+                    '3',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: AppDimensions.sm),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showInputBottomSheet(context),
+        backgroundColor: _primaryNavy,
+        elevation: 6,
+        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+        label: const Text(
+          'Input Nilai',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: AppDimensions.fontMd,
           ),
         ),
       ),
@@ -63,48 +153,48 @@ class _PatunAcademicMonitoringScreenState
                 .where((r) => r['kelompok_kelas'] == userPokjar)
                 .toList();
 
-            final listWithEWS = baseList.asMap().entries.map((entry) {
+            final listWithScores = baseList.asMap().entries.map((entry) {
               final index = entry.key;
               final serdik = Map<String, dynamic>.from(entry.value);
 
               double score;
               String status;
-              if (index % 5 == 0) {
+              if (index % 6 == 0) {
                 status = 'Kritis';
-                score = 65.0 + (index % 5);
-              } else if (index % 3 == 0) {
+                score = 60.0 + (index % 6).toDouble();
+              } else if (index % 4 == 0) {
                 status = 'Warning';
-                score = 70.0 + (index % 3);
+                score = 72.0 + (index % 4).toDouble();
               } else {
                 status = 'Aman';
-                score = 80.0 + (index % 15);
+                score = 80.0 + (index % 15).toDouble();
               }
-
               serdik['_mock_score'] = score;
               serdik['_mock_status'] = status;
               return serdik;
             }).toList();
 
-            var filteredList = listWithEWS.where((serdik) {
+            var filteredList = listWithScores.where((serdik) {
               final name = (serdik['nama_lengkap'] ?? '')
                   .toString()
                   .toLowerCase();
               final noSerdik = (serdik['no_serdik'] ?? '')
                   .toString()
                   .toLowerCase();
+              final status = (serdik['_mock_status'] as String?) ?? 'Aman';
               final query = _searchQuery.toLowerCase();
-              return name.contains(query) || noSerdik.contains(query);
+
+              final matchesSearch =
+                  name.contains(query) || noSerdik.contains(query);
+              final matchesFilter =
+                  _selectedFilter == 'Semua' || status == _selectedFilter;
+
+              return matchesSearch && matchesFilter;
             }).toList();
 
-            if (_selectedFilter != 'Semua') {
-              filteredList = filteredList
-                  .where((serdik) => serdik['_mock_status'] == _selectedFilter)
-                  .toList();
-            }
-
             filteredList.sort((a, b) {
-              final scoreA = (a['_mock_score'] as double?) ?? 100.0;
-              final scoreB = (b['_mock_score'] as double?) ?? 100.0;
+              final scoreA = (a['_mock_score'] as num?)?.toDouble() ?? 100.0;
+              final scoreB = (b['_mock_score'] as num?)?.toDouble() ?? 100.0;
               return scoreA.compareTo(scoreB);
             });
 
@@ -119,7 +209,7 @@ class _PatunAcademicMonitoringScreenState
                 ),
                 Expanded(
                   child: filteredList.isEmpty
-                      ? _buildEmptyState(userPokjar)
+                      ? _buildEmptyState()
                       : _buildSerdikList(filteredList),
                 ),
               ],
@@ -143,6 +233,10 @@ class _PatunAcademicMonitoringScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (_isSenatBannerVisible) ...[
+            _buildSenatBanner(),
+            const SizedBox(height: AppDimensions.lg),
+          ],
           Row(
             children: [
               Expanded(
@@ -202,7 +296,11 @@ class _PatunAcademicMonitoringScreenState
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.people_alt, color: Colors.white, size: 16),
+                    const Icon(
+                      Icons.people_alt_rounded,
+                      color: Colors.white,
+                      size: 16,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       '$totalSerdik Serdik',
@@ -222,7 +320,7 @@ class _PatunAcademicMonitoringScreenState
     );
   }
 
-  Widget _buildEmptyState(String pokjar) {
+  Widget _buildEmptyState() {
     final isFiltered = _selectedFilter != 'Semua';
     final isSearching = _searchQuery.isNotEmpty;
 
@@ -300,7 +398,12 @@ class _PatunAcademicMonitoringScreenState
         constraints: const BoxConstraints(maxWidth: 680),
         child: ListView.separated(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(AppDimensions.xl),
+          padding: const EdgeInsets.fromLTRB(
+            AppDimensions.xl,
+            AppDimensions.xl,
+            AppDimensions.xl,
+            AppDimensions.huge + AppDimensions.xxxl,
+          ),
           itemCount: serdikList.length,
           separatorBuilder: (context, index) =>
               const SizedBox(height: AppDimensions.md),
@@ -309,7 +412,6 @@ class _PatunAcademicMonitoringScreenState
             final name = (serdik['nama_lengkap'] ?? '-').toString();
             final noSerdik = (serdik['no_serdik'] ?? '-').toString();
             final pangkat = (serdik['pangkat'] ?? '-').toString();
-
             final double score =
                 (serdik['_mock_score'] as num?)?.toDouble() ?? 0.0;
             final String status = (serdik['_mock_status'] as String?) ?? 'Aman';
@@ -371,7 +473,7 @@ class _PatunAcademicMonitoringScreenState
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => PatunAcademicDetailScreen(serdik: serdik),
+                builder: (_) => PatunMentalDetailScreen(serdik: serdik),
               ),
             );
           },
@@ -490,17 +592,266 @@ class _PatunAcademicMonitoringScreenState
         serdik['profile_photo'] ?? serdik['profilePhoto'];
 
     return Container(
-      width: 56,
-      height: 56,
+      width: AppDimensions.avatarLg,
+      height: AppDimensions.avatarLg,
       decoration: BoxDecoration(
         color: _lightGrey,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey.shade200, width: 2),
+        border: Border.all(color: Colors.grey.shade200, width: 1.5),
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
               ? FileImage(File(profilePhoto)) as ImageProvider
               : const AssetImage('assets/images/default_avatar.png'),
           fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> _getDynamicList() {
+    return SerdikRealData.records.take(5).toList();
+  }
+
+  Widget _buildSenatBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade50,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        border: Border.all(color: Colors.orange.shade300),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.orange.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.notifications_active_rounded,
+              color: Colors.orange.shade800,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Saatnya Validasi Reward Senat',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: Colors.orange.shade900,
+                    fontSize: AppDimensions.fontMd,
+                  ),
+                ),
+                Text(
+                  'Batas waktu validasi minggu ini segera berakhir.',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontSm,
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: _showSenatValidationSheet,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange.shade600,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              minimumSize: Size.zero,
+            ),
+            child: const Text(
+              'Validasi',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSenatValidationSheet() async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return PatunSenatValidationSheet(pokjarMembers: _getDynamicList());
+      },
+    );
+
+    if (result == true && mounted) {
+      setState(() {
+        _isSenatBannerVisible = false;
+      });
+    }
+  }
+}
+
+class _InputTypeSheet extends StatelessWidget {
+  final VoidCallback onReward;
+  final VoidCallback onPunishment;
+
+  const _InputTypeSheet({required this.onReward, required this.onPunishment});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppDimensions.xl,
+            AppDimensions.lg,
+            AppDimensions.xl,
+            AppDimensions.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: AppDimensions.handleWidth,
+                  height: AppDimensions.bottomSheetHandle,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(
+                      AppDimensions.radiusFull,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xl),
+              const Text(
+                'Input Nilai Mental',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXxl,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF000B1D),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xs),
+              Text(
+                'Pilih jenis penilaian yang akan diinput',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  color: Colors.blueGrey.shade400,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xxl),
+              Row(
+                children: [
+                  Expanded(
+                    child: _SheetOptionCard(
+                      title: 'Reward',
+                      subtitle: 'Penilaian Positif',
+                      icon: Icons.thumb_up_rounded,
+                      color: const Color(0xFF1B5E20),
+                      bgColor: const Color(0xFFE8F5E9),
+                      onTap: onReward,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.lg),
+                  Expanded(
+                    child: _SheetOptionCard(
+                      title: 'Punishment',
+                      subtitle: 'Penilaian Negatif',
+                      icon: Icons.thumb_down_rounded,
+                      color: const Color(0xFFB71C1C),
+                      bgColor: const Color(0xFFFFEBEE),
+                      onTap: onPunishment,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimensions.lg),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetOptionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
+  final VoidCallback onTap;
+
+  const _SheetOptionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.bgColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: AppDimensions.xl,
+            horizontal: AppDimensions.lg,
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.3),
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(icon, color: color, size: AppDimensions.iconXl),
+              ),
+              const SizedBox(height: AppDimensions.md),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXl,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xs),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontSm,
+                  fontWeight: FontWeight.w500,
+                  color: color.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

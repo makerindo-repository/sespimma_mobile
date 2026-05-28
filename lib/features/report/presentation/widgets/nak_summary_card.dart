@@ -145,16 +145,16 @@ class NakSummaryCard extends StatelessWidget {
 
     if (nak > 85.0) {
       pred = 'Sangat Memuaskan (SM)';
-      pillBg = Colors.teal.shade100;
-      predColor = Colors.teal.shade900;
-    } else if (nak > 80.0) {
-      pred = 'Memuaskan (M)';
       pillBg = Colors.green.shade100;
       predColor = Colors.green.shade900;
+    } else if (nak > 80.0) {
+      pred = 'Memuaskan (M)';
+      pillBg = Colors.green.shade50;
+      predColor = Colors.green.shade700;
     } else if (nak > 75.0) {
       pred = 'Baik (B)';
-      pillBg = Colors.blue.shade100;
-      predColor = Colors.blue.shade900;
+      pillBg = Colors.lime.shade100;
+      predColor = Colors.lime.shade900;
     } else if (nak > 70.0) {
       pred = 'Cukup (C)';
       pillBg = Colors.amber.shade100;
@@ -190,33 +190,43 @@ class NakSummaryCard extends StatelessWidget {
   }
 
   Color _getCardBgColor() {
-    if (nak >= 80.0) return Colors.green.shade50;
-    if (nak >= 70.0) return Colors.amber.shade50;
+    if (nak > 85.0) return Colors.green.shade50;
+    if (nak > 80.0) return Colors.green.shade50;
+    if (nak > 75.0) return Colors.lime.shade50;
+    if (nak > 70.0) return Colors.amber.shade50;
     return Colors.red.shade50;
   }
 
   Color _getBorderColor() {
-    if (nak >= 80.0) return Colors.green.shade200;
-    if (nak >= 70.0) return Colors.amber.shade200;
-    return Colors.red.shade200;
+    if (nak > 85.0) return Colors.green.shade300;
+    if (nak > 80.0) return Colors.green.shade200;
+    if (nak > 75.0) return Colors.lime.shade300;
+    if (nak > 70.0) return Colors.amber.shade300;
+    return Colors.red.shade300;
   }
 
   Color _getTextHeaderColor() {
-    if (nak >= 80.0) return Colors.green.shade800;
-    if (nak >= 70.0) return Colors.amber.shade900;
+    if (nak > 85.0) return Colors.green.shade800;
+    if (nak > 80.0) return Colors.green.shade700;
+    if (nak > 75.0) return Colors.lime.shade800;
+    if (nak > 70.0) return Colors.amber.shade900;
     return Colors.red.shade800;
   }
 
   Color _getScoreColor() {
-    if (nak >= 80.0) return Colors.green.shade800;
-    if (nak >= 70.0) return Colors.amber.shade900;
-    return Colors.red.shade800;
+    if (nak > 85.0) return Colors.green.shade800;
+    if (nak > 80.0) return Colors.green.shade500;
+    if (nak > 75.0) return Colors.lime.shade700;
+    if (nak > 70.0) return Colors.amber.shade500;
+    return Colors.red.shade700;
   }
 
   Color _getBadgeBgColor() {
-    if (nak >= 80.0) return Colors.green.shade500;
-    if (nak >= 70.0) return Colors.amber.shade600;
-    return Colors.red.shade500;
+    if (nak > 85.0) return Colors.green.shade700;
+    if (nak > 80.0) return Colors.green.shade500;
+    if (nak > 75.0) return Colors.lime.shade600;
+    if (nak > 70.0) return Colors.amber.shade600;
+    return Colors.red.shade600;
   }
 
   Color _getBadgeTextColor() {
