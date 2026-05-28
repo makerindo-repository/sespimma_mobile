@@ -58,17 +58,14 @@ class _PatunAcademicMonitoringScreenState
             final user = state.user;
             final userPokjar = user.pokjar;
 
-            // 1. Get raw base list
             final baseList = SerdikRealData.records
                 .where((r) => r['kelompok_kelas'] == userPokjar)
                 .toList();
 
-            // 2. Attach mock EWS status to each item for filtering
             final listWithEWS = baseList.asMap().entries.map((entry) {
               final index = entry.key;
               final serdik = Map<String, dynamic>.from(entry.value);
 
-              // Mock EWS logic
               double score;
               String status;
               if (index % 5 == 0) {
@@ -87,15 +84,17 @@ class _PatunAcademicMonitoringScreenState
               return serdik;
             }).toList();
 
-            // 3. Filter by search query
             var filteredList = listWithEWS.where((serdik) {
-              final name = (serdik['nama_lengkap'] ?? '').toString().toLowerCase();
-              final noSerdik = (serdik['no_serdik'] ?? '').toString().toLowerCase();
+              final name = (serdik['nama_lengkap'] ?? '')
+                  .toString()
+                  .toLowerCase();
+              final noSerdik = (serdik['no_serdik'] ?? '')
+                  .toString()
+                  .toLowerCase();
               final query = _searchQuery.toLowerCase();
               return name.contains(query) || noSerdik.contains(query);
             }).toList();
 
-            // 4. Filter by EWS status
             if (_selectedFilter != 'Semua') {
               filteredList = filteredList
                   .where((serdik) => serdik['_mock_status'] == _selectedFilter)
@@ -185,7 +184,10 @@ class _PatunAcademicMonitoringScreenState
               ),
               const SizedBox(width: AppDimensions.md),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: _primaryNavy,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
@@ -193,11 +195,7 @@ class _PatunAcademicMonitoringScreenState
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.people_alt,
-                      color: Colors.white,
-                      size: 16,
-                    ),
+                    const Icon(Icons.people_alt, color: Colors.white, size: 16),
                     const SizedBox(width: 6),
                     Text(
                       '$totalSerdik Serdik',
@@ -222,11 +220,7 @@ class _PatunAcademicMonitoringScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.search_off,
-            size: 64,
-            color: Colors.grey.shade300,
-          ),
+          Icon(Icons.search_off, size: 64, color: Colors.grey.shade300),
           const SizedBox(height: AppDimensions.lg),
           Text(
             'Tidak Ada Hasil',
@@ -254,15 +248,14 @@ class _PatunAcademicMonitoringScreenState
     return ListView.separated(
       padding: const EdgeInsets.all(AppDimensions.xl),
       itemCount: serdikList.length,
-      separatorBuilder: (context, index) => const SizedBox(
-        height: AppDimensions.lg,
-      ),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppDimensions.lg),
       itemBuilder: (context, index) {
         final serdik = serdikList[index];
         final name = serdik['nama_lengkap'] ?? '-';
         final noSerdik = serdik['no_serdik'] ?? '-';
         final pangkat = serdik['pangkat'] ?? '-';
-        
+
         final double score = serdik['_mock_score'] as double;
         final String status = serdik['_mock_status'] as String;
 
@@ -344,7 +337,9 @@ class _PatunAcademicMonitoringScreenState
                         ),
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                         ),
                         child: Text(
                           status.toUpperCase(),

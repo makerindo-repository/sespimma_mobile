@@ -67,7 +67,7 @@ class AssessmentSearchBarWidget extends StatelessWidget {
           contentPadding: const EdgeInsets.only(
             left: AppDimensions.lg,
             right: AppDimensions.lg,
-            bottom: AppDimensions.fontLg / 2, // Fine-tuned centering
+            bottom: AppDimensions.fontLg / 2,
           ),
         ),
       ),
