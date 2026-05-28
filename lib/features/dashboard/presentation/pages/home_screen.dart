@@ -223,15 +223,17 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 const SizedBox(height: AppDimensions.xs),
-                Text(
-                  user.name.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: AppDimensions.fontXl,
-                    fontWeight: FontWeight.w800,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    user.name.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: AppDimensions.fontXl,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(

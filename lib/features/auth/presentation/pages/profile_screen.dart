@@ -174,15 +174,18 @@ class _ProfileScreenState extends State<ProfileScreen>
         children: [
           _buildAvatar(user),
           const SizedBox(height: AppDimensions.md),
-          Text(
-            user.name.toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: AppDimensions.fontXxl,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.5,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl),
+            child: Text(
+              user.name.toUpperCase(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: AppDimensions.fontXxl,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppDimensions.sm),
           Container(
