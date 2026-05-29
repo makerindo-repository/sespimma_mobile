@@ -193,6 +193,8 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
             }
             _updateFromPosition(pos.latitude, pos.longitude, false);
           },
+          onError: (dynamic _) {},
+          cancelOnError: false,
         );
 
     try {

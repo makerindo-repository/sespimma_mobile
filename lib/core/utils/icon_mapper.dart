@@ -123,4 +123,5 @@ abstract final class AppIcons {
   static const IconData thumbUpOutline = Icons.thumb_up_outlined;
   static const IconData thumbDown = Icons.thumb_down_rounded;
   static const IconData thumbDownOutline = Icons.thumb_down_outlined;
+  static const IconData starFill = Icons.star;
 }

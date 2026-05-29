@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
+import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
@@ -33,6 +35,8 @@ class _PatunMentalMonitoringScreenState
 
   String _selectedFilter = 'Semua';
   final List<String> _filterOptions = ['Semua', 'Aman', 'Warning', 'Kritis'];
+
+  List<Map<String, dynamic>> _currentPokjarList = [];
 
   @override
   void dispose() {
@@ -130,6 +134,7 @@ class _PatunMentalMonitoringScreenState
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: () => _showInputBottomSheet(context),
         backgroundColor: _primaryNavy,
         elevation: 6,
@@ -153,26 +158,30 @@ class _PatunMentalMonitoringScreenState
                 .where((r) => r['kelompok_kelas'] == userPokjar)
                 .toList();
 
-            final listWithScores = baseList.asMap().entries.map((entry) {
-              final index = entry.key;
-              final serdik = Map<String, dynamic>.from(entry.value);
+            final listWithScores = baseList.map((entry) {
+              final serdik = Map<String, dynamic>.from(entry);
+              final noSerdik = serdik['no_serdik'] as String? ?? '';
+              final realScores = SerdikMentalScores.getScores(noSerdik);
+              final score = realScores != null
+                  ? (realScores['nilai'] as num).toDouble()
+                  : 82.30;
 
-              double score;
-              String status;
-              if (index % 6 == 0) {
-                status = 'Kritis';
-                score = 60.0 + (index % 6).toDouble();
-              } else if (index % 4 == 0) {
-                status = 'Warning';
-                score = 72.0 + (index % 4).toDouble();
-              } else {
+              final String status;
+              if (score >= 80.0) {
                 status = 'Aman';
-                score = 80.0 + (index % 15).toDouble();
+              } else if (score >= 70.0) {
+                status = 'Warning';
+              } else {
+                status = 'Kritis';
               }
+
               serdik['_mock_score'] = score;
               serdik['_mock_status'] = status;
+              serdik['_senat_role'] = SerdikSenatRoles.getRole(noSerdik);
               return serdik;
             }).toList();
+
+            _currentPokjarList = listWithScores;
 
             var filteredList = listWithScores.where((serdik) {
               final name = (serdik['nama_lengkap'] ?? '')
@@ -440,6 +449,7 @@ class _PatunMentalMonitoringScreenState
   ) {
     final Color statusColor;
     final IconData statusIcon;
+    final String? senatRole = serdik['_senat_role'] as String?;
     if (status == 'Aman') {
       statusColor = const Color(0xFF2E7D32);
       statusIcon = Icons.check_circle_rounded;
@@ -537,6 +547,32 @@ class _PatunMentalMonitoringScreenState
                               ),
                             ),
                           ),
+                          if (senatRole != null) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFF1A237E,
+                                ).withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusMd,
+                                ),
+                              ),
+                              child: Text(
+                                senatRole,
+                                style: const TextStyle(
+                                  fontSize: AppDimensions.fontXs,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF1A237E),
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],
@@ -569,7 +605,7 @@ class _PatunMentalMonitoringScreenState
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        score.toStringAsFixed(1),
+                        score.toStringAsFixed(2),
                         style: TextStyle(
                           fontSize: AppDimensions.fontXl,
                           fontWeight: FontWeight.w900,
@@ -609,7 +645,7 @@ class _PatunMentalMonitoringScreenState
   }
 
   List<Map<String, dynamic>> _getDynamicList() {
-    return SerdikRealData.records.take(5).toList();
+    return _currentPokjarList;
   }
 
   Widget _buildSenatBanner() {

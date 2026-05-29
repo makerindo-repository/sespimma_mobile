@@ -151,33 +151,36 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     required VoidCallback onTap,
     Color? color,
   }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-      leading: Container(
-        padding: const EdgeInsets.all(AppDimensions.md),
-        decoration: BoxDecoration(
-          color: (color ?? _primaryNavy).withValues(alpha: 0.1),
-          shape: BoxShape.circle,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(AppDimensions.md),
+          decoration: BoxDecoration(
+            color: (color ?? _primaryNavy).withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: color ?? _primaryNavy,
+            size: AppDimensions.iconLg,
+          ),
         ),
-        child: Icon(
-          icon,
-          color: color ?? _primaryNavy,
-          size: AppDimensions.iconLg,
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: color ?? _primaryNavy,
+            fontSize: AppDimensions.fontLg + 1,
+          ),
         ),
+        trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: color ?? _primaryNavy,
-          fontSize: AppDimensions.fontLg + 1,
-        ),
-      ),
-      trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
     );
   }
 
@@ -422,7 +425,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Pendidikan Terakhir', user.pendidikanTerakhir),
             const SizedBox(height: AppDimensions.md),
-            _buildInfoRow('Kelompok', 'POKJAR ${user.pokjar}'),
+            _buildInfoRow('Kelompok', user.pokjar),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Diktuk Awal', user.diktukAwal),
             const SizedBox(height: AppDimensions.md),
@@ -433,6 +436,8 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             _buildInfoRow('NRP', user.nrp),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Pangkat', _getFullPangkat(user.pangkat)),
+            const SizedBox(height: AppDimensions.md),
+            _buildInfoRow('Jabatan Senat', user.jabatanSenat),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Jabatan', user.jabatan),
             const SizedBox(height: AppDimensions.md),

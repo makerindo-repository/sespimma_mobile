@@ -117,7 +117,7 @@ class ScoreSummaryCard extends StatelessWidget {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    score > 0 ? score.toStringAsFixed(1) : '-',
+                    score > 0 ? score.toStringAsFixed(2) : '-',
                     style: TextStyle(
                       fontSize: AppDimensions.fontXxl + 4,
                       fontWeight: FontWeight.w800,

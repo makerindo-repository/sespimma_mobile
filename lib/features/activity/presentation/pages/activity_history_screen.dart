@@ -754,11 +754,11 @@ class _AnimatedActivityTile extends StatelessWidget {
         break;
       case 'reward':
         iconColor = const Color(0xFF2E7D32);
-        iconData = AppIcons.medalFill;
+        iconData = AppIcons.thumbUp;
         break;
       case 'punishment':
         iconColor = const Color(0xFFD32F2F);
-        iconData = AppIcons.warningCircleFill;
+        iconData = AppIcons.thumbDown;
         break;
       case 'info':
       default:

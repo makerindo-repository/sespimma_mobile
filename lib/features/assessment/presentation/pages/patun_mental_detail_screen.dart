@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
+import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_activity_history_screen.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
@@ -112,8 +114,19 @@ class PatunMentalDetailScreen extends StatelessWidget {
     final String? profilePhoto =
         serdik['profile_photo'] ?? serdik['profilePhoto'];
 
-    final double score = (serdik['_mock_score'] as num?)?.toDouble() ?? 80.0;
-    final String status = (serdik['_mock_status'] as String?) ?? 'Aman';
+    final realScores = SerdikMentalScores.getScores(noSerdik);
+    final double score = realScores != null
+        ? (realScores['nilai'] as num).toDouble()
+        : (serdik['_mock_score'] as num?)?.toDouble() ?? 80.0;
+
+    final String status;
+    if (score >= 80.0) {
+      status = 'Aman';
+    } else if (score >= 70.0) {
+      status = 'Warning';
+    } else {
+      status = 'Kritis';
+    }
 
     return Scaffold(
       backgroundColor: _lightGrey,
@@ -156,7 +169,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                   ),
                   _buildMentalTrendChart(),
                   _buildActivityHistory(context),
-                  _buildMentalScores(score, status),
+                  _buildMentalScores(noSerdik, score, status),
                 ],
               ),
             ),
@@ -176,6 +189,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
   ) {
     final Color statusColor;
     final IconData statusIcon;
+    final String? senatRole = SerdikSenatRoles.getRole(noSerdik);
     if (status == 'Aman') {
       statusColor = const Color(0xFF2E7D32);
       statusIcon = Icons.check_circle_rounded;
@@ -239,32 +253,79 @@ class PatunMentalDetailScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: AppDimensions.sm),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Icon(statusIcon, size: 12, color: statusColor),
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusMd,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(statusIcon, size: 12, color: statusColor),
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusMd,
+                            ),
+                          ),
+                          child: Text(
+                            status.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontXs,
+                              fontWeight: FontWeight.w800,
+                              color: statusColor,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        status.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontXs,
-                          fontWeight: FontWeight.w800,
-                          color: statusColor,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      ],
                     ),
+                    if (senatRole != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(
+                            0xFF1A237E,
+                          ).withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                          border: Border.all(
+                            color: const Color(
+                              0xFF1A237E,
+                            ).withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 10,
+                              color: Color(0xFF1A237E),
+                            ),
+                            const SizedBox(width: 3),
+                            Text(
+                              senatRole,
+                              style: const TextStyle(
+                                fontSize: AppDimensions.fontXs,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1A237E),
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -292,7 +353,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  score > 0 ? score.toStringAsFixed(1) : '-',
+                  score > 0 ? score.toStringAsFixed(2) : '-',
                   style: TextStyle(
                     fontSize: AppDimensions.fontXxl,
                     fontWeight: FontWeight.w900,
@@ -836,13 +897,32 @@ class PatunMentalDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMentalScores(double baseScore, String status) {
+  Widget _buildMentalScores(String noSerdik, double baseScore, String status) {
+    final scores = SerdikMentalScores.getScores(noSerdik);
     final double base = baseScore == 0 ? 0.0 : baseScore;
 
-    final double sosiometri = base;
-    final double kedisiplinan = (base + 0.5).clamp(0, 100);
-    final double perilaku = (base - 0.2).clamp(0, 100);
-    const double kehadiran = 100.0;
+    final double moral = scores != null
+        ? (scores['moral'] as num).toDouble()
+        : (base + 1.2).clamp(0, 100);
+    final double disiplin = scores != null
+        ? (scores['disiplin'] as num).toDouble()
+        : (base + 0.5).clamp(0, 100);
+    final double kepemimpinan = scores != null
+        ? (scores['kepemimpinan'] as num).toDouble()
+        : (base - 0.2).clamp(0, 100);
+    final double pengendalianDiri = scores != null
+        ? (scores['pengendalian_diri'] as num).toDouble()
+        : (base + 1.5).clamp(0, 100);
+    final double penampilan = scores != null
+        ? (scores['penampilan'] as num).toDouble()
+        : (base - 1.0).clamp(0, 100);
+    final double sosiometriAwal = scores != null
+        ? (scores['sosiometri_awal'] as num).toDouble()
+        : (base - 2).clamp(0, 100);
+    final double sosiometriAkhir = scores != null
+        ? (scores['sosiometri_akhir'] as num).toDouble()
+        : (base + 2).clamp(0, 100);
+    final double sosiometri = (sosiometriAwal + sosiometriAkhir) / 2;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -884,23 +964,19 @@ class PatunMentalDetailScreen extends StatelessWidget {
               ],
             ),
           ),
-          _buildScoreGroup('Sosiometri', '30%', sosiometri, [
-            _buildSubScoreItem('Penilaian Rekan Sejawat', sosiometri),
-          ]),
+          _buildScoreGroup('Moral', '20%', moral, []),
           const SizedBox(height: AppDimensions.sm),
-          _buildScoreGroup('Kedisiplinan', '30%', kedisiplinan, [
-            _buildSubScoreItem('Kepatuhan Tata Tertib', kedisiplinan),
-            _buildSubScoreItem('Ketepatan Waktu', kedisiplinan),
-          ]),
+          _buildScoreGroup('Disiplin', '15%', disiplin, []),
           const SizedBox(height: AppDimensions.sm),
-          _buildScoreGroup('Perilaku & Etika', '25%', perilaku, [
-            _buildSubScoreItem('Sikap Terhadap Pengasuh', perilaku),
-            _buildSubScoreItem('Etika Pergaulan', perilaku),
-          ]),
+          _buildScoreGroup('Kepemimpinan', '20%', kepemimpinan, []),
           const SizedBox(height: AppDimensions.sm),
-          _buildScoreGroup('Kehadiran', '15%', kehadiran, [
-            _buildSubScoreItem('Absensi Apel', kehadiran),
-            _buildSubScoreItem('Kehadiran Kelas', kehadiran),
+          _buildScoreGroup('Pengendalian Diri', '15%', pengendalianDiri, []),
+          const SizedBox(height: AppDimensions.sm),
+          _buildScoreGroup('Penampilan', '15%', penampilan, []),
+          const SizedBox(height: AppDimensions.sm),
+          _buildScoreGroup('Sosiometri', '15%', sosiometri, [
+            _buildSubScoreItem('Sosiometri Awal', sosiometriAwal),
+            _buildSubScoreItem('Sosiometri Akhir', sosiometriAkhir),
           ]),
           const SizedBox(height: AppDimensions.lg),
           _buildRecommendationCard(baseScore, status),
@@ -950,26 +1026,30 @@ class PatunMentalDetailScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _primaryNavy.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
-                  ),
-                  child: Text(
-                    weight,
-                    style: const TextStyle(
-                      fontSize: AppDimensions.fontXs,
-                      fontWeight: FontWeight.w800,
-                      color: _primaryNavy,
-                      letterSpacing: 0.3,
+                if (weight.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _primaryNavy.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusSm,
+                      ),
+                    ),
+                    child: Text(
+                      weight,
+                      style: const TextStyle(
+                        fontSize: AppDimensions.fontXs,
+                        fontWeight: FontWeight.w800,
+                        color: _primaryNavy,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppDimensions.sm),
+                  const SizedBox(width: AppDimensions.sm),
+                ],
                 Expanded(
                   child: Text(
                     title,
@@ -994,7 +1074,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
                   child: Text(
-                    score > 0 ? score.toStringAsFixed(1) : '-',
+                    score > 0 ? score.toStringAsFixed(2) : '-',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: AppDimensions.fontMd,
@@ -1006,18 +1086,19 @@ class PatunMentalDetailScreen extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppDimensions.md,
-              AppDimensions.sm,
-              AppDimensions.md,
-              AppDimensions.sm,
+          if (children.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppDimensions.md,
+                AppDimensions.sm,
+                AppDimensions.md,
+                AppDimensions.sm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: children,
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: children,
-            ),
-          ),
         ],
       ),
     );
@@ -1056,7 +1137,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              score > 0 ? score.toStringAsFixed(1) : '-',
+              score > 0 ? score.toStringAsFixed(2) : '-',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppDimensions.fontXs + 1,

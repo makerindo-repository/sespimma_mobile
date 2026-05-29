@@ -74,7 +74,7 @@ class EvidenceBottomSheet {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    isReward ? AppIcons.medalFill : AppIcons.warningCircleFill,
+                    isReward ? AppIcons.thumbUp : AppIcons.thumbDown,
                     color: mainColor,
                     size: 28,
                   ),

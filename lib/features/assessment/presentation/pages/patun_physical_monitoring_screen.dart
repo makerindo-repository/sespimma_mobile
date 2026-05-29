@@ -8,18 +8,18 @@ import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
-import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_academic_detail_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_physical_detail_screen.dart';
 
-class PatunAcademicMonitoringScreen extends StatefulWidget {
-  const PatunAcademicMonitoringScreen({super.key});
+class PatunPhysicalMonitoringScreen extends StatefulWidget {
+  const PatunPhysicalMonitoringScreen({super.key});
 
   @override
-  State<PatunAcademicMonitoringScreen> createState() =>
-      _PatunAcademicMonitoringScreenState();
+  State<PatunPhysicalMonitoringScreen> createState() =>
+      _PatunPhysicalMonitoringScreenState();
 }
 
-class _PatunAcademicMonitoringScreenState
-    extends State<PatunAcademicMonitoringScreen> {
+class _PatunPhysicalMonitoringScreenState
+    extends State<PatunPhysicalMonitoringScreen> {
   static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
@@ -45,7 +45,7 @@ class _PatunAcademicMonitoringScreenState
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Monitoring Akademik',
+          'Monitoring Jasmani',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -69,10 +69,10 @@ class _PatunAcademicMonitoringScreenState
 
               double score;
               String status;
-              if (index % 5 == 0) {
+              if (index % 6 == 0) {
                 status = 'Kritis';
                 score = 65.0 + (index % 5);
-              } else if (index % 3 == 0) {
+              } else if (index % 4 == 0) {
                 status = 'Warning';
                 score = 70.0 + (index % 3);
               } else {
@@ -371,7 +371,7 @@ class _PatunAcademicMonitoringScreenState
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => PatunAcademicDetailScreen(serdik: serdik),
+                builder: (_) => PatunPhysicalDetailScreen(serdik: serdik),
               ),
             );
           },

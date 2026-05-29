@@ -129,6 +129,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: () {
           Navigator.pushNamed(context, '/buat-tugas').then((_) {
             if (mounted) setState(() {});

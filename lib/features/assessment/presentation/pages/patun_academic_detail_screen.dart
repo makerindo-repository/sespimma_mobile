@@ -171,7 +171,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
               border: Border.all(color: statusColor.withValues(alpha: 0.3)),
             ),
             child: Text(
-              score > 0 ? score.toStringAsFixed(1) : '-',
+              score > 0 ? score.toStringAsFixed(2) : '-',
               style: TextStyle(
                 fontSize: AppDimensions.fontXxl,
                 fontWeight: FontWeight.w900,
@@ -223,7 +223,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
         {
           'title': 'Peringatan Kritis Akademik',
           'desc':
-              'Nilai Ujian Esai Manajemen (${score.toStringAsFixed(1)}). Segera laksanakan penugasan ulang.',
+              'Nilai Ujian Esai Manajemen (${score.toStringAsFixed(2)}). Segera laksanakan penugasan ulang.',
           'sender': 'Sistem Akademik',
           'time': formatTimeStr(d1),
           'dateStr': getDateStr(d1),
@@ -248,7 +248,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
         {
           'title': 'Peringatan Sistem',
           'desc':
-              'Nilai Akademik (${score.toStringAsFixed(1)}) mendekati batas bawah. Perlu pemantauan.',
+              'Nilai Akademik (${score.toStringAsFixed(2)}) mendekati batas bawah. Perlu pemantauan.',
           'sender': 'Sistem Akademik',
           'time': formatTimeStr(d2),
           'dateStr': getDateStr(d2),
@@ -745,7 +745,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
                   child: Text(
-                    score > 0 ? score.toStringAsFixed(1) : '-',
+                    score > 0 ? score.toStringAsFixed(2) : '-',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: AppDimensions.fontMd,
@@ -848,7 +848,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
                   child: Text(
-                    score > 0 ? score.toStringAsFixed(1) : '-',
+                    score > 0 ? score.toStringAsFixed(2) : '-',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: AppDimensions.fontSm,
@@ -920,7 +920,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
             ),
             child: Text(
-              score > 0 ? score.toStringAsFixed(1) : '-',
+              score > 0 ? score.toStringAsFixed(2) : '-',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppDimensions.fontSm,
@@ -983,7 +983,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              score > 0 ? score.toStringAsFixed(1) : '-',
+              score > 0 ? score.toStringAsFixed(2) : '-',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppDimensions.fontXs + 1,

@@ -10,6 +10,7 @@ import '../../features/assignment/presentation/pages/gadik_task_list_screen.dart
 import '../../features/assessment/presentation/pages/gadik_assessment_screen.dart';
 import '../../features/assessment/presentation/pages/patun_academic_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/patun_mental_monitoring_screen.dart';
+import '../../features/assessment/presentation/pages/patun_physical_monitoring_screen.dart';
 import '../../features/leadership_report/presentation/pages/leadership_report_screen.dart';
 import '../../features/leadership_ews/presentation/pages/ews_screen.dart';
 import '../../features/leadership_dashboard/presentation/pages/pimpinan_home_screen.dart';
@@ -71,6 +72,12 @@ List<NavItem> getNavItemsByRole(String roleId) {
           icon: AppIcons.shieldCheck,
           activeIcon: AppIcons.shieldCheckFill,
           screen: PatunMentalMonitoringScreen(),
+        ),
+        NavItem(
+          label: 'Jasmani',
+          icon: AppIcons.barbellFill,
+          activeIcon: AppIcons.barbellFill,
+          screen: PatunPhysicalMonitoringScreen(),
         ),
         NavItem(
           label: 'Penilaian',

@@ -22,7 +22,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
   double _clampScore(double val) {
     if (val > 100.0) return 100.0;
     if (val < 0.0) return 0.0;
-    return double.parse(val.toStringAsFixed(1));
+    return double.parse(val.toStringAsFixed(2));
   }
 
   @override
@@ -344,7 +344,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          score.toStringAsFixed(1),
+          score.toStringAsFixed(2),
           style: const TextStyle(
             fontSize: AppDimensions.fontXl,
             fontWeight: FontWeight.w900,
@@ -400,7 +400,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
             ),
           ),
           Text(
-            score.toStringAsFixed(1),
+            score.toStringAsFixed(2),
             style: const TextStyle(
               fontSize: AppDimensions.fontDefault,
               fontWeight: FontWeight.w800,

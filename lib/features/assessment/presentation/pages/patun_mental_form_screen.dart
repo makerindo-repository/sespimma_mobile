@@ -145,33 +145,36 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
     required VoidCallback onTap,
     Color? color,
   }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-      leading: Container(
-        padding: const EdgeInsets.all(AppDimensions.md),
-        decoration: BoxDecoration(
-          color: (color ?? _primaryNavy).withValues(alpha: 0.1),
-          shape: BoxShape.circle,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(AppDimensions.md),
+          decoration: BoxDecoration(
+            color: (color ?? _primaryNavy).withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: color ?? _primaryNavy,
+            size: AppDimensions.iconLg,
+          ),
         ),
-        child: Icon(
-          icon,
-          color: color ?? _primaryNavy,
-          size: AppDimensions.iconLg,
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: color ?? _primaryNavy,
+            fontSize: AppDimensions.fontLg + 1,
+          ),
         ),
+        trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          color: color ?? _primaryNavy,
-          fontSize: AppDimensions.fontLg + 1,
-        ),
-      ),
-      trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
     );
   }
 
@@ -896,30 +899,33 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
                     itemCount: filteredList.length,
                     itemBuilder: (context, index) {
                       final serdik = filteredList[index];
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppDimensions.xl,
-                          vertical: 4,
-                        ),
-                        leading: _buildAvatar(serdik['profile_photo']),
-                        title: Text(
-                          serdik['nama_lengkap'] ?? '-',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            color: _primaryNavy,
+                      return Material(
+                        color: Colors.transparent,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: AppDimensions.xl,
+                            vertical: 4,
                           ),
-                        ),
-                        subtitle: Text(
-                          '${serdik['pangkat']} • ${serdik['no_serdik']}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.blueGrey.shade400,
+                          leading: _buildAvatar(serdik['profile_photo']),
+                          title: Text(
+                            serdik['nama_lengkap'] ?? '-',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: _primaryNavy,
+                            ),
                           ),
+                          subtitle: Text(
+                            '${serdik['pangkat']} • ${serdik['no_serdik']}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blueGrey.shade400,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() => _selectedSerdik = serdik);
+                            Navigator.pop(context);
+                          },
                         ),
-                        onTap: () {
-                          setState(() => _selectedSerdik = serdik);
-                          Navigator.pop(context);
-                        },
                       );
                     },
                   ),

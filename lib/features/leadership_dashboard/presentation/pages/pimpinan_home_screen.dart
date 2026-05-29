@@ -376,7 +376,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                 ),
                 _buildStatTile(
                   'Rata-rata',
-                  avgScore.toStringAsFixed(1),
+                  avgScore.toStringAsFixed(2),
                   AppIcons.chartLineUpFill,
                   _successGreen,
                 ),
@@ -514,7 +514,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        avgScore.toStringAsFixed(1),
+                        avgScore.toStringAsFixed(2),
                         style: const TextStyle(
                           fontSize: AppDimensions.fontHuge + 2,
                           fontWeight: FontWeight.w900,
@@ -541,17 +541,17 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
             children: [
               _buildCenteredLegendItem(
                 'Akademik (70%)',
-                akademik.toStringAsFixed(1),
+                akademik.toStringAsFixed(2),
                 _academicBlue,
               ),
               _buildCenteredLegendItem(
                 'Mental (20%)',
-                mental.toStringAsFixed(1),
+                mental.toStringAsFixed(2),
                 _mentalOrange,
               ),
               _buildCenteredLegendItem(
                 'Jasmani (10%)',
-                jasmani.toStringAsFixed(1),
+                jasmani.toStringAsFixed(2),
                 _physicalGreen,
               ),
             ],
@@ -612,7 +612,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
       multiplier = 0.2;
     }
 
-    return '(Kontribusi: ${(double.parse(value) * multiplier).toStringAsFixed(1)})';
+    return '(Kontribusi: ${(double.parse(value) * multiplier).toStringAsFixed(2)})';
   }
 
   Widget _buildBarChartSection() {
@@ -667,7 +667,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                 ),
               ),
               Text(
-                data.rataRataNilai.toStringAsFixed(1),
+                data.rataRataNilai.toStringAsFixed(2),
                 style: TextStyle(
                   fontSize: AppDimensions.fontMd,
                   fontWeight: FontWeight.w800,

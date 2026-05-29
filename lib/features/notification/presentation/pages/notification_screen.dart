@@ -693,9 +693,9 @@ class _AnimatedNotificationTile extends StatelessWidget {
   IconData _getIcon() {
     switch (notification['type']) {
       case 'reward':
-        return AppIcons.medalFill;
+        return AppIcons.thumbUp;
       case 'punishment':
-        return AppIcons.warningCircleFill;
+        return AppIcons.thumbDown;
       case 'task_dinilai':
         return AppIcons.checkCircleFill;
       case 'task_sedang_dinilai':

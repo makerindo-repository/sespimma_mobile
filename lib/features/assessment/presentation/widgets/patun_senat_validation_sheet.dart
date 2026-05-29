@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 
 class PatunSenatValidationSheet extends StatefulWidget {
   final List<Map<String, dynamic>> pokjarMembers;
@@ -24,7 +25,10 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
   void initState() {
     super.initState();
 
-    _senatMembers = widget.pokjarMembers.take(3).toList();
+    _senatMembers = SerdikSenatRoles.filterSenatMembers(widget.pokjarMembers);
+    if (_senatMembers.isEmpty) {
+      _senatMembers = widget.pokjarMembers.take(3).toList();
+    }
     for (var member in _senatMembers) {
       _approvalStatus[member['no_serdik']] = true;
     }
@@ -71,9 +75,7 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
                 final member = _senatMembers[index];
                 final id = member['no_serdik'] as String;
                 final isApproved = _approvalStatus[id] ?? false;
-
-                final roles = ['Ketua Senat', 'Sekretaris', 'Bendahara'];
-                final role = roles[index % roles.length];
+                final role = SerdikSenatRoles.getRole(id) ?? 'Anggota Senat';
 
                 return _buildSenatCard(member, role, isApproved, id);
               },
@@ -289,7 +291,7 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
             elevation: 0,
           ),
           child: const Text(
-            'APPROVE',
+            'SETUJU',
             style: TextStyle(
               fontSize: AppDimensions.fontLg,
               fontWeight: FontWeight.w800,

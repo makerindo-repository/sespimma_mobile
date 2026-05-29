@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 
 class ScoreLineChart extends StatelessWidget {
   final double nilaiAkademik;
   final double nilaiMental;
   final double nilaiJasmani;
   final String selectedCategory;
+  final String noSerdik;
 
   const ScoreLineChart({
     super.key,
@@ -15,6 +17,7 @@ class ScoreLineChart extends StatelessWidget {
     required this.nilaiMental,
     required this.nilaiJasmani,
     required this.selectedCategory,
+    required this.noSerdik,
   });
 
   @override
@@ -129,7 +132,9 @@ class ScoreLineChart extends StatelessWidget {
               ),
               const SizedBox(height: AppDimensions.xs / 2),
               Text(
-                'Evaluasi Komprehensif Periode I - IV',
+                selectedCategory == 'Mental Kepribadian'
+                    ? 'Evaluasi Mingguan Terkini'
+                    : 'Evaluasi Komprehensif Periode I - IV',
                 style: TextStyle(
                   fontSize: AppDimensions.fontXs + 1,
                   fontWeight: FontWeight.w600,
@@ -208,10 +213,17 @@ class ScoreLineChart extends StatelessWidget {
                   fontSize: AppDimensions.fontSm,
                 );
                 String text = '';
-                if (value == 0.0) text = 'Periode I';
-                if (value == 1.0) text = 'Periode II';
-                if (value == 2.0) text = 'Periode III';
-                if (value == 3.0) text = 'Periode IV';
+                if (selectedCategory == 'Mental Kepribadian') {
+                  if (value == 0.0) text = 'W1';
+                  if (value == 1.0) text = 'W2';
+                  if (value == 2.0) text = 'W3';
+                  if (value == 3.0) text = 'W4';
+                } else {
+                  if (value == 0.0) text = 'Periode I';
+                  if (value == 1.0) text = 'Periode II';
+                  if (value == 2.0) text = 'Periode III';
+                  if (value == 3.0) text = 'Periode IV';
+                }
                 if (text.isEmpty) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 10.0),
@@ -253,7 +265,7 @@ class ScoreLineChart extends StatelessWidget {
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 return LineTooltipItem(
-                  '${_resolveLabel(spot.barIndex)} - ${spot.y.toStringAsFixed(1)}',
+                  '${_resolveLabel(spot.barIndex)} - ${spot.y.toStringAsFixed(2)}',
                   const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
@@ -327,6 +339,15 @@ class ScoreLineChart extends StatelessWidget {
           FlSpot(3, finalScore),
         ];
       } else if (cat == 'Mental Kepribadian') {
+        final scores = SerdikMentalScores.getScores(noSerdik);
+        if (scores != null) {
+          return [
+            FlSpot(0, (scores['moral'] as num).toDouble()),
+            FlSpot(1, (scores['disiplin'] as num).toDouble()),
+            FlSpot(2, (scores['kepemimpinan'] as num).toDouble()),
+            FlSpot(3, (scores['nilai'] as num).toDouble()),
+          ];
+        }
         return [
           FlSpot(0, (finalScore - 3.8).clamp(0.0, 100.0)),
           FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)),

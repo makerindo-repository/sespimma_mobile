@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/features/auth/domain/entities/user_entity.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 
 class DetailedCompetencies extends StatelessWidget {
   final String category;
@@ -25,38 +26,15 @@ class DetailedCompetencies extends StatelessWidget {
     }
 
     if (category == 'Mental Kepribadian') {
-      double base = baseScore == 0 ? 0.0 : baseScore;
+      final scores = SerdikMentalScores.getScores(user.noSerdik);
 
-      double moralJujur = base == 0 ? 0 : (base - 1.0).clamp(0, 100);
-      double moralAgama = base == 0 ? 0 : (base + 0.25).clamp(0, 100);
-      double moralTanahAir = base == 0 ? 0 : (base + 1.2).clamp(0, 100);
-      double moralBerkorban = base == 0 ? 0 : (base + 0.8).clamp(0, 100);
-      double moralPersatuan = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-      double moral =
-          (moralJujur +
-              moralAgama +
-              moralTanahAir +
-              moralBerkorban +
-              moralPersatuan) /
-          5;
-
-      double disWaktu = base == 0 ? 0 : (base - 0.5).clamp(0, 100);
-      double disAturan = base == 0 ? 0 : (base - 1.5).clamp(0, 100);
-      double disiplin = (disWaktu + disAturan) / 2;
-
-      double kepTampil = base == 0 ? 0 : (base + 1.8).clamp(0, 100);
-      double kepKembang = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-      double kepTanggungJawab = base == 0 ? 0 : (base + 2.0).clamp(0, 100);
-      double kepemimpinan = (kepTampil + kepKembang + kepTanggungJawab) / 3;
-
-      double kendaliEmosi = base == 0 ? 0 : (base - 0.5).clamp(0, 100);
-      double kendaliEgo = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-      double pengendalian = (kendaliEmosi + kendaliEgo) / 2;
-
-      double penSikap = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-      double penBersih = base == 0 ? 0 : (base + 2.5).clamp(0, 100);
-      double penampilan = (penSikap + penBersih) / 2;
-
+      double moral = scores?['moral']?.toDouble() ?? 0.0;
+      double disiplin = scores?['disiplin']?.toDouble() ?? 0.0;
+      double kepemimpinan = scores?['kepemimpinan']?.toDouble() ?? 0.0;
+      double pengendalian = scores?['pengendalian_diri']?.toDouble() ?? 0.0;
+      double penampilan = scores?['penampilan']?.toDouble() ?? 0.0;
+      double sosiometriAwal = scores?['sosiometri_awal']?.toDouble() ?? 0.0;
+      double sosiometriAkhir = scores?['sosiometri_akhir']?.toDouble() ?? 0.0;
       double pengamatan =
           ((moral * 20) +
               (disiplin * 15) +
@@ -64,105 +42,35 @@ class DetailedCompetencies extends StatelessWidget {
               (pengendalian * 15) +
               (penampilan * 15)) /
           85;
-
-      double sosio = base == 0 ? 0 : (base + 2.5).clamp(0, 100);
-      double ns = sosio;
+      double ns = (sosiometriAwal + sosiometriAkhir) / 2;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionTitle(title: 'Nilai Pengamatan', score: pengamatan),
-          _ExpandableCompetencyGroup(
-            title: 'Moral (20%)',
-            score: moral,
-            children: [
-              _SubCompetencyItem(title: 'Kejujuran', score: moralJujur),
-              _SubCompetencyItem(title: 'Taat Beragama', score: moralAgama),
-              _SubCompetencyItem(
-                title: 'Cinta Tanah Air',
-                score: moralTanahAir,
-              ),
-              _SubCompetencyItem(
-                title: 'Rela Berkorban',
-                score: moralBerkorban,
-              ),
-              _SubCompetencyItem(
-                title: 'Persatuan dan Kesatuan',
-                score: moralPersatuan,
-              ),
-            ],
-          ),
-          _ExpandableCompetencyGroup(
-            title: 'Disiplin (15%)',
-            score: disiplin,
-            children: [
-              _SubCompetencyItem(title: 'Tepat Waktu', score: disWaktu),
-              _SubCompetencyItem(
-                title: 'Melaksanakan Peraturan',
-                score: disAturan,
-              ),
-            ],
-          ),
-          _ExpandableCompetencyGroup(
-            title: 'Kepemimpinan (20%)',
-            score: kepemimpinan,
-            children: [
-              _SubCompetencyItem(
-                title: 'Berani Tampil atau Berpendapat',
-                score: kepTampil,
-              ),
-              _SubCompetencyItem(
-                title: 'Pengembangan Kemampuan',
-                score: kepKembang,
-              ),
-              _SubCompetencyItem(
-                title: 'Tanggung Jawab',
-                score: kepTanggungJawab,
-              ),
-            ],
-          ),
-          _ExpandableCompetencyGroup(
+          const SizedBox(height: AppDimensions.sm),
+          _SectionTitle(title: 'Nilai Pengamatan (70%)', score: pengamatan),
+          _CompetencyItem(title: 'Moral (20%)', score: moral),
+          _CompetencyItem(title: 'Disiplin (15%)', score: disiplin),
+          _CompetencyItem(title: 'Kepemimpinan (20%)', score: kepemimpinan),
+          _CompetencyItem(
             title: 'Pengendalian Diri (15%)',
             score: pengendalian,
-            children: [
-              _SubCompetencyItem(
-                title: 'Pengendalian Emosi',
-                score: kendaliEmosi,
-              ),
-              _SubCompetencyItem(
-                title: 'Pengendalian Egoisme',
-                score: kendaliEgo,
-              ),
-            ],
           ),
-          _ExpandableCompetencyGroup(
-            title: 'Penampilan (15%)',
-            score: penampilan,
-            children: [
-              _SubCompetencyItem(
-                title: 'Sikap Tampang dan Kerapihan',
-                score: penSikap,
-              ),
-              _SubCompetencyItem(
-                title: 'Kebersihan Lingkungan',
-                score: penBersih,
-              ),
-            ],
-          ),
+          _CompetencyItem(title: 'Penampilan (15%)', score: penampilan),
 
           const SizedBox(height: AppDimensions.lg),
-          _SectionTitle(title: 'Sosiometri', score: ns),
+          _SectionTitle(title: 'Sosiometri (30%)', score: ns),
           _ExpandableCompetencyGroup(
             title: 'Penilaian Sosiometri Peleton (15%)',
             score: ns,
             children: [
               _SubCompetencyItem(
                 title: 'Sosiometri Awal Pendidikan',
-                score: ns - 1.2,
+                score: sosiometriAwal,
               ),
               _SubCompetencyItem(
                 title: 'Sosiometri Akhir Pendidikan',
-                score: ns + 1.2,
+                score: sosiometriAkhir,
               ),
             ],
           ),
@@ -544,7 +452,7 @@ class _CompetencyItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  score > 0 ? score.toStringAsFixed(1) : '-',
+                  score > 0 ? score.toStringAsFixed(2) : '-',
                   style: TextStyle(
                     fontSize: AppDimensions.fontXl,
                     fontWeight: FontWeight.w800,
@@ -762,7 +670,7 @@ class _ExpandableCompetencyGroup extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  score > 0 ? score.toStringAsFixed(1) : '-',
+                  score > 0 ? score.toStringAsFixed(2) : '-',
                   style: TextStyle(
                     fontSize: AppDimensions.fontXl,
                     fontWeight: FontWeight.w800,
@@ -893,7 +801,7 @@ class _SubCompetencyItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
             ),
             child: Text(
-              score > 0 ? score.toStringAsFixed(1) : '-',
+              score > 0 ? score.toStringAsFixed(2) : '-',
               style: TextStyle(
                 fontSize: AppDimensions.fontMd,
                 fontWeight: FontWeight.w800,
@@ -997,7 +905,7 @@ class _SectionTitle extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
             ),
             child: Text(
-              score.toStringAsFixed(1),
+              score.toStringAsFixed(2),
               style: TextStyle(
                 fontSize: AppDimensions.fontMd,
                 fontWeight: FontWeight.w800,

@@ -133,11 +133,11 @@ class _NumericInputDialogSheetState extends State<NumericInputDialogSheet> {
     if (matchReport.isEmpty) return '85.0';
     final r = matchReport.first;
     if (r.rawScores.containsKey('${cat}_$ctrlIndex')) {
-      return r.rawScores['${cat}_$ctrlIndex']!.toStringAsFixed(1);
+      return r.rawScores['${cat}_$ctrlIndex']!.toStringAsFixed(2);
     }
-    if (cat == 'Jasmani') return r.physicalScore.toStringAsFixed(1);
-    if (cat == 'Mental Kepribadian') return r.mentalScore.toStringAsFixed(1);
-    return r.academicScore.toStringAsFixed(1);
+    if (cat == 'Jasmani') return r.physicalScore.toStringAsFixed(2);
+    if (cat == 'Mental Kepribadian') return r.mentalScore.toStringAsFixed(2);
+    return r.academicScore.toStringAsFixed(2);
   }
 
   void _calculateAverage() {

@@ -860,7 +860,7 @@ class _ConfirmSelectionDialog extends StatefulWidget {
 
 class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
   String? _selectedImagePath;
-  late final TextEditingController _noteController;
+  final TextEditingController _justifikasiController = TextEditingController();
 
   static const Color _primaryNavy = Color(0xFF001C40);
   static const Color _successGreen = Color(0xFF2E7D32);
@@ -869,12 +869,11 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
   @override
   void initState() {
     super.initState();
-    _noteController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _noteController.dispose();
+    _justifikasiController.dispose();
     super.dispose();
   }
 
@@ -1047,7 +1046,7 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
             ),
             const SizedBox(height: AppDimensions.md),
             Text(
-              'Catatan Justifikasi Tambahan',
+              'Keterangan Justifikasi',
               style: TextStyle(
                 fontSize: AppDimensions.fontDefault,
                 fontWeight: FontWeight.w600,
@@ -1062,20 +1061,22 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
                 border: Border.all(color: Colors.blueGrey.shade200),
               ),
               child: TextField(
-                controller: _noteController,
-                maxLines: 3,
+                controller: _justifikasiController,
+                maxLines: 4,
+                minLines: 3,
+                textInputAction: TextInputAction.newline,
                 style: const TextStyle(
                   fontSize: AppDimensions.fontDefault,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w500,
                   color: _primaryNavy,
                 ),
                 decoration: InputDecoration(
                   hintText:
-                      'Masukkan detail kejadian, waktu, lokasi, atau kronologi singkat...',
+                      'Deskripsikan kejadian, waktu, lokasi, atau kronologi singkat...',
                   hintStyle: TextStyle(
                     fontSize: AppDimensions.fontMd,
                     color: Colors.blueGrey.shade400,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.all(AppDimensions.md),
@@ -1130,7 +1131,7 @@ class _ConfirmSelectionDialogState extends State<_ConfirmSelectionDialog> {
                     'dateTime': DateTime.now(),
                     'points': pointStr,
                     'type': typeString,
-                    'note': _noteController.text,
+                    'note': _justifikasiController.text.trim(),
                   });
 
                   Navigator.pop(context);

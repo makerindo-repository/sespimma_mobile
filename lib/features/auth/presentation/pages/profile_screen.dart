@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../domain/entities/user_entity.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
+import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -211,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           const SizedBox(height: AppDimensions.sm),
           Text(
             user.roleId == 'siswa'
-                ? 'NO. SERDIK: ${user.noSerdik}'
+                ? 'NOSIS: ${user.noSerdik}'
                 : '${user.nrp.length > 10 ? 'NIP' : 'NRP'}: ${user.nrp}',
             style: TextStyle(
               color: Colors.blueGrey.shade200,
@@ -317,9 +318,12 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildFormalDataCard(UserEntity user) {
     final isSiswa = user.roleId == 'siswa';
+    final senatRole = isSiswa ? SerdikSenatRoles.getRole(user.noSerdik) : null;
 
     List<Widget> rows = isSiswa
         ? [
+            if (senatRole != null)
+              _buildDetailRow(AppIcons.starFill, 'JABATAN SENAT', senatRole),
             _buildDetailRow(AppIcons.medal, 'ANGKATAN', user.angkatan),
             _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
             _buildDetailRow(
@@ -388,6 +392,11 @@ class _ProfileScreenState extends State<ProfileScreen>
               AppIcons.medal,
               'PANGKAT',
               _getFullPangkat(user.pangkat),
+            ),
+            _buildDetailRow(
+              AppIcons.starFill,
+              'JABATAN SENAT',
+              user.jabatanSenat,
             ),
             _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
             _buildDetailRow(AppIcons.buildingsFill, 'SATKER', user.satker),

@@ -184,6 +184,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: null,
         onPressed: _contactAdminWA,
         backgroundColor: _waColor,
         elevation: 4,

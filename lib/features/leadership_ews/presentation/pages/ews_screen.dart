@@ -525,7 +525,7 @@ class _EwsScreenState extends State<EwsScreen>
                       Expanded(
                         child: _buildMetricItem(
                           'Rerata Nilai',
-                          serdik.averageScore.toStringAsFixed(1),
+                          serdik.averageScore.toStringAsFixed(2),
                           statusColor,
                         ),
                       ),

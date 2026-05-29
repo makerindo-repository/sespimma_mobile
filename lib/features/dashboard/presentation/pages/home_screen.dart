@@ -246,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   child: Text(
                     user.roleId == 'siswa'
-                        ? 'NO. SERDIK: ${user.noSerdik}'
+                        ? 'NOSIS: ${user.noSerdik}'
                         : 'NRP: ${user.nrp}',
                     style: const TextStyle(
                       color: Colors.white,
@@ -369,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen>
                     points: _rewardPoints > 0
                         ? '+${_rewardPoints.toStringAsFixed(2)}'
                         : '0',
-                    icon: AppIcons.medalFill,
+                    icon: AppIcons.thumbUp,
                     color: _successGreen,
                   ),
                 ),
@@ -381,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen>
                     points: _punishmentPoints != 0
                         ? _punishmentPoints.toStringAsFixed(2)
                         : '0',
-                    icon: AppIcons.warningCircleFill,
+                    icon: AppIcons.thumbDown,
                     color: _dangerRed,
                   ),
                 ),
@@ -856,8 +856,8 @@ class _HomeScreenState extends State<HomeScreen>
                       subtitle: item['subtitle'] as String,
                       time: item['timeRaw'] as String? ?? '',
                       points: item['points'] as String,
-                      isReward: item['type'] == 'reward',
-                      isTask: item['type'] == 'task',
+                      isReward: (item['isReward'] as bool?) ?? false,
+                      isTask: (item['isTask'] as bool?) ?? false,
                     );
                   },
                 ),
@@ -992,7 +992,7 @@ class _AnimatedCircularScore extends StatelessWidget {
                   ),
                   Center(
                     child: Text(
-                      value > 0 ? (animValue * 100).toStringAsFixed(1) : '-',
+                      value > 0 ? (animValue * 100).toStringAsFixed(2) : '-',
                       style: TextStyle(
                         fontSize: AppDimensions.fontLg,
                         fontWeight: FontWeight.w800,
@@ -1044,7 +1044,7 @@ class _ActivityTile extends StatelessWidget {
 
     final IconData iconData = isTask
         ? AppIcons.clipboardTextFill
-        : (isReward ? AppIcons.medalFill : AppIcons.warningCircleFill);
+        : (isReward ? AppIcons.thumbUp : AppIcons.thumbDown);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

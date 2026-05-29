@@ -3,6 +3,7 @@ import '../models/login_response.dart';
 import 'auth_remote_data_source.dart';
 import 'serdik_real_data.dart';
 import 'patun_real_data.dart';
+import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
   @override
@@ -35,7 +36,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tanggalLahir: serdikRecord['tanggal_lahir'] ?? '1990-01-01',
         noSerdik: serdikRecord['no_serdik'] ?? '-',
         nik: serdikRecord['nik'] ?? '-',
-        jabatanSenat: '-',
+        jabatanSenat:
+            SerdikSenatRoles.getRole(serdikRecord['no_serdik'] ?? '') ?? '-',
         tempatLahir: serdikRecord['tempat_lahir'] ?? '-',
         noHandphone: serdikRecord['no_handphone'] ?? '-',
         pendidikanTerakhir: serdikRecord['pendidikan_terakhir'] ?? '-',
