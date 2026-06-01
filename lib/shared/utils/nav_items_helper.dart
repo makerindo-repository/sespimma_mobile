@@ -12,6 +12,7 @@ import '../../features/assessment/presentation/pages/patun_academic_monitoring_s
 import '../../features/assessment/presentation/pages/patun_mental_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/patun_physical_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/korsis_inbox_screen.dart';
+import '../../features/gadik_assignment/presentation/pages/gadik_assignment_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/korsis_mental_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/korsis_sociometry_monitoring_screen.dart';
 import '../../features/leadership_report/presentation/pages/leadership_report_screen.dart';
@@ -64,6 +65,20 @@ List<NavItem> getNavItemsByRole(String roleId) {
         ),
       ];
     case 'pengajar':
+      return const [
+        NavItem(
+          label: 'Tugas',
+          icon: AppIcons.clipboardText,
+          activeIcon: AppIcons.clipboardTextFill,
+          screen: GadikAssignmentMonitoringScreen(),
+        ),
+        NavItem(
+          label: 'Profil',
+          icon: AppIcons.user,
+          activeIcon: AppIcons.userFill,
+          screen: ProfileScreen(),
+        ),
+      ];
     case 'pengajar_patun':
       return const [
         NavItem(

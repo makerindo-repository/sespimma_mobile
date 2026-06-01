@@ -4,6 +4,7 @@ import 'auth_remote_data_source.dart';
 import 'serdik_real_data.dart';
 import 'patun_real_data.dart';
 import 'korsis_real_data.dart';
+import 'gadik_real_data.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
@@ -50,6 +51,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: serdikRecord['tahun_diktuk']?.toString() ?? '-',
         personel: (serdikRecord['is_personel'] == true) ? 'Ya' : 'Tidak',
         satker: serdikRecord['satker'] ?? '-',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: true,
         nilaiAkademik: 82.5,
         nilaiMental: 85.0,
@@ -87,6 +90,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '2010',
         personel: 'Ya',
         satker: 'Polrestabes Bandung',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 65.0,
         nilaiMental: 68.0,
@@ -128,6 +133,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '-',
         personel: 'Ya',
         satker: 'Korsis Sespimma',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
@@ -165,6 +172,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '-',
         personel: 'Ya',
         satker: 'Sespimma Polri',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
@@ -202,6 +211,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '-',
         personel: 'Ya',
         satker: 'Sespimma Polri',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
@@ -239,6 +250,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '-',
         personel: 'Tidak',
         satker: 'Sespimma Polri',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
@@ -276,6 +289,8 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '-',
         personel: 'Ya',
         satker: 'Sespim Lemdiklat Polri',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
@@ -317,12 +332,57 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         tahunDiktuk: '-',
         personel: 'Ya',
         satker: '-',
+        eselon: '-',
+        golongan: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
         accessToken: 'dummy_token_korsis_real',
         refreshToken: 'dummy_refresh_korsis_real',
+      );
+    }
+
+    final gadikRecord = GadikRealData.records
+        .where((r) => r['nrp_nip'] == request.nrp)
+        .firstOrNull;
+
+    if (gadikRecord != null) {
+      return LoginResponse(
+        userId: 'USR-${gadikRecord['nrp_nip']}',
+        name: gadikRecord['nama'] ?? '-',
+        roleId: 'pengajar',
+        pokjar: '-',
+        nrp: gadikRecord['nrp_nip'] ?? '-',
+        nosis: '-',
+        pangkat: gadikRecord['pangkat'] ?? '-',
+        angkatan: '-',
+        agama: gadikRecord['agama'] ?? '-',
+        jenisKelamin: '-',
+        jabatan: gadikRecord['jabatan_struktural'] ?? '-',
+        tanggalLahir: '-',
+        noSerdik: '-',
+        nik: '-',
+        jabatanSenat: '-',
+        tempatLahir: '-',
+        noHandphone: '-',
+        pendidikanTerakhir: '-',
+        alamatLengkap: '-',
+        email: '-',
+        noTelepon: '-',
+        kelompok: '-',
+        diktukAwal: '-',
+        tahunDiktuk: '-',
+        personel: 'Ya',
+        satker: 'Sespimma',
+        eselon: gadikRecord['eselon'] ?? '-',
+        golongan: gadikRecord['golongan'] ?? '-',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_gadik_real',
+        refreshToken: 'dummy_refresh_gadik_real',
       );
     }
 

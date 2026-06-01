@@ -321,87 +321,97 @@ class _ProfileScreenState extends State<ProfileScreen>
     final isSiswa = user.roleId == 'siswa';
     final senatRole = isSiswa ? SerdikSenatRoles.getRole(user.noSerdik) : null;
 
-    List<Widget> rows = isSiswa
-        ? [
-            if (senatRole != null)
-              _buildDetailRow(AppIcons.starFill, 'JABATAN SENAT', senatRole),
-            _buildDetailRow(AppIcons.medal, 'ANGKATAN', user.angkatan),
-            _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
-            _buildDetailRow(
-              AppIcons.identificationCard,
-              'JENIS KELAMIN',
-              user.jenisKelamin,
-            ),
-            _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
-          ]
-        : [
-            _buildDetailRow(
-              AppIcons.identificationCard,
-              'NO SERDIK',
-              user.noSerdik,
-            ),
-            _buildDetailRow(AppIcons.identificationCard, 'NIK', user.nik),
-            _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
-            _buildDetailRow(AppIcons.mapPin, 'TEMPAT LAHIR', user.tempatLahir),
-            _buildDetailRow(
-              AppIcons.calendarBlank,
-              'TANGGAL LAHIR',
-              user.tanggalLahir ?? '-',
-            ),
-            _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
-            _buildDetailRow(
-              AppIcons.identificationCard,
-              'JENIS KELAMIN',
-              user.jenisKelamin,
-            ),
-            _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
-            _buildDetailRow(
-              AppIcons.deviceMobileSpeakerFill,
-              'NO HANDPHONE',
-              user.noHandphone,
-            ),
-            _buildDetailRow(
-              AppIcons.bookOpen,
-              'PENDIDIKAN TERAKHIR',
-              user.pendidikanTerakhir,
-            ),
-            _buildDetailRow(
-              AppIcons.mapPin,
-              'ALAMAT LENGKAP',
-              user.alamatLengkap,
-            ),
-            _buildDetailRow(AppIcons.paperPlaneTiltFill, 'EMAIL', user.email),
-            _buildDetailRow(
-              AppIcons.deviceMobileSpeakerFill,
-              'NO TELEPON',
-              user.noTelepon,
-            ),
-            _buildDetailRow(AppIcons.usersFill, 'KELOMPOK', user.pokjar),
-            _buildDetailRow(AppIcons.bookOpen, 'DIKTUK AWAL', user.diktukAwal),
-            _buildDetailRow(
-              AppIcons.calendarBlank,
-              'TAHUN DIKTUK',
-              user.tahunDiktuk,
-            ),
-            _buildDetailRow(
-              AppIcons.user,
-              'PERSONEL (YA/TIDAK)',
-              user.personel,
-            ),
-            _buildDetailRow(AppIcons.identificationCard, 'NRP', user.nrp),
-            _buildDetailRow(
-              AppIcons.medal,
-              'PANGKAT',
-              _getFullPangkat(user.pangkat),
-            ),
-            _buildDetailRow(
-              AppIcons.starFill,
-              'JABATAN SENAT',
-              user.jabatanSenat,
-            ),
-            _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
-            _buildDetailRow(AppIcons.buildingsFill, 'SATKER', user.satker),
-          ];
+    List<Widget> rows;
+
+    if (isSiswa) {
+      rows = [
+        if (senatRole != null)
+          _buildDetailRow(AppIcons.starFill, 'JABATAN SENAT', senatRole),
+        _buildDetailRow(AppIcons.medal, 'ANGKATAN', user.angkatan),
+        _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
+        _buildDetailRow(
+          AppIcons.identificationCard,
+          'JENIS KELAMIN',
+          user.jenisKelamin,
+        ),
+        _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
+      ];
+    } else if (user.roleId == 'pengajar' || user.roleId.startsWith('pengajar_')) {
+      rows = [
+        _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
+        _buildDetailRow(AppIcons.chartBar, 'ESELON', user.eselon),
+        _buildDetailRow(AppIcons.chartBar, 'GOLONGAN', user.golongan),
+      ];
+    } else {
+      rows = [
+        _buildDetailRow(
+          AppIcons.identificationCard,
+          'NO SERDIK',
+          user.noSerdik,
+        ),
+        _buildDetailRow(AppIcons.identificationCard, 'NIK', user.nik),
+        _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
+        _buildDetailRow(AppIcons.mapPin, 'TEMPAT LAHIR', user.tempatLahir),
+        _buildDetailRow(
+          AppIcons.calendarBlank,
+          'TANGGAL LAHIR',
+          user.tanggalLahir ?? '-',
+        ),
+        _buildDetailRow(AppIcons.cake, 'UMUR', '${user.displayUmur} Tahun'),
+        _buildDetailRow(
+          AppIcons.identificationCard,
+          'JENIS KELAMIN',
+          user.jenisKelamin,
+        ),
+        _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
+        _buildDetailRow(
+          AppIcons.deviceMobileSpeakerFill,
+          'NO HANDPHONE',
+          user.noHandphone,
+        ),
+        _buildDetailRow(
+          AppIcons.bookOpen,
+          'PENDIDIKAN TERAKHIR',
+          user.pendidikanTerakhir,
+        ),
+        _buildDetailRow(
+          AppIcons.mapPin,
+          'ALAMAT LENGKAP',
+          user.alamatLengkap,
+        ),
+        _buildDetailRow(AppIcons.paperPlaneTiltFill, 'EMAIL', user.email),
+        _buildDetailRow(
+          AppIcons.deviceMobileSpeakerFill,
+          'NO TELEPON',
+          user.noTelepon,
+        ),
+        _buildDetailRow(AppIcons.usersFill, 'KELOMPOK', user.pokjar),
+        _buildDetailRow(AppIcons.bookOpen, 'DIKTUK AWAL', user.diktukAwal),
+        _buildDetailRow(
+          AppIcons.calendarBlank,
+          'TAHUN DIKTUK',
+          user.tahunDiktuk,
+        ),
+        _buildDetailRow(
+          AppIcons.user,
+          'PERSONEL (YA/TIDAK)',
+          user.personel,
+        ),
+        _buildDetailRow(AppIcons.identificationCard, 'NRP', user.nrp),
+        _buildDetailRow(
+          AppIcons.medal,
+          'PANGKAT',
+          _getFullPangkat(user.pangkat),
+        ),
+        _buildDetailRow(
+          AppIcons.starFill,
+          'JABATAN SENAT',
+          user.jabatanSenat,
+        ),
+        _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
+        _buildDetailRow(AppIcons.buildingsFill, 'SATKER', user.satker),
+      ];
+    }
 
     List<Widget> children = [];
     for (int i = 0; i < rows.length; i++) {

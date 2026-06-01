@@ -55,6 +55,8 @@ class AuthRepositoryImpl implements AuthRepository {
       tahunDiktuk: loginResponse.tahunDiktuk,
       personel: loginResponse.personel,
       satker: loginResponse.satker,
+      eselon: loginResponse.eselon,
+      golongan: loginResponse.golongan,
       isNakApproved: loginResponse.isNakApproved,
       nilaiAkademik: loginResponse.nilaiAkademik,
       nilaiMental: loginResponse.nilaiMental,

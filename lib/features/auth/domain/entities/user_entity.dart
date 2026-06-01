@@ -30,6 +30,8 @@ class UserEntity extends Equatable {
   final String tahunDiktuk;
   final String personel;
   final String satker;
+  final String eselon;
+  final String golongan;
   final double nilaiAkademik;
   final double nilaiMental;
   final double nilaiJasmani;
@@ -64,6 +66,8 @@ class UserEntity extends Equatable {
     required this.tahunDiktuk,
     required this.personel,
     required this.satker,
+    required this.eselon,
+    required this.golongan,
     required this.nilaiAkademik,
     required this.nilaiMental,
     required this.nilaiJasmani,
@@ -120,6 +124,8 @@ class UserEntity extends Equatable {
     String? tahunDiktuk,
     String? personel,
     String? satker,
+    String? eselon,
+    String? golongan,
     double? nilaiAkademik,
     double? nilaiMental,
     double? nilaiJasmani,
@@ -156,6 +162,8 @@ class UserEntity extends Equatable {
       tahunDiktuk: tahunDiktuk ?? this.tahunDiktuk,
       personel: personel ?? this.personel,
       satker: satker ?? this.satker,
+      eselon: eselon ?? this.eselon,
+      golongan: golongan ?? this.golongan,
       nilaiAkademik: nilaiAkademik ?? this.nilaiAkademik,
       nilaiMental: nilaiMental ?? this.nilaiMental,
       nilaiJasmani: nilaiJasmani ?? this.nilaiJasmani,
@@ -193,6 +201,8 @@ class UserEntity extends Equatable {
     tahunDiktuk,
     personel,
     satker,
+    eselon,
+    golongan,
     nilaiAkademik,
     nilaiMental,
     nilaiJasmani,

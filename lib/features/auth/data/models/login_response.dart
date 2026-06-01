@@ -67,6 +67,12 @@ class LoginResponse {
   @JsonKey(name: 'tanggal_lahir', defaultValue: '1990-01-01')
   final String tanggalLahir;
 
+  @JsonKey(name: 'eselon', defaultValue: '-')
+  final String eselon;
+
+  @JsonKey(name: 'golongan', defaultValue: '-')
+  final String golongan;
+
   @JsonKey(name: 'is_nak_approved', defaultValue: false)
   final bool isNakApproved;
 
@@ -115,6 +121,8 @@ class LoginResponse {
     required this.personel,
     required this.satker,
     required this.tanggalLahir,
+    required this.eselon,
+    required this.golongan,
     required this.isNakApproved,
     required this.nilaiAkademik,
     required this.nilaiMental,

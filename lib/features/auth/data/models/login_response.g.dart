@@ -1,4 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'login_response.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
 
 LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
     LoginResponse(
@@ -28,6 +34,8 @@ LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
       personel: json['personel'] as String? ?? '-',
       satker: json['satker'] as String? ?? '-',
       tanggalLahir: json['tanggal_lahir'] as String? ?? '1990-01-01',
+      eselon: json['eselon'] as String? ?? '-',
+      golongan: json['golongan'] as String? ?? '-',
       isNakApproved: json['is_nak_approved'] as bool? ?? false,
       nilaiAkademik: (json['nilai_akademik'] as num?)?.toDouble() ?? 0.0,
       nilaiMental: (json['nilai_mental'] as num?)?.toDouble() ?? 0.0,
@@ -63,6 +71,8 @@ Map<String, dynamic> _$LoginResponseToJson(LoginResponse instance) =>
       'personel': instance.personel,
       'satker': instance.satker,
       'tanggal_lahir': instance.tanggalLahir,
+      'eselon': instance.eselon,
+      'golongan': instance.golongan,
       'is_nak_approved': instance.isNakApproved,
       'jenis_kelamin': instance.jenisKelamin,
       'nilai_akademik': instance.nilaiAkademik,
