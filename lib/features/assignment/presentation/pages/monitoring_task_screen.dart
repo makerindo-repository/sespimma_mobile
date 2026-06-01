@@ -642,6 +642,25 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     );
   }
 
+  String _mapRomanToArabic(String roman) {
+    switch (roman) {
+      case 'POKJAR I':
+        return 'POKJAR 1';
+      case 'POKJAR II':
+        return 'POKJAR 2';
+      case 'POKJAR III':
+        return 'POKJAR 3';
+      case 'POKJAR IV':
+        return 'POKJAR 4';
+      case 'POKJAR V':
+        return 'POKJAR 5';
+      case 'POKJAR VI':
+        return 'POKJAR 6';
+      default:
+        return roman;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskArg = ModalRoute.of(context)?.settings.arguments as TugasModel?;
@@ -669,7 +688,8 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         return false;
       }
 
-      if (_selectedPokjar != 'Semua' && sub['pokjar'] != _selectedPokjar) {
+      if (_selectedPokjar != 'Semua' &&
+          sub['pokjar'] != _mapRomanToArabic(_selectedPokjar)) {
         return false;
       }
 
@@ -1111,11 +1131,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     final bool isFiltered = _selectedPokjar != 'Semua';
     final pokjars = [
       'Semua',
-      'POKJAR 1',
-      'POKJAR 2',
-      'POKJAR 3',
-      'POKJAR 4',
-      'POKJAR 5',
+      'POKJAR I',
+      'POKJAR II',
+      'POKJAR III',
+      'POKJAR IV',
+      'POKJAR V',
       'Simulasi Kesatuan',
     ];
     return PopupMenuButton<String>(

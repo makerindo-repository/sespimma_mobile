@@ -39,12 +39,12 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
   ];
   final List<String> _pokjars = [
     'Semua Pokjar',
-    'POKJAR 1',
-    'POKJAR 2',
-    'POKJAR 3',
-    'POKJAR 4',
-    'POKJAR 5',
-    'POKJAR 6',
+    'POKJAR I',
+    'POKJAR II',
+    'POKJAR III',
+    'POKJAR IV',
+    'POKJAR V',
+    'POKJAR VI',
   ];
 
   @override
@@ -248,6 +248,25 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
     AppNotifier.showInfo(context, msg);
   }
 
+  String _mapRomanToArabic(String roman) {
+    switch (roman) {
+      case 'POKJAR I':
+        return 'POKJAR 1';
+      case 'POKJAR II':
+        return 'POKJAR 2';
+      case 'POKJAR III':
+        return 'POKJAR 3';
+      case 'POKJAR IV':
+        return 'POKJAR 4';
+      case 'POKJAR V':
+        return 'POKJAR 5';
+      case 'POKJAR VI':
+        return 'POKJAR 6';
+      default:
+        return roman;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredList = _mockSerdikList.where((serdik) {
@@ -257,7 +276,7 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
           serdik['nrp']!.toLowerCase().contains(q);
       final matchPokjar =
           _selectedPokjar == 'Semua Pokjar' ||
-          serdik['pokjar'] == _selectedPokjar;
+          serdik['pokjar'] == _mapRomanToArabic(_selectedPokjar);
       final matchStatus =
           _selectedStatus == 'Semua Status' ||
           serdik['status'] == _selectedStatus;

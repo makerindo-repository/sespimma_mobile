@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 enum MapTileMode {
   normal,
   satellite,
@@ -28,11 +30,21 @@ enum MapTileMode {
   String get tileUrl {
     switch (this) {
       case MapTileMode.normal:
-        return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+        return 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
       case MapTileMode.satellite:
         return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       case MapTileMode.terrain:
-        return 'https://tile.opentopomap.org/{z}/{x}/{y}.png';
+        return 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
+    }
+  }
+
+  List<String> get subdomains {
+    switch (this) {
+      case MapTileMode.normal:
+      case MapTileMode.terrain:
+        return ['a', 'b', 'c', 'd'];
+      case MapTileMode.satellite:
+        return [];
     }
   }
 
@@ -54,10 +66,14 @@ class AttendanceZone {
   final double latitude;
   final double longitude;
   final double radiusMeters;
+  final List<LatLng>? polygonPoints;
   final String activityName;
   final String creator;
   final DateTime startTime;
   final DateTime endTime;
+  final DateTime deadline;
+  final DateTime cutoffTime;
+  final bool isRoutine;
 
   const AttendanceZone({
     required this.id,
@@ -65,10 +81,14 @@ class AttendanceZone {
     required this.latitude,
     required this.longitude,
     required this.radiusMeters,
+    this.polygonPoints,
     required this.activityName,
     required this.creator,
     required this.startTime,
     required this.endTime,
+    required this.deadline,
+    required this.cutoffTime,
+    this.isRoutine = false,
   });
 
   String get timeString {
@@ -78,10 +98,6 @@ class AttendanceZone {
         '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}';
     return '$startStr - $endStr WIB';
   }
-
-  DateTime get deadline => endTime.subtract(const Duration(minutes: 30));
-
-  DateTime get cutoffTime => endTime.subtract(const Duration(minutes: 15));
 }
 
 class AttendanceZones {
@@ -89,10 +105,13 @@ class AttendanceZones {
 
   static bool isMakerindoEnabled = false;
 
+  static final List<AttendanceZone> _dynamicZones = [];
+
   static List<AttendanceZone> get activeZones {
     final List<AttendanceZone> zones = [];
 
     if (isMakerindoEnabled) {
+      final now = DateTime.now();
       zones.add(
         AttendanceZone(
           id: 'zone_apel_makerindo',
@@ -102,60 +121,37 @@ class AttendanceZones {
           radiusMeters: 50.0,
           activityName: 'Apel Pagi',
           creator: 'Korsis',
-          startTime: DateTime.now().subtract(const Duration(hours: 1)),
-          endTime: DateTime.now().add(const Duration(hours: 4)),
+          startTime: now.subtract(const Duration(hours: 1)),
+          endTime: now.add(const Duration(hours: 4)),
+          deadline: now.add(const Duration(hours: 3, minutes: 30)),
+          cutoffTime: now.add(const Duration(hours: 3, minutes: 45)),
+          isRoutine: true,
         ),
       );
     }
 
-    zones.addAll([
-      AttendanceZone(
-        id: 'zone_aula_widya',
-        name: 'Gedung Rapat Widya Swara',
-        latitude: -6.200500,
-        longitude: 106.817500,
-        radiusMeters: 45.0,
-        activityName: 'Rapat Akademik Bulanan',
-        creator: 'Korsis',
-        startTime: DateTime.now().subtract(const Duration(minutes: 30)),
-        endTime: DateTime.now().add(const Duration(hours: 2)),
-      ),
-      AttendanceZone(
-        id: 'zone_aula_tribrata',
-        name: 'Aula Tribrata Sespimma',
-        latitude: -6.199500,
-        longitude: 106.816000,
-        radiusMeters: 60.0,
-        activityName: 'Kuliah Umum Kebangsaan',
-        creator: 'Binkar Sespimma',
-        startTime: DateTime.now().subtract(const Duration(minutes: 50)),
-        endTime: DateTime.now().add(const Duration(minutes: 10)),
-      ),
-      AttendanceZone(
-        id: 'zone_masjid',
-        name: 'Masjid Al-Ikhlas Sespimma',
-        latitude: -6.201200,
-        longitude: 106.816300,
-        radiusMeters: 40.0,
-        activityName: 'Kajian Siang Serdik',
-        creator: 'Pokjar',
-        startTime: DateTime.now().add(const Duration(minutes: 30)),
-        endTime: DateTime.now().add(const Duration(hours: 2, minutes: 30)),
-      ),
-      AttendanceZone(
-        id: 'zone_tembak',
-        name: 'Lapangan Tembak Sespimma',
-        latitude: -6.198500,
-        longitude: 106.815500,
-        radiusMeters: 70.0,
-        activityName: 'Latihan Menembak Presisi',
-        creator: 'Instruktur',
-        startTime: DateTime.now().subtract(const Duration(hours: 1)),
-        endTime: DateTime.now().add(const Duration(hours: 5)),
-      ),
-    ]);
+    zones.addAll(_dynamicZones);
 
     return zones;
+  }
+
+  static void addZone(AttendanceZone zone) {
+    _dynamicZones.add(zone);
+  }
+
+  static void removeZone(String id) {
+    _dynamicZones.removeWhere((z) => z.id == id);
+  }
+
+  static void updateZone(AttendanceZone updatedZone) {
+    final index = _dynamicZones.indexWhere((z) => z.id == updatedZone.id);
+    if (index != -1) {
+      _dynamicZones[index] = updatedZone;
+    }
+  }
+
+  static void clearAllZones() {
+    _dynamicZones.clear();
   }
 
   static AttendanceZone get apelHarian => activeZones.first;

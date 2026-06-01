@@ -54,6 +54,10 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
       ? SociometryPeriodConfig.isAwalActive()
       : SociometryPeriodConfig.isAkhirActive();
 
+  bool get _isCurrentPhaseClosed => _isPhaseAwal
+      ? SociometryPeriodConfig.isAwalClosed()
+      : SociometryPeriodConfig.isAkhirClosed();
+
   bool get _isCurrentTabLocked => _isPhaseAwal
       ? SociometryPeriodConfig.isAwalLocked
       : SociometryPeriodConfig.isAkhirLocked;
@@ -529,7 +533,7 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'BELUM DIBUKA',
+              _isCurrentPhaseClosed ? 'DITUTUP' : 'BELUM DIBUKA',
               style: TextStyle(
                 color: Colors.grey.shade500,
                 fontSize: AppDimensions.fontSm,
@@ -638,7 +642,9 @@ class _SerdikSosiometriScreenState extends State<SerdikSosiometriScreen> {
               _isCurrentTabLocked
                   ? 'DATA TELAH DIKUNCI PERMANEN'
                   : !_isCurrentPhaseActive
-                  ? 'TAHAP BELUM DIBUKA'
+                  ? (_isCurrentPhaseClosed
+                        ? 'TAHAP SUDAH DITUTUP'
+                        : 'TAHAP BELUM DIBUKA')
                   : !_isAllEvaluated
                   ? 'SELESAIKAN PENILAIAN ($_evaluatedCount/$_totalCount)'
                   : 'KUNCI & KIRIM DATA',

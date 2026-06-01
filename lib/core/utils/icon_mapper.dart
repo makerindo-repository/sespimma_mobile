@@ -124,4 +124,9 @@ abstract final class AppIcons {
   static const IconData thumbDown = Icons.thumb_down_rounded;
   static const IconData thumbDownOutline = Icons.thumb_down_outlined;
   static const IconData starFill = Icons.star;
+  static const IconData arrowUUpLeft = Icons.undo;
+  static const IconData qrCode = Icons.qr_code;
+  static const IconData buildings = Icons.business_outlined;
+  static const IconData clock = Icons.schedule;
+  static const IconData printer = Icons.print;
 }

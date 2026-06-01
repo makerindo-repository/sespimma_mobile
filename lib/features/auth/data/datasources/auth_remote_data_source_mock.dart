@@ -3,6 +3,7 @@ import '../models/login_response.dart';
 import 'auth_remote_data_source.dart';
 import 'serdik_real_data.dart';
 import 'patun_real_data.dart';
+import 'korsis_real_data.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
@@ -284,40 +285,44 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       );
     }
 
-    if (request.nrp == '80104444') {
+    final korsisRecord = KorsisRealData.records
+        .where((r) => r['nrp_nip'] == request.nrp)
+        .firstOrNull;
+
+    if (korsisRecord != null) {
       return LoginResponse(
-        userId: 'USR-KORSIS',
-        name: 'AKBP Rudi Haryanto, S.I.K.',
+        userId: 'USR-${korsisRecord['nrp_nip']}',
+        name: korsisRecord['nama'] ?? '-',
         roleId: 'pengajar_korsis',
         pokjar: '-',
-        nrp: '80104444',
-        nosis: '2026051082',
-        pangkat: 'AKBP',
+        nrp: korsisRecord['nrp_nip'] ?? '-',
+        nosis: '-',
+        pangkat: korsisRecord['pangkat'] ?? '-',
         angkatan: '-',
-        agama: 'Islam',
-        jenisKelamin: 'Laki-laki',
-        jabatan: 'KASENAT KORSIS SESPIMMA',
-        tanggalLahir: '1982-05-10',
+        agama: '-',
+        jenisKelamin: '-',
+        jabatan: korsisRecord['jabatan_struktural'] ?? '-',
+        tanggalLahir: '-',
         noSerdik: '-',
-        nik: '3201012345678907',
-        jabatanSenat: '-',
-        tempatLahir: 'Palembang',
-        noHandphone: '081234567896',
-        pendidikanTerakhir: 'S1 Ilmu Kepolisian',
-        alamatLengkap: 'Jl. Merdeka, Palembang',
-        email: 'rudi@example.com',
+        nik: '-',
+        jabatanSenat: korsisRecord['peran_pengasuhan'] ?? '-',
+        tempatLahir: '-',
+        noHandphone: '-',
+        pendidikanTerakhir: '-',
+        alamatLengkap: '-',
+        email: '-',
         noTelepon: '-',
         kelompok: '-',
         diktukAwal: '-',
         tahunDiktuk: '-',
         personel: 'Ya',
-        satker: 'Korsis Sespimma',
+        satker: '-',
         isNakApproved: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
-        accessToken: 'dummy_token_korsis',
-        refreshToken: 'dummy_refresh_korsis',
+        accessToken: 'dummy_token_korsis_real',
+        refreshToken: 'dummy_refresh_korsis_real',
       );
     }
 

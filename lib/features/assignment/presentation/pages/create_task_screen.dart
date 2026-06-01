@@ -57,11 +57,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
 
   final List<String> _pokjarList = [
     'Semua POKJAR',
-    'POKJAR 1',
-    'POKJAR 2',
-    'POKJAR 3',
-    'POKJAR 4',
-    'POKJAR 5',
+    'POKJAR I',
+    'POKJAR II',
+    'POKJAR III',
+    'POKJAR IV',
+    'POKJAR V',
   ];
 
   final List<String> _subjectList = [

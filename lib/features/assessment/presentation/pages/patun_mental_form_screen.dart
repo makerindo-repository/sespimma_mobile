@@ -23,6 +23,14 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
   Map<String, dynamic>? _selectedSerdik;
   RewardPunishmentItem? _selectedCategory;
   File? _selectedPhoto;
+  final TextEditingController _justificationController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _justificationController.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, dynamic>> _serdikList = SerdikRealData.records;
   String _serdikSearchQuery = '';
@@ -251,6 +259,10 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
               ),
             ),
             _buildPhotoUploader(),
+            const SizedBox(height: AppDimensions.xxl),
+
+            _buildSectionTitle('Keterangan Justifikasi'),
+            _buildJustificationField(),
             const SizedBox(height: AppDimensions.xxl),
 
             _buildPreviewSection(pointColor),
@@ -632,6 +644,43 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJustificationField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _justificationController,
+        maxLines: 4,
+        minLines: 3,
+        style: const TextStyle(
+          fontSize: AppDimensions.fontMd,
+          fontWeight: FontWeight.w600,
+          color: _primaryNavy,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Masukkan keterangan justifikasi...',
+          hintStyle: TextStyle(
+            fontSize: AppDimensions.fontMd,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade400,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(AppDimensions.lg),
         ),
       ),
     );

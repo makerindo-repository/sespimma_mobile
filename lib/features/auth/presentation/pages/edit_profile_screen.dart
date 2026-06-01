@@ -442,7 +442,8 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             _buildInfoRow('Jabatan', user.jabatan),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Satker', user.satker),
-          ] else if (user.roleId == 'pengajar_patun') ...[
+          ] else if (user.roleId == 'pengajar_patun' ||
+              user.roleId == 'pengajar_korsis') ...[
             _buildInfoRow(user.nrp.length > 10 ? 'NIP' : 'NRP', user.nrp),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Nama Lengkap', user.name),

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
 import '../../domain/models/map_tile_mode.dart';
@@ -25,6 +26,8 @@ class GeofenceMapWidget extends StatefulWidget {
   final VoidCallback? onReload;
   final Function(AttendanceZone tappedZone)? onRadiusTap;
 
+  final double? fabBottomBase;
+
   const GeofenceMapWidget({
     super.key,
     required this.zones,
@@ -32,6 +35,7 @@ class GeofenceMapWidget extends StatefulWidget {
     this.onGpsStateChanged,
     this.onReload,
     this.onRadiusTap,
+    this.fabBottomBase,
   });
 
   @override
@@ -61,7 +65,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
   static const double _defaultZoom = 19.0;
 
   LatLng get _firstZoneLatLng {
-    if (widget.zones.isEmpty) return const LatLng(-6.200000, 106.816666);
+    if (widget.zones.isEmpty) return const LatLng(-6.824003, 107.640779);
     return LatLng(widget.zones.first.latitude, widget.zones.first.longitude);
   }
 
@@ -252,16 +256,34 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     double finalDistance = -1.0;
 
     for (final zone in zonesToUse) {
-      final distance = Geolocator.distanceBetween(
-        zone.latitude,
-        zone.longitude,
-        lat,
-        lng,
-      );
-      if (distance <= zone.radiusMeters) {
-        matchedZone = zone;
-        finalDistance = distance;
-        break;
+      if (zone.polygonPoints != null && zone.polygonPoints!.isNotEmpty) {
+        final mpPoint = mp.LatLng(lat, lng);
+        final mpPolygon = zone.polygonPoints!
+            .map((p) => mp.LatLng(p.latitude, p.longitude))
+            .toList();
+
+        if (mp.PolygonUtil.containsLocation(mpPoint, mpPolygon, false)) {
+          matchedZone = zone;
+          finalDistance = Geolocator.distanceBetween(
+            zone.latitude,
+            zone.longitude,
+            lat,
+            lng,
+          );
+          break;
+        }
+      } else {
+        final distance = Geolocator.distanceBetween(
+          zone.latitude,
+          zone.longitude,
+          lat,
+          lng,
+        );
+        if (distance <= zone.radiusMeters) {
+          matchedZone = zone;
+          finalDistance = distance;
+          break;
+        }
       }
     }
 
@@ -305,9 +327,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     return Stack(
       children: [
         _buildMap(),
-        _buildReloadFab(),
-        _buildLayerFab(),
-        _buildCenterFab(),
+        _buildMapControls(),
         if (_isLoading) _buildLoadingOverlay(),
         _buildAuditDebugPanel(),
         if (_gpsErrorMessage != null) _buildGpsErrorOverlay(),
@@ -481,13 +501,29 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
         ),
         onTap: (tapPosition, point) {
           for (final zone in widget.zones) {
-            final distance = Geolocator.distanceBetween(
-              zone.latitude,
-              zone.longitude,
-              point.latitude,
-              point.longitude,
-            );
-            if (distance <= zone.radiusMeters) {
+            bool isInside = false;
+
+            if (zone.polygonPoints != null && zone.polygonPoints!.isNotEmpty) {
+              final mpPoint = mp.LatLng(point.latitude, point.longitude);
+              final mpPolygon = zone.polygonPoints!
+                  .map((p) => mp.LatLng(p.latitude, p.longitude))
+                  .toList();
+              isInside = mp.PolygonUtil.containsLocation(
+                mpPoint,
+                mpPolygon,
+                false,
+              );
+            } else {
+              final distance = Geolocator.distanceBetween(
+                zone.latitude,
+                zone.longitude,
+                point.latitude,
+                point.longitude,
+              );
+              isInside = distance <= zone.radiusMeters;
+            }
+
+            if (isInside) {
               HapticFeedback.selectionClick();
               widget.onRadiusTap?.call(zone);
               break;
@@ -498,38 +534,76 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
       children: [
         TileLayer(
           urlTemplate: _tileMode.tileUrl,
-          subdomains: const ['a', 'b', 'c'],
+          subdomains: _tileMode.subdomains,
           userAgentPackageName: 'com.sespimma.mobile',
           maxZoom: 22,
           maxNativeZoom: 19,
         ),
         if (showGeofenceCircles)
+          PolygonLayer(
+            polygons: widget.zones
+                .where(
+                  (zone) =>
+                      zone.polygonPoints != null &&
+                      zone.polygonPoints!.isNotEmpty,
+                )
+                .map((zone) {
+                  bool isInside = false;
+                  if (_userLatLng != null) {
+                    final mpPoint = mp.LatLng(
+                      _userLatLng!.latitude,
+                      _userLatLng!.longitude,
+                    );
+                    final mpPolygon = zone.polygonPoints!
+                        .map((p) => mp.LatLng(p.latitude, p.longitude))
+                        .toList();
+                    isInside = mp.PolygonUtil.containsLocation(
+                      mpPoint,
+                      mpPolygon,
+                      false,
+                    );
+                  }
+                  final Color ringColor = isInside ? _successGreen : _dangerRed;
+
+                  return Polygon(
+                    points: zone.polygonPoints!,
+                    color: ringColor.withValues(alpha: 0.15),
+                    borderColor: ringColor,
+                    borderStrokeWidth: 2.0,
+                  );
+                })
+                .toList(),
+          ),
+        if (showGeofenceCircles)
           CircleLayer(
-            circles: widget.zones.map((zone) {
-              bool isUserInsideThisZone = false;
-              if (_userLatLng != null) {
-                final distance = Geolocator.distanceBetween(
-                  zone.latitude,
-                  zone.longitude,
-                  _userLatLng!.latitude,
-                  _userLatLng!.longitude,
-                );
-                isUserInsideThisZone = distance <= zone.radiusMeters;
-              }
+            circles: widget.zones
+                .where(
+                  (zone) =>
+                      zone.polygonPoints == null || zone.polygonPoints!.isEmpty,
+                )
+                .map((zone) {
+                  bool isInside = false;
+                  if (_userLatLng != null) {
+                    final distance = Geolocator.distanceBetween(
+                      zone.latitude,
+                      zone.longitude,
+                      _userLatLng!.latitude,
+                      _userLatLng!.longitude,
+                    );
+                    isInside = distance <= zone.radiusMeters;
+                  }
+                  final Color ringColor = isInside ? _successGreen : _dangerRed;
 
-              final Color ringColor = isUserInsideThisZone
-                  ? _successGreen
-                  : _dangerRed;
-
-              return CircleMarker(
-                point: LatLng(zone.latitude, zone.longitude),
-                radius: zone.radiusMeters,
-                useRadiusInMeter: true,
-                color: ringColor.withValues(alpha: 0.15),
-                borderColor: ringColor,
-                borderStrokeWidth: 2.0,
-              );
-            }).toList(),
+                  return CircleMarker(
+                    point: LatLng(zone.latitude, zone.longitude),
+                    radius: zone.radiusMeters,
+                    useRadiusInMeter: true,
+                    color: ringColor.withValues(alpha: 0.15),
+                    borderColor: ringColor,
+                    borderStrokeWidth: 2.0,
+                  );
+                })
+                .toList(),
           ),
         MarkerLayer(
           markers: [
@@ -556,7 +630,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
 
   Widget _buildZoneMarker() {
     return const Tooltip(
-      message: 'Zona Apel',
+      message: 'Zona',
       child: Icon(
         AppIcons.buildingsFill,
         color: Color(0xFF001C40),
@@ -610,47 +684,18 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     );
   }
 
-  Widget _buildReloadFab() {
+  Widget _buildMapControls() {
+    final base =
+        widget.fabBottomBase ?? (MediaQuery.of(context).size.height * 0.25);
     return Positioned(
-      bottom: MediaQuery.of(context).size.height * 0.25 + 120,
+      bottom: base,
       right: 16,
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
-        elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.2),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
-          onTap: _isRefreshingMap
-              ? null
-              : () async {
-                  HapticFeedback.mediumImpact();
-                  setState(() => _isRefreshingMap = true);
-                  await Future.delayed(const Duration(milliseconds: 1200));
-                  if (mounted) {
-                    setState(() => _isRefreshingMap = false);
-                    widget.onReload?.call();
-                    final latestZones = AttendanceZones.activeZones;
-                    if (_userLatLng != null) {
-                      _updateFromPosition(
-                        _userLatLng!.latitude,
-                        _userLatLng!.longitude,
-                        false,
-                        overrideZones: latestZones,
-                      );
-                    }
-
-                    if (latestZones.isNotEmpty) {
-                      final firstZone = LatLng(
-                        latestZones.first.latitude,
-                        latestZones.first.longitude,
-                      );
-                      _animateTo(firstZone);
-                    }
-                  }
-                },
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.sm + 2),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _buildMapFab(
+            tooltip: 'Refresh Lokasi',
             child: _isRefreshingMap
                 ? const SizedBox(
                     width: 22,
@@ -665,16 +710,75 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
                     color: _primaryNavy,
                     size: AppDimensions.iconDefault + 2,
                   ),
+            onTap: _isRefreshingMap
+                ? null
+                : () async {
+                    HapticFeedback.mediumImpact();
+                    setState(() => _isRefreshingMap = true);
+                    await Future.delayed(const Duration(milliseconds: 1200));
+                    if (mounted) {
+                      setState(() => _isRefreshingMap = false);
+                      widget.onReload?.call();
+                      final latestZones = AttendanceZones.activeZones;
+                      if (_userLatLng != null) {
+                        _updateFromPosition(
+                          _userLatLng!.latitude,
+                          _userLatLng!.longitude,
+                          false,
+                          overrideZones: latestZones,
+                        );
+                      }
+
+                      if (latestZones.isNotEmpty) {
+                        final firstZone = LatLng(
+                          latestZones.first.latitude,
+                          latestZones.first.longitude,
+                        );
+                        _animateTo(firstZone);
+                      }
+                    }
+                  },
           ),
-        ),
+          const SizedBox(height: 8),
+
+          _buildMapFab(
+            tooltip: 'Jenis Peta',
+            child: const Icon(
+              AppIcons.stackBold,
+              color: Color(0xFF001C40),
+              size: AppDimensions.iconDefault + 2,
+            ),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _showLayerBottomSheet();
+            },
+          ),
+          const SizedBox(height: 8),
+
+          _buildMapFab(
+            tooltip: 'Pusat ke Lokasi',
+            child: const Icon(
+              AppIcons.crosshairBold,
+              color: Color(0xFF001C40),
+              size: AppDimensions.iconDefault + 2,
+            ),
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _centerOnUser();
+            },
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildLayerFab() {
-    return Positioned(
-      bottom: MediaQuery.of(context).size.height * 0.25 + 60,
-      right: 16,
+  Widget _buildMapFab({
+    required Widget child,
+    required VoidCallback? onTap,
+    required String tooltip,
+  }) {
+    return Tooltip(
+      message: tooltip,
       child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
@@ -682,17 +786,10 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
         shadowColor: Colors.black.withValues(alpha: 0.2),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
-          onTap: () {
-            HapticFeedback.lightImpact();
-            _showLayerBottomSheet();
-          },
-          child: const Padding(
-            padding: EdgeInsets.all(AppDimensions.sm + 2),
-            child: Icon(
-              AppIcons.stackBold,
-              color: Color(0xFF001C40),
-              size: AppDimensions.iconDefault + 2,
-            ),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.sm + 2),
+            child: child,
           ),
         ),
       ),
@@ -713,12 +810,17 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
+                child: Tooltip(
+                  message: 'Pusat Zona',
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusXs,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -806,34 +908,6 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCenterFab() {
-    return Positioned(
-      bottom: MediaQuery.of(context).size.height * 0.25,
-      right: 16,
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
-        elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.2),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg + 2),
-          onTap: () {
-            HapticFeedback.lightImpact();
-            _centerOnUser();
-          },
-          child: const Padding(
-            padding: EdgeInsets.all(AppDimensions.sm + 2),
-            child: Icon(
-              AppIcons.crosshairBold,
-              color: Color(0xFF001C40),
-              size: AppDimensions.iconDefault + 2,
-            ),
-          ),
         ),
       ),
     );

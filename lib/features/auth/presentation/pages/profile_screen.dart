@@ -95,7 +95,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildStatCards(user),
-                              if (user.roleId != 'pengajar_patun') ...[
+                              if (user.roleId != 'pengajar_patun' &&
+                                  user.roleId != 'pengajar_korsis') ...[
                                 const SizedBox(height: AppDimensions.lg),
                                 _buildFormalDataCard(user),
                               ],
@@ -126,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   String _getRoleLabel(UserEntity user) {
-    if (user.roleId == 'pengajar_patun' &&
+    if ((user.roleId == 'pengajar_patun' || user.roleId == 'pengajar_korsis') &&
         user.jabatanSenat.isNotEmpty &&
         user.jabatanSenat != '-') {
       return user.jabatanSenat.toUpperCase();

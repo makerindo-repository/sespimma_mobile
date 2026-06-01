@@ -28,12 +28,12 @@ class _EwsScreenState extends State<EwsScreen>
 
   final List<String> _pokjars = [
     'Semua Pokjar',
-    'Pokjar 1',
-    'Pokjar 2',
-    'Pokjar 3',
-    'Pokjar 4',
-    'Pokjar 5',
-    'Pokjar 6',
+    'POKJAR I',
+    'POKJAR II',
+    'POKJAR III',
+    'POKJAR IV',
+    'POKJAR V',
+    'POKJAR VI',
   ];
 
   final TextEditingController _searchController = TextEditingController();
@@ -57,9 +57,29 @@ class _EwsScreenState extends State<EwsScreen>
 
   List<EwsModel> get _allReports => PimpinanMockData.sharedEwsData;
 
+  String _mapRomanToArabic(String roman) {
+    switch (roman) {
+      case 'POKJAR I':
+        return 'Pokjar 1';
+      case 'POKJAR II':
+        return 'Pokjar 2';
+      case 'POKJAR III':
+        return 'Pokjar 3';
+      case 'POKJAR IV':
+        return 'Pokjar 4';
+      case 'POKJAR V':
+        return 'Pokjar 5';
+      case 'POKJAR VI':
+        return 'Pokjar 6';
+      default:
+        return roman;
+    }
+  }
+
   List<EwsModel> get _filteredList {
     return _allReports.where((serdik) {
-      final String selectedP = _selectedPokjar.trim().toLowerCase();
+      final String mappedPokjar = _mapRomanToArabic(_selectedPokjar);
+      final String selectedP = mappedPokjar.trim().toLowerCase();
       final bool matchesPokjar =
           selectedP == 'semua pokjar' ||
           serdik.pokjar.trim().toLowerCase() == selectedP;

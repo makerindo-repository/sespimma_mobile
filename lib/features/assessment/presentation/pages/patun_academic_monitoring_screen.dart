@@ -118,9 +118,23 @@ class _PatunAcademicMonitoringScreenState
                   thickness: AppDimensions.dividerHeight,
                 ),
                 Expanded(
-                  child: filteredList.isEmpty
-                      ? _buildEmptyState(userPokjar)
-                      : _buildSerdikList(filteredList),
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {});
+                      await Future.delayed(const Duration(milliseconds: 500));
+                    },
+                    color: _primaryNavy,
+                    child: filteredList.isEmpty
+                        ? CustomScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: [
+                              SliverFillRemaining(
+                                child: _buildEmptyState(userPokjar),
+                              ),
+                            ],
+                          )
+                        : _buildSerdikList(filteredList),
+                  ),
                 ),
               ],
             );
@@ -133,7 +147,27 @@ class _PatunAcademicMonitoringScreenState
     );
   }
 
+  String _mapArabicToRoman(String arabic) {
+    switch (arabic) {
+      case 'POKJAR 1':
+        return 'POKJAR I';
+      case 'POKJAR 2':
+        return 'POKJAR II';
+      case 'POKJAR 3':
+        return 'POKJAR III';
+      case 'POKJAR 4':
+        return 'POKJAR IV';
+      case 'POKJAR 5':
+        return 'POKJAR V';
+      case 'POKJAR 6':
+        return 'POKJAR VI';
+      default:
+        return arabic;
+    }
+  }
+
   Widget _buildHeaderBlock(String pokjar, int totalSerdik) {
+    final displayPokjar = _mapArabicToRoman(pokjar);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.symmetric(
@@ -180,7 +214,7 @@ class _PatunAcademicMonitoringScreenState
             children: [
               Expanded(
                 child: Text(
-                  'DAFTAR SERDIK ${pokjar.toUpperCase()}',
+                  'DAFTAR SERDIK ${displayPokjar.toUpperCase()}',
                   style: const TextStyle(
                     color: _primaryNavy,
                     fontWeight: FontWeight.w800,
@@ -299,7 +333,7 @@ class _PatunAcademicMonitoringScreenState
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 680),
         child: ListView.separated(
-          physics: const BouncingScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(AppDimensions.xl),
           itemCount: serdikList.length,
           separatorBuilder: (context, index) =>

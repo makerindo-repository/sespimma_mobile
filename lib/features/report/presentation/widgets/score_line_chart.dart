@@ -214,10 +214,10 @@ class ScoreLineChart extends StatelessWidget {
                 );
                 String text = '';
                 if (selectedCategory == 'Mental Kepribadian') {
-                  if (value == 0.0) text = 'W1';
-                  if (value == 1.0) text = 'W2';
-                  if (value == 2.0) text = 'W3';
-                  if (value == 3.0) text = 'W4';
+                  if (value == 0.0) text = 'Mg 1';
+                  if (value == 1.0) text = 'Mg 2';
+                  if (value == 2.0) text = 'Mg 3';
+                  if (value == 3.0) text = 'Mg 4';
                 } else {
                   if (value == 0.0) text = 'Periode I';
                   if (value == 1.0) text = 'Periode II';

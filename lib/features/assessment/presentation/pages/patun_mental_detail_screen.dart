@@ -512,7 +512,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                             reservedSize: 22,
                             interval: 1,
                             getTitlesWidget: (value, meta) {
-                              final titles = ['W1', 'W2', 'W3', 'W4'];
+                              final titles = ['Mg 1', 'Mg 2', 'Mg 3', 'Mg 4'];
                               if (value.toInt() >= 0 &&
                                   value.toInt() < titles.length) {
                                 return Padding(

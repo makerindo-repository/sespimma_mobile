@@ -6,14 +6,19 @@ import '../../features/report/presentation/pages/report_screen.dart';
 import '../../features/attendance/presentation/pages/attendance_screen.dart';
 import '../../features/assignment/presentation/pages/assignment_screen.dart';
 import '../../features/dashboard/presentation/pages/home_screen.dart';
-import '../../features/assignment/presentation/pages/gadik_task_list_screen.dart';
+import '../../features/assessment/presentation/pages/patun_sociometry_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/gadik_assessment_screen.dart';
 import '../../features/assessment/presentation/pages/patun_academic_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/patun_mental_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/patun_physical_monitoring_screen.dart';
+import '../../features/assessment/presentation/pages/korsis_inbox_screen.dart';
+import '../../features/assessment/presentation/pages/korsis_mental_monitoring_screen.dart';
+import '../../features/assessment/presentation/pages/korsis_sociometry_monitoring_screen.dart';
 import '../../features/leadership_report/presentation/pages/leadership_report_screen.dart';
 import '../../features/leadership_ews/presentation/pages/ews_screen.dart';
 import '../../features/leadership_dashboard/presentation/pages/pimpinan_home_screen.dart';
+import '../../features/attendance/presentation/pages/patun_attendance_monitoring_screen.dart';
+import '../../features/attendance/presentation/pages/korsis_zone_screen.dart';
 
 class NavItem {
   final String label;
@@ -80,16 +85,16 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: PatunPhysicalMonitoringScreen(),
         ),
         NavItem(
-          label: 'Penilaian',
-          icon: AppIcons.pencilSimple,
-          activeIcon: AppIcons.pencilSimpleFill,
-          screen: GadikAssessmentScreen(),
+          label: 'Absen',
+          icon: AppIcons.mapPin,
+          activeIcon: AppIcons.mapPinFill,
+          screen: PatunAttendanceMonitoringScreen(),
         ),
         NavItem(
-          label: 'Tugas',
-          icon: AppIcons.clipboardText,
-          activeIcon: AppIcons.clipboardTextFill,
-          screen: GadikTaskListScreen(),
+          label: 'Sosiometri',
+          icon: Icons.groups_outlined,
+          activeIcon: AppIcons.usersThreeFill,
+          screen: PatunSociometryMonitoringScreen(),
         ),
         NavItem(
           label: 'Profil',
@@ -122,22 +127,28 @@ List<NavItem> getNavItemsByRole(String roleId) {
     case 'pengajar_korsis':
       return const [
         NavItem(
-          label: 'Akademik',
-          icon: AppIcons.bookOpen,
-          activeIcon: AppIcons.bookOpenFill,
-          screen: PatunAcademicMonitoringScreen(),
+          label: 'Inbox',
+          icon: AppIcons.archive,
+          activeIcon: AppIcons.archive,
+          screen: KorsisInboxScreen(),
         ),
         NavItem(
-          label: 'Penilaian',
-          icon: AppIcons.pencilSimple,
-          activeIcon: AppIcons.pencilSimpleFill,
-          screen: GadikAssessmentScreen(),
+          label: 'Mental',
+          icon: AppIcons.shieldCheck,
+          activeIcon: AppIcons.shieldCheckFill,
+          screen: KorsisMentalMonitoringScreen(),
         ),
         NavItem(
-          label: 'Tugas',
-          icon: AppIcons.clipboardText,
-          activeIcon: AppIcons.clipboardTextFill,
-          screen: GadikTaskListScreen(),
+          label: 'Sosiometri',
+          icon: Icons.groups_outlined,
+          activeIcon: AppIcons.usersThreeFill,
+          screen: KorsisSociometryMonitoringScreen(),
+        ),
+        NavItem(
+          label: 'Zona',
+          icon: AppIcons.mapPin,
+          activeIcon: AppIcons.mapPinFill,
+          screen: KorsisZoneScreen(),
         ),
         NavItem(
           label: 'Profil',
@@ -162,7 +173,7 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: AssignmentScreen(),
         ),
         NavItem(
-          label: 'Apel',
+          label: 'Zona',
           icon: AppIcons.mapPin,
           activeIcon: AppIcons.mapPinFill,
           screen: AttendanceScreen(),

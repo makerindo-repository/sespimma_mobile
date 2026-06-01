@@ -44,6 +44,9 @@ dependencies:
   talker_flutter: ^5.1.16
   talker_bloc_logger: ^5.1.17
   talker_dio_logger: ^5.1.17
+  maps_toolkit: ^3.1.0
+  intl: ^0.20.2
+  open_filex: ^4.7.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

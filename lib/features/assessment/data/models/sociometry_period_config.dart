@@ -3,23 +3,70 @@ import 'sociometry_peer_model.dart';
 class SociometryPeriodConfig {
   static final DateTime educationStartDate = DateTime(2026, 5, 21);
 
-  static DateTime get awalStartDate => educationStartDate;
-  static DateTime get awalEndDate =>
-      educationStartDate.add(const Duration(days: 7));
+  static DateTime _awalStartDate = DateTime(2026, 5, 21);
+  static DateTime _awalEndDate = DateTime(
+    2026,
+    5,
+    21,
+  ).add(const Duration(days: 15));
 
-  static DateTime get akhirStartDate =>
-      educationStartDate.add(const Duration(days: 90));
-  static DateTime get akhirEndDate =>
-      educationStartDate.add(const Duration(days: 97));
+  static DateTime _akhirStartDate = DateTime(
+    2026,
+    5,
+    21,
+  ).add(const Duration(days: 90));
+  static DateTime _akhirEndDate = DateTime(
+    2026,
+    5,
+    21,
+  ).add(const Duration(days: 97));
+
+  static DateTime get awalStartDate => _awalStartDate;
+  static DateTime get awalEndDate => _awalEndDate;
+  static DateTime get akhirStartDate => _akhirStartDate;
+  static DateTime get akhirEndDate => _akhirEndDate;
+
+  static void setAwalPeriod(DateTime start, DateTime end) {
+    _awalStartDate = start;
+    _awalEndDate = end;
+  }
+
+  static void setAkhirPeriod(DateTime start, DateTime end) {
+    _akhirStartDate = start;
+    _akhirEndDate = end;
+  }
+
+  static bool? isAwalUnlockedForce;
+  static bool? isAkhirUnlockedForce;
+
+  static bool get isAwalLocked => isAwalUnlockedForce == false;
+  static bool get isAkhirLocked => isAkhirUnlockedForce == false;
+
+  static void lockAwal() => isAwalUnlockedForce = false;
+  static void lockAkhir() => isAkhirUnlockedForce = false;
 
   static bool isAwalActive() {
+    if (isAwalUnlockedForce != null) return isAwalUnlockedForce!;
     final now = DateTime.now();
     return now.isAfter(awalStartDate) && now.isBefore(awalEndDate);
   }
 
+  static bool isAwalClosed() {
+    if (isAwalUnlockedForce != null) return !isAwalUnlockedForce!;
+    final now = DateTime.now();
+    return now.isAfter(awalEndDate);
+  }
+
   static bool isAkhirActive() {
+    if (isAkhirUnlockedForce != null) return isAkhirUnlockedForce!;
     final now = DateTime.now();
     return now.isAfter(akhirStartDate) && now.isBefore(akhirEndDate);
+  }
+
+  static bool isAkhirClosed() {
+    if (isAkhirUnlockedForce != null) return !isAkhirUnlockedForce!;
+    final now = DateTime.now();
+    return now.isAfter(akhirEndDate);
   }
 
   static bool isAnyActive() {
@@ -259,16 +306,7 @@ class SociometryPeriodConfig {
     return peers.length;
   }
 
-  static bool _isAwalLocked = false;
-  static bool _isAkhirLocked = false;
-
-  static bool get isAwalLocked => _isAwalLocked;
-  static bool get isAkhirLocked => _isAkhirLocked;
-
-  static void lockAwal() => _isAwalLocked = true;
-  static void lockAkhir() => _isAkhirLocked = true;
-
-  static bool isCurrentPhaseLocked() {
-    return isAkhirActive() ? _isAkhirLocked : _isAwalLocked;
+  static bool isCurrentPhaseLocked(bool isAwal) {
+    return isAwal ? !isAwalActive() : !isAkhirActive();
   }
 }

@@ -217,9 +217,21 @@ class _PatunMentalMonitoringScreenState
                   thickness: AppDimensions.dividerHeight,
                 ),
                 Expanded(
-                  child: filteredList.isEmpty
-                      ? _buildEmptyState()
-                      : _buildSerdikList(filteredList),
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {});
+                      await Future.delayed(const Duration(milliseconds: 500));
+                    },
+                    color: _primaryNavy,
+                    child: filteredList.isEmpty
+                        ? CustomScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            slivers: [
+                              SliverFillRemaining(child: _buildEmptyState()),
+                            ],
+                          )
+                        : _buildSerdikList(filteredList),
+                  ),
                 ),
               ],
             );
@@ -406,7 +418,7 @@ class _PatunMentalMonitoringScreenState
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 680),
         child: ListView.separated(
-          physics: const BouncingScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(
             AppDimensions.xl,
             AppDimensions.xl,

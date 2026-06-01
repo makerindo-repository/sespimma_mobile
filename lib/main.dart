@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/utils/app_logger.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
@@ -54,6 +55,8 @@ void main() async {
   );
 
   await dotenv.load(fileName: ".env");
+
+  await initializeDateFormatting('id_ID', null);
 
   await di.init();
 
