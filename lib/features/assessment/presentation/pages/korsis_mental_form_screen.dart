@@ -6,6 +6,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class KorsisMentalFormScreen extends StatefulWidget {
   final bool isReward;
@@ -38,7 +39,6 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   @override
@@ -59,10 +59,25 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
         return 'POKJAR 4';
       case 'POKJAR V':
         return 'POKJAR 5';
-      case 'POKJAR VI':
-        return 'POKJAR 6';
       default:
         return roman;
+    }
+  }
+
+  String _mapArabicToRoman(String arabic) {
+    switch (arabic) {
+      case 'POKJAR 1':
+        return 'POKJAR I';
+      case 'POKJAR 2':
+        return 'POKJAR II';
+      case 'POKJAR 3':
+        return 'POKJAR III';
+      case 'POKJAR 4':
+        return 'POKJAR IV';
+      case 'POKJAR 5':
+        return 'POKJAR V';
+      default:
+        return arabic;
     }
   }
 
@@ -306,18 +321,9 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                   ? () {
                       HapticFeedback.heavyImpact();
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Catatan berhasil ditambahkan ke sistem!',
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          backgroundColor: Colors.green.shade700,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                      AppNotifier.showSuccess(
+                        context,
+                        'Catatan berhasil ditambahkan ke sistem!',
                       );
                     }
                   : null,
@@ -966,7 +972,7 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                           onChanged: (val) =>
                               setModalState(() => _serdikSearchQuery = val),
                           decoration: InputDecoration(
-                            hintText: 'Cari nama atau No. Serdik...',
+                            hintText: 'Cari nama atau nomor serdik...',
                             prefixIcon: const Icon(
                               Icons.search,
                               color: Colors.grey,
@@ -1063,7 +1069,9 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                               ),
                             ),
                             child: Text(
-                              serdik['kelompok_kelas'] ?? '-',
+                              _mapArabicToRoman(
+                                serdik['kelompok_kelas']?.toString() ?? '-',
+                              ),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,

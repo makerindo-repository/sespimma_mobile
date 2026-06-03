@@ -12,6 +12,7 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/features/auth/data/datasources/korsis_real_data.dart';
 import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class KorsisGenerateMentalReportScreen extends StatefulWidget {
   const KorsisGenerateMentalReportScreen({super.key});
@@ -596,19 +597,16 @@ class _KorsisGenerateMentalReportScreenState
       await file.writeAsBytes(await pdf.save());
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Laporan berhasil dibuat! Membuka file...'),
-          ),
+        AppNotifier.showSuccess(
+          context,
+          'Laporan berhasil dibuat! Membuka file...',
         );
       }
 
       await OpenFilex.open(file.path);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal membuat laporan: $e')));
+        AppNotifier.showError(context, 'Gagal membuat laporan: $e');
       }
     }
   }
@@ -786,7 +784,6 @@ class _KorsisGenerateMentalReportScreenState
               _buildDataCell(data[i]['no_serdik'] ?? '-', base),
 
               pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.stretch,
                 children: [
                   _buildSubDataCell(
                     (data[i]['moral'] as double).toStringAsFixed(2),
@@ -893,12 +890,16 @@ class _KorsisGenerateMentalReportScreenState
     return pw.Container(
       alignment: align,
       padding: const pw.EdgeInsets.all(2),
-      child: pw.Text(
-        text,
-        style: pw.TextStyle(font: base, fontSize: 7),
-        textAlign: align == pw.Alignment.center
-            ? pw.TextAlign.center
-            : pw.TextAlign.left,
+      child: pw.FittedBox(
+        fit: pw.BoxFit.scaleDown,
+        alignment: align,
+        child: pw.Text(
+          text,
+          style: pw.TextStyle(font: base, fontSize: 7),
+          textAlign: align == pw.Alignment.center
+              ? pw.TextAlign.center
+              : pw.TextAlign.left,
+        ),
       ),
     );
   }

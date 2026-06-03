@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'patun_sociometry_detail_screen.dart';
 import '../../data/models/sociometry_period_config.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class KorsisSociometryMonitoringScreen extends StatefulWidget {
   const KorsisSociometryMonitoringScreen({super.key});
@@ -155,14 +156,11 @@ class _KorsisSociometryMonitoringScreenState
       }
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isCurrentPhaseActive ? 'Sosiometri Dibuka' : 'Sosiometri Ditutup',
-        ),
-        backgroundColor: _isCurrentPhaseActive ? Colors.green : Colors.red,
-      ),
-    );
+    if (_isCurrentPhaseActive) {
+      AppNotifier.showSuccess(context, 'Sosiometri Dibuka');
+    } else {
+      AppNotifier.showError(context, 'Sosiometri Ditutup');
+    }
   }
 
   void _showSettingsSheet() {
@@ -430,10 +428,9 @@ class _KorsisSociometryMonitoringScreenState
                           });
 
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Pengaturan berhasil disimpan'),
-                            ),
+                          AppNotifier.showSuccess(
+                            context,
+                            'Pengaturan berhasil disimpan',
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -580,7 +577,7 @@ class _KorsisSociometryMonitoringScreenState
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  if (_selectedPokjar != 'Semua Pokjar')
+                                  if (_selectedPokjar != 'Semua Pokjar') ...[
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 10,
@@ -599,33 +596,41 @@ class _KorsisSociometryMonitoringScreenState
                                         ),
                                       ),
                                     ),
-                                ],
-                              ),
-                              Row(
-                                children: [
+                                    const SizedBox(width: 8),
+                                  ],
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 10,
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _primaryNavy.withValues(
-                                        alpha: 0.05,
-                                      ),
-                                      borderRadius: BorderRadius.circular(
-                                        AppDimensions.radiusSm,
-                                      ),
+                                      color: _primaryNavy,
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
-                                    child: Text(
-                                      'Total: ${serdikList.length}',
-                                      style: const TextStyle(
-                                        fontSize: AppDimensions.fontSm + 1,
-                                        fontWeight: FontWeight.w800,
-                                        color: _primaryNavy,
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          AppIcons.usersFill,
+                                          size: 12,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${serdikList.length} Serdik',
+                                          style: const TextStyle(
+                                            fontSize: AppDimensions.fontXs,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                ],
+                              ),
+                              Row(
+                                children: [
                                   _buildFilterDropdown(
                                     icon: AppIcons.usersFill,
                                     value: _selectedPokjar,
@@ -1025,12 +1030,35 @@ class _KorsisSociometryMonitoringScreenState
                       ),
                       const SizedBox(height: AppDimensions.xs),
                       Text(
-                        '${serdik['pangkat']} • ${serdik['no_serdik']}\n${_formatPokjarName(serdik['kelompok_kelas'].toString())}',
+                        '${serdik['pangkat']} • ${serdik['no_serdik']}',
                         style: TextStyle(
                           fontSize: AppDimensions.fontSm + 1,
                           fontWeight: FontWeight.w600,
                           color: Colors.blueGrey.shade400,
                           letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.xs),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey.shade50,
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusSm,
+                          ),
+                        ),
+                        child: Text(
+                          _formatPokjarName(
+                            serdik['kelompok_kelas']?.toString() ?? '-',
+                          ),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.blueGrey.shade600,
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppDimensions.sm),

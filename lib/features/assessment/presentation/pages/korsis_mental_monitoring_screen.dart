@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
@@ -32,7 +33,6 @@ class _KorsisMentalMonitoringScreenState
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   String _selectedAspect = 'Rata-rata';
@@ -57,10 +57,25 @@ class _KorsisMentalMonitoringScreenState
         return 'POKJAR 4';
       case 'POKJAR V':
         return 'POKJAR 5';
-      case 'POKJAR VI':
-        return 'POKJAR 6';
       default:
         return roman;
+    }
+  }
+
+  String _mapArabicToRoman(String arabic) {
+    switch (arabic) {
+      case 'POKJAR 1':
+        return 'POKJAR I';
+      case 'POKJAR 2':
+        return 'POKJAR II';
+      case 'POKJAR 3':
+        return 'POKJAR III';
+      case 'POKJAR 4':
+        return 'POKJAR IV';
+      case 'POKJAR 5':
+        return 'POKJAR V';
+      default:
+        return arabic;
     }
   }
 
@@ -79,14 +94,35 @@ class _KorsisMentalMonitoringScreenState
     for (var s in allSerdik) {
       final nosis = s['no_serdik'].toString();
       final mentalData = SerdikMentalScores.data[nosis] ?? {};
-      s['disiplin'] = mentalData['disiplin'] ?? 80.0;
-      s['kepemimpinan'] = mentalData['kepemimpinan'] ?? 80.0;
-      s['pengendalian_diri'] = mentalData['pengendalian_diri'] ?? 80.0;
-      s['penampilan'] = mentalData['penampilan'] ?? 80.0;
-      final socA = mentalData['sosiometri_awal'] ?? 80.0;
-      final socB = mentalData['sosiometri_akhir'] ?? 80.0;
-      s['sosiometri'] = (socA + socB) / 2;
-      s['nilai'] = mentalData['nilai'] ?? 80.0;
+
+      final double moral = mentalData['moral'] ?? 80.0;
+      final double disiplin = mentalData['disiplin'] ?? 80.0;
+      final double kepemimpinan = mentalData['kepemimpinan'] ?? 80.0;
+      final double pengendalianDiri = mentalData['pengendalian_diri'] ?? 80.0;
+      final double penampilan = mentalData['penampilan'] ?? 80.0;
+      final double socA = mentalData['sosiometri_awal'] ?? 80.0;
+      final double socB = mentalData['sosiometri_akhir'] ?? 80.0;
+      final double sosiometri = (socA + socB) / 2;
+
+      final double points = mentalData['points'] ?? 0.0;
+
+      final double pengamatan =
+          (moral * 0.20) +
+          (disiplin * 0.15) +
+          (kepemimpinan * 0.20) +
+          (pengendalianDiri * 0.15) +
+          (penampilan * 0.15) +
+          (sosiometri * 0.15) +
+          points;
+
+      final double nk = ((pengamatan * 7) + (sosiometri * 3)) / 10;
+
+      s['disiplin'] = disiplin;
+      s['kepemimpinan'] = kepemimpinan;
+      s['pengendalian_diri'] = pengendalianDiri;
+      s['penampilan'] = penampilan;
+      s['sosiometri'] = sosiometri;
+      s['nilai'] = nk;
     }
     return allSerdik;
   }
@@ -328,7 +364,7 @@ class _KorsisMentalMonitoringScreenState
                   const SizedBox(width: AppDimensions.md),
                   Expanded(
                     child: _buildMetricItem(
-                      'Kendali Diri',
+                      'Pengendalian Diri',
                       avgKendali,
                       AppIcons.shieldCheckFill,
                       Colors.red.shade700,
@@ -375,23 +411,26 @@ class _KorsisMentalMonitoringScreenState
     Color color,
     Color bgColor,
   ) {
+    final displayColor = value == 0 ? Colors.blueGrey.shade600 : color;
+    final displayBgColor = value == 0 ? Colors.blueGrey.shade50 : bgColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: displayBgColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: displayColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
+          Icon(icon, color: displayColor, size: 24),
           const SizedBox(height: 8),
           Text(
             value.toStringAsFixed(2),
             style: TextStyle(
               fontSize: AppDimensions.fontXxl,
               fontWeight: FontWeight.w900,
-              color: color,
+              color: displayColor,
             ),
           ),
           const SizedBox(height: 2),
@@ -401,7 +440,7 @@ class _KorsisMentalMonitoringScreenState
             style: TextStyle(
               fontSize: AppDimensions.fontXs,
               fontWeight: FontWeight.w700,
-              color: color,
+              color: displayColor,
             ),
           ),
         ],
@@ -470,7 +509,7 @@ class _KorsisMentalMonitoringScreenState
                         getTooltipItems: (touchedSpots) {
                           return touchedSpots.map((LineBarSpot touchedSpot) {
                             return LineTooltipItem(
-                              '${touchedSpot.y.toInt()}',
+                              touchedSpot.y.toStringAsFixed(2),
                               TextStyle(
                                 color: touchedSpot.bar.color,
                                 fontWeight: FontWeight.bold,
@@ -540,7 +579,7 @@ class _KorsisMentalMonitoringScreenState
                     ),
                     borderData: FlBorderData(show: false),
                     minX: 1,
-                    maxX: 6,
+                    maxX: 4,
                     minY: 0,
                     maxY: 40,
                     lineBarsData: [
@@ -550,8 +589,6 @@ class _KorsisMentalMonitoringScreenState
                           FlSpot(2, 15),
                           FlSpot(3, 12),
                           FlSpot(4, 25),
-                          FlSpot(5, 20),
-                          FlSpot(6, 35),
                         ],
                         isCurved: true,
                         color: Colors.green,
@@ -569,8 +606,6 @@ class _KorsisMentalMonitoringScreenState
                           FlSpot(2, 8),
                           FlSpot(3, 4),
                           FlSpot(4, 10),
-                          FlSpot(5, 6),
-                          FlSpot(6, 2),
                         ],
                         isCurved: true,
                         color: Colors.red,
@@ -618,6 +653,8 @@ class _KorsisMentalMonitoringScreenState
   }
 
   Widget _buildRecommendationCard() {
+    final currentMonth = DateFormat('MMMM', 'id_ID').format(DateTime.now());
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.lg),
       decoration: BoxDecoration(
@@ -655,7 +692,7 @@ class _KorsisMentalMonitoringScreenState
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
-                  'Grafik menunjukkan peningkatan Reward yang signifikan pada minggu ke-6 dan penurunan Punishment. Pertahankan pola kedisiplinan dan lanjutkan program motivasi Serdik.',
+                  'Grafik pada bulan $currentMonth menunjukkan peningkatan Reward yang signifikan pada minggu ke-4 dan pergerakan Punishment yang fluktuatif. Pertahankan pola kedisiplinan dan lanjutkan program motivasi Serdik.',
                   style: TextStyle(
                     color: Colors.blueGrey.shade700,
                     fontSize: AppDimensions.fontXs + 2,
@@ -857,6 +894,29 @@ class _KorsisMentalMonitoringScreenState
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: AppDimensions.xs),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey.shade50,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusSm,
+                      ),
+                    ),
+                    child: Text(
+                      _mapArabicToRoman(
+                        serdik['kelompok_kelas']?.toString() ?? '-',
+                      ),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.blueGrey.shade600,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: AppDimensions.xs),
                   Text(

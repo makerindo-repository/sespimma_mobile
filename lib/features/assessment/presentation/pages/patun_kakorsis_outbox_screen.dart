@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class PatunKakorsisOutboxScreen extends StatefulWidget {
   const PatunKakorsisOutboxScreen({super.key});
@@ -118,18 +119,9 @@ class _PatunKakorsisOutboxScreenState extends State<PatunKakorsisOutboxScreen> {
       _drafts.clear();
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white),
-            SizedBox(width: 8),
-            Text('Semua draft berhasil dikirim ke Kakorsis!'),
-          ],
-        ),
-        backgroundColor: Colors.green.shade700,
-        behavior: SnackBarBehavior.floating,
-      ),
+    AppNotifier.showSuccess(
+      context,
+      'Semua draft berhasil dikirim ke Kakorsis!',
     );
 
     Future.delayed(const Duration(seconds: 1), () {

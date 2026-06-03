@@ -11,6 +11,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class KorsisZoneQrSheet extends StatefulWidget {
   final List<AttendanceZone> zones;
@@ -106,9 +107,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal membuat PDF: $e')));
+        AppNotifier.showError(context, 'Gagal membuat PDF: $e');
       }
     } finally {
       if (mounted) setState(() => _isPrinting = false);

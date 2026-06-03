@@ -257,7 +257,8 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
       onSelected: onChanged,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
-        padding: const EdgeInsets.all(AppDimensions.sm),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.sm),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
@@ -312,123 +313,129 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
         horizontal: AppDimensions.xl,
         vertical: AppDimensions.lg,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: AssessmentSearchBarWidget(
-              controller: _searchController,
-              searchQuery: _searchQuery,
-              hintText: 'Cari nama atau No. Serdik...',
-              onChanged: (value) {
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: AssessmentSearchBarWidget(
+                controller: _searchController,
+                searchQuery: _searchQuery,
+                hintText: 'Cari nama atau nomor serdik...',
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                    _applyFilters();
+                  });
+                },
+                onClear: () {
+                  setState(() {
+                    _searchQuery = '';
+                    _searchController.clear();
+                    _applyFilters();
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: AppDimensions.sm),
+            _buildFilterDropdown(
+              icon: AppIcons.usersFill,
+              value: _selectedPokjar,
+              options: _pokjarOptions,
+              onChanged: (val) {
                 setState(() {
-                  _searchQuery = value;
+                  _selectedPokjar = val;
                   _applyFilters();
                 });
               },
-              onClear: () {
+            ),
+            const SizedBox(width: AppDimensions.sm),
+            _buildFilterDropdown(
+              icon: AppIcons.funnelFill,
+              value: _selectedStatus,
+              options: _statusOptions,
+              iconColor: _selectedStatus == 'Reward'
+                  ? Colors.green
+                  : (_selectedStatus == 'Punishment'
+                        ? Colors.red
+                        : AppColors.primaryNavy),
+              onChanged: (val) {
                 setState(() {
-                  _searchQuery = '';
-                  _searchController.clear();
+                  _selectedStatus = val;
                   _applyFilters();
                 });
               },
             ),
-          ),
-          const SizedBox(width: AppDimensions.sm),
-          _buildFilterDropdown(
-            icon: AppIcons.usersFill,
-            value: _selectedPokjar,
-            options: _pokjarOptions,
-            onChanged: (val) {
-              setState(() {
-                _selectedPokjar = val;
-                _applyFilters();
-              });
-            },
-          ),
-          const SizedBox(width: AppDimensions.sm),
-          _buildFilterDropdown(
-            icon: AppIcons.funnelFill,
-            value: _selectedStatus,
-            options: _statusOptions,
-            iconColor: _selectedStatus == 'Reward'
-                ? Colors.green
-                : (_selectedStatus == 'Punishment'
-                      ? Colors.red
-                      : AppColors.primaryNavy),
-            onChanged: (val) {
-              setState(() {
-                _selectedStatus = val;
-                _applyFilters();
-              });
-            },
-          ),
-          const SizedBox(width: AppDimensions.sm),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'approve') {
-                _approveAll();
-              } else if (value == 'reject') {
-                _rejectAll();
-              }
-            },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            enabled: _filteredItems.any((i) => i.status == 'pending'),
-            offset: const Offset(0, 45),
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'approve',
-                child: Row(
-                  children: [
-                    Icon(
-                      AppIcons.checkCircleFill,
-                      color: Colors.green.shade600,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Setujui Semua',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ],
+            const SizedBox(width: AppDimensions.sm),
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'approve') {
+                  _approveAll();
+                } else if (value == 'reject') {
+                  _rejectAll();
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              enabled: _filteredItems.any((i) => i.status == 'pending'),
+              offset: const Offset(0, 45),
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  value: 'approve',
+                  child: Row(
+                    children: [
+                      Icon(
+                        AppIcons.checkCircleFill,
+                        color: Colors.green.shade600,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Setujui Semua',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  value: 'reject',
+                  child: Row(
+                    children: [
+                      Icon(
+                        AppIcons.xCircleFill,
+                        color: Colors.red.shade600,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Tolak Semua',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              child: Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.sm + 2,
+                ),
+                decoration: BoxDecoration(
+                  color: _filteredItems.any((i) => i.status == 'pending')
+                      ? AppColors.primaryNavy
+                      : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                ),
+                child: const Icon(
+                  AppIcons.dotsThreeVerticalBold,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
-              PopupMenuItem<String>(
-                value: 'reject',
-                child: Row(
-                  children: [
-                    Icon(
-                      AppIcons.xCircleFill,
-                      color: Colors.red.shade600,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Tolak Semua',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            child: Container(
-              padding: const EdgeInsets.all(AppDimensions.sm + 2),
-              decoration: BoxDecoration(
-                color: _filteredItems.any((i) => i.status == 'pending')
-                    ? AppColors.primaryNavy
-                    : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-              ),
-              child: const Icon(
-                AppIcons.dotsThreeVerticalBold,
-                color: Colors.white,
-                size: 20,
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -481,9 +488,6 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
   }
 
   Widget _buildListHeader() {
-    final titlePokjar = _selectedPokjar == 'Semua Pokjar'
-        ? 'POKJAR I - V'
-        : _selectedPokjar;
     final totalSerdik = _filteredItems.length;
 
     return Padding(
@@ -504,22 +508,24 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
               letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(width: AppDimensions.sm),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.primaryNavy,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            ),
-            child: Text(
-              titlePokjar,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: AppDimensions.fontSm,
+          if (_selectedPokjar != 'Semua Pokjar') ...[
+            const SizedBox(width: AppDimensions.sm),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primaryNavy,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              ),
+              child: Text(
+                _selectedPokjar,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontSm,
+                ),
               ),
             ),
-          ),
+          ],
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -533,7 +539,7 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
                 const Icon(Icons.people_alt, color: Colors.white, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  '$totalSerdik Data',
+                  '$totalSerdik Serdik',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
