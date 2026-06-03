@@ -46,12 +46,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     super.dispose();
   }
 
-  // Pro Max Premium Color Palette
-  static const Color _primaryNavy = Color(0xFF0F172A); // Slate 900
-  static const Color _lightGrey = Color(0xFFF8FAFC); // Slate 50
-  static const Color _successGreen = Color(0xFF10B981); // Emerald 500
-  static const Color _dangerRed = Color(0xFFEF4444); // Red 500
-  static const Color _warningOrange = Color(0xFFF59E0B); // Amber 500
+  static const Color _primaryNavy = Color(0xFF0F172A);
+  static const Color _lightGrey = Color(0xFFF8FAFC);
+  static const Color _successGreen = Color(0xFF10B981);
+  static const Color _dangerRed = Color(0xFFEF4444);
+  static const Color _warningOrange = Color(0xFFF59E0B);
   static const Color _surfaceColor = Colors.white;
 
   List<Map<String, dynamic>> _getSubmissionsForTask(String taskId) {
@@ -68,7 +67,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent, // We wrap with our own Container
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
           decoration: const BoxDecoration(
@@ -190,7 +189,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                               color: _primaryNavy,
                               size: AppDimensions.iconLg,
                             ),
-                            onPressed: () => _downloadFile(submission['file'] ?? 'document.pdf'),
+                            onPressed: () => _downloadFile(
+                              submission['file'] ?? 'document.pdf',
+                            ),
                           ),
                         ],
                       ),
@@ -405,9 +406,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
       context: context,
       builder: (ctx) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            AppDimensions.radiusXl,
-          ),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         ),
         insetPadding: const EdgeInsets.all(AppDimensions.xl),
         clipBehavior: Clip.antiAlias,
@@ -424,8 +423,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                 ),
                 color: _primaryNavy,
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
@@ -521,9 +519,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
-              const CircularProgressIndicator(
-                color: _primaryNavy,
-              ),
+              const CircularProgressIndicator(color: _primaryNavy),
               const SizedBox(width: AppDimensions.xl),
               Expanded(
                 child: Text(
@@ -546,7 +542,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
       await file.writeAsString('Simulasi file dokumen $filename');
       await Future.delayed(const Duration(seconds: 1));
     } catch (e) {
-      // ignore
+      debugPrint('Error: $e');
     }
 
     if (!mounted) return;
@@ -686,7 +682,10 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         actions: [
           if (task.id != 'DUMMY')
             IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+              icon: const Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.white,
+              ),
               tooltip: 'Hapus Tugas',
               onPressed: () => _showDeleteConfirmationDialog(context, task),
             ),
@@ -796,7 +795,9 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                       ),
                       decoration: BoxDecoration(
                         color: _primaryNavy.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusSm,
+                        ),
                       ),
                       child: Text(
                         task.mapel.toUpperCase(),
@@ -854,13 +855,21 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStatItem('Total', total.toString(), Colors.blueGrey.shade700),
+                _buildStatItem(
+                  'Total',
+                  total.toString(),
+                  Colors.blueGrey.shade700,
+                ),
                 _buildDivider(),
                 _buildStatItem('Sudah', sudah.toString(), _successGreen),
                 _buildDivider(),
                 _buildStatItem('Belum', belum.toString(), _dangerRed),
                 _buildDivider(),
-                _buildStatItem('Terlambat', terlambat.toString(), _warningOrange),
+                _buildStatItem(
+                  'Terlambat',
+                  terlambat.toString(),
+                  _warningOrange,
+                ),
               ],
             ),
           ),
@@ -1260,10 +1269,15 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                       ),
                       const SizedBox(height: AppDimensions.md),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusSm,
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,

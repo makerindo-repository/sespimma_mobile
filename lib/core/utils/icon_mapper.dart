@@ -13,6 +13,7 @@ abstract final class AppIcons {
   static const IconData medalFill = Icons.emoji_events;
   static const IconData warningCircleFill = Icons.error;
   static const IconData infoFill = Icons.info;
+  static const IconData infoCircleFill = Icons.info;
   static const IconData usersThreeFill = Icons.groups;
   static const IconData calendarBlankFill = Icons.calendar_today;
   static const IconData lockFill = Icons.lock;
@@ -95,6 +96,7 @@ abstract final class AppIcons {
   static const IconData chartLineUpFill = Icons.trending_up;
   static const IconData treeStructureFill = Icons.account_tree;
   static const IconData trendUpFill = Icons.trending_up;
+  static const IconData trendDownFill = Icons.trending_down;
   static const IconData warningFill = Icons.warning;
   static const IconData receiptFill = Icons.receipt;
   static const IconData paperPlaneTiltFill = Icons.send;

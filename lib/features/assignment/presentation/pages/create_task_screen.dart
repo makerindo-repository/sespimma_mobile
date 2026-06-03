@@ -51,10 +51,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
   String? _attachedFileName;
   bool _isAttaching = false;
 
-  // Pro Max Premium Color Palette
-  static const Color _primaryNavy = Color(0xFF0F172A); // Slate 900
-  static const Color _lightGrey = Color(0xFFF8FAFC); // Slate 50
-  static const Color _successGreen = Color(0xFF10B981); // Emerald 500
+  static const Color _primaryNavy = Color(0xFF0F172A);
+  static const Color _lightGrey = Color(0xFFF8FAFC);
+  static const Color _successGreen = Color(0xFF10B981);
   static const Color _surfaceColor = Colors.white;
 
   final List<String> _pokjarList = [
@@ -804,10 +803,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
                   width: _selectedDeadline != null ? 2.0 : 1.0,
                 ),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 18,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
               child: Row(
                 children: [
                   Icon(
@@ -875,10 +871,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
               elevation: 4,
               shadowColor: _primaryNavy.withValues(alpha: 0.4),
             ),
-            icon: const Icon(
-              Icons.send_rounded,
-              size: AppDimensions.iconLg,
-            ),
+            icon: const Icon(Icons.send_rounded, size: AppDimensions.iconLg),
             label: const Text(
               'PUBLIKASIKAN TUGAS',
               style: TextStyle(

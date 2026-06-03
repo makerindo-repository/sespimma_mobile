@@ -1,10 +1,11 @@
-// lib/features/assessment/presentation/pages/samapta_a_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/jasmani_grading_data.dart';
 import 'package:sespimma_mobile/features/assessment/data/datasources/jasmani_lookup_tables.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/serdik_info_header_widget.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class SamaptaAScreen extends StatefulWidget {
   final Map<String, dynamic> serdik;
@@ -31,12 +32,9 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
   @override
   void initState() {
     super.initState();
-    // If we have previous grading
+
     if (widget.gradingData.nilaiA != null) {
-      // Actually we don't save distance, only the final score in the mock model.
-      // In a real app we'd save both. For now, we just initialize the score.
       _ngaScore = widget.gradingData.nilaiA!;
-      // Assume a default reverse calculation or just leave distance empty
     }
   }
 
@@ -51,10 +49,14 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
       setState(() => _ngaScore = 0.0);
       return;
     }
-    
+
     final int? meters = int.tryParse(value);
     if (meters != null) {
-      final double score = JasmaniLookupTables.getNilaiLari(meters, widget.gender, widget.golongan);
+      final double score = JasmaniLookupTables.getNilaiLari(
+        meters,
+        widget.gender,
+        widget.golongan,
+      );
       setState(() {
         _ngaScore = score;
       });
@@ -63,31 +65,22 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
 
   void _saveData() {
     if (_ngaScore == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Jarak belum diisi atau tidak valid'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppNotifier.showError(context, 'Jarak belum diisi atau tidak valid');
       return;
     }
-    
+
     widget.gradingData.nilaiA = _ngaScore;
     JasmaniGradingData.saveJasmaniData(widget.gradingData);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Nilai Samapta A berhasil disimpan'),
-        backgroundColor: Colors.green,
-      ),
-    );
+
+    AppNotifier.showSuccess(context, 'Nilai Samapta A berhasil disimpan');
+
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final isGol4 = widget.golongan == 'GOL IV';
-    
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
@@ -99,7 +92,7 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isGol4 ? 'Jalan Kaki 20 Menit' : 'Lari/Jalan 12 Menit',
+          isGol4 ? 'Jalan selama 12 menit' : 'Lari selama 12 menit',
           style: const TextStyle(
             color: AppColors.primaryNavy,
             fontWeight: FontWeight.w700,
@@ -111,10 +104,15 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SerdikInfoHeaderWidget(
+              serdik: widget.serdik,
+              golongan: widget.golongan,
+              gender: widget.gender,
+            ),
+            const SizedBox(height: AppDimensions.xl),
             _buildInsightInfo(isGol4),
             const SizedBox(height: AppDimensions.xl),
-            
-            // Calculator Section
+
             Container(
               padding: const EdgeInsets.all(AppDimensions.lg),
               decoration: BoxDecoration(
@@ -139,27 +137,47 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
                         child: TextField(
                           controller: _distanceController,
                           keyboardType: TextInputType.number,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                           onChanged: _calculateScore,
                           decoration: InputDecoration(
                             hintText: 'Misal: 2500',
                             filled: true,
                             fillColor: Colors.grey.shade50,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusMd,
+                              ),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                              borderSide: BorderSide(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusMd,
+                              ),
+                              borderSide: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                              borderSide: const BorderSide(color: AppColors.primaryNavy),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusMd,
+                              ),
+                              borderSide: const BorderSide(
+                                color: AppColors.primaryNavy,
+                              ),
                             ),
                             suffixIcon: const Padding(
                               padding: EdgeInsets.all(12),
-                              child: Text('m', style: TextStyle(fontWeight: FontWeight.w700, color: Colors.grey)),
+                              child: Text(
+                                'm',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.grey,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -169,10 +187,16 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
                         width: 80,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: _ngaScore >= 70 ? Colors.green.shade50 : Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                          color: _ngaScore >= 70
+                              ? Colors.green.shade50
+                              : Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                           border: Border.all(
-                            color: _ngaScore >= 70 ? Colors.green.shade200 : Colors.red.shade200,
+                            color: _ngaScore >= 70
+                                ? Colors.green.shade200
+                                : Colors.red.shade200,
                           ),
                         ),
                         child: Center(
@@ -181,7 +205,9 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
                             style: TextStyle(
                               fontSize: AppDimensions.fontLg,
                               fontWeight: FontWeight.w800,
-                              color: _ngaScore >= 70 ? Colors.green.shade700 : Colors.red.shade700,
+                              color: _ngaScore >= 70
+                                  ? Colors.green.shade700
+                                  : Colors.red.shade700,
                             ),
                           ),
                         ),
@@ -191,7 +217,7 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: AppDimensions.xxxl),
             ElevatedButton(
               onPressed: _saveData,
@@ -244,26 +270,38 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
           const SizedBox(height: AppDimensions.md),
           Text(
             'APA ITU:',
-            style: TextStyle(fontWeight: FontWeight.w700, color: Colors.blue.shade900, fontSize: 12),
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Colors.blue.shade900,
+              fontSize: 12,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
-            isGol4 
-              ? 'Tes jalan kaki selama 20 menit untuk mengukur daya tahan kardiovaskuler serdik khusus Golongan IV.'
-              : 'Tes lari atau jalan (tetap dihitung) selama 12 menit untuk mengukur daya tahan kardiovaskuler serdik.',
+            isGol4
+                ? 'Tes jalan selama 12 menit untuk mengukur daya tahan kardiovaskuler serdik khusus Golongan IV.'
+                : 'Tes lari selama 12 menit untuk mengukur daya tahan kardiovaskuler serdik.',
             style: TextStyle(color: Colors.blue.shade800, fontSize: 13),
           ),
           const SizedBox(height: AppDimensions.md),
           Text(
             'TEKNIS PELAKSANAAN:',
-            style: TextStyle(fontWeight: FontWeight.w700, color: Colors.blue.shade900, fontSize: 12),
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: Colors.blue.shade900,
+              fontSize: 12,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
-            isGol4 
-              ? '• Serdik berjalan kaki\n• Durasi: 20 MENIT\n• Yang diukur: JARAK yang ditempuh (dalam meter)'
-              : '• Serdik berlari ATAU berjalan\n• Durasi: 12 MENIT\n• Yang diukur: JARAK yang ditempuh (dalam meter)',
-            style: TextStyle(color: Colors.blue.shade800, fontSize: 13, height: 1.5),
+            isGol4
+                ? '• Serdik berjalan kaki\n• Durasi: 12 MENIT\n• Yang diukur: JARAK yang ditempuh (dalam meter)'
+                : '• Serdik berlari\n• Durasi: 12 MENIT\n• Yang diukur: JARAK yang ditempuh (dalam meter)',
+            style: TextStyle(
+              color: Colors.blue.shade800,
+              fontSize: 13,
+              height: 1.5,
+            ),
           ),
         ],
       ),

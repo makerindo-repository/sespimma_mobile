@@ -37,7 +37,7 @@ class _GadikAssignmentMonitoringScreenState
     'Naskah Praktek Kerja Profesi (NPKP)',
     'Naskah Program Transformasi Teknis (NPTT)',
     'Naskah Karya Perseorangan (NKP)',
-    'Simulasi Kepemimpinan Kontemporer'
+    'Simulasi Kepemimpinan Kontemporer',
   ];
 
   String _getDynamicCategoryName(String rawCategory) {
@@ -171,11 +171,7 @@ class _GadikAssignmentMonitoringScreenState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildHeaderBlock(totalTasks),
-          Divider(
-            height: 1,
-            color: Colors.grey.shade200,
-            thickness: 1,
-          ),
+          Divider(height: 1, color: Colors.grey.shade200, thickness: 1),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
@@ -211,10 +207,15 @@ class _GadikAssignmentMonitoringScreenState
             setState(() {});
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Tugas berhasil dibuat dan didistribusikan.', style: TextStyle(fontWeight: FontWeight.w700)),
-                backgroundColor: const Color(0xFF10B981), // Emerald 500
+                content: const Text(
+                  'Tugas berhasil dibuat dan didistribusikan.',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                backgroundColor: const Color(0xFF10B981),
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                ),
                 duration: const Duration(seconds: 3),
               ),
             );
@@ -223,7 +224,14 @@ class _GadikAssignmentMonitoringScreenState
         backgroundColor: _primaryNavy,
         elevation: 4,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('Buat Tugas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+        label: const Text(
+          'Buat Tugas',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
     );
   }
@@ -314,11 +322,22 @@ class _GadikAssignmentMonitoringScreenState
                   onTap: _pickDate,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: _selectedDate != null ? _primaryNavy.withValues(alpha: 0.08) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                      border: Border.all(color: _selectedDate != null ? _primaryNavy.withValues(alpha: 0.2) : Colors.grey.shade200),
+                      color: _selectedDate != null
+                          ? _primaryNavy.withValues(alpha: 0.08)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
+                      border: Border.all(
+                        color: _selectedDate != null
+                            ? _primaryNavy.withValues(alpha: 0.2)
+                            : Colors.grey.shade200,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -326,12 +345,17 @@ class _GadikAssignmentMonitoringScreenState
                         Icon(
                           Icons.calendar_today_rounded,
                           size: 16,
-                          color: _selectedDate != null ? _primaryNavy : Colors.blueGrey.shade400,
+                          color: _selectedDate != null
+                              ? _primaryNavy
+                              : Colors.blueGrey.shade400,
                         ),
                         if (_selectedDate != null) ...[
                           const SizedBox(width: 6),
                           Text(
-                            DateFormat('dd MMM', 'id_ID').format(_selectedDate!),
+                            DateFormat(
+                              'dd MMM',
+                              'id_ID',
+                            ).format(_selectedDate!),
                             style: const TextStyle(
                               fontSize: AppDimensions.fontSm,
                               fontWeight: FontWeight.w700,
@@ -358,7 +382,9 @@ class _GadikAssignmentMonitoringScreenState
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
                       border: Border.all(color: Colors.grey.shade200),
                       color: Colors.grey.shade50,
                     ),
@@ -383,7 +409,8 @@ class _GadikAssignmentMonitoringScreenState
 
   Widget _buildEmptyState() {
     final isSearching = _searchQuery.isNotEmpty;
-    final isFiltered = _selectedCategory != 'Semua Kategori' || _selectedDate != null;
+    final isFiltered =
+        _selectedCategory != 'Semua Kategori' || _selectedDate != null;
 
     return Center(
       child: Padding(
@@ -406,11 +433,17 @@ class _GadikAssignmentMonitoringScreenState
                     color: Colors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
                     ],
                   ),
                   child: Icon(
-                    isSearching ? Icons.search_off_rounded : Icons.assignment_outlined,
+                    isSearching
+                        ? Icons.search_off_rounded
+                        : Icons.assignment_outlined,
                     size: 32,
                     color: _primaryNavy,
                   ),
@@ -432,8 +465,8 @@ class _GadikAssignmentMonitoringScreenState
               isSearching
                   ? 'Tidak ada tugas yang cocok dengan kata kunci "$_searchQuery".'
                   : isFiltered
-                      ? 'Tidak ada tugas yang sesuai dengan filter.'
-                      : 'Mulai dengan menekan tombol "Buat Tugas" di bawah.',
+                  ? 'Tidak ada tugas yang sesuai dengan filter.'
+                  : 'Mulai dengan menekan tombol "Buat Tugas" di bawah.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppDimensions.fontLg,
@@ -459,7 +492,10 @@ class _GadikAssignmentMonitoringScreenState
                   backgroundColor: _primaryNavy,
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   ),
@@ -479,7 +515,12 @@ class _GadikAssignmentMonitoringScreenState
         constraints: const BoxConstraints(maxWidth: 800),
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(AppDimensions.xl, AppDimensions.lg, AppDimensions.xl, 100),
+          padding: const EdgeInsets.fromLTRB(
+            AppDimensions.xl,
+            AppDimensions.lg,
+            AppDimensions.xl,
+            100,
+          ),
           itemCount: tasks.length,
           separatorBuilder: (context, index) =>
               const SizedBox(height: AppDimensions.lg),
@@ -495,20 +536,20 @@ class _GadikAssignmentMonitoringScreenState
     final int totalTarget = _getTotalSerdik(task.targetPokjar);
     final int submitted = _getSubmittedCount(task.id);
     final int graded = _getGradedCount(task.id);
-    
+
     final bool allGraded = submitted > 0 && graded == submitted;
     final bool hasSubmissions = submitted > 0;
-    
+
     Color statusColor = Colors.grey.shade400;
     Color statusBgColor = Colors.grey.shade100;
     IconData statusIcon = Icons.assignment_outlined;
 
     if (allGraded) {
-      statusColor = const Color(0xFF10B981); // Emerald 500
+      statusColor = const Color(0xFF10B981);
       statusBgColor = const Color(0xFF10B981).withValues(alpha: 0.1);
       statusIcon = Icons.check_circle_rounded;
     } else if (hasSubmissions) {
-      statusColor = const Color(0xFFF59E0B); // Amber 500
+      statusColor = const Color(0xFFF59E0B);
       statusBgColor = const Color(0xFFF59E0B).withValues(alpha: 0.1);
       statusIcon = Icons.pending_actions_rounded;
     }
@@ -540,20 +581,28 @@ class _GadikAssignmentMonitoringScreenState
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => GadikAssignmentDetailScreen(assignment: task),
+                builder: (context) =>
+                    GadikAssignmentDetailScreen(assignment: task),
               ),
             );
             if (!context.mounted) return;
             if (result == 'deleted') {
               setState(() {
-                GadikAssignmentMockData.assignments.removeWhere((a) => a.id == task.id);
+                GadikAssignmentMockData.assignments.removeWhere(
+                  (a) => a.id == task.id,
+                );
               });
               scaffoldMessenger.showSnackBar(
                 SnackBar(
-                  content: const Text('Tugas berhasil dihapus.', style: TextStyle(fontWeight: FontWeight.w700)),
-                  backgroundColor: const Color(0xFFEF4444), // Red 500
+                  content: const Text(
+                    'Tugas berhasil dihapus.',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  backgroundColor: const Color(0xFFEF4444),
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  ),
                 ),
               );
             } else {
@@ -573,7 +622,9 @@ class _GadikAssignmentMonitoringScreenState
                       height: 48,
                       decoration: BoxDecoration(
                         color: statusBgColor,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusLg,
+                        ),
                       ),
                       child: Icon(statusIcon, color: statusColor, size: 24),
                     ),
@@ -585,10 +636,15 @@ class _GadikAssignmentMonitoringScreenState
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: _lightGrey,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusSm,
+                                  ),
                                 ),
                                 child: Text(
                                   shortCat,
@@ -640,14 +696,23 @@ class _GadikAssignmentMonitoringScreenState
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.timer_outlined, size: 16, color: Colors.blueGrey.shade600),
+                          Icon(
+                            Icons.timer_outlined,
+                            size: 16,
+                            color: Colors.blueGrey.shade600,
+                          ),
                           const SizedBox(width: 6),
                           Text(
-                            DateFormat('dd MMM yy, HH:mm', 'id_ID').format(task.deadline),
+                            DateFormat(
+                              'dd MMM yy, HH:mm',
+                              'id_ID',
+                            ).format(task.deadline),
                             style: TextStyle(
                               fontSize: AppDimensions.fontSm,
                               fontWeight: FontWeight.w700,
@@ -677,7 +742,9 @@ class _GadikAssignmentMonitoringScreenState
                             child: LinearProgressIndicator(
                               value: progressPct,
                               backgroundColor: Colors.grey.shade200,
-                              valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                statusColor,
+                              ),
                               minHeight: 4,
                             ),
                           ),

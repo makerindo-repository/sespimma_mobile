@@ -1,4 +1,3 @@
-// lib/features/assessment/presentation/pages/medis_health_monitoring_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,7 +36,7 @@ class _MedisHealthMonitoringScreenState
     'POKJAR 3',
     'POKJAR 4',
     'POKJAR 5',
-    'POKJAR 6'
+    'POKJAR 6',
   ];
 
   @override
@@ -82,7 +81,8 @@ class _MedisHealthMonitoringScreenState
           ],
         ),
         content: const Text(
-            'Apakah Anda yakin ingin mengunci data kesehatan seluruh Serdik? Data yang sudah dikunci akan digunakan untuk kalkulasi Nilai Akhir.'),
+          'Apakah Anda yakin ingin mengunci data kesehatan seluruh Serdik? Data yang sudah dikunci akan digunakan untuk kalkulasi Nilai Akhir.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -99,7 +99,10 @@ class _MedisHealthMonitoringScreenState
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Kunci Data', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Kunci Data',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -137,7 +140,9 @@ class _MedisHealthMonitoringScreenState
             );
           }
         },
-        backgroundColor: _isAllHealthScoresFilled ? AppColors.primaryNavy : Colors.grey,
+        backgroundColor: _isAllHealthScoresFilled
+            ? AppColors.primaryNavy
+            : Colors.grey,
         icon: const Icon(Icons.lock_outline, color: Colors.white),
         label: const Text(
           'Kunci Nilai',
@@ -150,18 +155,21 @@ class _MedisHealthMonitoringScreenState
             final baseList = SerdikRealData.records.toList();
 
             var filteredList = baseList.where((serdik) {
-              final name =
-                  (serdik['nama_lengkap'] ?? '').toString().toLowerCase();
-              final noSerdik =
-                  (serdik['no_serdik'] ?? '').toString().toLowerCase();
+              final name = (serdik['nama_lengkap'] ?? '')
+                  .toString()
+                  .toLowerCase();
+              final noSerdik = (serdik['no_serdik'] ?? '')
+                  .toString()
+                  .toLowerCase();
               final query = _searchQuery.toLowerCase();
               return name.contains(query) || noSerdik.contains(query);
             }).toList();
 
             if (_selectedFilter != 'Semua') {
               filteredList = filteredList
-                  .where((serdik) =>
-                      serdik['kelompok_kelas'] == _selectedFilter)
+                  .where(
+                    (serdik) => serdik['kelompok_kelas'] == _selectedFilter,
+                  )
                   .toList();
             }
 
@@ -185,9 +193,7 @@ class _MedisHealthMonitoringScreenState
                         ? CustomScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
                             slivers: [
-                              SliverFillRemaining(
-                                child: _buildEmptyState(),
-                              ),
+                              SliverFillRemaining(child: _buildEmptyState()),
                             ],
                           )
                         : _buildSerdikList(filteredList),
@@ -384,7 +390,9 @@ class _MedisHealthMonitoringScreenState
     final data = HealthMonitoringData.getHealthData(noSerdik);
     final bool isGraded = data.nilaiA != null && data.nilaiB != null;
     final double finalScore = isGraded ? data.nilaiAkhir : 0;
-    final Color scoreColor = isGraded ? _getScoreColor(finalScore) : Colors.grey;
+    final Color scoreColor = isGraded
+        ? _getScoreColor(finalScore)
+        : Colors.grey;
 
     return Container(
       decoration: BoxDecoration(
@@ -460,8 +468,12 @@ class _MedisHealthMonitoringScreenState
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: isGraded ? scoreColor.withValues(alpha: 0.1) : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      color: isGraded
+                          ? scoreColor.withValues(alpha: 0.1)
+                          : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -489,13 +501,19 @@ class _MedisHealthMonitoringScreenState
                   ElevatedButton(
                     onPressed: () {
                       HapticFeedback.selectionClick();
-                      MedisHealthGradingSheet.show(context, serdik, _refreshData);
+                      MedisHealthGradingSheet.show(
+                        context,
+                        serdik,
+                        _refreshData,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryNavy,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusLg,
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       minimumSize: const Size(0, 36),
@@ -507,7 +525,7 @@ class _MedisHealthMonitoringScreenState
                         fontSize: AppDimensions.fontSm,
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ],

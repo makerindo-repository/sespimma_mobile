@@ -7,6 +7,8 @@ class StatusFilterButtonWidget extends StatelessWidget {
   final List<String> statuses;
   final ValueChanged<String> onSelected;
   final String defaultStatus;
+  final IconData? icon;
+  final String? tooltip;
 
   const StatusFilterButtonWidget({
     super.key,
@@ -14,6 +16,8 @@ class StatusFilterButtonWidget extends StatelessWidget {
     required this.statuses,
     required this.onSelected,
     this.defaultStatus = 'Semua Status',
+    this.icon,
+    this.tooltip,
   });
 
   @override
@@ -43,13 +47,13 @@ class StatusFilterButtonWidget extends StatelessWidget {
       ),
       child: PopupMenuButton<String>(
         icon: Icon(
-          Icons.filter_list_rounded,
+          icon ?? Icons.filter_list_rounded,
           color: hasActiveFilter
               ? AppColors.primaryNavy
               : Colors.blueGrey.shade600,
           size: AppDimensions.iconDefault,
         ),
-        tooltip: 'Filter Status Penilaian',
+        tooltip: tooltip ?? 'Filter Status Penilaian',
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         ),

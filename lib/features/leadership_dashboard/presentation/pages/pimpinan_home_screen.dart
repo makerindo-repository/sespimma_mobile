@@ -11,6 +11,7 @@ import '../../../notification/presentation/pages/notification_screen.dart';
 import '../../data/datasources/pimpinan_mock_data.dart';
 import '../../data/models/pokjar_stats_model.dart';
 import '../../../auth/domain/entities/user_entity.dart';
+import '../../../auth/data/datasources/serdik_real_data.dart';
 
 class PimpinanHomeScreen extends StatefulWidget {
   const PimpinanHomeScreen({super.key});
@@ -24,23 +25,24 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
   AnimationController? _animController;
   bool _animateBars = false;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const Color _academicBlue = Color(0xFF1976D2);
   static const Color _mentalOrange = Color(0xFFF57C00);
-  static const Color _physicalGreen = Color(0xFF2E7D32);
-  static const Color _warningColor = Color(0xFFD32F2F);
-  static const Color _dangerRed = Color(0xFFD32F2F);
+  static const Color _physicalGreen = Color(0xFF10B981);
+  static const Color _dangerRed = Color(0xFFEF4444);
   static const Color _successGreen = Color(0xFF2E7D32);
 
   List<PokjarStatsModel> get _pokjarData {
-    return PimpinanMockData.getPokjarAverages().map((e) {
+    final list = PimpinanMockData.getPokjarAverages().map((e) {
       return PokjarStatsModel(
         id: e['name'],
         namaPokjar: e['name'],
         rataRataNilai: e['average'],
       );
     }).toList();
+    list.sort((a, b) => b.rataRataNilai.compareTo(a.rataRataNilai));
+    return list;
   }
 
   @override
@@ -195,13 +197,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(24, statusBarHeight + 16, 24, 60),
-      decoration: const BoxDecoration(
-        color: _primaryNavy,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(32),
-          bottomRight: Radius.circular(32),
-        ),
-      ),
+      decoration: const BoxDecoration(color: _primaryNavy),
       child: Row(
         children: [
           Container(
@@ -254,9 +250,11 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
-                  child: const Text(
-                    'PIMPINAN SESPIMMA',
-                    style: TextStyle(
+                  child: Text(
+                    user.jabatanSenat.isNotEmpty && user.jabatanSenat != '-'
+                        ? user.jabatanSenat.toUpperCase()
+                        : 'PENANGGUNG JAWAB',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
@@ -269,7 +267,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
           ),
           _buildHeaderIcon(
             icon: AppIcons.bell,
-            count: '3',
+            count: '1',
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -319,10 +317,11 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
   }
 
   Widget _buildGeneralStats(BuildContext context) {
-    final int totalSerdik = PimpinanMockData.sharedReportData.length;
-    final double avgScore =
-        _pokjarData.fold<double>(0, (s, e) => s + e.rataRataNilai) /
-        _pokjarData.length;
+    final compAverages = PimpinanMockData.getGlobalComponentAverages();
+    final double akademik = compAverages['akademik']!;
+    final double mental = compAverages['mental']!;
+    final double jasmani = compAverages['jasmani']!;
+    final int totalSerdik = SerdikRealData.records.length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -360,37 +359,41 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
               ],
             ),
             const SizedBox(height: AppDimensions.md),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              childAspectRatio: 2.2,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
+            Column(
               children: [
-                _buildStatTile(
+                _buildColumnStatTile(
                   'Total Serdik',
                   totalSerdik.toString(),
                   AppIcons.usersFill,
                   _academicBlue,
                 ),
-                _buildStatTile(
-                  'Rata-rata',
-                  avgScore.toStringAsFixed(2),
-                  AppIcons.chartLineUpFill,
-                  _successGreen,
-                ),
-                _buildStatTile(
-                  'Pokjar Aktif',
-                  _pokjarData.length.toString(),
+                const SizedBox(height: 8),
+                _buildColumnStatTile(
+                  'Total Pokjar',
+                  '5',
                   AppIcons.treeStructureFill,
                   _mentalOrange,
                 ),
-                _buildStatTile(
-                  'Laporan Absensi',
-                  PimpinanMockData.attendanceReportCount.toString(),
-                  AppIcons.clipboardTextFill,
-                  _primaryNavy,
+                const SizedBox(height: 8),
+                _buildColumnStatTile(
+                  'Rata-rata Akademik',
+                  akademik > 0 ? akademik.toStringAsFixed(2) : 'BELUM DINILAI',
+                  AppIcons.bookOpenFill,
+                  _academicBlue,
+                ),
+                const SizedBox(height: 8),
+                _buildColumnStatTile(
+                  'Rata-rata Mental',
+                  mental > 0 ? mental.toStringAsFixed(2) : 'BELUM DINILAI',
+                  AppIcons.shieldCheckFill,
+                  _mentalOrange,
+                ),
+                const SizedBox(height: 8),
+                _buildColumnStatTile(
+                  'Rata-rata Jasmani',
+                  jasmani > 0 ? jasmani.toStringAsFixed(2) : 'BELUM DINILAI',
+                  AppIcons.barbellFill,
+                  _physicalGreen,
                 ),
               ],
             ),
@@ -400,39 +403,53 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
     );
   }
 
-  Widget _buildStatTile(
+  Widget _buildColumnStatTile(
     String label,
     String value,
     IconData icon,
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.md,
+        vertical: AppDimensions.sm,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         border: Border.all(color: color.withValues(alpha: 0.1)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          Icon(icon, color: color, size: AppDimensions.iconDefault),
-          const SizedBox(height: AppDimensions.radiusSm),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: AppDimensions.fontXl,
-              fontWeight: FontWeight.w900,
-              color: color,
+          Container(
+            padding: const EdgeInsets.all(AppDimensions.xs),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: AppDimensions.iconDefault),
+          ),
+          const SizedBox(width: AppDimensions.md),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: AppDimensions.fontMd,
+                fontWeight: FontWeight.w700,
+                color: Colors.blueGrey.shade700,
+              ),
             ),
           ),
           Text(
-            label,
+            value,
             style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
-              color: Colors.blueGrey.shade400,
+              fontSize: value == 'BELUM DINILAI'
+                  ? AppDimensions.fontSm
+                  : AppDimensions.fontLg,
+              fontWeight: FontWeight.w900,
+              color: value == 'BELUM DINILAI'
+                  ? Colors.blueGrey.shade300
+                  : color,
             ),
           ),
         ],
@@ -441,14 +458,15 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
   }
 
   Widget _buildPieChartSection() {
-    final double avgScore =
-        _pokjarData.fold<double>(0, (s, e) => s + e.rataRataNilai) /
-        _pokjarData.length;
-
     final compAverages = PimpinanMockData.getGlobalComponentAverages();
-    final double akademik = compAverages['akademik']!;
-    final double mental = compAverages['mental']!;
-    final double jasmani = compAverages['jasmani']!;
+    final double akademik = compAverages['akademik'] ?? 0.0;
+    final double mental = compAverages['mental'] ?? 0.0;
+    final double jasmani = compAverages['jasmani'] ?? 0.0;
+
+    final double nakScore =
+        (akademik * 0.70) + (mental * 0.20) + (jasmani * 0.10);
+    final bool hasData = nakScore > 0;
+    final bool isStabil = akademik >= 70.0 && mental >= 70.0 && jasmani >= 70.0;
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.xl - 4),
@@ -479,19 +497,37 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _successGreen.withValues(alpha: 0.1),
+                  color: hasData
+                      ? (isStabil
+                            ? _successGreen.withValues(alpha: 0.1)
+                            : _dangerRed.withValues(alpha: 0.1))
+                      : Colors.blueGrey.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
                 ),
                 child: Row(
                   children: [
-                    Icon(AppIcons.trendUpFill, size: 10, color: _successGreen),
+                    Icon(
+                      hasData
+                          ? (isStabil
+                                ? AppIcons.trendUpFill
+                                : AppIcons.trendDownFill)
+                          : AppIcons.minusCircle,
+                      size: 10,
+                      color: hasData
+                          ? (isStabil ? _successGreen : _dangerRed)
+                          : Colors.blueGrey,
+                    ),
                     const SizedBox(width: AppDimensions.xs),
-                    const Text(
-                      'Stabil',
+                    Text(
+                      hasData
+                          ? (isStabil ? 'Stabil' : 'Tidak Stabil')
+                          : 'Belum Dinilai',
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
-                        color: _successGreen,
+                        color: hasData
+                            ? (isStabil ? _successGreen : _dangerRed)
+                            : Colors.blueGrey,
                       ),
                     ),
                   ],
@@ -500,59 +536,76 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
             ],
           ),
           const SizedBox(height: AppDimensions.lg),
-          SizedBox(
-            width: 120,
-            height: 120,
-            child: RepaintBoundary(
-              child: CustomPaint(
-                painter: _DonutChartPainter(
-                  values: [akademik * 0.70, mental * 0.20, jasmani * 0.10],
-                  colors: const [_academicBlue, _mentalOrange, _physicalGreen],
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        avgScore.toStringAsFixed(2),
-                        style: const TextStyle(
-                          fontSize: AppDimensions.fontHuge + 2,
-                          fontWeight: FontWeight.w900,
-                          color: _primaryNavy,
-                        ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _DonutChartPainter(
+                      values: _animateBars && hasData
+                          ? [akademik * 0.70, mental * 0.20, jasmani * 0.10]
+                          : [0.0, 0.0, 0.0],
+                      colors: const [
+                        _academicBlue,
+                        _mentalOrange,
+                        _physicalGreen,
+                      ],
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            hasData ? nakScore.toStringAsFixed(2) : '0',
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontHuge,
+                              fontWeight: FontWeight.w900,
+                              color: _primaryNavy,
+                            ),
+                          ),
+                          Text(
+                            'NAK',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.blueGrey.shade300,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        'TOTAL',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.blueGrey.shade300,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: AppDimensions.lg),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildCenteredLegendItem(
-                'Akademik (70%)',
-                akademik.toStringAsFixed(2),
-                _academicBlue,
-              ),
-              _buildCenteredLegendItem(
-                'Mental (20%)',
-                mental.toStringAsFixed(2),
-                _mentalOrange,
-              ),
-              _buildCenteredLegendItem(
-                'Jasmani (10%)',
-                jasmani.toStringAsFixed(2),
-                _physicalGreen,
+              const SizedBox(width: AppDimensions.xl),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCenteredLegendItem(
+                    'Akademik',
+                    hasData ? akademik.toStringAsFixed(2) : '0',
+                    _academicBlue,
+                    '70%',
+                  ),
+                  const SizedBox(height: AppDimensions.sm),
+                  _buildCenteredLegendItem(
+                    'Mental Kepribadian',
+                    hasData ? mental.toStringAsFixed(2) : '0',
+                    _mentalOrange,
+                    '20%',
+                  ),
+                  const SizedBox(height: AppDimensions.sm),
+                  _buildCenteredLegendItem(
+                    'Jasmani',
+                    hasData ? jasmani.toStringAsFixed(2) : '0',
+                    _physicalGreen,
+                    '10%',
+                  ),
+                ],
               ),
             ],
           ),
@@ -561,27 +614,24 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
     );
   }
 
-  Widget _buildCenteredLegendItem(String label, String value, Color color) {
-    return Column(
+  Widget _buildCenteredLegendItem(
+    String label,
+    String value,
+    Color color,
+    String weight,
+  ) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: AppDimensions.fontLg + 1,
-            fontWeight: FontWeight.w900,
-            color: color,
-          ),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(height: AppDimensions.xs),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        const SizedBox(width: AppDimensions.sm),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: AppDimensions.xs),
             Text(
               label,
               style: TextStyle(
@@ -590,29 +640,42 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                 color: Colors.blueGrey.shade500,
               ),
             ),
+            const SizedBox(height: 2),
+            Row(
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontMd,
+                    fontWeight: FontWeight.w900,
+                    color: color,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    weight,
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
-        ),
-        Text(
-          _calculateKontribusi(label, value),
-          style: TextStyle(
-            fontSize: AppDimensions.fontXs,
-            fontWeight: FontWeight.w600,
-            color: Colors.blueGrey.shade300,
-          ),
         ),
       ],
     );
-  }
-
-  String _calculateKontribusi(String label, String value) {
-    double multiplier = 0.1;
-    if (label.contains('70')) {
-      multiplier = 0.7;
-    } else if (label.contains('20')) {
-      multiplier = 0.2;
-    }
-
-    return '(Kontribusi: ${(double.parse(value) * multiplier).toStringAsFixed(2)})';
   }
 
   Widget _buildBarChartSection() {
@@ -632,13 +695,26 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Analisis Pokjar',
-            style: TextStyle(
-              fontSize: AppDimensions.fontLg + 1,
-              fontWeight: FontWeight.w800,
-              color: _primaryNavy,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Expanded(
+                child: Text(
+                  'Analisis Rata-Rata Nilai Pokjar',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontMd,
+                    fontWeight: FontWeight.w800,
+                    color: _primaryNavy,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.sort_rounded,
+                color: Colors.blueGrey.shade400,
+                size: 20,
+              ),
+            ],
           ),
           const SizedBox(height: AppDimensions.xl),
           ..._pokjarData.map((data) => _buildBarRow(data)),
@@ -647,9 +723,18 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
     );
   }
 
+  Color _getGradingColor(double score) {
+    if (score == 0) return Colors.blueGrey.shade300;
+    if (score > 85.00) return Colors.green.shade600;
+    if (score > 80.00) return Colors.lightGreen.shade600;
+    if (score > 75.00) return Colors.orange.shade500;
+    if (score > 70.00) return Colors.amber.shade600;
+    return _dangerRed;
+  }
+
   Widget _buildBarRow(PokjarStatsModel data) {
-    final bool isWarning = data.rataRataNilai < 76.0;
-    final Color color = isWarning ? _warningColor : _academicBlue;
+    final bool hasData = data.rataRataNilai > 0;
+    final Color color = _getGradingColor(data.rataRataNilai);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -667,7 +752,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
                 ),
               ),
               Text(
-                data.rataRataNilai.toStringAsFixed(2),
+                hasData ? data.rataRataNilai.toStringAsFixed(2) : '0',
                 style: TextStyle(
                   fontSize: AppDimensions.fontMd,
                   fontWeight: FontWeight.w800,
@@ -680,7 +765,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
           ClipRRect(
             borderRadius: BorderRadius.circular(AppDimensions.radiusXs),
             child: LinearProgressIndicator(
-              value: _animateBars ? data.rataRataNilai / 100 : 0,
+              value: _animateBars && hasData ? data.rataRataNilai / 100 : 0,
               backgroundColor: Colors.blueGrey.shade50,
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 6,
@@ -692,10 +777,58 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
   }
 
   Widget _buildAiRecommendation() {
-    final lowest = _pokjarData.reduce(
+    final hasDataList = _pokjarData.where((e) => e.rataRataNilai > 0).toList();
+    if (hasDataList.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(AppDimensions.xl - 4),
+        decoration: BoxDecoration(
+          color: Colors.blueGrey.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+          border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              AppIcons.infoCircleFill,
+              color: Colors.blueGrey,
+              size: AppDimensions.iconLg,
+            ),
+            const SizedBox(width: AppDimensions.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Rekomendasi Sistem',
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontLg,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: AppDimensions.xs),
+                  Text(
+                    'Data penilaian belum tersedia untuk dilakukan analisis.',
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontMd,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.blueGrey.shade700,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final lowest = hasDataList.reduce(
       (a, b) => a.rataRataNilai < b.rataRataNilai ? a : b,
     );
-    final bool hasRisk = lowest.rataRataNilai < 76.0;
+    final bool hasRisk = lowest.rataRataNilai < 70.0;
 
     return Container(
       padding: const EdgeInsets.all(AppDimensions.xl - 4),
@@ -769,13 +902,15 @@ class _DonutChartPainter extends CustomPainter {
 
     double startAngle = -pi / 2;
     for (int i = 0; i < values.length; i++) {
-      final sweepAngle = (values[i] / total) * 2 * pi;
+      final sweepAngle = total == 0 ? 0.0 : (values[i] / total) * 2 * pi;
       final paint = Paint()
         ..color = colors[i]
         ..style = PaintingStyle.stroke
         ..strokeWidth = 10
         ..strokeCap = StrokeCap.round;
-      canvas.drawArc(rect, startAngle, sweepAngle - 0.05, false, paint);
+      if (sweepAngle > 0) {
+        canvas.drawArc(rect, startAngle, sweepAngle - 0.05, false, paint);
+      }
       startAngle += sweepAngle;
     }
   }

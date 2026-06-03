@@ -17,7 +17,8 @@ class KorsisZoneMarkingScreen extends StatefulWidget {
       _KorsisZoneMarkingScreenState();
 }
 
-class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen> {
+class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen>
+    with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
   final _radiusController = TextEditingController(text: '100');
   final List<LatLng> _points = [];
@@ -26,14 +27,28 @@ class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen> {
   LatLng? _userLocation;
   bool _isRefreshing = false;
 
+  late final AnimationController _pulseController;
+  late final Animation<double> _pulseAnimation;
+
   @override
   void initState() {
     super.initState();
     _initLocation();
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+
+    _pulseAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
   }
 
   @override
   void dispose() {
+    _pulseController.dispose();
     _mapController.dispose();
     _radiusController.dispose();
     super.dispose();
@@ -400,8 +415,8 @@ class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen> {
             if (_userLocation != null)
               Marker(
                 point: _userLocation!,
-                width: 14,
-                height: 14,
+                width: 44,
+                height: 44,
                 child: _buildUserLocationMarker(),
               ),
             ..._points.indexed.map(
@@ -513,19 +528,44 @@ class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen> {
   }
 
   Widget _buildUserLocationMarker() {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.blue.shade600,
-        border: Border.all(color: Colors.white, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.3),
-            blurRadius: 2,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Transform.scale(
+              scale: 1.0 + (_pulseAnimation.value * 0.8),
+              child: Opacity(
+                opacity: (1.0 - _pulseAnimation.value).clamp(0.0, 1.0),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.dangerRed.withValues(alpha: 0.35),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.dangerRed,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.dangerRed.withValues(alpha: 0.5),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

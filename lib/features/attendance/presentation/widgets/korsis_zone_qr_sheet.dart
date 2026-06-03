@@ -68,7 +68,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
             crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
               pw.Text(
-                zone.name,
+                zone.activityName,
                 textAlign: pw.TextAlign.center,
                 style: pw.TextStyle(
                   fontSize: 18,
@@ -77,7 +77,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
               ),
               pw.SizedBox(height: 6),
               pw.Text(
-                zone.activityName,
+                zone.name,
                 textAlign: pw.TextAlign.center,
                 style: const pw.TextStyle(fontSize: 13),
               ),
@@ -141,13 +141,37 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
           ),
           const SizedBox(height: AppDimensions.md),
 
-          Text(
-            '${widget.zones.length} Zona Aktif',
-            style: TextStyle(
-              fontSize: AppDimensions.fontSm,
-              color: Colors.blueGrey.shade400,
-              fontWeight: FontWeight.w600,
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Zona Aktif',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontSm,
+                  color: Colors.blueGrey.shade400,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade400.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${widget.zones.length}',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontSm,
+                    color: Colors.green.shade900,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: PageView.builder(
@@ -204,7 +228,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            zone.name,
+            zone.activityName,
             style: const TextStyle(
               fontSize: AppDimensions.fontXxl,
               fontWeight: FontWeight.w900,
@@ -216,7 +240,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
           ),
           const SizedBox(height: 4),
           Text(
-            zone.activityName,
+            zone.name,
             style: TextStyle(
               fontSize: AppDimensions.fontLg,
               fontWeight: FontWeight.w600,
@@ -240,7 +264,6 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
               padding: const EdgeInsets.all(AppDimensions.xl),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.1),
@@ -267,7 +290,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
           ),
           const SizedBox(height: AppDimensions.xl),
           Text(
-            'Minta Serdik scan QR ini dari aplikasi mereka.',
+            'Minta serdik scan QR Code ini dari aplikasi mereka. Apabila fitur geofencing bermasalah',
             style: TextStyle(
               fontSize: AppDimensions.fontDefault,
               color: Colors.blueGrey.shade400,
@@ -302,7 +325,7 @@ class _KorsisZoneQrSheetState extends State<KorsisZoneQrSheet> {
                     )
                   : const Icon(AppIcons.printer, size: 20),
               label: Text(
-                _isPrinting ? 'Menyiapkan...' : 'SIMPAN / CETAK QR CODE',
+                _isPrinting ? '' : 'SIMPAN QR CODE',
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.5,

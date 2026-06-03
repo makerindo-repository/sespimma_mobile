@@ -289,41 +289,17 @@ class _NotificationScreenState extends State<NotificationScreen>
         },
       ]);
     } else {
-      list.addAll([
-        {
-          'id': 'notif_p001',
-          'title': 'Validasi Persetujuan NAK',
-          'body':
-              'Terdapat kompilasi data NAK Siswa gelombang terbaru yang memerlukan validasi persetujuan resmi Anda.',
-          'date': _getDynamicDateStr(0),
-          'time': '10:15 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'task',
-        },
-        {
-          'id': 'notif_p002',
-          'title': 'Laporan Sistem Deteksi EWS',
-          'body':
-              'Sistem geofencing mendeteksi radar performa 2 siswa berada pada radar disiplin rawan.',
-          'date': _getDynamicDateStr(0),
-          'time': '08:45 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'punishment',
-        },
-        {
-          'id': 'notif_p003',
-          'title': 'Undangan Evaluasi Kurikulum',
-          'body':
-              'Rapat pleno bulanan evaluasi kurikulum pembelajaran besok pukul 10:00 WIB di Ruang Pimpinan.',
-          'date': _getDynamicDateStr(1),
-          'time': '14:00 WIB',
-          'dateTime': yesterday,
-          'isRead': true,
-          'type': 'info',
-        },
-      ]);
+      list.add({
+        'id': 'notif_p002',
+        'title': 'Peringatan Zona Tinggi',
+        'body':
+            'Sistem EWS mendeteksi adanya serdik yang berada pada zona risiko tinggi. Mohon segera lakukan peninjauan.',
+        'date': _getDynamicDateStr(0),
+        'time': 'Baru saja',
+        'dateTime': today,
+        'isRead': false,
+        'type': 'punishment',
+      });
     }
 
     setState(() {

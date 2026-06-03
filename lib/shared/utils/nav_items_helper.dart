@@ -23,7 +23,6 @@ import '../../features/leadership_dashboard/presentation/pages/pimpinan_home_scr
 import '../../features/attendance/presentation/pages/patun_attendance_monitoring_screen.dart';
 import '../../features/attendance/presentation/pages/korsis_zone_screen.dart';
 
-
 class NavItem {
   final String label;
   final IconData icon;
@@ -43,9 +42,9 @@ List<NavItem> getNavItemsByRole(String roleId) {
     case 'pimpinan':
       return const [
         NavItem(
-          label: 'Dashboard',
-          icon: AppIcons.squaresFour,
-          activeIcon: AppIcons.squaresFourFill,
+          label: 'Beranda',
+          icon: AppIcons.house,
+          activeIcon: AppIcons.houseFill,
           screen: PimpinanHomeScreen(),
         ),
         NavItem(
@@ -182,6 +181,12 @@ List<NavItem> getNavItemsByRole(String roleId) {
           icon: Icons.directions_run_outlined,
           activeIcon: Icons.directions_run,
           screen: OperatorJasmaniScreen(),
+        ),
+        NavItem(
+          label: 'Zona',
+          icon: AppIcons.mapPin,
+          activeIcon: AppIcons.mapPinFill,
+          screen: KorsisZoneScreen(),
         ),
         NavItem(
           label: 'Profil',

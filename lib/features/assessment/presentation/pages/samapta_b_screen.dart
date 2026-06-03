@@ -1,10 +1,11 @@
-// lib/features/assessment/presentation/pages/samapta_b_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/jasmani_grading_data.dart';
 import 'package:sespimma_mobile/features/assessment/data/datasources/jasmani_lookup_tables.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/serdik_info_header_widget.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class SamaptaBScreen extends StatefulWidget {
   final Map<String, dynamic> serdik;
@@ -62,7 +63,13 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
     }
     final count = int.tryParse(value);
     if (count != null) {
-      setState(() => _ngb1 = JasmaniLookupTables.getNilaiPullUp(count, widget.gender, widget.golongan));
+      setState(
+        () => _ngb1 = JasmaniLookupTables.getNilaiPullUp(
+          count,
+          widget.gender,
+          widget.golongan,
+        ),
+      );
     }
   }
 
@@ -73,7 +80,13 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
     }
     final count = int.tryParse(value);
     if (count != null) {
-      setState(() => _ngb2 = JasmaniLookupTables.getNilaiSitUp(count, widget.gender, widget.golongan));
+      setState(
+        () => _ngb2 = JasmaniLookupTables.getNilaiSitUp(
+          count,
+          widget.gender,
+          widget.golongan,
+        ),
+      );
     }
   }
 
@@ -84,7 +97,13 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
     }
     final count = int.tryParse(value);
     if (count != null) {
-      setState(() => _ngb3 = JasmaniLookupTables.getNilaiPushUp(count, widget.gender, widget.golongan));
+      setState(
+        () => _ngb3 = JasmaniLookupTables.getNilaiPushUp(
+          count,
+          widget.gender,
+          widget.golongan,
+        ),
+      );
     }
   }
 
@@ -95,37 +114,36 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
     }
     final seconds = double.tryParse(value.replaceAll(',', '.'));
     if (seconds != null) {
-      setState(() => _ngb4 = JasmaniLookupTables.getNilaiShuttleRun(seconds, widget.gender, widget.golongan));
+      setState(
+        () => _ngb4 = JasmaniLookupTables.getNilaiShuttleRun(
+          seconds,
+          widget.gender,
+          widget.golongan,
+        ),
+      );
     }
   }
 
   void _saveData() {
     if (_ngb1 == 0 || _ngb2 == 0 || _ngb3 == 0 || _ngb4 == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Harap isi semua nilai Samapta B'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppNotifier.showError(context, 'Harap isi semua nilai Samapta B');
       return;
     }
-    
+
     widget.gradingData.nilaiB1 = _ngb1;
     widget.gradingData.nilaiB2 = _ngb2;
     widget.gradingData.nilaiB3 = _ngb3;
     widget.gradingData.nilaiB4 = _ngb4;
     JasmaniGradingData.saveJasmaniData(widget.gradingData);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Nilai Samapta B berhasil disimpan'),
-        backgroundColor: Colors.green,
-      ),
-    );
+
+    AppNotifier.showSuccess(context, 'Nilai Samapta B berhasil disimpan');
+
     Navigator.pop(context);
   }
 
-  bool get _isPria => widget.gender.toLowerCase() == 'laki-laki' || widget.gender.toLowerCase() == 'pria';
+  bool get _isPria =>
+      widget.gender.toLowerCase() == 'laki-laki' ||
+      widget.gender.toLowerCase() == 'pria';
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +170,13 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Overall NGB Banner
+            SerdikInfoHeaderWidget(
+              serdik: widget.serdik,
+              golongan: widget.golongan,
+              gender: widget.gender,
+            ),
+            const SizedBox(height: AppDimensions.xl),
+
             Container(
               padding: const EdgeInsets.all(AppDimensions.lg),
               decoration: BoxDecoration(
@@ -164,11 +188,23 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
                 children: [
                   const Text(
                     'Total NGB:',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: AppDimensions.fontLg),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: AppDimensions.fontLg,
+                    ),
                   ),
                   Text(
                     _ngbTotal.toStringAsFixed(2),
-                    style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.w900, fontSize: AppDimensions.fontXxl),
+                    style: TextStyle(
+                      color: _ngbTotal == 0.0
+                          ? Colors.redAccent
+                          : (_ngbTotal >= 70
+                                ? Colors.greenAccent
+                                : Colors.orangeAccent),
+                      fontWeight: FontWeight.w900,
+                      fontSize: AppDimensions.fontXxl,
+                    ),
                   ),
                 ],
               ),
@@ -176,11 +212,10 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
             const SizedBox(height: AppDimensions.xl),
 
             _buildSection(
-              title: _isPria ? 'Pull Up (1 Menit)' : 'Chinning (1 Menit)',
+              title: 'Pull Up (1 Menit)',
               unit: 'kali',
-              insight: _isPria
-                ? 'Posisi awal tangan lurus menggantung. Mengangkat badan dengan DAGU melewati batas tiang.'
-                : 'Posisi badan DIAGONAL 60 DERAJAT. Menarik badan dengan DADA menyentuh ke tiang.',
+              insight:
+                  'Posisi awal tangan lurus menggantung. Mengangkat badan dengan DAGU melewati batas tiang.',
               controller: _pullUpController,
               currentScore: _ngb1,
               onChanged: _calculatePullUp,
@@ -192,8 +227,8 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
               title: 'Sit Up (1 Menit)',
               unit: 'kali',
               insight: _isPria
-                ? 'Tangan DI BELAKANG KEPALA. Mengangkat badan menyentuh kaki, SIKUT MENYILANG MASUK.'
-                : 'Tangan LURUS atau DISILANG DI DEPAN DADA. Mengangkat badan sampai menyentuh LUTUT.',
+                  ? 'Tangan DI BELAKANG KEPALA. Mengangkat badan menyentuh kaki, SIKUT MENYILANG MASUK.'
+                  : 'Tangan LURUS atau DISILANG DI DEPAN DADA. Mengangkat badan sampai menyentuh LUTUT.',
               controller: _sitUpController,
               currentScore: _ngb2,
               onChanged: _calculateSitUp,
@@ -205,8 +240,8 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
               title: 'Push Up (1 Menit)',
               unit: 'kali',
               insight: _isPria
-                ? 'Tangan selebar bahu, UJUNG JARI KAKI menghadap tanah. Angkat sampai lurus.'
-                : 'TUMPUAN LUTUT KAKI. Angkat sampai tangan lurus, sejajar dengan PAHA.',
+                  ? 'Tangan selebar bahu, UJUNG JARI KAKI menghadap tanah. Angkat sampai lurus.'
+                  : 'TUMPUAN LUTUT KAKI. Angkat sampai tangan lurus, sejajar dengan PAHA.',
               controller: _pushUpController,
               currentScore: _ngb3,
               onChanged: _calculatePushUp,
@@ -217,7 +252,8 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
             _buildSection(
               title: 'Shuttle Run 6x10 Meter',
               unit: 'detik',
-              insight: 'Lari membentuk ANGKA 8 (delapan). TIGA KALI PUTARAN (6x10 meter).',
+              insight:
+                  'Lari membentuk ANGKA 8 (delapan). TIGA KALI PUTARAN (6x10 meter).',
               controller: _shuttleRunController,
               currentScore: _ngb4,
               onChanged: _calculateShuttleRun,
@@ -270,7 +306,11 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.sports_gymnastics, color: Colors.blue.shade700, size: 20),
+              Icon(
+                Icons.sports_gymnastics,
+                color: Colors.blue.shade700,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -293,31 +333,54 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
               Expanded(
                 child: TextField(
                   controller: controller,
-                  keyboardType: TextInputType.numberWithOptions(decimal: isDecimal),
-                  inputFormatters: isDecimal 
-                    ? [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*'))]
-                    : [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.numberWithOptions(
+                    decimal: isDecimal,
+                  ),
+                  inputFormatters: isDecimal
+                      ? [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d+\.?\d*'),
+                          ),
+                        ]
+                      : [FilteringTextInputFormatter.digitsOnly],
                   onChanged: onChanged,
                   decoration: InputDecoration(
                     hintText: isDecimal ? 'Misal: 18.5' : 'Misal: 25',
                     filled: true,
                     fillColor: Colors.grey.shade50,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                      borderSide: const BorderSide(color: AppColors.primaryNavy),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
+                      borderSide: const BorderSide(
+                        color: AppColors.primaryNavy,
+                      ),
                     ),
                     suffixIcon: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Text(unit, style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.grey)),
+                      child: Text(
+                        unit,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -327,10 +390,14 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
                 width: 70,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: currentScore >= 70 ? Colors.green.shade50 : Colors.red.shade50,
+                  color: currentScore >= 70
+                      ? Colors.green.shade50
+                      : Colors.red.shade50,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                   border: Border.all(
-                    color: currentScore >= 70 ? Colors.green.shade200 : Colors.red.shade200,
+                    color: currentScore >= 70
+                        ? Colors.green.shade200
+                        : Colors.red.shade200,
                   ),
                 ),
                 child: Center(
@@ -339,7 +406,9 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
                     style: TextStyle(
                       fontSize: AppDimensions.fontLg,
                       fontWeight: FontWeight.w800,
-                      color: currentScore >= 70 ? Colors.green.shade700 : Colors.red.shade700,
+                      color: currentScore >= 70
+                          ? Colors.green.shade700
+                          : Colors.red.shade700,
                     ),
                   ),
                 ),

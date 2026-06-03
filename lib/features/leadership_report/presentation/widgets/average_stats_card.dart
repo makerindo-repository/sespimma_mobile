@@ -7,7 +7,6 @@ class AverageStatsCard extends StatelessWidget {
   final List<FinalRecapModel> data;
 
   static const Color _primaryNavy = Color(0xFF001C40);
-  static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _dangerRed = Color(0xFFD32F2F);
 
   const AverageStatsCard({super.key, required this.data});
@@ -71,10 +70,10 @@ class AverageStatsCard extends StatelessWidget {
                   const SizedBox(height: AppDimensions.sm + 2),
                   Text(
                     avgScore > 0 ? avgScore.toStringAsFixed(2) : '-',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: AppDimensions.fontDisplay,
                       fontWeight: FontWeight.w900,
-                      color: _primaryNavy,
+                      color: _resolvePredicateColor(avgScore),
                     ),
                   ),
                 ],
@@ -95,7 +94,7 @@ class AverageStatsCard extends StatelessWidget {
                       const Icon(
                         AppIcons.medalFill,
                         size: AppDimensions.iconSm,
-                        color: _successGreen,
+                        color: _primaryNavy,
                       ),
                       const SizedBox(width: AppDimensions.radiusSm),
                       Text(
@@ -127,7 +126,10 @@ class AverageStatsCard extends StatelessWidget {
   }
 
   Color _resolvePredicateColor(double avgScore) {
-    if (avgScore >= 70.0) return _successGreen;
+    if (avgScore > 85.0) return Colors.green.shade700;
+    if (avgScore > 80.0) return Colors.lightGreen.shade600;
+    if (avgScore > 75.0) return Colors.orange.shade700;
+    if (avgScore >= 70.0) return Colors.amber.shade700;
     if (avgScore > 0) return _dangerRed;
     return Colors.blueGrey;
   }

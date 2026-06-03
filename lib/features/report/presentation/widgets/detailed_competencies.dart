@@ -251,10 +251,7 @@ class DetailedCompetencies extends StatelessWidget {
             title: 'Samapta B',
             score: samaptaB,
             children: [
-              _SubCompetencyItem(
-                title: 'Pull Up atau Chinning (1 menit)',
-                score: pullUp,
-              ),
+              _SubCompetencyItem(title: 'Pull Up (1 menit)', score: pullUp),
               _SubCompetencyItem(title: 'Sit Up (1 menit)', score: sitUp),
               _SubCompetencyItem(title: 'Push Up (1 menit)', score: pushUp),
               _SubCompetencyItem(
@@ -451,12 +448,16 @@ class _CompetencyItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(
-                  score > 0 ? score.toStringAsFixed(2) : '-',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontXl,
-                    fontWeight: FontWeight.w800,
-                    color: _scoreColor,
+                SizedBox(
+                  width: 72,
+                  child: Text(
+                    score > 0 ? score.toStringAsFixed(2) : '-',
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontXl,
+                      fontWeight: FontWeight.w800,
+                      color: _scoreColor,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -669,12 +670,16 @@ class _ExpandableCompetencyGroup extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text(
-                  score > 0 ? score.toStringAsFixed(2) : '-',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontXl,
-                    fontWeight: FontWeight.w800,
-                    color: _scoreColor,
+                SizedBox(
+                  width: 72,
+                  child: Text(
+                    score > 0 ? score.toStringAsFixed(2) : '-',
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontXl,
+                      fontWeight: FontWeight.w800,
+                      color: _scoreColor,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
@@ -795,7 +800,9 @@ class _SubCompetencyItem extends StatelessWidget {
           ),
           const SizedBox(width: AppDimensions.md),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            width: 72,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               color: _scoreBgColor,
               borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
@@ -807,6 +814,7 @@ class _SubCompetencyItem extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: _scoreTextColor,
               ),
+              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -896,10 +904,9 @@ class _SectionTitle extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.md,
-              vertical: 4,
-            ),
+            width: 72,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               color: color.shade50,
               borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
@@ -911,6 +918,7 @@ class _SectionTitle extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: score == 0 ? const Color(0xFF001C40) : color.shade900,
               ),
+              textAlign: TextAlign.center,
             ),
           ),
         ],

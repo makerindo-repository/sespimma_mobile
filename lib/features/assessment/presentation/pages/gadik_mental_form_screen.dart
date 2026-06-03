@@ -1,5 +1,3 @@
-// lib/features/assessment/presentation/pages/gadik_mental_form_screen.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,35 +10,26 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
 import '../../data/models/korsis_inbox_mock_data.dart';
 
-/// Form screen for Gadik to input reward or punishment for a
-/// specific Serdik. On save, the entry is pushed into
-/// [KorsisInboxMockData] so it becomes immediately visible
-/// in the Korsis inbox.
 class GadikMentalFormScreen extends StatefulWidget {
   final bool isReward;
 
   const GadikMentalFormScreen({super.key, required this.isReward});
 
   @override
-  State<GadikMentalFormScreen> createState() =>
-      _GadikMentalFormScreenState();
+  State<GadikMentalFormScreen> createState() => _GadikMentalFormScreenState();
 }
 
-class _GadikMentalFormScreenState
-    extends State<GadikMentalFormScreen> {
-  // ── Constants ─────────────────────────────────────────────
+class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
   static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
-  // ── State ─────────────────────────────────────────────────
   Map<String, dynamic>? _selectedSerdik;
   RewardPunishmentItem? _selectedCategory;
   File? _selectedPhoto;
   final TextEditingController _justificationController =
       TextEditingController();
 
-  final List<Map<String, dynamic>> _serdikList =
-      SerdikRealData.records;
+  final List<Map<String, dynamic>> _serdikList = SerdikRealData.records;
   String _serdikSearchQuery = '';
   String _indicatorSearchQuery = '';
   String _selectedFilterPokjar = 'Semua';
@@ -55,15 +44,11 @@ class _GadikMentalFormScreenState
     'POKJAR VI',
   ];
 
-  // ── Lifecycle ─────────────────────────────────────────────
-
   @override
   void dispose() {
     _justificationController.dispose();
     super.dispose();
   }
-
-  // ── Helpers ───────────────────────────────────────────────
 
   String _mapRomanToArabic(String roman) {
     const mapping = {
@@ -84,8 +69,7 @@ class _GadikMentalFormScreenState
   double get _currentBaseScore {
     if (_selectedSerdik != null &&
         _selectedSerdik!.containsKey('_mock_score')) {
-      return (_selectedSerdik!['_mock_score'] as num)
-          .toDouble();
+      return (_selectedSerdik!['_mock_score'] as num).toDouble();
     }
     return 80.0;
   }
@@ -109,8 +93,6 @@ class _GadikMentalFormScreenState
       _selectedSerdik != null &&
       _selectedCategory != null &&
       _selectedPhoto != null;
-
-  // ── Image Picker ──────────────────────────────────────────
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -139,8 +121,7 @@ class _GadikMentalFormScreenState
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
         return SafeArea(
@@ -190,8 +171,6 @@ class _GadikMentalFormScreenState
     );
   }
 
-  // ── Save ──────────────────────────────────────────────────
-
   void _submitForm() {
     if (!_isFormValid) return;
 
@@ -200,7 +179,6 @@ class _GadikMentalFormScreenState
     final serdik = _selectedSerdik!;
     final category = _selectedCategory!;
 
-    // Build an InboxItem and push it to the shared store.
     final newItem = InboxItem(
       id: 'gadik_${DateTime.now().millisecondsSinceEpoch}',
       serdikName: serdik['nama_lengkap'] ?? '-',
@@ -208,13 +186,15 @@ class _GadikMentalFormScreenState
       nosis: serdik['no_serdik'] ?? '-',
       pokjar: serdik['kelompok_kelas'] ?? '-',
       isReward: widget.isReward,
-      senderName: GadikRealData.records.isNotEmpty ? GadikRealData.records.first['nama'] : 'Gadik Sespimma',
+      senderName: GadikRealData.records.isNotEmpty
+          ? GadikRealData.records.first['nama']
+          : 'Gadik Sespimma',
       timestamp: DateTime.now(),
       points: category.point,
       description: _justificationController.text.isNotEmpty
           ? _justificationController.text
           : 'Pencatatan oleh Gadik terhadap '
-              'kedisiplinan dan kinerja serdik.',
+                'kedisiplinan dan kinerja serdik.',
       rewardPunishmentName: category.description,
       status: 'pending',
       photoPath: _selectedPhoto?.path,
@@ -224,18 +204,12 @@ class _GadikMentalFormScreenState
 
     if (!mounted) return;
     Navigator.pop(context);
-    AppNotifier.showSuccess(
-      context,
-      'Catatan berhasil dikirim ke Korsis!',
-    );
+    AppNotifier.showSuccess(context, 'Catatan berhasil dikirim ke Korsis!');
   }
-
-  // ── Build ─────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    final String title =
-        widget.isReward ? 'Input Reward' : 'Input Punishment';
+    final String title = widget.isReward ? 'Input Reward' : 'Input Punishment';
     final Color pointColor = widget.isReward
         ? Colors.green.shade600
         : Colors.red.shade600;
@@ -273,16 +247,12 @@ class _GadikMentalFormScreenState
             _buildSerdikSelectionCard(),
             const SizedBox(height: AppDimensions.xl),
             _buildSectionTitle(
-              widget.isReward
-                  ? 'Indikator Prestasi'
-                  : 'Indikator Pelanggaran',
+              widget.isReward ? 'Indikator Prestasi' : 'Indikator Pelanggaran',
             ),
             _buildIndicatorSelectionCard(pointColor),
             const SizedBox(height: AppDimensions.xl),
             Padding(
-              padding: const EdgeInsets.only(
-                bottom: AppDimensions.sm,
-              ),
+              padding: const EdgeInsets.only(bottom: AppDimensions.sm),
               child: Row(
                 children: [
                   const Text(
@@ -321,8 +291,6 @@ class _GadikMentalFormScreenState
     );
   }
 
-  // ── UI Fragments ──────────────────────────────────────────
-
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppDimensions.sm),
@@ -343,13 +311,11 @@ class _GadikMentalFormScreenState
 
     return InkWell(
       onTap: _showSerdikLookup,
-      borderRadius:
-          BorderRadius.circular(AppDimensions.radiusLg),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
           border: Border.all(
             color: isSelected
                 ? _primaryNavy.withValues(alpha: 0.5)
@@ -367,11 +333,7 @@ class _GadikMentalFormScreenState
         padding: const EdgeInsets.all(AppDimensions.lg),
         child: Row(
           children: [
-            _buildAvatar(
-              isSelected
-                  ? _selectedSerdik!['profile_photo']
-                  : null,
-            ),
+            _buildAvatar(isSelected ? _selectedSerdik!['profile_photo'] : null),
             const SizedBox(width: AppDimensions.md),
             Expanded(
               child: Column(
@@ -421,13 +383,11 @@ class _GadikMentalFormScreenState
 
     return InkWell(
       onTap: _showIndicatorLookup,
-      borderRadius:
-          BorderRadius.circular(AppDimensions.radiusLg),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
           border: Border.all(
             color: isSelected
                 ? _primaryNavy.withValues(alpha: 0.5)
@@ -455,12 +415,8 @@ class _GadikMentalFormScreenState
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                widget.isReward
-                    ? Icons.stars_rounded
-                    : Icons.warning_rounded,
-                color: isSelected
-                    ? pointColor
-                    : Colors.grey.shade400,
+                widget.isReward ? Icons.stars_rounded : Icons.warning_rounded,
+                color: isSelected ? pointColor : Colors.grey.shade400,
                 size: AppDimensions.iconLg,
               ),
             ),
@@ -484,8 +440,7 @@ class _GadikMentalFormScreenState
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  if (isSelected &&
-                      _selectedCategory!.note != null)
+                  if (isSelected && _selectedCategory!.note != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -519,8 +474,7 @@ class _GadikMentalFormScreenState
                         ),
                       ),
                       child: Text(
-                        _selectedCategory!.aspect
-                            .toUpperCase(),
+                        _selectedCategory!.aspect.toUpperCase(),
                         style: TextStyle(
                           fontSize: AppDimensions.fontXs,
                           fontWeight: FontWeight.w800,
@@ -544,17 +498,14 @@ class _GadikMentalFormScreenState
             ),
             if (isSelected)
               Container(
-                margin:
-                    const EdgeInsets.only(left: AppDimensions.sm),
+                margin: const EdgeInsets.only(left: AppDimensions.sm),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: pointColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(
-                    AppDimensions.radiusMd,
-                  ),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                 ),
                 child: Text(
                   '${_selectedCategory!.point > 0 ? "+" : ""}${_selectedCategory!.point}',
@@ -584,8 +535,7 @@ class _GadikMentalFormScreenState
         height: 180,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
           border: Border.all(
             color: _selectedPhoto != null
                 ? _primaryNavy.withValues(alpha: 0.5)
@@ -615,8 +565,7 @@ class _GadikMentalFormScreenState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding:
-                    const EdgeInsets.all(AppDimensions.md),
+                padding: const EdgeInsets.all(AppDimensions.md),
                 decoration: BoxDecoration(
                   color: _selectedPhoto != null
                       ? _primaryNavy.withValues(alpha: 0.2)
@@ -657,8 +606,7 @@ class _GadikMentalFormScreenState
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
@@ -685,8 +633,7 @@ class _GadikMentalFormScreenState
             color: Colors.grey.shade400,
           ),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.all(AppDimensions.lg),
+          contentPadding: const EdgeInsets.all(AppDimensions.lg),
         ),
       ),
     );
@@ -697,8 +644,7 @@ class _GadikMentalFormScreenState
       padding: const EdgeInsets.all(AppDimensions.xl),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
@@ -739,13 +685,10 @@ class _GadikMentalFormScreenState
           ),
           const SizedBox(height: AppDimensions.lg),
           Container(
-            padding:
-                const EdgeInsets.all(AppDimensions.md),
+            padding: const EdgeInsets.all(AppDimensions.md),
             decoration: BoxDecoration(
               color: _lightGrey,
-              borderRadius: BorderRadius.circular(
-                AppDimensions.radiusMd,
-              ),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
             ),
             child: _selectedSerdik == null
                 ? Padding(
@@ -766,21 +709,18 @@ class _GadikMentalFormScreenState
                 : Column(
                     children: [
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Nilai Saat Ini',
                             style: TextStyle(
                               fontSize: AppDimensions.fontMd,
-                              color:
-                                  Colors.blueGrey.shade600,
+                              color: Colors.blueGrey.shade600,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           Container(
-                            padding:
-                                const EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 2,
                             ),
@@ -788,20 +728,15 @@ class _GadikMentalFormScreenState
                               color: _getScoreColor(
                                 _currentBaseScore,
                               ).withValues(alpha: 0.1),
-                              borderRadius:
-                                  BorderRadius.circular(
+                              borderRadius: BorderRadius.circular(
                                 AppDimensions.radiusSm,
                               ),
                             ),
                             child: Text(
-                              _currentBaseScore
-                                  .toStringAsFixed(2),
+                              _currentBaseScore.toStringAsFixed(2),
                               style: TextStyle(
-                                fontSize:
-                                    AppDimensions.fontLg,
-                                color: _getScoreColor(
-                                  _currentBaseScore,
-                                ),
+                                fontSize: AppDimensions.fontLg,
+                                color: _getScoreColor(_currentBaseScore),
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
@@ -810,55 +745,37 @@ class _GadikMentalFormScreenState
                       ),
                       if (_selectedCategory != null) ...[
                         const Padding(
-                          padding: EdgeInsets.symmetric(
-                            vertical: 8.0,
-                          ),
-                          child: Divider(
-                            height: 1,
-                            thickness: 1,
-                          ),
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Divider(height: 1, thickness: 1),
                         ),
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               widget.isReward
                                   ? 'Penambahan Poin'
                                   : 'Pengurangan Poin',
                               style: TextStyle(
-                                fontSize:
-                                    AppDimensions.fontMd,
-                                color: Colors
-                                    .blueGrey.shade600,
+                                fontSize: AppDimensions.fontMd,
+                                color: Colors.blueGrey.shade600,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             Container(
-                              padding:
-                                  const EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: pointColor
-                                    .withValues(
-                                  alpha: 0.1,
-                                ),
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  4,
-                                ),
+                                color: pointColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 '${_selectedCategory!.point > 0 ? "+" : ""}${_selectedCategory!.point}',
                                 style: TextStyle(
-                                  fontSize:
-                                      AppDimensions.fontMd,
+                                  fontSize: AppDimensions.fontMd,
                                   color: pointColor,
-                                  fontWeight:
-                                      FontWeight.w800,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ),
@@ -871,8 +788,7 @@ class _GadikMentalFormScreenState
           if (_selectedSerdik != null) ...[
             const SizedBox(height: AppDimensions.lg),
             Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
                   'Estimasi Nilai Baru',
@@ -891,18 +807,13 @@ class _GadikMentalFormScreenState
                     color: _getScoreColor(
                       _calculatedFinalScore,
                     ).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(
-                      AppDimensions.radiusMd,
-                    ),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                   ),
                   child: Text(
-                    _calculatedFinalScore
-                        .toStringAsFixed(2),
+                    _calculatedFinalScore.toStringAsFixed(2),
                     style: TextStyle(
                       fontSize: AppDimensions.fontXxl,
-                      color: _getScoreColor(
-                        _calculatedFinalScore,
-                      ),
+                      color: _getScoreColor(_calculatedFinalScore),
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -923,8 +834,7 @@ class _GadikMentalFormScreenState
         disabledBackgroundColor: Colors.grey.shade300,
         padding: const EdgeInsets.symmetric(vertical: 18),
         shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         ),
         elevation: 0,
       ),
@@ -940,8 +850,6 @@ class _GadikMentalFormScreenState
     );
   }
 
-  // ── Bottom Sheet Tile ─────────────────────────────────────
-
   Widget _buildBottomSheetTile({
     required IconData icon,
     required String title,
@@ -951,15 +859,11 @@ class _GadikMentalFormScreenState
     return Material(
       color: Colors.transparent,
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 4,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
         leading: Container(
           padding: const EdgeInsets.all(AppDimensions.md),
           decoration: BoxDecoration(
-            color:
-                (color ?? _primaryNavy).withValues(alpha: 0.1),
+            color: (color ?? _primaryNavy).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -976,10 +880,7 @@ class _GadikMentalFormScreenState
             fontSize: AppDimensions.fontLg + 1,
           ),
         ),
-        trailing: Icon(
-          AppIcons.caretRight,
-          color: Colors.grey.shade400,
-        ),
+        trailing: Icon(AppIcons.caretRight, color: Colors.grey.shade400),
         onTap: () {
           HapticFeedback.lightImpact();
           onTap();
@@ -987,8 +888,6 @@ class _GadikMentalFormScreenState
       ),
     );
   }
-
-  // ── Avatar ────────────────────────────────────────────────
 
   Widget _buildAvatar(String? photoPath) {
     return Container(
@@ -1001,16 +900,12 @@ class _GadikMentalFormScreenState
         image: DecorationImage(
           image: (photoPath != null && photoPath.isNotEmpty)
               ? FileImage(File(photoPath)) as ImageProvider
-              : const AssetImage(
-                  'assets/images/default_avatar.png',
-                ),
+              : const AssetImage('assets/images/default_avatar.png'),
           fit: BoxFit.cover,
         ),
       ),
     );
   }
-
-  // ── Serdik Lookup Bottom Sheet ────────────────────────────
 
   void _showSerdikLookup() {
     _serdikSearchQuery = '';
@@ -1027,55 +922,40 @@ class _GadikMentalFormScreenState
             final noSerdik = (serdik['no_serdik'] ?? '')
                 .toString()
                 .toLowerCase();
-            final pokjar =
-                (serdik['kelompok_kelas'] ?? '').toString();
+            final pokjar = (serdik['kelompok_kelas'] ?? '').toString();
 
             final query = _serdikSearchQuery.toLowerCase();
-            final matchQuery = name.contains(query) ||
-                noSerdik.contains(query);
+            final matchQuery = name.contains(query) || noSerdik.contains(query);
             final matchPokjar =
                 _selectedFilterPokjar == 'Semua' ||
-                    pokjar ==
-                        _mapRomanToArabic(
-                          _selectedFilterPokjar,
-                        );
+                pokjar == _mapRomanToArabic(_selectedFilterPokjar);
 
             return matchQuery && matchPokjar;
           }).toList();
 
           return Container(
-            height:
-                MediaQuery.of(context).size.height * 0.85,
+            height: MediaQuery.of(context).size.height * 0.85,
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildBottomSheetHeader(
                   'Cari Serdik',
                   () => Navigator.pop(context),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(
-                    AppDimensions.lg,
-                  ),
+                  padding: const EdgeInsets.all(AppDimensions.lg),
                   child: Row(
                     children: [
                       Expanded(
                         child: TextField(
                           onChanged: (val) =>
-                              setModalState(
-                            () =>
-                                _serdikSearchQuery = val,
-                          ),
+                              setModalState(() => _serdikSearchQuery = val),
                           decoration: InputDecoration(
-                            hintText:
-                                'Cari nama atau No. Serdik...',
+                            hintText: 'Cari nama atau No. Serdik...',
                             prefixIcon: const Icon(
                               Icons.search,
                               color: Colors.grey,
@@ -1083,8 +963,7 @@ class _GadikMentalFormScreenState
                             filled: true,
                             fillColor: _lightGrey,
                             border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.circular(
+                              borderRadius: BorderRadius.circular(
                                 AppDimensions.radiusLg,
                               ),
                               borderSide: BorderSide.none,
@@ -1092,62 +971,43 @@ class _GadikMentalFormScreenState
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: AppDimensions.sm,
-                      ),
+                      const SizedBox(width: AppDimensions.sm),
                       Container(
                         decoration: BoxDecoration(
-                          color: _selectedFilterPokjar ==
-                                  'Semua'
+                          color: _selectedFilterPokjar == 'Semua'
                               ? _lightGrey
-                              : _primaryNavy
-                                  .withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(
+                              : _primaryNavy.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(
                             AppDimensions.radiusLg,
                           ),
                         ),
                         child: PopupMenuButton<String>(
                           icon: Icon(
                             Icons.filter_list_rounded,
-                            color:
-                                _selectedFilterPokjar ==
-                                        'Semua'
-                                    ? Colors.grey.shade600
-                                    : _primaryNavy,
+                            color: _selectedFilterPokjar == 'Semua'
+                                ? Colors.grey.shade600
+                                : _primaryNavy,
                           ),
                           onSelected: (val) =>
-                              setModalState(
-                            () =>
-                                _selectedFilterPokjar =
-                                    val,
-                          ),
-                          itemBuilder: (context) =>
-                              _pokjarOptions
-                                  .map(
-                                    (opt) =>
-                                        PopupMenuItem<
-                                          String
-                                        >(
-                                      value: opt,
-                                      child: Text(
-                                        opt,
-                                        style: TextStyle(
-                                          fontWeight:
-                                              _selectedFilterPokjar ==
-                                                      opt
-                                                  ? FontWeight.w800
-                                                  : FontWeight.w500,
-                                          color:
-                                              _selectedFilterPokjar ==
-                                                      opt
-                                                  ? _primaryNavy
-                                                  : Colors.black87,
-                                        ),
-                                      ),
+                              setModalState(() => _selectedFilterPokjar = val),
+                          itemBuilder: (context) => _pokjarOptions
+                              .map(
+                                (opt) => PopupMenuItem<String>(
+                                  value: opt,
+                                  child: Text(
+                                    opt,
+                                    style: TextStyle(
+                                      fontWeight: _selectedFilterPokjar == opt
+                                          ? FontWeight.w800
+                                          : FontWeight.w500,
+                                      color: _selectedFilterPokjar == opt
+                                          ? _primaryNavy
+                                          : Colors.black87,
                                     ),
-                                  )
-                                  .toList(),
+                                  ),
+                                ),
+                              )
+                              .toList(),
                         ),
                       ),
                     ],
@@ -1155,78 +1015,56 @@ class _GadikMentalFormScreenState
                 ),
                 Expanded(
                   child: ListView.builder(
-                    physics:
-                        const BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     itemCount: filteredList.length,
                     itemBuilder: (context, index) {
-                      final serdik =
-                          filteredList[index];
+                      final serdik = filteredList[index];
                       return Material(
                         color: Colors.transparent,
                         child: ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(
-                            horizontal:
-                                AppDimensions.xl,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: AppDimensions.xl,
                             vertical: 4,
                           ),
                           leading: _buildAvatar(
-                            serdik['profile_photo']
-                                as String?,
+                            serdik['profile_photo'] as String?,
                           ),
                           title: Text(
-                            serdik['nama_lengkap'] ??
-                                '-',
+                            serdik['nama_lengkap'] ?? '-',
                             style: const TextStyle(
-                              fontWeight:
-                                  FontWeight.w800,
+                              fontWeight: FontWeight.w800,
                               color: _primaryNavy,
                             ),
                           ),
                           subtitle: Text(
                             '${serdik['pangkat']} · ${serdik['no_serdik']}',
                             style: TextStyle(
-                              fontWeight:
-                                  FontWeight.w600,
-                              color: Colors
-                                  .blueGrey.shade400,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blueGrey.shade400,
                             ),
                           ),
                           trailing: Container(
-                            padding:
-                                const EdgeInsets
-                                    .symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors
-                                  .blueGrey.shade50,
-                              borderRadius:
-                                  BorderRadius.circular(
+                              color: Colors.blueGrey.shade50,
+                              borderRadius: BorderRadius.circular(
                                 AppDimensions.radiusSm,
                               ),
                             ),
                             child: Text(
-                              serdik[
-                                      'kelompok_kelas'] ??
-                                  '-',
+                              serdik['kelompok_kelas'] ?? '-',
                               style: TextStyle(
                                 fontSize: 11,
-                                fontWeight:
-                                    FontWeight.w800,
-                                color: Colors
-                                    .blueGrey
-                                    .shade600,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.blueGrey.shade600,
                               ),
                             ),
                           ),
                           onTap: () {
-                            setState(
-                              () =>
-                                  _selectedSerdik =
-                                      serdik,
-                            );
+                            setState(() => _selectedSerdik = serdik);
                             Navigator.pop(context);
                           },
                         ),
@@ -1242,8 +1080,6 @@ class _GadikMentalFormScreenState
     );
   }
 
-  // ── Indicator Lookup Bottom Sheet ─────────────────────────
-
   void _showIndicatorLookup() {
     _indicatorSearchQuery = '';
     showModalBottomSheet(
@@ -1255,10 +1091,8 @@ class _GadikMentalFormScreenState
           final filteredList = _currentOptions.where((opt) {
             final desc = opt.description.toLowerCase();
             final type = opt.aspect.toLowerCase();
-            final query =
-                _indicatorSearchQuery.toLowerCase();
-            return desc.contains(query) ||
-                type.contains(query);
+            final query = _indicatorSearchQuery.toLowerCase();
+            return desc.contains(query) || type.contains(query);
           }).toList();
 
           final pointColor = widget.isReward
@@ -1266,17 +1100,13 @@ class _GadikMentalFormScreenState
               : Colors.red.shade600;
 
           return Container(
-            height:
-                MediaQuery.of(context).size.height * 0.85,
+            height: MediaQuery.of(context).size.height * 0.85,
             decoration: const BoxDecoration(
               color: _lightGrey,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildBottomSheetHeader(
                   widget.isReward
@@ -1286,26 +1116,19 @@ class _GadikMentalFormScreenState
                 ),
                 Container(
                   color: Colors.white,
-                  padding: const EdgeInsets.all(
-                    AppDimensions.lg,
-                  ),
+                  padding: const EdgeInsets.all(AppDimensions.lg),
                   child: TextField(
-                    onChanged: (val) => setModalState(
-                      () => _indicatorSearchQuery = val,
-                    ),
+                    onChanged: (val) =>
+                        setModalState(() => _indicatorSearchQuery = val),
                     decoration: InputDecoration(
                       hintText: widget.isReward
                           ? 'Cari indikator prestasi...'
                           : 'Cari indikator pelanggaran...',
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                      ),
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
                       fillColor: _lightGrey,
                       border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(
+                        borderRadius: BorderRadius.circular(
                           AppDimensions.radiusLg,
                         ),
                         borderSide: BorderSide.none,
@@ -1315,230 +1138,144 @@ class _GadikMentalFormScreenState
                 ),
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(
-                      AppDimensions.lg,
-                    ),
-                    physics:
-                        const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.all(AppDimensions.lg),
+                    physics: const BouncingScrollPhysics(),
                     itemCount: filteredList.length,
                     separatorBuilder: (_, _) =>
-                        const SizedBox(
-                      height: AppDimensions.md,
-                    ),
+                        const SizedBox(height: AppDimensions.md),
                     itemBuilder: (context, index) {
                       final opt = filteredList[index];
                       return InkWell(
                         onTap: () {
-                          setState(
-                            () =>
-                                _selectedCategory =
-                                    opt,
-                          );
+                          setState(() => _selectedCategory = opt);
                           Navigator.pop(context);
                         },
-                        borderRadius:
-                            BorderRadius.circular(
+                        borderRadius: BorderRadius.circular(
                           AppDimensions.radiusLg,
                         ),
                         child: Container(
-                          padding:
-                              const EdgeInsets.all(
-                            AppDimensions.lg,
-                          ),
+                          padding: const EdgeInsets.all(AppDimensions.lg),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            border: Border.all(
-                              color:
-                                  Colors.grey.shade300,
-                            ),
-                            borderRadius:
-                                BorderRadius.circular(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(
                               AppDimensions.radiusLg,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black
-                                    .withValues(
-                                  alpha: 0.01,
-                                ),
+                                color: Colors.black.withValues(alpha: 0.01),
                                 blurRadius: 5,
-                                offset:
-                                    const Offset(0, 2),
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
                           child: Row(
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                padding:
-                                    const EdgeInsets
-                                        .all(10),
-                                decoration:
-                                    BoxDecoration(
-                                  color: pointColor
-                                      .withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  shape:
-                                      BoxShape.circle,
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: pointColor.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   widget.isReward
-                                      ? Icons
-                                          .stars_rounded
-                                      : Icons
-                                          .warning_rounded,
+                                      ? Icons.stars_rounded
+                                      : Icons.warning_rounded,
                                   color: pointColor,
-                                  size: AppDimensions
-                                      .iconLg,
+                                  size: AppDimensions.iconLg,
                                 ),
                               ),
-                              const SizedBox(
-                                width:
-                                    AppDimensions.md,
-                              ),
+                              const SizedBox(width: AppDimensions.md),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment
-                                          .start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Expanded(
                                           child: Text(
                                             opt.description,
-                                            style:
-                                                const TextStyle(
-                                              fontWeight:
-                                                  FontWeight.w800,
-                                              fontSize:
-                                                  AppDimensions.fontMd,
-                                              color:
-                                                  _primaryNavy,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: AppDimensions.fontMd,
+                                              color: _primaryNavy,
                                             ),
                                           ),
                                         ),
                                         Container(
-                                          margin:
-                                              const EdgeInsets.only(
+                                          margin: const EdgeInsets.only(
                                             left: 8,
                                           ),
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                            horizontal:
-                                                8,
-                                            vertical:
-                                                4,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
                                           ),
-                                          decoration:
-                                              BoxDecoration(
-                                            color: pointColor
-                                                .withValues(
-                                              alpha:
-                                                  0.1,
+                                          decoration: BoxDecoration(
+                                            color: pointColor.withValues(
+                                              alpha: 0.1,
                                             ),
-                                            borderRadius:
-                                                BorderRadius.circular(
+                                            borderRadius: BorderRadius.circular(
                                               AppDimensions.radiusSm,
                                             ),
                                           ),
                                           child: Text(
                                             '${opt.point > 0 ? "+" : ""}${opt.point}',
-                                            style:
-                                                TextStyle(
-                                              fontSize:
-                                                  AppDimensions.fontLg,
-                                              fontWeight:
-                                                  FontWeight.w900,
-                                              color:
-                                                  pointColor,
+                                            style: TextStyle(
+                                              fontSize: AppDimensions.fontLg,
+                                              fontWeight: FontWeight.w900,
+                                              color: pointColor,
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(
-                                      height: 4,
-                                    ),
+                                    const SizedBox(height: 4),
                                     Row(
                                       children: [
                                         Container(
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                            horizontal:
-                                                8,
-                                            vertical:
-                                                2,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
                                           ),
-                                          decoration:
-                                              BoxDecoration(
-                                            color: Colors
-                                                .blueGrey
-                                                .shade50,
-                                            borderRadius:
-                                                BorderRadius.circular(
+                                          decoration: BoxDecoration(
+                                            color: Colors.blueGrey.shade50,
+                                            borderRadius: BorderRadius.circular(
                                               AppDimensions.radiusSm,
                                             ),
                                           ),
                                           child: Text(
-                                            opt.aspect
-                                                .toUpperCase(),
-                                            style:
-                                                TextStyle(
-                                              fontSize:
-                                                  AppDimensions.fontXs,
-                                              fontWeight:
-                                                  FontWeight.w800,
-                                              color: Colors
-                                                  .blueGrey
-                                                  .shade600,
-                                              letterSpacing:
-                                                  0.5,
+                                            opt.aspect.toUpperCase(),
+                                            style: TextStyle(
+                                              fontSize: AppDimensions.fontXs,
+                                              fontWeight: FontWeight.w800,
+                                              color: Colors.blueGrey.shade600,
+                                              letterSpacing: 0.5,
                                             ),
                                           ),
                                         ),
-                                        if (opt.note !=
-                                            null) ...[
-                                          const SizedBox(
-                                            width: 8,
-                                          ),
+                                        if (opt.note != null) ...[
+                                          const SizedBox(width: 8),
                                           Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                              horizontal:
-                                                  8,
-                                              vertical:
-                                                  2,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
                                             ),
-                                            decoration:
-                                                BoxDecoration(
-                                              color: Colors
-                                                  .orange
-                                                  .shade50,
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange.shade50,
                                               borderRadius:
                                                   BorderRadius.circular(
-                                                AppDimensions.radiusSm,
-                                              ),
+                                                    AppDimensions.radiusSm,
+                                                  ),
                                             ),
-                                            child:
-                                                Text(
+                                            child: Text(
                                               opt.note!,
-                                              style:
-                                                  TextStyle(
-                                                fontSize:
-                                                    AppDimensions.fontXs,
-                                                fontWeight:
-                                                    FontWeight.w800,
-                                                color: Colors
-                                                    .orange
-                                                    .shade800,
+                                              style: TextStyle(
+                                                fontSize: AppDimensions.fontXs,
+                                                fontWeight: FontWeight.w800,
+                                                color: Colors.orange.shade800,
                                               ),
                                             ),
                                           ),
@@ -1563,12 +1300,7 @@ class _GadikMentalFormScreenState
     );
   }
 
-  // ── Bottom Sheet Header ───────────────────────────────────
-
-  Widget _buildBottomSheetHeader(
-    String title,
-    VoidCallback onClose,
-  ) {
+  Widget _buildBottomSheetHeader(String title, VoidCallback onClose) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.xl,
@@ -1576,17 +1308,11 @@ class _GadikMentalFormScreenState
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
-        border: Border(
-          bottom:
-              BorderSide(color: Colors.grey.shade200),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             title,

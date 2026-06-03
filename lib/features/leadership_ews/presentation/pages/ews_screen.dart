@@ -1,10 +1,15 @@
+import 'dart:math';
+
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
-import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
 
-import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
-import 'package:sespimma_mobile/features/leadership_ews/data/models/ews_model.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/patun_real_data.dart';
+import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
+import 'package:intl/intl.dart';
 
 class EwsScreen extends StatefulWidget {
   const EwsScreen({super.key});
@@ -17,33 +22,45 @@ class _EwsScreenState extends State<EwsScreen>
     with SingleTickerProviderStateMixin {
   AnimationController? _animController;
   String _searchQuery = '';
-  String _selectedPokjar = 'Semua Pokjar';
-  String _selectedRiskFilter = 'Semua Risiko';
+  String _selectedPokjar = 'Semua';
+  String _selectedStatus = 'Semua Status';
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _warningOrange = Color(0xFFF57C00);
   static const Color _dangerRed = Color(0xFFD32F2F);
 
-  final List<String> _pokjars = [
-    'Semua Pokjar',
+  List<String> get _pokjarOptions => [
+    'Semua',
     'POKJAR I',
     'POKJAR II',
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
+  ];
+
+  List<String> get _statusOptions => [
+    'Semua Status',
+    'Tinggi',
+    'Sedang',
+    'Aman',
   ];
 
   final TextEditingController _searchController = TextEditingController();
+
+  Map<String, _EwsSerdikData>? _ewsDataMapCache;
+  Map<String, _EwsSerdikData> get _ewsDataMap {
+    _ewsDataMapCache ??= _generateEwsData();
+    return _ewsDataMapCache!;
+  }
 
   @override
   void initState() {
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 800),
     );
     _animController?.forward();
   }
@@ -55,87 +72,138 @@ class _EwsScreenState extends State<EwsScreen>
     super.dispose();
   }
 
-  List<EwsModel> get _allReports => PimpinanMockData.sharedEwsData;
+  Map<String, _EwsSerdikData> _generateEwsData() {
+    final map = <String, _EwsSerdikData>{};
+    final records = SerdikRealData.records;
+    final random = Random(42);
 
-  String _mapRomanToArabic(String roman) {
-    switch (roman) {
-      case 'POKJAR I':
-        return 'Pokjar 1';
-      case 'POKJAR II':
-        return 'Pokjar 2';
-      case 'POKJAR III':
-        return 'Pokjar 3';
-      case 'POKJAR IV':
-        return 'Pokjar 4';
-      case 'POKJAR V':
-        return 'Pokjar 5';
-      case 'POKJAR VI':
-        return 'Pokjar 6';
+    for (final serdik in records) {
+      final noSerdik = (serdik['no_serdik'] ?? '').toString();
+
+      final nak = 65.0 + random.nextDouble() * 30.0;
+
+      final violations = random.nextInt(9);
+
+      map[noSerdik] = _EwsSerdikData(
+        nakScore: double.parse(nak.toStringAsFixed(2)),
+        violationCount: violations,
+      );
+    }
+    return map;
+  }
+
+  String _getRiskLevel(_EwsSerdikData data) {
+    if (data.nakScore <= 70.0 || data.violationCount >= 5) {
+      return 'Tinggi';
+    }
+    if (data.nakScore > 70.0 &&
+        data.nakScore <= 75.0 &&
+        data.violationCount < 5) {
+      return 'Sedang';
+    }
+    return 'Aman';
+  }
+
+  Color _getRiskColor(String risk) {
+    switch (risk) {
+      case 'Tinggi':
+        return _dangerRed;
+      case 'Sedang':
+        return _warningOrange;
       default:
-        return roman;
+        return _successGreen;
     }
   }
 
-  List<EwsModel> get _filteredList {
-    return _allReports.where((serdik) {
-      final String mappedPokjar = _mapRomanToArabic(_selectedPokjar);
-      final String selectedP = mappedPokjar.trim().toLowerCase();
-      final bool matchesPokjar =
-          selectedP == 'semua pokjar' ||
-          serdik.pokjar.trim().toLowerCase() == selectedP;
-
-      final bool matchesRisk =
-          _selectedRiskFilter == 'Semua Risiko' ||
-          (_selectedRiskFilter == 'Risiko Tinggi' && serdik.isHighRisk) ||
-          (_selectedRiskFilter == 'Risiko Sedang' && serdik.isMediumRisk) ||
-          (_selectedRiskFilter == 'Aman' && serdik.isSafe);
-
-      final String query = _searchQuery.trim().toLowerCase();
-      final bool matchesSearch =
-          query.isEmpty ||
-          serdik.name.toLowerCase().contains(query) ||
-          serdik.nrp.toLowerCase().contains(query);
-
-      return matchesPokjar && matchesRisk && matchesSearch;
-    }).toList();
+  IconData _getRiskIcon(String risk) {
+    switch (risk) {
+      case 'Tinggi':
+        return AppIcons.warningCircleFill;
+      case 'Sedang':
+        return AppIcons.warningFill;
+      default:
+        return AppIcons.checkCircleFill;
+    }
   }
 
-  Widget _buildAnimatedSection({
-    required Widget child,
-    required double beginInterval,
-    required double endInterval,
-  }) {
-    if (_animController == null) return child;
-    return FadeTransition(
-      opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _animController!,
-          curve: Interval(beginInterval, endInterval, curve: Curves.easeOut),
-        ),
-      ),
-      child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, 0.05), end: Offset.zero)
-            .animate(
-              CurvedAnimation(
-                parent: _animController!,
-                curve: Interval(
-                  beginInterval,
-                  endInterval,
-                  curve: Curves.easeOutQuart,
-                ),
-              ),
-            ),
-        child: child,
-      ),
-    );
+  String _getDynamicAnalysis(String risk, _EwsSerdikData data) {
+    if (risk == 'Tinggi') {
+      if (data.nakScore <= 70.0 && data.violationCount >= 5) {
+        return 'NAK di bawah passing grade DAN jumlah pelanggaran mencapai ambang kritis. Perlu penanganan segera dari Patun.';
+      } else if (data.nakScore <= 70.0) {
+        return 'NAK di bawah passing grade (${data.nakScore.toStringAsFixed(2)}). Perlu peningkatan intensif pada bidang akademik, mental, atau jasmani.';
+      } else {
+        return 'Jumlah pelanggaran tinggi (${data.violationCount} kali). Perlu pembinaan disiplin lebih lanjut dari Patun.';
+      }
+    } else if (risk == 'Sedang') {
+      return 'NAK mendekati batas bawah (${data.nakScore.toStringAsFixed(2)}). Memerlukan bimbingan preventif dari Patun agar tidak turun ke zona risiko tinggi.';
+    } else {
+      return 'Capaian NAK di atas standar (${data.nakScore.toStringAsFixed(2)}) dan riwayat disiplin terpantau baik (${data.violationCount} pelanggaran).';
+    }
+  }
+
+  String _formatPokjar(String pokjar) {
+    String p = pokjar.toUpperCase().trim();
+    if (p.endsWith(' 1')) return 'POKJAR I';
+    if (p.endsWith(' 2')) return 'POKJAR II';
+    if (p.endsWith(' 3')) return 'POKJAR III';
+    if (p.endsWith(' 4')) return 'POKJAR IV';
+    if (p.endsWith(' 5')) return 'POKJAR V';
+    return p;
+  }
+
+  List<Map<String, dynamic>> get _filteredList {
+    final records = SerdikRealData.records;
+
+    return records.where((serdik) {
+      final name = (serdik['nama_lengkap'] ?? '').toString().toLowerCase();
+      final noSerdik = (serdik['no_serdik'] ?? '').toString().toLowerCase();
+      final query = _searchQuery.toLowerCase();
+
+      if (query.isNotEmpty &&
+          !name.contains(query) &&
+          !noSerdik.contains(query)) {
+        return false;
+      }
+
+      if (_selectedPokjar != 'Semua') {
+        final pokjar = _formatPokjar(
+          (serdik['kelompok_kelas'] ?? '').toString(),
+        );
+        if (pokjar != _selectedPokjar) return false;
+      }
+
+      if (_selectedStatus != 'Semua Status') {
+        final ewsData = _ewsDataMap[(serdik['no_serdik'] ?? '').toString()];
+        if (ewsData == null) return false;
+        final risk = _getRiskLevel(ewsData);
+        if (risk != _selectedStatus) return false;
+      }
+
+      return true;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredList = _filteredList;
-    final int highRiskCount = filteredList.where((s) => s.isHighRisk).length;
-    final int medRiskCount = filteredList.where((s) => s.isMediumRisk).length;
-    final int safeCount = filteredList.where((s) => s.isSafe).length;
+
+    int highRisk = 0;
+    int medRisk = 0;
+    int safe = 0;
+    for (final serdik in filteredList) {
+      final noSerdik = (serdik['no_serdik'] ?? '').toString();
+      final ewsData = _ewsDataMap[noSerdik];
+      if (ewsData == null) continue;
+      final risk = _getRiskLevel(ewsData);
+      if (risk == 'Tinggi') {
+        highRisk++;
+      } else if (risk == 'Sedang') {
+        medRisk++;
+      } else {
+        safe++;
+      }
+    }
 
     return Scaffold(
       backgroundColor: _lightGrey,
@@ -143,249 +211,210 @@ class _EwsScreenState extends State<EwsScreen>
         backgroundColor: _primaryNavy,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(AppIcons.caretLeft, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text(
-          'Monitoring Serdik',
+          'Early Warning System',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             fontSize: AppDimensions.fontXxl,
           ),
         ),
       ),
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              beginInterval: 0.0,
-              endInterval: 0.4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppDimensions.md),
-                  _buildSectionTitle('RINGKASAN STATUS'),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: _buildSummaryCard(
-                            'Tinggi',
-                            '$highRiskCount',
-                            _dangerRed,
-                            AppIcons.warningCircleFill,
-                          ),
-                        ),
-                        const SizedBox(width: AppDimensions.md - 4),
-                        Expanded(
-                          child: _buildSummaryCard(
-                            'Sedang',
-                            '$medRiskCount',
-                            _warningOrange,
-                            AppIcons.warningFill,
-                          ),
-                        ),
-                        const SizedBox(width: AppDimensions.md - 4),
-                        Expanded(
-                          child: _buildSummaryCard(
-                            'Aman',
-                            '$safeCount',
-                            _successGreen,
-                            AppIcons.checkCircleFill,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildHeaderBlock(filteredList.length, highRisk, medRisk, safe),
+
+          _buildRingkasanStatus(highRisk, medRisk, safe),
+          Divider(
+            height: AppDimensions.dividerHeight,
+            color: Colors.grey.shade200,
+            thickness: AppDimensions.dividerHeight,
           ),
-          SliverToBoxAdapter(
-            child: _buildAnimatedSection(
-              beginInterval: 0.2,
-              endInterval: 0.6,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppDimensions.md),
-                  _buildSectionTitle('PENCARIAN & FILTER'),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusXl,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (val) =>
-                                  setState(() => _searchQuery = val),
-                              decoration: InputDecoration(
-                                hintText: 'Cari Nama/NRP...',
-                                hintStyle: TextStyle(
-                                  color: Colors.blueGrey.shade200,
-                                  fontSize: AppDimensions.fontDefault,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: _primaryNavy,
-                                fontSize: AppDimensions.fontDefault,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          _buildFilterIcon(
-                            icon: AppIcons.treeStructureFill,
-                            label: 'Pokjar',
-                            value: _selectedPokjar,
-                            items: _pokjars,
-                            onChanged: (val) =>
-                                setState(() => _selectedPokjar = val!),
-                          ),
-                          const SizedBox(width: AppDimensions.sm),
-                          _buildFilterIcon(
-                            icon: AppIcons.funnelFill,
-                            label: 'Risiko',
-                            value: _selectedRiskFilter,
-                            items: const [
-                              'Semua Risiko',
-                              'Risiko Tinggi',
-                              'Risiko Sedang',
-                              'Aman',
-                            ],
-                            onChanged: (val) =>
-                                setState(() => _selectedRiskFilter = val!),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          Expanded(
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                if (_selectedPokjar != 'Semua')
+                  SliverToBoxAdapter(child: _buildPatunSection()),
+                if (filteredList.isEmpty)
+                  SliverFillRemaining(child: _buildEmptyState())
+                else
+                  _buildSerdikList(filteredList),
+              ],
             ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: AppDimensions.xl)),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 60),
-            sliver: filteredList.isEmpty
-                ? SliverToBoxAdapter(
-                    child: _buildAnimatedSection(
-                      beginInterval: 0.4,
-                      endInterval: 0.8,
-                      child: _buildEmptyState(),
-                    ),
-                  )
-                : SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => _buildAnimatedSection(
-                        beginInterval: 0.3 + (index * 0.05).clamp(0.0, 0.4),
-                        endInterval: 0.7 + (index * 0.05).clamp(0.0, 0.2),
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: _buildEwsCard(context, filteredList[index]),
-                        ),
-                      ),
-                      childCount: filteredList.length,
-                    ),
-                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFilterIcon({
-    required IconData icon,
-    required String label,
-    required String value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    final bool isFiltered = value != items.first;
-    return PopupMenuButton<String>(
-      onSelected: onChanged,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+  Widget _buildHeaderBlock(int totalFiltered, int high, int med, int safe) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.xl,
+        vertical: AppDimensions.lg,
       ),
-      offset: const Offset(0, 45),
-      itemBuilder: (context) => items.map((item) {
-        return PopupMenuItem(
-          value: item,
-          child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              Icon(
-                item == value ? AppIcons.checkCircleFill : null,
-                size: AppDimensions.iconMd,
-                color: _primaryNavy,
+              Expanded(
+                child: AssessmentSearchBarWidget(
+                  controller: _searchController,
+                  searchQuery: _searchQuery,
+                  hintText: 'Cari nama atau No. Serdik...',
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  onClear: () {
+                    setState(() {
+                      _searchQuery = '';
+                      _searchController.clear();
+                    });
+                  },
+                ),
               ),
               const SizedBox(width: AppDimensions.sm),
-              Text(
-                item,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontDefault,
-                  fontWeight: item == value ? FontWeight.w800 : FontWeight.w600,
+              StatusFilterButtonWidget(
+                selectedStatus: _selectedPokjar,
+                statuses: _pokjarOptions,
+                onSelected: (value) {
+                  setState(() {
+                    _selectedPokjar = value;
+                  });
+                },
+                defaultStatus: 'Semua',
+                icon: Icons.groups_rounded,
+                tooltip: 'Filter Pokjar',
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              StatusFilterButtonWidget(
+                selectedStatus: _selectedStatus,
+                statuses: _statusOptions,
+                onSelected: (value) {
+                  setState(() {
+                    _selectedStatus = value;
+                  });
+                },
+                defaultStatus: 'Semua Status',
+                icon: AppIcons.funnelFill,
+                tooltip: 'Filter Status Risiko',
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.lg),
+
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _selectedPokjar != 'Semua'
+                      ? 'DAFTAR SERDIK ${_selectedPokjar.toUpperCase()}'
+                      : 'PENCARIAN SELURUH SERDIK',
+                  style: const TextStyle(
+                    color: _primaryNavy,
+                    fontWeight: FontWeight.w800,
+                    fontSize: AppDimensions.fontLg,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              _buildMiniCounter('$high', _dangerRed),
+              const SizedBox(width: 4),
+              _buildMiniCounter('$med', _warningOrange),
+              const SizedBox(width: 4),
+              _buildMiniCounter('$safe', _successGreen),
+              const SizedBox(width: AppDimensions.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
                   color: _primaryNavy,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.people_alt, color: Colors.white, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      '$totalFiltered Serdik',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: AppDimensions.fontSm,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        );
-      }).toList(),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.sm),
-        decoration: BoxDecoration(
-          color: isFiltered
-              ? _primaryNavy.withValues(alpha: 0.08)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
-        ),
-        child: Icon(
-          icon,
-          size: AppDimensions.iconDefault,
-          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade300,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniCounter(String count, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        count,
+        style: TextStyle(
+          fontSize: AppDimensions.fontSm,
+          fontWeight: FontWeight.w900,
+          color: color,
         ),
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: AppDimensions.fontSm + 1,
-          fontWeight: FontWeight.w900,
-          color: Colors.blueGrey.shade400,
-          letterSpacing: 1.2,
-        ),
+  Widget _buildRingkasanStatus(int high, int med, int safe) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildSummaryCard(
+              'Tinggi',
+              '$high',
+              _dangerRed,
+              AppIcons.warningCircleFill,
+            ),
+          ),
+          const SizedBox(width: AppDimensions.md - 4),
+          Expanded(
+            child: _buildSummaryCard(
+              'Sedang',
+              '$med',
+              _warningOrange,
+              AppIcons.warningFill,
+            ),
+          ),
+          const SizedBox(width: AppDimensions.md - 4),
+          Expanded(
+            child: _buildSummaryCard(
+              'Aman',
+              '$safe',
+              _successGreen,
+              AppIcons.checkCircleFill,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -397,17 +426,11 @@ class _EwsScreenState extends State<EwsScreen>
     IconData icon,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: color.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Column(
         children: [
@@ -419,7 +442,7 @@ class _EwsScreenState extends State<EwsScreen>
             ),
             child: Icon(icon, color: color, size: AppDimensions.iconDefault),
           ),
-          const SizedBox(height: AppDimensions.md),
+          const SizedBox(height: AppDimensions.sm),
           Text(
             count,
             style: TextStyle(
@@ -442,229 +465,369 @@ class _EwsScreenState extends State<EwsScreen>
     );
   }
 
-  Widget _buildEwsCard(BuildContext context, EwsModel serdik) {
-    Color statusColor;
-    String riskLabel;
-    IconData riskIcon;
-    String analysisText;
+  Widget _buildPatunSection() {
+    final patuns = PatunRealData.records
+        .where(
+          (p) =>
+              _formatPokjar((p['pokjar'] ?? '').toString()) == _selectedPokjar,
+        )
+        .toList();
 
-    if (serdik.isHighRisk) {
-      statusColor = _dangerRed;
-      riskLabel = 'TINGGI';
-      riskIcon = AppIcons.warningCircleFill;
-      analysisText =
-          'Nilai di bawah passing grade ATAU pelanggaran disiplin mencapai ambang kritis.';
-    } else if (serdik.isMediumRisk) {
-      statusColor = _warningOrange;
-      riskLabel = 'SEDANG';
-      riskIcon = AppIcons.warningFill;
-      analysisText =
-          'Nilai mendekati batas bawah. Memerlukan bimbingan preventif dari Patun.';
-    } else {
-      statusColor = _successGreen;
-      riskLabel = 'AMAN';
-      riskIcon = AppIcons.checkCircleFill;
-      analysisText =
-          'Capaian nilai di atas standar dan riwayat disiplin terpantau baik.';
-    }
+    if (patuns.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppDimensions.sm),
+            child: Text(
+              'PATUN $_selectedPokjar',
+              style: TextStyle(
+                fontSize: AppDimensions.fontSm + 1,
+                fontWeight: FontWeight.w900,
+                color: Colors.blueGrey.shade400,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ),
+          ...patuns.map((patun) => _buildPatunCard(patun)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPatunCard(Map<String, dynamic> patun) {
+    final name = (patun['nama'] ?? '-').toString();
+    final pangkat = (patun['pangkat'] ?? '-').toString();
+    final nrpNip = (patun['nrp_nip'] ?? '-').toString();
+    final peran = (patun['peran_pengasuhan'] ?? '-').toString();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppDimensions.sm),
+      padding: const EdgeInsets.all(AppDimensions.md),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAFBFC),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 2),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/default_avatar.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppDimensions.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontDefault,
+                    fontWeight: FontWeight.w800,
+                    color: _primaryNavy,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$pangkat · $nrpNip',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontSm,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blueGrey.shade400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppDimensions.sm),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF8E44AD).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              peran,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF8E44AD),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSerdikList(List<Map<String, dynamic>> serdikList) {
+    return SliverPadding(
+      padding: const EdgeInsets.all(AppDimensions.xl),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate((context, index) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: index < serdikList.length - 1 ? AppDimensions.md : 0,
+            ),
+            child: _buildSerdikCard(context, serdikList[index]),
+          );
+        }, childCount: serdikList.length),
+      ),
+    );
+  }
+
+  Widget _buildSerdikCard(BuildContext context, Map<String, dynamic> serdik) {
+    final name = (serdik['nama_lengkap'] ?? '-').toString();
+    final noSerdik = (serdik['no_serdik'] ?? '-').toString();
+    final pangkat = (serdik['pangkat'] ?? '-').toString();
+    final pokjar = _formatPokjar((serdik['kelompok_kelas'] ?? '-').toString());
+
+    final ewsData = _ewsDataMap[noSerdik];
+    final risk = ewsData != null ? _getRiskLevel(ewsData) : 'Aman';
+    final riskColor = _getRiskColor(risk);
+    final riskIcon = _getRiskIcon(risk);
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          leading: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        clipBehavior: Clip.antiAlias,
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
             ),
-            child: Icon(
-              riskIcon,
-              color: statusColor,
-              size: AppDimensions.iconLg,
-            ),
-          ),
-          title: Text(
-            serdik.name,
-            style: const TextStyle(
-              fontSize: AppDimensions.fontLg + 1,
-              fontWeight: FontWeight.w800,
-              color: _primaryNavy,
-            ),
-          ),
-          subtitle: Text(
-            '${serdik.nrp} • ${serdik.pokjar}',
-            style: TextStyle(
-              fontSize: AppDimensions.fontMd,
-              fontWeight: FontWeight.w600,
-              color: Colors.blueGrey.shade400,
-            ),
-          ),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
-            ),
-            child: Text(
-              riskLabel,
-              style: TextStyle(
-                fontSize: AppDimensions.fontSm,
-                fontWeight: FontWeight.w900,
-                color: statusColor,
-              ),
-            ),
-          ),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.md),
+            childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            leading: Container(
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: _lightGrey.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                border: Border.all(color: Colors.grey.shade100),
+                color: Colors.grey.shade200,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+                image: const DecorationImage(
+                  image: AssetImage('assets/images/default_avatar.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+            title: Text(
+              name,
+              style: const TextStyle(
+                fontSize: AppDimensions.fontLg,
+                fontWeight: FontWeight.w800,
+                color: _primaryNavy,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 2),
+                Text(
+                  '$pangkat · $noSerdik',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontSm,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blueGrey.shade400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey.shade50,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        pokjar,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.blueGrey.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: riskColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                border: Border.all(color: riskColor.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildMetricItem(
-                          'Rerata Nilai',
-                          serdik.averageScore.toStringAsFixed(2),
-                          statusColor,
-                        ),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 30,
-                        color: Colors.grey.shade200,
-                      ),
-                      Expanded(
-                        child: _buildMetricItem(
-                          'Pelanggaran',
-                          '${serdik.violationCount}',
-                          statusColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Divider(height: 1),
-                  ),
+                  Icon(riskIcon, size: 14, color: riskColor),
+                  const SizedBox(width: 4),
                   Text(
-                    'ANALISIS SISTEM',
+                    risk.toUpperCase(),
                     style: TextStyle(
                       fontSize: AppDimensions.fontSm,
                       fontWeight: FontWeight.w900,
-                      color: Colors.blueGrey.shade400,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.radiusSm),
-                  Text(
-                    analysisText,
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontMd,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blueGrey.shade700,
-                      height: 1.5,
+                      color: riskColor,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: AppDimensions.md),
-            if (!serdik.isSafe)
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => _showViolationLog(context, serdik),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey.shade200),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusMd,
-                          ),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.receiptFill,
-                            size: AppDimensions.iconSm,
-                            color: _primaryNavy,
-                          ),
-                          SizedBox(width: AppDimensions.sm),
-                          Text(
-                            'Log',
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontMd,
-                              fontWeight: FontWeight.w800,
-                              color: _primaryNavy,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.md - 4),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _notifyPatun(context, serdik.name),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _primaryNavy,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusMd,
-                          ),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.paperPlaneTiltFill,
-                            size: AppDimensions.iconSm,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: AppDimensions.sm),
-                          Text(
-                            'Hubungi Patun',
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontMd,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-          ],
+            children: [_buildDetailContent(context, serdik, ewsData, risk)],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailContent(
+    BuildContext context,
+    Map<String, dynamic> serdik,
+    _EwsSerdikData? ewsData,
+    String risk,
+  ) {
+    final riskColor = _getRiskColor(risk);
+    final nak = ewsData?.nakScore ?? 0.0;
+    final violations = ewsData?.violationCount ?? 0;
+    final analysisText = ewsData != null
+        ? _getDynamicAnalysis(risk, ewsData)
+        : 'Data belum tersedia.';
+
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.md),
+      decoration: BoxDecoration(
+        color: _lightGrey.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildMetricItem(
+                  'NAK',
+                  nak.toStringAsFixed(2),
+                  riskColor,
+                ),
+              ),
+              Container(width: 1, height: 30, color: Colors.grey.shade200),
+              Expanded(
+                child: _buildMetricItem(
+                  'Pelanggaran',
+                  '$violations',
+                  riskColor,
+                ),
+              ),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Divider(height: 1),
+          ),
+          Text(
+            'ANALISIS SISTEM',
+            style: TextStyle(
+              fontSize: AppDimensions.fontSm,
+              fontWeight: FontWeight.w900,
+              color: Colors.blueGrey.shade400,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.radiusSm),
+          Text(
+            analysisText,
+            style: TextStyle(
+              fontSize: AppDimensions.fontMd,
+              fontWeight: FontWeight.w600,
+              color: Colors.blueGrey.shade700,
+              height: 1.5,
+            ),
+          ),
+          if (risk != 'Aman') ...[
+            const SizedBox(height: AppDimensions.md),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => _showViolationLog(context, serdik, ewsData),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Colors.grey.shade200),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      AppIcons.receiptFill,
+                      size: AppDimensions.iconSm,
+                      color: _primaryNavy,
+                    ),
+                    SizedBox(width: AppDimensions.sm),
+                    Text(
+                      'Log Pelanggaran',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontMd,
+                        fontWeight: FontWeight.w800,
+                        color: _primaryNavy,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -694,30 +857,82 @@ class _EwsScreenState extends State<EwsScreen>
   }
 
   Widget _buildEmptyState() {
+    final isSearching = _searchQuery.isNotEmpty;
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            AppIcons.magnifyingGlassFill,
-            size: AppDimensions.iconDisplay,
-            color: Colors.blueGrey.shade200,
-          ),
-          const SizedBox(height: AppDimensions.md),
-          Text(
-            'Data tidak ditemukan',
-            style: TextStyle(
-              fontSize: AppDimensions.fontXl,
-              fontWeight: FontWeight.w600,
-              color: Colors.blueGrey.shade400,
+      child: Padding(
+        padding: const EdgeInsets.all(AppDimensions.xxxl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isSearching
+                    ? Icons.search_off_rounded
+                    : Icons.person_search_rounded,
+                size: AppDimensions.iconDisplay,
+                color: Colors.grey.shade300,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: AppDimensions.xl),
+            Text(
+              isSearching ? 'Tidak Ditemukan' : 'Tidak Ada Data',
+              style: TextStyle(
+                fontSize: AppDimensions.fontXxl,
+                fontWeight: FontWeight.w800,
+                color: Colors.grey.shade500,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.sm),
+            Text(
+              isSearching
+                  ? 'Tidak ada Serdik yang cocok dengan pencarian "$_searchQuery".'
+                  : 'Belum ada data Serdik.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: AppDimensions.fontLg,
+                color: Colors.grey.shade400,
+                height: 1.5,
+              ),
+            ),
+            if (isSearching) ...[
+              const SizedBox(height: AppDimensions.xl),
+              TextButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _searchQuery = '';
+                    _searchController.clear();
+                    _selectedPokjar = 'Semua';
+                    _selectedStatus = 'Semua Status';
+                  });
+                },
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Reset Filter'),
+                style: TextButton.styleFrom(
+                  foregroundColor: _primaryNavy,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  void _showViolationLog(BuildContext context, EwsModel serdik) {
+  void _showViolationLog(
+    BuildContext context,
+    Map<String, dynamic> serdik,
+    _EwsSerdikData? ewsData,
+  ) {
+    final name = (serdik['nama_lengkap'] ?? '-').toString();
+    final nrp = (serdik['nrp'] ?? '').toString();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -729,7 +944,7 @@ class _EwsScreenState extends State<EwsScreen>
         title: Container(
           padding: const EdgeInsets.all(AppDimensions.xl),
           decoration: const BoxDecoration(
-            color: Color(0xFFD32F2F),
+            color: _dangerRed,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(AppDimensions.radiusXxl),
               topRight: Radius.circular(AppDimensions.radiusXxl),
@@ -757,7 +972,7 @@ class _EwsScreenState extends State<EwsScreen>
                     ),
                     const SizedBox(height: AppDimensions.xs / 2),
                     Text(
-                      serdik.name,
+                      name,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.9),
                         fontSize: AppDimensions.fontMd,
@@ -770,49 +985,79 @@ class _EwsScreenState extends State<EwsScreen>
             ],
           ),
         ),
-        content: Builder(
-          builder: (context) {
-            final punishments = PimpinanMockData.customActivities
-                .where(
-                  (a) => a['nrp'] == serdik.nrp && a['type'] == 'punishment',
-                )
-                .toList();
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: punishments.isEmpty
-                  ? [
-                      const SizedBox(height: AppDimensions.md),
-                      const Text(
-                        'Belum ada pelanggaran tercatat.',
-                        style: TextStyle(
-                          color: Colors.blueGrey,
-                          fontStyle: FontStyle.italic,
-                        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Builder(
+            builder: (context) {
+              final count = ewsData?.violationCount ?? 0;
+              if (count == 0) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppDimensions.xl),
+                  child: Center(
+                    child: Text(
+                      'Belum ada pelanggaran tercatat.',
+                      style: TextStyle(
+                        color: Colors.blueGrey,
+                        fontStyle: FontStyle.italic,
                       ),
-                    ]
-                  : punishments.map((p) {
-                      final dateStr =
-                          (p['date'] != null && p['date'].toString().isNotEmpty)
-                          ? p['date']
-                          : p['timeRaw'] ?? '';
-                      return Padding(
-                        padding: const EdgeInsets.only(top: AppDimensions.md),
-                        child: _buildLogItem(
-                          p['subtitle'] ?? p['title'],
-                          dateStr,
-                          AppIcons.warningFill,
-                        ),
-                      );
-                    }).toList(),
-            );
-          },
+                    ),
+                  ),
+                );
+              }
+
+              final random = Random(nrp.hashCode);
+              final allPunishments = RewardPunishmentData.punishments;
+              final allPatuns = PatunRealData.records;
+
+              final logs = List.generate(count, (index) {
+                final p = allPunishments[random.nextInt(allPunishments.length)];
+                final patun =
+                    allPatuns[random.nextInt(allPatuns.length)]['nama']
+                        .toString();
+
+                final daysAgo = random.nextInt(30);
+                final hoursAgo = random.nextInt(24);
+                final minsAgo = random.nextInt(60);
+                final date = DateTime.now().subtract(
+                  Duration(days: daysAgo, hours: hoursAgo, minutes: minsAgo),
+                );
+
+                return {
+                  'description': p.description,
+                  'point': p.point,
+                  'patun': patun,
+                  'date': date,
+                };
+              });
+
+              logs.sort(
+                (a, b) =>
+                    (b['date'] as DateTime).compareTo(a['date'] as DateTime),
+              );
+
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: logs.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: AppDimensions.md),
+                  itemBuilder: (context, index) {
+                    final log = logs[index];
+                    return _buildLogItem(log);
+                  },
+                ),
+              );
+            },
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF001C40),
+              foregroundColor: _primaryNavy,
               textStyle: const TextStyle(fontWeight: FontWeight.w800),
             ),
             child: const Text('TUTUP'),
@@ -822,25 +1067,41 @@ class _EwsScreenState extends State<EwsScreen>
     );
   }
 
-  Widget _buildLogItem(String title, String date, IconData icon) {
+  Widget _buildLogItem(Map<String, dynamic> log) {
+    final DateTime date = log['date'] as DateTime;
+    final String formattedDay = DateFormat(
+      'EEEE, dd MMM yyyy',
+      'id_ID',
+    ).format(date);
+    final String formattedTime = DateFormat('HH:mm').format(date);
+    final double point = log['point'] as double;
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.md),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(AppDimensions.sm),
             decoration: BoxDecoration(
-              color: const Color(0xFFD32F2F).withValues(alpha: 0.1),
+              color: _dangerRed.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFFD32F2F),
+            child: const Icon(
+              AppIcons.warningCircleFill,
+              color: _dangerRed,
               size: AppDimensions.iconMd,
             ),
           ),
@@ -850,34 +1111,80 @@ class _EwsScreenState extends State<EwsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  log['description'].toString(),
                   style: const TextStyle(
                     fontSize: AppDimensions.fontDefault,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF001C40),
+                    fontWeight: FontWeight.w800,
+                    color: _primaryNavy,
+                    height: 1.3,
                   ),
                 ),
-                const SizedBox(height: AppDimensions.xs),
-                Text(
-                  date,
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontSm + 1,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blueGrey,
-                  ),
+                const SizedBox(height: AppDimensions.sm),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.calendar_today,
+                      size: 12,
+                      color: Colors.blueGrey,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$formattedDay  •  $formattedTime',
+                      style: const TextStyle(
+                        fontSize: AppDimensions.fontSm,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.person, size: 12, color: Colors.blueGrey),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${log['patun']}',
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontSm,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blueGrey,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ],
+            ),
+          ),
+          const SizedBox(width: AppDimensions.sm),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: _dangerRed.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '${point.toStringAsFixed(2)} Poin',
+              style: const TextStyle(
+                fontSize: AppDimensions.fontSm,
+                fontWeight: FontWeight.w800,
+                color: _dangerRed,
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  void _notifyPatun(BuildContext context, String name) {
-    AppNotifier.showInfo(
-      context,
-      'Notifikasi telah dikirim ke Patun untuk $name',
-    );
-  }
+class _EwsSerdikData {
+  final double nakScore;
+  final int violationCount;
+
+  const _EwsSerdikData({required this.nakScore, required this.violationCount});
 }

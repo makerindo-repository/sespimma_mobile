@@ -4,6 +4,9 @@ import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 
 class HelpFaqScreen extends StatefulWidget {
   const HelpFaqScreen({super.key});
@@ -24,35 +27,91 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const Color _waColor = Color(0xFF25D366);
 
-  final List<Map<String, String>> _faqs = [
-    {
-      'q': 'Bagaimana cara Absensi Geofencing?',
-      'a':
-          'Gunakan menu "Apel" di navigasi bawah. Pastikan fitur GPS di perangkat Anda aktif dan Anda berada di dalam radius Geofencing yang telah ditentukan. Anda juga dapat menggunakan fitur Scan QR Code jika diminta.',
-    },
-    {
-      'q': 'Bagaimana sistem perhitungan bobot nilai?',
-      'a':
-          'Sistem penilaian terintegrasi (IDMS) menerapkan pembobotan transparan: 70% Nilai Akademik, 20% Nilai Mental & Kepribadian, dan 10% Kesamaptaan Jasmani. Detail progres dapat dilihat pada menu "Nilai".',
-    },
-    {
-      'q': 'Bagaimana cara mengumpulkan Tugas Harian?',
-      'a':
-          'Masuk ke menu "Tugas", pilih Sprint/Tugas yang berstatus aktif, lalu klik "Unggah Bukti". Pastikan Anda mengunggah foto atau dokumen sebelum batas waktu 1x24 jam berakhir agar nilai Anda tidak terpotong.',
-    },
-    {
-      'q': 'Apa yang harus dilakukan jika GPS tidak akurat?',
-      'a':
-          'Pastikan izin lokasi (Location Permission) disetel ke "Selalu Izinkan" (Always Allow) dengan opsi Akurasi Tinggi. Jika radius geofencing masih tidak sesuai, segera hubungi Admin IT.',
-    },
-  ];
+  List<Map<String, String>> get _faqs {
+    if (!mounted) return [];
+    final authState = context.read<AuthBloc>().state;
+    String role = 'siswa';
+    if (authState is AuthSuccess) {
+      role = authState.user.roleId;
+    }
+
+    if (role == 'pimpinan') {
+      return [
+        {
+          'q': 'Bagaimana cara memantau peringatan dini (EWS)?',
+          'a':
+              'Buka menu "Monitoring". Anda dapat melihat daftar Serdik berdasarkan tingkat risikonya. Klik pada Serdik untuk melihat rincian kompetensi dan "Log Pelanggaran" secara dinamis.',
+        },
+        {
+          'q': 'Bagaimana cara mengunduh Laporan Nilai Akhir?',
+          'a':
+              'Di menu "Laporan", Anda akan melihat rekapitulasi nilai Serdik. Klik ikon unduh (PDF) di pojok kanan atas, sesuaikan nama dan pangkat penandatangan, lalu klik "Generate Laporan".',
+        },
+        {
+          'q': 'Apa indikator Serdik berstatus Risiko Tinggi?',
+          'a':
+              'Status "Tinggi" pada Early Warning System muncul jika nilai rata-rata Serdik di bawah standar (Cukup/Kurang), atau Serdik memiliki banyak riwayat pelanggaran (Punishment).',
+        },
+        {
+          'q': 'Bagaimana sistem penilaian terintegrasi bekerja?',
+          'a':
+              'Sistem (IDMS) akan mengakumulasi nilai dari Patun, Gadik, dan Korsis secara otomatis. Bobot penilaian terdiri dari Akademik (70%), Mental Kepribadian (20%), dan Jasmani (10%).',
+        },
+      ];
+    } else if (role == 'tim_operator') {
+      return [
+        {
+          'q': 'Bagaimana cara membuat Zona Kegiatan?',
+          'a':
+              'Gunakan menu "Zona". Anda dapat menandai koordinat lokasi dan menentukan batas radiusnya, lalu sistem akan memantau kehadiran Serdik secara otomatis.',
+        },
+        {
+          'q': 'Bagaimana cara menginput Nilai Jasmani?',
+          'a':
+              'Gunakan menu "Jasmani" untuk mencari Serdik dan memasukkan nilai ujian kesamaptaan jasmani secara real-time.',
+        },
+      ];
+    }
+
+    return [
+      {
+        'q': 'Bagaimana cara Absensi Geofencing?',
+        'a':
+            'Gunakan menu "Apel" di navigasi bawah. Pastikan fitur GPS aktif dan Anda berada di dalam radius Geofencing.',
+      },
+      {
+        'q': 'Bagaimana sistem perhitungan bobot nilai?',
+        'a':
+            'Sistem penilaian menerapkan pembobotan transparan: 70% Akademik, 20% Mental & Kepribadian, dan 10% Jasmani.',
+      },
+      {
+        'q': 'Bagaimana cara mengumpulkan Tugas Harian?',
+        'a':
+            'Masuk ke menu "Tugas", pilih Tugas aktif, lalu klik "Unggah Bukti" sebelum batas waktu berakhir.',
+      },
+      {
+        'q': 'Apa yang harus dilakukan jika GPS tidak akurat?',
+        'a':
+            'Pastikan izin lokasi disetel ke "Selalu Izinkan" dengan opsi Akurasi Tinggi. Jika bermasalah, hubungi Admin IT.',
+      },
+    ];
+  }
 
   List<Map<String, String>> _filteredFaqs = [];
+  bool _isInit = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      _filteredFaqs = List.from(_faqs);
+      _isInit = true;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _filteredFaqs = List.from(_faqs);
     _searchController.addListener(_onSearchChanged);
 
     _animationController = AnimationController(
@@ -99,7 +158,7 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
   Future<void> _contactAdminWA(BuildContext context) async {
     HapticFeedback.mediumImpact();
     final Uri url = Uri.parse(
-      'https://wa.me/628123456789?text=Halo%20Admin%20Makerindo%2C%20saya%20Serdik%20SESPIMMA%20membutuhkan%20bantuan%20terkait%20aplikasi.',
+      'https://wa.me/6285862393696?text=Halo%20Admin%20Makerindo%2C%20saya%20Serdik%20SESPIMMA%20membutuhkan%20bantuan%20terkait%20aplikasi.',
     );
 
     try {
@@ -202,7 +261,6 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
   Widget _buildFaqItem(String question, String answer) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         boxShadow: [
           BoxShadow(
@@ -212,35 +270,43 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
           ),
         ],
       ),
-      child: Theme(
-        data: ThemeData().copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          onExpansionChanged: (_) => HapticFeedback.selectionClick(),
-          collapsedIconColor: _primaryNavy,
-          iconColor: _primaryNavy,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-          title: Text(
-            question,
-            style: const TextStyle(
-              fontSize: AppDimensions.fontLg,
-              fontWeight: FontWeight.w700,
-              color: _primaryNavy,
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        clipBehavior: Clip.antiAlias,
+        child: Theme(
+          data: ThemeData().copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            onExpansionChanged: (_) => HapticFeedback.selectionClick(),
+            collapsedIconColor: _primaryNavy,
+            iconColor: _primaryNavy,
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 4,
             ),
-          ),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-              child: Text(
-                answer,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontDefault,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.blueGrey.shade600,
-                  height: 1.6,
-                ),
+            title: Text(
+              question,
+              style: const TextStyle(
+                fontSize: AppDimensions.fontLg,
+                fontWeight: FontWeight.w700,
+                color: _primaryNavy,
               ),
             ),
-          ],
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: Text(
+                  answer,
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontDefault,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blueGrey.shade600,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -90,37 +90,37 @@ class _GadikCreateAssignmentScreenState
         );
         return;
       }
-      
+
       final String id = 'G-${DateTime.now().millisecondsSinceEpoch}';
 
       final newTask = GadikAssignmentModel(
         id: id,
         judul: _judulController.text,
         jenisTugas: _jenisTugas,
-        turunanTugas: _jenisTugas == 'Naskah Karya Perseorangan (NKP)' ? _turunanTugas : null,
+        turunanTugas: _jenisTugas == 'Naskah Karya Perseorangan (NKP)'
+            ? _turunanTugas
+            : null,
         deadline: _deadline!,
         targetPokjar: _targetPokjar,
         instruksi: _instruksiController.text,
         status: 'Belum Mulai',
-        createdBy: 'Kombes Pol. Fajar Nugroho', // Hardcoded as example
+        createdBy: 'Kombes Pol. Fajar Nugroho',
         createdAt: DateTime.now(),
         fileName: _fileName,
         fileUrl: _fileName != null ? 'https://example.com/$_fileName' : null,
       );
 
-      // Save to Gadik data
       GadikAssignmentMockData.assignments.add(newTask);
 
-      // Integrate into Serdik (PimpinanMockData) task list
       final newSerdikTask = TugasModel(
         id: id,
         judul: _judulController.text,
         deskripsi: _instruksiController.text,
-        mapel: _jenisTugas, 
+        mapel: _jenisTugas,
         deadline: _deadline!,
         status: 'Aktif',
-        createdBy: '12345678', // Mock NRP
-        createdByName: 'Kombes Pol. Fajar Nugroho', // Mock Name
+        createdBy: '12345678',
+        createdByName: 'Kombes Pol. Fajar Nugroho',
       );
       PimpinanMockData.sharedTasks.add(newSerdikTask);
 
@@ -237,7 +237,11 @@ class _GadikCreateAssignmentScreenState
               ),
             ),
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -267,23 +271,49 @@ class _GadikCreateAssignmentScreenState
                       _buildLabel('Judul Tugas'),
                       TextFormField(
                         controller: _judulController,
-                        style: const TextStyle(fontWeight: FontWeight.w600, color: _primaryNavy),
-                        decoration: _inputDecoration('Contoh: Analisis Kebijakan...'),
-                        validator: (val) => val == null || val.isEmpty ? 'Judul wajib diisi' : null,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: _primaryNavy,
+                        ),
+                        decoration: _inputDecoration(
+                          'Contoh: Analisis Kebijakan...',
+                        ),
+                        validator: (val) => val == null || val.isEmpty
+                            ? 'Judul wajib diisi'
+                            : null,
                       ),
                       const SizedBox(height: AppDimensions.xl),
-                      
+
                       _buildLabel('Jenis Tugas'),
                       DropdownButtonFormField<String>(
                         initialValue: _jenisTugas,
-                        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryNavy),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: _primaryNavy,
+                        ),
                         decoration: _inputDecoration('Pilih jenis tugas'),
-                        style: const TextStyle(fontWeight: FontWeight.w600, color: _primaryNavy, fontSize: AppDimensions.fontLg),
-                        items: _jenisTugasList.map((j) => DropdownMenuItem(value: j, child: Text(j, maxLines: 1, overflow: TextOverflow.ellipsis))).toList(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: _primaryNavy,
+                          fontSize: AppDimensions.fontLg,
+                        ),
+                        items: _jenisTugasList
+                            .map(
+                              (j) => DropdownMenuItem(
+                                value: j,
+                                child: Text(
+                                  j,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            )
+                            .toList(),
                         onChanged: (val) {
                           setState(() {
                             _jenisTugas = val!;
-                            if (_jenisTugas == 'Naskah Karya Perseorangan (NKP)') {
+                            if (_jenisTugas ==
+                                'Naskah Karya Perseorangan (NKP)') {
                               _turunanTugas = _kompetensiNKP.first;
                             } else {
                               _turunanTugas = null;
@@ -297,11 +327,30 @@ class _GadikCreateAssignmentScreenState
                         _buildLabel('Kompetensi Utama'),
                         DropdownButtonFormField<String>(
                           initialValue: _turunanTugas,
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryNavy),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: _primaryNavy,
+                          ),
                           decoration: _inputDecoration('Pilih kompetensi'),
-                          style: const TextStyle(fontWeight: FontWeight.w600, color: _primaryNavy, fontSize: AppDimensions.fontLg),
-                          items: _kompetensiNKP.map((k) => DropdownMenuItem(value: k, child: Text(k, maxLines: 1, overflow: TextOverflow.ellipsis))).toList(),
-                          onChanged: (val) => setState(() => _turunanTugas = val),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: _primaryNavy,
+                            fontSize: AppDimensions.fontLg,
+                          ),
+                          items: _kompetensiNKP
+                              .map(
+                                (k) => DropdownMenuItem(
+                                  value: k,
+                                  child: Text(
+                                    k,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (val) =>
+                              setState(() => _turunanTugas = val),
                         ),
                         const SizedBox(height: AppDimensions.xl),
                       ],
@@ -322,20 +371,32 @@ class _GadikCreateAssignmentScreenState
                                   color: Colors.transparent,
                                   child: InkWell(
                                     onTap: _selectDate,
-                                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimensions.radiusLg,
+                                    ),
                                     child: InputDecorator(
-                                      decoration: _inputDecoration('Pilih Tanggal'),
+                                      decoration: _inputDecoration(
+                                        'Pilih Tanggal',
+                                      ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Text(
                                               _deadline != null
-                                                  ? DateFormat('dd MMM yy, HH:mm', 'id_ID').format(_deadline!)
+                                                  ? DateFormat(
+                                                      'dd MMM yy, HH:mm',
+                                                      'id_ID',
+                                                    ).format(_deadline!)
                                                   : 'Pilih Jadwal',
                                               style: TextStyle(
-                                                color: _deadline != null ? _primaryNavy : Colors.blueGrey.shade400,
-                                                fontWeight: _deadline != null ? FontWeight.w700 : FontWeight.w500,
+                                                color: _deadline != null
+                                                    ? _primaryNavy
+                                                    : Colors.blueGrey.shade400,
+                                                fontWeight: _deadline != null
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
                                                 fontSize: AppDimensions.fontSm,
                                               ),
                                               maxLines: 1,
@@ -343,7 +404,13 @@ class _GadikCreateAssignmentScreenState
                                             ),
                                           ),
                                           const SizedBox(width: 4),
-                                          Icon(Icons.calendar_month_rounded, size: 18, color: _deadline != null ? _primaryNavy : Colors.blueGrey.shade400),
+                                          Icon(
+                                            Icons.calendar_month_rounded,
+                                            size: 18,
+                                            color: _deadline != null
+                                                ? _primaryNavy
+                                                : Colors.blueGrey.shade400,
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -357,46 +424,77 @@ class _GadikCreateAssignmentScreenState
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildLabel(widget.isRemedialMode ? 'Target Serdik' : 'Target Pokjar'),
+                                _buildLabel(
+                                  widget.isRemedialMode
+                                      ? 'Target Serdik'
+                                      : 'Target Pokjar',
+                                ),
                                 if (widget.isRemedialMode)
                                   Wrap(
                                     spacing: 4,
                                     runSpacing: 4,
-                                    children: (widget.remedialSerdiks ?? []).map((serdikName) {
-                                      return Chip(
-                                        label: Text(
-                                          serdikName,
-                                          style: const TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.red.shade400,
-                                        padding: EdgeInsets.zero,
-                                        visualDensity: VisualDensity.compact,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(4),
-                                          side: BorderSide.none,
-                                        ),
-                                      );
-                                    }).toList(),
+                                    children: (widget.remedialSerdiks ?? [])
+                                        .map((serdikName) {
+                                          return Chip(
+                                            label: Text(
+                                              serdikName,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                Colors.red.shade400,
+                                            padding: EdgeInsets.zero,
+                                            visualDensity:
+                                                VisualDensity.compact,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                              side: BorderSide.none,
+                                            ),
+                                          );
+                                        })
+                                        .toList(),
                                   )
                                 else
                                   DropdownButtonFormField<String>(
                                     initialValue: _targetPokjar,
-                                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: _primaryNavy, size: 20),
-                                    decoration: _inputDecoration('Pilih Target'),
-                                    style: const TextStyle(fontWeight: FontWeight.w600, color: _primaryNavy, fontSize: AppDimensions.fontSm),
-                                    items: _pokjarList.map((p) => DropdownMenuItem(value: p, child: Text(p, maxLines: 1, overflow: TextOverflow.ellipsis))).toList(),
-                                    onChanged: (val) => setState(() => _targetPokjar = val!),
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: _primaryNavy,
+                                      size: 20,
+                                    ),
+                                    decoration: _inputDecoration(
+                                      'Pilih Target',
+                                    ),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: _primaryNavy,
+                                      fontSize: AppDimensions.fontSm,
+                                    ),
+                                    items: _pokjarList
+                                        .map(
+                                          (p) => DropdownMenuItem(
+                                            value: p,
+                                            child: Text(
+                                              p,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (val) =>
+                                        setState(() => _targetPokjar = val!),
                                   ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      
+
                       const Divider(height: 32, color: Color(0xFFF1F5F9)),
                       _buildSectionTitle('Detail & Lampiran'),
                       const SizedBox(height: AppDimensions.md),
@@ -405,8 +503,13 @@ class _GadikCreateAssignmentScreenState
                       TextFormField(
                         controller: _instruksiController,
                         maxLines: 4,
-                        style: const TextStyle(fontWeight: FontWeight.w500, color: _primaryNavy),
-                        decoration: _inputDecoration('Ketik instruksi spesifik di sini...'),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: _primaryNavy,
+                        ),
+                        decoration: _inputDecoration(
+                          'Ketik instruksi spesifik di sini...',
+                        ),
                       ),
                       const SizedBox(height: AppDimensions.xl),
 
@@ -415,14 +518,22 @@ class _GadikCreateAssignmentScreenState
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: _pickFile,
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusLg,
+                          ),
                           child: Container(
                             padding: const EdgeInsets.all(AppDimensions.lg),
                             decoration: BoxDecoration(
-                              color: _fileName != null ? _primaryNavy.withValues(alpha: 0.05) : const Color(0xFFF8FAFC),
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                              color: _fileName != null
+                                  ? _primaryNavy.withValues(alpha: 0.05)
+                                  : const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusLg,
+                              ),
                               border: Border.all(
-                                color: _fileName == null ? Colors.grey.shade200 : _primaryNavy.withValues(alpha: 0.3),
+                                color: _fileName == null
+                                    ? Colors.grey.shade200
+                                    : _primaryNavy.withValues(alpha: 0.3),
                                 width: 1.5,
                               ),
                             ),
@@ -437,18 +548,27 @@ class _GadikCreateAssignmentScreenState
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.05),
+                                              color: Colors.black.withValues(
+                                                alpha: 0.05,
+                                              ),
                                               blurRadius: 4,
                                               offset: const Offset(0, 2),
                                             ),
                                           ],
                                         ),
-                                        child: Icon(Icons.cloud_upload_rounded, color: Colors.blueGrey.shade400, size: 20),
+                                        child: Icon(
+                                          Icons.cloud_upload_rounded,
+                                          color: Colors.blueGrey.shade400,
+                                          size: 20,
+                                        ),
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
                                         'Pilih File Dokumen',
-                                        style: TextStyle(color: Colors.blueGrey.shade600, fontWeight: FontWeight.w600),
+                                        style: TextStyle(
+                                          color: Colors.blueGrey.shade600,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ],
                                   )
@@ -457,22 +577,37 @@ class _GadikCreateAssignmentScreenState
                                       Container(
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: _primaryNavy.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                                          color: _primaryNavy.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            AppDimensions.radiusMd,
+                                          ),
                                         ),
-                                        child: const Icon(Icons.description_rounded, color: _primaryNavy, size: 20),
+                                        child: const Icon(
+                                          Icons.description_rounded,
+                                          color: _primaryNavy,
+                                          size: 20,
+                                        ),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
                                           _fileName!,
-                                          style: const TextStyle(fontWeight: FontWeight.w700, color: _primaryNavy),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: _primaryNavy,
+                                          ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.cancel_rounded, color: Colors.redAccent, size: 24),
+                                        icon: const Icon(
+                                          Icons.cancel_rounded,
+                                          color: Colors.redAccent,
+                                          size: 24,
+                                        ),
                                         onPressed: _removeFile,
                                         constraints: const BoxConstraints(),
                                         padding: EdgeInsets.zero,
@@ -495,7 +630,9 @@ class _GadikCreateAssignmentScreenState
                             elevation: 8,
                             shadowColor: _primaryNavy.withValues(alpha: 0.3),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusXl,
+                              ),
                             ),
                           ),
                           child: const Row(
@@ -505,7 +642,11 @@ class _GadikCreateAssignmentScreenState
                               SizedBox(width: 8),
                               Text(
                                 'Terbitkan Tugas',
-                                style: TextStyle(fontWeight: FontWeight.w800, fontSize: AppDimensions.fontLg, letterSpacing: 0.5),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: AppDimensions.fontLg,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
                             ],
                           ),
@@ -572,7 +713,7 @@ class _GadikCreateAssignmentScreenState
         fontWeight: FontWeight.w500,
       ),
       filled: true,
-      fillColor: const Color(0xFFF8FAFC), // Slate 50
+      fillColor: const Color(0xFFF8FAFC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),

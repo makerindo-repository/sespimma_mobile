@@ -560,7 +560,7 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
               100,
             ),
             [
-              _buildSubScoreItem('Pull Up / Chinning (1 menit)', scorePullUp),
+              _buildSubScoreItem('Pull Up (1 menit)', scorePullUp),
               _buildSubScoreItem('Sit Up (1 menit)', scoreSitUp),
               _buildSubScoreItem('Push Up (1 menit)', scorePushUp),
               _buildSubScoreItem('Shuttle Run 6x10m', scoreShuttle),

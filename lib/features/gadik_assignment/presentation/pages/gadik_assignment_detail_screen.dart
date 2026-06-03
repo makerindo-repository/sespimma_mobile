@@ -42,7 +42,6 @@ class _GadikAssignmentDetailScreenState
           .where((s) => s.assignmentId == widget.assignment.id)
           .toList();
 
-      // Auto-inject dummy submissions if empty (for testing grading on new tasks)
       if (_submissions.isEmpty) {
         final dummySubmissions = [
           GadikSubmissionModel(
@@ -138,7 +137,7 @@ class _GadikAssignmentDetailScreenState
       String? selectedDirectory = await FilePicker.getDirectoryPath();
 
       if (selectedDirectory == null) {
-        return; // User canceled
+        return;
       }
 
       final String savePath = '$selectedDirectory/$fileName';
@@ -151,7 +150,10 @@ class _GadikAssignmentDetailScreenState
               const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(child: Text('Mengunduh lampiran $fileName...')),
@@ -165,7 +167,7 @@ class _GadikAssignmentDetailScreenState
       if (url.contains('example.com')) {
         await Future.delayed(const Duration(seconds: 1));
         final file = File(savePath);
-        await file.writeAsBytes([0]); // Dummy file for mock URL
+        await file.writeAsBytes([0]);
       } else {
         await Dio().download(url, savePath);
       }
@@ -238,7 +240,10 @@ class _GadikAssignmentDetailScreenState
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: () => _showDeleteConfirmation(context),
               ),
               const SizedBox(width: 8),
@@ -247,17 +252,27 @@ class _GadikAssignmentDetailScreenState
           SliverToBoxAdapter(
             child: Container(
               color: _primaryNavy,
-              padding: const EdgeInsets.fromLTRB(AppDimensions.xl, 0, AppDimensions.xl, AppDimensions.xl + 20),
+              padding: const EdgeInsets.fromLTRB(
+                AppDimensions.xl,
+                0,
+                AppDimensions.xl,
+                AppDimensions.xl + 20,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                         ),
                         child: Text(
                           shortCat,
@@ -271,10 +286,15 @@ class _GadikAssignmentDetailScreenState
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                         ),
                         child: Text(
                           widget.assignment.targetPokjar.toUpperCase(),
@@ -317,7 +337,7 @@ class _GadikAssignmentDetailScreenState
                           icon: Icons.timer_outlined,
                           title: 'Tenggat Waktu',
                           value: _formatDeadline(widget.assignment.deadline),
-                          valueColor: const Color(0xFFFCA5A5), // Red 300
+                          valueColor: const Color(0xFFFCA5A5),
                         ),
                       ),
                       const SizedBox(width: AppDimensions.md),
@@ -326,7 +346,7 @@ class _GadikAssignmentDetailScreenState
                           icon: Icons.check_circle_outline_rounded,
                           title: 'Progres',
                           value: '$submittedCount / $totalSerdik',
-                          valueColor: const Color(0xFF6EE7B7), // Emerald 300
+                          valueColor: const Color(0xFF6EE7B7),
                         ),
                       ),
                     ],
@@ -355,16 +375,27 @@ class _GadikAssignmentDetailScreenState
                             if (value == true) {
                               messenger.showSnackBar(
                                 SnackBar(
-                                  content: const Text('Tugas Remedial berhasil dibuat', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  content: const Text(
+                                    'Tugas Remedial berhasil dibuat',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   backgroundColor: Colors.green.shade700,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
                               );
                             }
                           });
                         },
-                        icon: const Icon(Icons.assignment_late_rounded, color: Colors.white, size: 18),
+                        icon: const Icon(
+                          Icons.assignment_late_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                         label: const Text(
                           'Buat Tugas Remedial',
                           style: TextStyle(
@@ -377,7 +408,9 @@ class _GadikAssignmentDetailScreenState
                           backgroundColor: Colors.red.shade600,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusLg,
+                            ),
                           ),
                           elevation: 0,
                         ),
@@ -522,18 +555,29 @@ class _GadikAssignmentDetailScreenState
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXl)),
-        title: const Text('Hapus Tugas', style: TextStyle(fontWeight: FontWeight.w800, color: _primaryNavy)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        ),
+        title: const Text(
+          'Hapus Tugas',
+          style: TextStyle(fontWeight: FontWeight.w800, color: _primaryNavy),
+        ),
         content: const Text(
           'Apakah Anda yakin ingin menghapus tugas ini beserta seluruh nilainya?',
-          style: TextStyle(fontSize: AppDimensions.fontLg, color: Colors.blueGrey),
+          style: TextStyle(
+            fontSize: AppDimensions.fontLg,
+            color: Colors.blueGrey,
+          ),
         ),
         actionsPadding: const EdgeInsets.all(16),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             style: TextButton.styleFrom(foregroundColor: Colors.blueGrey),
-            child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.w700)),
+            child: const Text(
+              'Batal',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -544,9 +588,14 @@ class _GadikAssignmentDetailScreenState
               backgroundColor: const Color(0xFFEF4444),
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              ),
             ),
-            child: const Text('Hapus', style: TextStyle(fontWeight: FontWeight.w700)),
+            child: const Text(
+              'Hapus',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
@@ -601,7 +650,12 @@ class _GadikAssignmentDetailScreenState
 
   Widget _buildInstructionSection() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppDimensions.xl, AppDimensions.xxl, AppDimensions.xl, AppDimensions.xl),
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.xl,
+        AppDimensions.xxl,
+        AppDimensions.xl,
+        AppDimensions.xl,
+      ),
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.xl),
         decoration: BoxDecoration(
@@ -679,11 +733,19 @@ class _GadikAssignmentDetailScreenState
                     widget.assignment.fileName,
                   ),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                      border: Border.all(color: Colors.grey.shade200, width: 1.5),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
+                      border: Border.all(
+                        color: Colors.grey.shade200,
+                        width: 1.5,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -691,12 +753,22 @@ class _GadikAssignmentDetailScreenState
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusMd,
+                            ),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2)),
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
                             ],
                           ),
-                          child: const Icon(Icons.picture_as_pdf_rounded, color: Colors.redAccent, size: 24),
+                          child: const Icon(
+                            Icons.picture_as_pdf_rounded,
+                            color: Colors.redAccent,
+                            size: 24,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -731,7 +803,11 @@ class _GadikAssignmentDetailScreenState
                             color: _primaryNavy.withValues(alpha: 0.05),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.download_rounded, color: _primaryNavy, size: 20),
+                          child: const Icon(
+                            Icons.download_rounded,
+                            color: _primaryNavy,
+                            size: 20,
+                          ),
                         ),
                       ],
                     ),
@@ -752,7 +828,9 @@ class _GadikAssignmentDetailScreenState
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         border: Border.all(
-          color: sub.isRemedial == true ? Colors.red.shade400 : Colors.grey.shade100,
+          color: sub.isRemedial == true
+              ? Colors.red.shade400
+              : Colors.grey.shade100,
           width: sub.isRemedial == true ? 2.0 : 1.0,
         ),
         boxShadow: [
@@ -769,9 +847,9 @@ class _GadikAssignmentDetailScreenState
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
           onTap: () {
-                  HapticFeedback.selectionClick();
-                  _openGradingSheet(sub);
-                },
+            HapticFeedback.selectionClick();
+            _openGradingSheet(sub);
+          },
           child: Padding(
             padding: const EdgeInsets.all(AppDimensions.lg),
             child: Row(
@@ -780,7 +858,9 @@ class _GadikAssignmentDetailScreenState
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: _lightGrey,
-                  backgroundImage: const AssetImage('assets/images/default_avatar.png'),
+                  backgroundImage: const AssetImage(
+                    'assets/images/default_avatar.png',
+                  ),
                 ),
                 const SizedBox(width: AppDimensions.lg),
                 Expanded(
@@ -811,18 +891,29 @@ class _GadikAssignmentDetailScreenState
                         const SizedBox(height: 10),
                         InkWell(
                           onTap: () => _downloadFile(sub.fileUrl, sub.fileName),
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusSm,
+                          ),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusSm,
+                              ),
                               border: Border.all(color: Colors.blue.shade100),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.attachment_rounded, size: 14, color: Colors.blue.shade700),
+                                Icon(
+                                  Icons.attachment_rounded,
+                                  size: 14,
+                                  color: Colors.blue.shade700,
+                                ),
                                 const SizedBox(width: 6),
                                 Flexible(
                                   child: Text(
@@ -867,8 +958,12 @@ class _GadikAssignmentDetailScreenState
     if (sub.isGraded) {
       final double score = sub.nilaiAkhir ?? 0.0;
       final Color scoreColor = _getScoreColor(score);
-      final Color scoreBgColor = score > 0 ? scoreColor.withValues(alpha: 0.1) : const Color(0xFFECFDF5);
-      final Color scoreBorderColor = score > 0 ? scoreColor.withValues(alpha: 0.3) : const Color(0xFFA7F3D0);
+      final Color scoreBgColor = score > 0
+          ? scoreColor.withValues(alpha: 0.1)
+          : const Color(0xFFECFDF5);
+      final Color scoreBorderColor = score > 0
+          ? scoreColor.withValues(alpha: 0.3)
+          : const Color(0xFFA7F3D0);
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -877,9 +972,11 @@ class _GadikAssignmentDetailScreenState
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: scoreBgColor,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
@@ -954,7 +1051,7 @@ class _GadikAssignmentDetailScreenState
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEE2E2), // Red 100
+                color: const Color(0xFFFEE2E2),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Text(
@@ -962,7 +1059,7 @@ class _GadikAssignmentDetailScreenState
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFFB91C1C), // Red 700
+                  color: Color(0xFFB91C1C),
                   letterSpacing: 0.5,
                 ),
               ),
@@ -999,7 +1096,11 @@ class _GadikAssignmentDetailScreenState
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle_rounded, color: Color(0xFF047857), size: 24),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Color(0xFF047857),
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               const Expanded(

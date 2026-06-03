@@ -1,4 +1,3 @@
-// lib/features/assessment/presentation/widgets/medis_health_grading_sheet.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
@@ -24,10 +23,8 @@ class MedisHealthGradingSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => MedisHealthGradingSheet(
-        serdik: serdik,
-        onDataChanged: onDataChanged,
-      ),
+      builder: (context) =>
+          MedisHealthGradingSheet(serdik: serdik, onDataChanged: onDataChanged),
     );
   }
 
@@ -58,7 +55,7 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
   }
 
   void _showInputDialog(String type) {
-    Navigator.pop(context); // Close main sheet
+    Navigator.pop(context);
 
     final TextEditingController controller = TextEditingController();
     final noSerdik = widget.serdik['no_serdik'].toString();
@@ -83,7 +80,9 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               ),
               title: Text(
-                type == 'A' ? 'Input Nilai A (Tes Awal)' : 'Input Nilai B (Tes Akhir)',
+                type == 'A'
+                    ? 'Input Nilai A (Tes Awal)'
+                    : 'Input Nilai B (Tes Akhir)',
                 style: const TextStyle(
                   color: _primaryNavy,
                   fontWeight: FontWeight.w800,
@@ -95,34 +94,54 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                 children: [
                   TextField(
                     controller: controller,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Masukkan nilai (0-100)',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                        borderSide: const BorderSide(color: _primaryNavy, width: 2),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
+                        borderSide: const BorderSide(
+                          color: _primaryNavy,
+                          width: 2,
+                        ),
                       ),
                     ),
                     onChanged: (val) {
                       final parsed = double.tryParse(val) ?? 0.0;
                       if (parsed > 100) {
                         controller.text = '100';
-                        controller.selection = TextSelection.fromPosition(const TextPosition(offset: 3));
+                        controller.selection = TextSelection.fromPosition(
+                          const TextPosition(offset: 3),
+                        );
                       }
                       setStateDialog(() {});
                     },
                   ),
                   const SizedBox(height: AppDimensions.lg),
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 16,
+                    ),
                     decoration: BoxDecoration(
-                      color: currentScore > 0 ? scoreColor.withValues(alpha: 0.1) : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      color: currentScore > 0
+                          ? scoreColor.withValues(alpha: 0.1)
+                          : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                       border: Border.all(
-                        color: currentScore > 0 ? scoreColor.withValues(alpha: 0.5) : Colors.grey.shade300,
+                        color: currentScore > 0
+                            ? scoreColor.withValues(alpha: 0.5)
+                            : Colors.grey.shade300,
                       ),
                     ),
                     child: Column(
@@ -141,26 +160,33 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                           style: TextStyle(
                             fontSize: AppDimensions.fontMd,
                             fontWeight: FontWeight.w800,
-                            color: currentScore > 0 ? scoreColor : Colors.grey.shade500,
+                            color: currentScore > 0
+                                ? scoreColor
+                                : Colors.grey.shade500,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+                  child: const Text(
+                    'Batal',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryNavy,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusMd,
+                      ),
                     ),
                   ),
                   onPressed: () {
@@ -173,7 +199,7 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                       }
                       widget.onDataChanged();
                       Navigator.pop(context);
-                      
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Nilai berhasil disimpan'),
@@ -193,7 +219,7 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
   }
 
   void _navigateToRecordScreen() {
-    Navigator.pop(context); // close sheet
+    Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(

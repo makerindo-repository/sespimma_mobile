@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:ui';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -80,7 +81,7 @@ class MyApp extends StatelessWidget {
             primary: const Color(0xFF001C40),
           ),
           scaffoldBackgroundColor: const Color(0xFFF8F9FA),
-          fontFamily: 'Roboto',
+          textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
           appBarTheme: const AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -487,7 +486,7 @@ class _PatunPhysicalMonitoringScreenState
 
   Widget _buildAvatar(Map<String, dynamic> serdik) {
     final String? profilePhoto =
-        serdik['profile_photo'] ?? serdik['profilePhoto'];
+        serdik['foto'] ?? serdik['profile_photo'] ?? serdik['profilePhoto'];
 
     return Container(
       width: 56,
@@ -498,7 +497,7 @@ class _PatunPhysicalMonitoringScreenState
         border: Border.all(color: Colors.grey.shade200, width: 2),
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
-              ? FileImage(File(profilePhoto)) as ImageProvider
+              ? NetworkImage(profilePhoto) as ImageProvider
               : const AssetImage('assets/images/default_avatar.png'),
           fit: BoxFit.cover,
         ),

@@ -139,9 +139,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         _activeZone != null && DateTime.now().isAfter(_activeZone!.cutoffTime);
     if (isAlpha) {
       HapticFeedback.vibrate();
+      final punishmentCode = _activeZone!.isTraining
+          ? 'P_D_12 (-0.80)'
+          : 'P_D_05 (-0.90)';
       _showErrorDialog(
         'Absensi Ditutup',
-        'Waktu toleransi kehadiran untuk sesi ini telah sepenuhnya berakhir. Status Anda otomatis tercatat sebagai ALPHA.',
+        'Waktu toleransi kehadiran untuk sesi ini telah sepenuhnya berakhir. Status Anda otomatis tercatat sebagai ALPHA.\n\nSanksi pelanggaran: $punishmentCode',
       );
       return;
     }
@@ -193,9 +196,22 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         _activeZone != null && now.isAfter(_activeZone!.deadline);
 
     if (isLate) {
+      final actLower = activityName.toLowerCase();
+      final isApelOrOlga =
+          actLower.contains('apel pagi') ||
+          actLower.contains('apel malam') ||
+          actLower.contains('olahraga pagi') ||
+          actLower.contains('olga pagi');
+      String punishmentCode = 'P_D_02 (-0.53)';
+      if (isApelOrOlga) {
+        punishmentCode = 'P_D_04 (-0.50)';
+      } else if (fromQr || _isInRadius) {
+        punishmentCode = 'P_D_01 (-0.50)';
+      }
+
       AppNotifier.showWarning(
         context,
-        'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.',
+        'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.\nSanksi pelanggaran: $punishmentCode',
       );
     } else {
       AppNotifier.showSuccess(

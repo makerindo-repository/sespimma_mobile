@@ -1,4 +1,3 @@
-// lib/features/assessment/presentation/pages/medis_health_record_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -51,14 +50,13 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
 
   int _calculateMinusPoints(String type) {
     if (type.contains('POLIKLINIK')) {
-      // Logic for Poliklinik is based on total visits, handled by the model or here.
-      // But actually, we just need to know if THIS visit causes a deduction.
       final noSerdik = widget.serdik['no_serdik'].toString();
       final data = HealthMonitoringData.getHealthData(noSerdik);
-      final totalPoli = data.records.where((r) => r.type.contains('POLIKLINIK')).length;
+      final totalPoli = data.records
+          .where((r) => r.type.contains('POLIKLINIK'))
+          .length;
       final newTotal = totalPoli + 1;
-      // 1-5x = -1, 6-10x = -2 (total). 
-      // If newTotal is 1, 6, 11, etc. we deduct -1. Otherwise 0.
+
       if (newTotal % 5 == 1) {
         return 1;
       }
@@ -66,10 +64,8 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
     } else {
       final days = int.tryParse(_daysController.text.trim()) ?? 1;
       if (type.contains('TPS')) {
-        // 1-2 hari -> -1, 3-4 hari -> -2
         return (days / 2).ceil();
       } else if (type.contains('RS')) {
-        // 1 hari -> -2, 2 hari -> -4
         return days * 2;
       }
     }
@@ -87,7 +83,8 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
       return;
     }
 
-    if ((_selectedType!.contains('RAWAT INAP')) && _daysController.text.trim().isEmpty) {
+    if ((_selectedType!.contains('RAWAT INAP')) &&
+        _daysController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Isi durasi hari rawat inap'),
@@ -266,14 +263,15 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
   Widget _buildAvatar(Map<String, dynamic> serdik) {
-    final String? profilePhoto = serdik['profile_photo'] ?? serdik['profilePhoto'];
+    final String? profilePhoto =
+        serdik['profile_photo'] ?? serdik['profilePhoto'];
 
     return Container(
       width: 48,
@@ -322,7 +320,10 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
             decoration: InputDecoration(
               filled: true,
               fillColor: _lightGrey,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 4,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                 borderSide: BorderSide.none,
@@ -344,7 +345,8 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
               ),
             ),
           ),
-          if (_selectedType != null && _selectedType!.contains('RAWAT INAP')) ...[
+          if (_selectedType != null &&
+              _selectedType!.contains('RAWAT INAP')) ...[
             const SizedBox(height: AppDimensions.md),
             TextField(
               controller: _daysController,
@@ -384,11 +386,15 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
               _photoPath != null ? Icons.check_circle : Icons.camera_alt,
               color: _photoPath != null ? Colors.green : _primaryNavy,
             ),
-            label: Text(_photoPath != null ? 'Bukti Foto Terlampir' : 'Upload Bukti Foto'),
+            label: Text(
+              _photoPath != null ? 'Bukti Foto Terlampir' : 'Upload Bukti Foto',
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               foregroundColor: _photoPath != null ? Colors.green : _primaryNavy,
-              side: BorderSide(color: _photoPath != null ? Colors.green : _primaryNavy),
+              side: BorderSide(
+                color: _photoPath != null ? Colors.green : _primaryNavy,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
               ),
@@ -466,10 +472,13 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: records.length,
-      separatorBuilder: (context, index) => const SizedBox(height: AppDimensions.md),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppDimensions.md),
       itemBuilder: (context, index) {
         final record = records[index];
-        final timeStr = DateFormat('dd MMM yyyy HH:mm').format(record.timestamp);
+        final timeStr = DateFormat(
+          'dd MMM yyyy HH:mm',
+        ).format(record.timestamp);
 
         return Container(
           padding: const EdgeInsets.all(AppDimensions.md),
@@ -487,7 +496,11 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
                   color: Colors.red.shade50,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.medical_services, color: Colors.red.shade400, size: 20),
+                child: Icon(
+                  Icons.medical_services,
+                  color: Colors.red.shade400,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: AppDimensions.md),
               Expanded(
@@ -509,7 +522,10 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
                     const SizedBox(height: 8),
                     Text(
                       '$timeStr • ${record.medisName}',
-                      style: TextStyle(fontSize: 12, color: Colors.blueGrey.shade300),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.blueGrey.shade300,
+                      ),
                     ),
                   ],
                 ),

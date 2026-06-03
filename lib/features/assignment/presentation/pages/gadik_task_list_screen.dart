@@ -35,10 +35,9 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
     super.dispose();
   }
 
-  // Pro Max Premium Color Palette
-  static const Color _primaryNavy = Color(0xFF0F172A); // Slate 900
-  static const Color _lightGrey = Color(0xFFF8FAFC); // Slate 50
-  static const Color _successGreen = Color(0xFF10B981); // Emerald 500
+  static const Color _primaryNavy = Color(0xFF0F172A);
+  static const Color _lightGrey = Color(0xFFF8FAFC);
+  static const Color _successGreen = Color(0xFF10B981);
   static const Color _surfaceColor = Colors.white;
 
   List<TugasModel> get _mockTasks {
@@ -162,7 +161,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
             color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
@@ -265,8 +264,12 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
         label,
         style: TextStyle(
           fontSize: AppDimensions.fontDefault,
-          fontWeight: _selectedFilter == value ? FontWeight.w700 : FontWeight.w500,
-          color: _selectedFilter == value ? _primaryNavy : Colors.blueGrey.shade700,
+          fontWeight: _selectedFilter == value
+              ? FontWeight.w700
+              : FontWeight.w500,
+          color: _selectedFilter == value
+              ? _primaryNavy
+              : Colors.blueGrey.shade700,
         ),
       ),
     );
@@ -318,7 +321,9 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
   Widget _buildTaskItem(BuildContext context, TugasModel task) {
     final bool isAktif = task.status.toLowerCase() == 'aktif';
     final String displayStatus = isAktif ? 'SEDANG BERJALAN' : 'DITUTUP';
-    final Color statusColor = isAktif ? _successGreen : Colors.blueGrey.shade500;
+    final Color statusColor = isAktif
+        ? _successGreen
+        : Colors.blueGrey.shade500;
     final IconData statusIcon = isAktif
         ? Icons.run_circle_rounded
         : Icons.lock_clock_rounded;

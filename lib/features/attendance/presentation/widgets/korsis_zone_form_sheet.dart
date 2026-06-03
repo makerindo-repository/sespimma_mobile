@@ -42,6 +42,7 @@ class _KorsisZoneFormSheetState extends State<KorsisZoneFormSheet> {
   TimeOfDay _cutoffTime = const TimeOfDay(hour: 16, minute: 30);
 
   bool _isRoutine = false;
+  bool _isTraining = false;
 
   bool _generateQr = true;
 
@@ -62,6 +63,7 @@ class _KorsisZoneFormSheetState extends State<KorsisZoneFormSheet> {
         minute: z.cutoffTime.minute,
       );
       _isRoutine = z.isRoutine;
+      _isTraining = z.isTraining;
     }
   }
 
@@ -329,17 +331,31 @@ class _KorsisZoneFormSheetState extends State<KorsisZoneFormSheet> {
                       icon: AppIcons.arrowsClockwiseBold,
                       title: 'Kegiatan Rutin',
                       subtitle:
-                          'Zona berulang harian, QR di-rotate otomatis setiap hari',
+                          'Zona berulang harian, QR Code diperbarui otomatis setiap hari',
                       value: _isRoutine,
-                      onChanged: (val) => setState(() => _isRoutine = val),
+                      onChanged: (val) => setState(() {
+                        _isRoutine = val;
+                        if (val) _isTraining = false;
+                      }),
+                    ),
+                    Divider(height: 1, color: Colors.grey.shade200),
+                    _buildToggleRow(
+                      icon: AppIcons.usersFill,
+                      title: 'Kegiatan Pelatihan',
+                      subtitle:
+                          'Zona ini khusus dibuat ketika ada kegiatan pelatihan khusus',
+                      value: _isTraining,
+                      onChanged: (val) => setState(() {
+                        _isTraining = val;
+                        if (val) _isRoutine = false;
+                      }),
                     ),
                     Divider(height: 1, color: Colors.grey.shade200),
                     _buildToggleRow(
                       icon: AppIcons.qrCode,
                       title: 'Buat QR Code',
-                      subtitle: _isRoutine
-                          ? 'QR aktif hari ini, berubah otomatis tiap hari'
-                          : 'QR Code permanen untuk zona ini',
+                      subtitle:
+                          'QR Code berfungsi apabila fitur geofencing bermasalah',
                       value: _generateQr,
                       onChanged: (val) => setState(() => _generateQr = val),
                     ),

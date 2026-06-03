@@ -1,4 +1,3 @@
-// lib/features/assessment/presentation/widgets/jasmani_grading_bottom_sheet.dart
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
@@ -29,7 +28,9 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXxl)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusXxl),
+        ),
       ),
       child: SafeArea(
         child: Padding(
@@ -41,7 +42,6 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -62,12 +62,13 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppDimensions.md),
-              
-              // Samapta A Option
+
               _buildOptionCard(
                 context,
                 title: 'Samapta A',
-                subtitle: isGol4 ? 'Jalan Kaki 20 Menit' : 'Lari atau Jalan selama 12 menit',
+                subtitle: isGol4
+                    ? 'Jalan selama 12 menit'
+                    : 'Lari selama 12 menit',
                 icon: Icons.directions_run_rounded,
                 isCompleted: gradingData.nilaiA != null,
                 onTap: () {
@@ -85,15 +86,15 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
                   ).then((_) => onGradingComplete());
                 },
               ),
-              
+
               const SizedBox(height: AppDimensions.md),
-              
-              // Samapta B Option (Hidden for Gol IV)
+
               if (!isGol4)
                 _buildOptionCard(
                   context,
                   title: 'Samapta B',
-                  subtitle: 'Pull Up/Chinning, Sit Up, Push Up, dan Shuttle Run 6x10 Meter',
+                  subtitle:
+                      'Pull Up, Sit Up, Push Up, dan Shuttle Run 6x10 Meter',
                   icon: Icons.fitness_center_rounded,
                   isCompleted: gradingData.isSamaptaBComplete,
                   onTap: () {
@@ -111,7 +112,7 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
                     ).then((_) => onGradingComplete());
                   },
                 ),
-                
+
               const SizedBox(height: AppDimensions.xl),
             ],
           ),
@@ -145,12 +146,16 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isCompleted ? Colors.green.shade100 : Colors.blue.shade50,
+                color: isCompleted
+                    ? Colors.green.shade100
+                    : Colors.blue.shade50,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isCompleted ? Colors.green.shade700 : AppColors.primaryNavy,
+                color: isCompleted
+                    ? Colors.green.shade700
+                    : AppColors.primaryNavy,
               ),
             ),
             const SizedBox(width: AppDimensions.lg),
@@ -170,7 +175,11 @@ class JasmaniGradingBottomSheet extends StatelessWidget {
                       ),
                       if (isCompleted) ...[
                         const SizedBox(width: 8),
-                        const Icon(Icons.check_circle, color: Colors.green, size: 16),
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        ),
                       ],
                     ],
                   ),

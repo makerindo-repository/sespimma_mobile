@@ -44,36 +44,44 @@ class PdfReportService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'KEPOLISIAN NEGARA REPUBLIK INDONESIA',
+          'SESPIM LEMDIKLAT POLRI',
           style: pw.TextStyle(font: bold, fontSize: 10),
         ),
         pw.Text(
-          'LEMBAGA PENDIDIKAN DAN PELATIHAN',
+          'SEKOLAH STAF DAN PIMPINAN PERTAMA',
           style: pw.TextStyle(font: bold, fontSize: 10),
         ),
-        pw.Container(width: 200, child: pw.Divider(thickness: 1)),
+        pw.Container(
+          margin: const pw.EdgeInsets.only(top: 2),
+          width: 210,
+          child: pw.Divider(thickness: 1),
+        ),
       ],
     );
   }
 
   static pw.Widget _buildTitle(pw.Font bold, String pokjar) {
+    final year = DateTime.now().year;
     return pw.Center(
       child: pw.Column(
         children: [
           pw.Text(
-            'LAPORAN HASIL EVALUASI AKHIR SERDIK',
-            style: pw.TextStyle(font: bold, fontSize: 14),
-          ),
-          pw.Text(
-            'SESPIMMA POLRI ANGKATAN KE-75',
+            'LAPORAN HASIL NILAI AKHIR KESELURUHAN SERDIK',
             style: pw.TextStyle(font: bold, fontSize: 12),
           ),
           pw.Text(
-            'WILAYAH MONITORING: ${pokjar.toUpperCase()}',
-            style: pw.TextStyle(font: bold, fontSize: 11),
+            'SESPIM LEMDIKLAT POLRI ANGKATAN KE-75 T.A.$year',
+            style: pw.TextStyle(font: bold, fontSize: 12),
           ),
+          if (pokjar != 'Semua') ...[
+            pw.SizedBox(height: 5),
+            pw.Text(
+              'WILAYAH MONITORING: ${pokjar.toUpperCase()}',
+              style: pw.TextStyle(font: bold, fontSize: 11),
+            ),
+          ],
           pw.SizedBox(height: 5),
-          pw.Container(width: 300, child: pw.Divider(thickness: 2)),
+          pw.Container(width: 400, child: pw.Divider(thickness: 2)),
         ],
       ),
     );
@@ -86,12 +94,12 @@ class PdfReportService {
   ) {
     final headers = [
       'NO',
-      'NAMA / NRP',
+      'NAMA / NOSIS',
       'POKJAR',
-      'AKD',
+      'AKADEMIK',
       'MENTAL',
-      'JAS',
-      'RATA2',
+      'JASMANI',
+      'NAK',
       'STATUS',
     ];
 
@@ -102,7 +110,7 @@ class PdfReportService {
         final isLulus = item.average >= 70.0;
         return [
           '${index + 1}',
-          '${item.name}\n${item.nrp}',
+          '${item.name}\n${item.nosis}',
           item.pokjar,
           item.academicScore.toStringAsFixed(2),
           item.mentalScore.toStringAsFixed(2),
@@ -122,11 +130,11 @@ class PdfReportService {
         0: const pw.FixedColumnWidth(25),
         1: const pw.FlexColumnWidth(3),
         2: const pw.FlexColumnWidth(1.5),
-        3: const pw.FixedColumnWidth(35),
-        4: const pw.FixedColumnWidth(35),
-        5: const pw.FixedColumnWidth(35),
+        3: const pw.FixedColumnWidth(55),
+        4: const pw.FixedColumnWidth(45),
+        5: const pw.FixedColumnWidth(50),
         6: const pw.FixedColumnWidth(40),
-        7: const pw.FixedColumnWidth(60),
+        7: const pw.FixedColumnWidth(65),
       },
       cellAlignment: pw.Alignment.center,
       cellAlignments: {1: pw.Alignment.centerLeft},
@@ -192,21 +200,30 @@ class PdfReportService {
       mainAxisAlignment: pw.MainAxisAlignment.end,
       children: [
         pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
             pw.Text(
-              'Lembang, $dateStr',
+              'Ditetapkan di: Lembang\npada tanggal: $dateStr',
               style: pw.TextStyle(font: regular, fontSize: 10),
+              textAlign: pw.TextAlign.center,
             ),
             pw.SizedBox(height: 5),
             pw.Text(
-              'KA SESPIMMA LEMDIKLAT POLRI',
+              'KA SESPIMMA SESPIM LEMDIKLAT POLRI',
               style: pw.TextStyle(font: bold, fontSize: 10),
             ),
             pw.SizedBox(height: 60),
-            pw.Container(width: 150, child: pw.Divider(thickness: 1)),
             pw.Text(
-              'INSPEKTUR JENDERAL POLISI',
-              style: pw.TextStyle(font: regular, fontSize: 9),
+              'VICTOR T. OGI TAMBUNAN, S.H., S.I.K.',
+              style: pw.TextStyle(
+                font: bold,
+                fontSize: 10,
+                decoration: pw.TextDecoration.underline,
+              ),
+            ),
+            pw.Text(
+              'BRIGADIR JENDERAL POLISI',
+              style: pw.TextStyle(font: regular, fontSize: 10),
             ),
           ],
         ),

@@ -4,10 +4,6 @@ import 'package:sespimma_mobile/features/auth/data/datasources/korsis_real_data.
 import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 
-/// Represents a single reward/punishment inbox entry.
-///
-/// Used by both Korsis (inbox approval) and Gadik
-/// (monitoring penilaian) features.
 class InboxItem {
   final String id;
   final String serdikName;
@@ -40,43 +36,25 @@ class InboxItem {
   });
 }
 
-/// Persistent, in-memory mock data store for Korsis inbox items.
-///
-/// Data is generated once and held in a static list so that
-/// records added by Gadik are immediately visible to the Korsis
-/// inbox screen without a restart.
 class KorsisInboxMockData {
   KorsisInboxMockData._();
 
   static List<InboxItem>? _items;
 
-  /// Returns the shared, persistent list of inbox items.
-  ///
-  /// The list is lazily initialized on first access. Subsequent
-  /// calls always return the same instance.
   static List<InboxItem> get items {
     _items ??= _generateInitialData();
     return _items!;
   }
 
-  /// Convenience alias that preserves backwards-compatibility
-  /// with existing callers that used `generateMockData()`.
   static List<InboxItem> generateMockData() => items;
 
-  /// Inserts a new [InboxItem] at the front of the shared list.
-  ///
-  /// Called from the Gadik mental form screen after the user
-  /// saves a new reward/punishment entry.
   static void addRecord(InboxItem item) {
     items.insert(0, item);
   }
 
-  /// Resets the mock data (useful for testing or hard-refresh).
   static void reset() {
     _items = null;
   }
-
-  // ── Private helpers ───────────────────────────────────────
 
   static List<InboxItem> _generateInitialData() {
     final now = DateTime.now();

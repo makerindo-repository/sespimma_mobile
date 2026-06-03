@@ -74,6 +74,7 @@ class AttendanceZone {
   final DateTime deadline;
   final DateTime cutoffTime;
   final bool isRoutine;
+  final bool isTraining;
 
   const AttendanceZone({
     required this.id,
@@ -89,6 +90,7 @@ class AttendanceZone {
     required this.deadline,
     required this.cutoffTime,
     this.isRoutine = false,
+    this.isTraining = false,
   });
 
   String get timeString {

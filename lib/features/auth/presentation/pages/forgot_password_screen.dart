@@ -24,7 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   static const Color _lightGrey = Color(0xFFF8F9FA);
   static const Color _waColor = Color(0xFF25D366);
 
-  static const String _adminWaNumber = '628123456789';
+  static const String _adminWaNumber = '6285862393696';
   static const String _adminWaText =
       'Halo Admin Makerindo, saya di akun SESPIMMA ingin meminta token reset password.';
   static const String _validResetToken = 'MAKERINDO75';

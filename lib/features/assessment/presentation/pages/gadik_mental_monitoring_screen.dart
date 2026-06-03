@@ -1,5 +1,3 @@
-// lib/features/assessment/presentation/pages/gadik_mental_monitoring_screen.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,11 +8,6 @@ import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessm
 import '../../data/models/korsis_inbox_mock_data.dart';
 import 'gadik_mental_form_screen.dart';
 
-/// Monitoring screen for Gadik to view all mental assessment
-/// records (reward / punishment) they have submitted.
-///
-/// Mirrors the Korsis inbox UI but removes the approve/reject
-/// actions and adds a FAB for creating new entries.
 class GadikMentalMonitoringScreen extends StatefulWidget {
   const GadikMentalMonitoringScreen({super.key});
 
@@ -25,10 +18,8 @@ class GadikMentalMonitoringScreen extends StatefulWidget {
 
 class _GadikMentalMonitoringScreenState
     extends State<GadikMentalMonitoringScreen> {
-  // ── Constants ─────────────────────────────────────────────
   static const Color _primaryNavy = AppColors.primaryNavy;
 
-  // ── State ─────────────────────────────────────────────────
   List<InboxItem> _allItems = [];
   List<InboxItem> _filteredItems = [];
 
@@ -37,8 +28,7 @@ class _GadikMentalMonitoringScreenState
   String _selectedStatus = 'Semua Status';
   DateTimeRange? _selectedDateRange;
 
-  final TextEditingController _searchController =
-      TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> _pokjarOptions = [
     'Semua Pokjar',
@@ -50,13 +40,7 @@ class _GadikMentalMonitoringScreenState
     'POKJAR VI',
   ];
 
-  final List<String> _statusOptions = [
-    'Semua Status',
-    'Reward',
-    'Punishment',
-  ];
-
-  // ── Lifecycle ─────────────────────────────────────────────
+  final List<String> _statusOptions = ['Semua Status', 'Reward', 'Punishment'];
 
   @override
   void initState() {
@@ -75,8 +59,6 @@ class _GadikMentalMonitoringScreenState
     super.reassemble();
     _loadData();
   }
-
-  // ── Data ──────────────────────────────────────────────────
 
   void _loadData() {
     _allItems = KorsisInboxMockData.items;
@@ -98,7 +80,6 @@ class _GadikMentalMonitoringScreenState
   void _applyFilters() {
     setState(() {
       _filteredItems = _allItems.where((item) {
-        // Search filter
         if (_searchQuery.isNotEmpty) {
           final query = _searchQuery.toLowerCase();
           if (!item.serdikName.toLowerCase().contains(query) &&
@@ -107,15 +88,12 @@ class _GadikMentalMonitoringScreenState
           }
         }
 
-        // Pokjar filter
         if (_selectedPokjar != 'Semua Pokjar') {
-          if (item.pokjar !=
-              _mapRomanToArabic(_selectedPokjar)) {
+          if (item.pokjar != _mapRomanToArabic(_selectedPokjar)) {
             return false;
           }
         }
 
-        // Status filter
         if (_selectedStatus != 'Semua Status') {
           if (_selectedStatus == 'Reward' && !item.isReward) {
             return false;
@@ -125,7 +103,6 @@ class _GadikMentalMonitoringScreenState
           }
         }
 
-        // Date range filter
         if (_selectedDateRange != null) {
           final dt = item.timestamp;
           final start = DateTime(
@@ -149,8 +126,7 @@ class _GadikMentalMonitoringScreenState
         return true;
       }).toList();
 
-      _filteredItems
-          .sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      _filteredItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     });
   }
 
@@ -160,7 +136,8 @@ class _GadikMentalMonitoringScreenState
       context: context,
       firstDate: DateTime(2025),
       lastDate: DateTime(2030),
-      initialDateRange: _selectedDateRange ??
+      initialDateRange:
+          _selectedDateRange ??
           DateTimeRange(
             start: DateTime(now.year, now.month, 1),
             end: DateTime(now.year, now.month, now.day),
@@ -195,8 +172,6 @@ class _GadikMentalMonitoringScreenState
     });
   }
 
-  // ── Navigation ────────────────────────────────────────────
-
   void _openFormScreen(bool isReward) {
     Navigator.push(
       context,
@@ -204,12 +179,9 @@ class _GadikMentalMonitoringScreenState
         builder: (_) => GadikMentalFormScreen(isReward: isReward),
       ),
     ).then((_) {
-      // Refresh list after returning from form
       _loadData();
     });
   }
-
-  // ── Build ─────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -259,15 +231,12 @@ class _GadikMentalMonitoringScreenState
             child: RefreshIndicator(
               onRefresh: () async {
                 _loadData();
-                await Future.delayed(
-                  const Duration(milliseconds: 400),
-                );
+                await Future.delayed(const Duration(milliseconds: 400));
               },
               color: _primaryNavy,
               child: _filteredItems.isEmpty
                   ? ListView(
-                      physics:
-                          const AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       children: [
                         const SizedBox(height: 200),
                         Center(
@@ -282,11 +251,9 @@ class _GadikMentalMonitoringScreenState
                               Text(
                                 'Tidak ada riwayat penilaian',
                                 style: TextStyle(
-                                  fontSize:
-                                      AppDimensions.fontDefault,
+                                  fontSize: AppDimensions.fontDefault,
                                   fontWeight: FontWeight.w600,
-                                  color:
-                                      Colors.blueGrey.shade400,
+                                  color: Colors.blueGrey.shade400,
                                 ),
                               ),
                             ],
@@ -303,14 +270,10 @@ class _GadikMentalMonitoringScreenState
     );
   }
 
-  // ── FAB ───────────────────────────────────────────────────
-
   Widget _buildFab() {
     return PopupMenuButton<bool>(
       onSelected: _openFormScreen,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       offset: const Offset(0, -120),
       itemBuilder: (_) => [
         PopupMenuItem<bool>(
@@ -382,16 +345,10 @@ class _GadikMentalMonitoringScreenState
             ),
           ],
         ),
-        child: const Icon(
-          Icons.add_rounded,
-          color: Colors.white,
-          size: 28,
-        ),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
   }
-
-  // ── Filters Block ─────────────────────────────────────────
 
   Widget _buildFiltersBlock() {
     return Container(
@@ -441,9 +398,7 @@ class _GadikMentalMonitoringScreenState
             options: _statusOptions,
             iconColor: _selectedStatus == 'Reward'
                 ? Colors.green
-                : (_selectedStatus == 'Punishment'
-                    ? Colors.red
-                    : _primaryNavy),
+                : (_selectedStatus == 'Punishment' ? Colors.red : _primaryNavy),
             onChanged: (val) {
               setState(() {
                 _selectedStatus = val;
@@ -465,31 +420,20 @@ class _GadikMentalMonitoringScreenState
   }) {
     return PopupMenuButton<String>(
       onSelected: onChanged,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         padding: const EdgeInsets.all(AppDimensions.sm),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusMd),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
           border: Border.all(color: Colors.grey.shade300),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 20,
-              color: iconColor ?? _primaryNavy,
-            ),
+            Icon(icon, size: 20, color: iconColor ?? _primaryNavy),
             const SizedBox(width: 4),
-            Icon(
-              Icons.arrow_drop_down,
-              size: 16,
-              color: Colors.grey.shade600,
-            ),
+            Icon(Icons.arrow_drop_down, size: 16, color: Colors.grey.shade600),
           ],
         ),
       ),
@@ -503,9 +447,7 @@ class _GadikMentalMonitoringScreenState
                   value == choice
                       ? Icons.radio_button_checked
                       : Icons.radio_button_off,
-                  color: value == choice
-                      ? _primaryNavy
-                      : Colors.grey,
+                  color: value == choice ? _primaryNavy : Colors.grey,
                   size: 18,
                 ),
                 const SizedBox(width: 8),
@@ -515,9 +457,7 @@ class _GadikMentalMonitoringScreenState
                     fontWeight: value == choice
                         ? FontWeight.bold
                         : FontWeight.normal,
-                    color: value == choice
-                        ? _primaryNavy
-                        : Colors.black87,
+                    color: value == choice ? _primaryNavy : Colors.black87,
                   ),
                 ),
               ],
@@ -527,8 +467,6 @@ class _GadikMentalMonitoringScreenState
       },
     );
   }
-
-  // ── Active Date Chip ──────────────────────────────────────
 
   Widget _buildActiveDateFilter() {
     if (_selectedDateRange == null) {
@@ -570,8 +508,7 @@ class _GadikMentalMonitoringScreenState
             ),
             onDeleted: _clearDateFilter,
             shape: RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(AppDimensions.radiusFull),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
               side: BorderSide(color: Colors.teal.shade100),
             ),
           ),
@@ -579,8 +516,6 @@ class _GadikMentalMonitoringScreenState
       ),
     );
   }
-
-  // ── List Header ───────────────────────────────────────────
 
   Widget _buildListHeader() {
     final titlePokjar = _selectedPokjar == 'Semua Pokjar'
@@ -607,14 +542,10 @@ class _GadikMentalMonitoringScreenState
           ),
           const Spacer(),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: _primaryNavy,
-              borderRadius:
-                  BorderRadius.circular(AppDimensions.radiusMd),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
             ),
             child: Text(
               titlePokjar,
@@ -627,23 +558,15 @@ class _GadikMentalMonitoringScreenState
           ),
           const SizedBox(width: AppDimensions.sm),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: _primaryNavy,
-              borderRadius:
-                  BorderRadius.circular(AppDimensions.radiusXl),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.people_alt,
-                  color: Colors.white,
-                  size: 16,
-                ),
+                const Icon(Icons.people_alt, color: Colors.white, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   '${_filteredItems.length} Data',
@@ -660,8 +583,6 @@ class _GadikMentalMonitoringScreenState
       ),
     );
   }
-
-  // ── Grouped List ──────────────────────────────────────────
 
   Widget _buildGroupedList() {
     final Map<String, List<InboxItem>> grouped = {};
@@ -709,22 +630,18 @@ class _GadikMentalMonitoringScreenState
     );
   }
 
-  // ── List Item Card ────────────────────────────────────────
-
   Widget _buildListItem(InboxItem item) {
     final isReward = item.isReward;
     final statusColor = isReward
         ? const Color(0xFF2E7D32)
         : const Color(0xFFD32F2F);
-    final statusIcon =
-        isReward ? AppIcons.thumbUp : AppIcons.thumbDown;
+    final statusIcon = isReward ? AppIcons.thumbUp : AppIcons.thumbDown;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.md),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -735,11 +652,9 @@ class _GadikMentalMonitoringScreenState
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius:
-            BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         child: InkWell(
-          borderRadius:
-              BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
           onTap: () => _showItemDetail(item),
           child: Padding(
             padding: const EdgeInsets.all(AppDimensions.lg),
@@ -750,8 +665,7 @@ class _GadikMentalMonitoringScreenState
                 const SizedBox(width: AppDimensions.md),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         item.serdikName,
@@ -779,29 +693,20 @@ class _GadikMentalMonitoringScreenState
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: statusColor
-                                  .withValues(alpha: 0.1),
-                              borderRadius:
-                                  BorderRadius.circular(
+                              color: statusColor.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(
                                 AppDimensions.radiusSm,
                               ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  statusIcon,
-                                  size: 10,
-                                  color: statusColor,
-                                ),
+                                Icon(statusIcon, size: 10, color: statusColor),
                                 const SizedBox(width: 4),
                                 Text(
-                                  isReward
-                                      ? 'REWARD'
-                                      : 'PUNISHMENT',
+                                  isReward ? 'REWARD' : 'PUNISHMENT',
                                   style: TextStyle(
-                                    fontSize:
-                                        AppDimensions.fontXs,
+                                    fontSize: AppDimensions.fontXs,
                                     fontWeight: FontWeight.w800,
                                     color: statusColor,
                                     letterSpacing: 0.5,
@@ -815,11 +720,9 @@ class _GadikMentalMonitoringScreenState
                             child: Text(
                               item.senderName,
                               style: TextStyle(
-                                fontSize:
-                                    AppDimensions.fontSm,
+                                fontSize: AppDimensions.fontSm,
                                 fontWeight: FontWeight.w600,
-                                color:
-                                    Colors.blueGrey.shade500,
+                                color: Colors.blueGrey.shade500,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -837,8 +740,7 @@ class _GadikMentalMonitoringScreenState
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            DateFormat('HH:mm')
-                                .format(item.timestamp),
+                            DateFormat('HH:mm').format(item.timestamp),
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.grey.shade500,
@@ -859,11 +761,8 @@ class _GadikMentalMonitoringScreenState
     );
   }
 
-  // ── Score Badge (replaces approve/reject) ─────────────────
-
   Widget _buildScoreBadge(InboxItem item, Color statusColor) {
-    final pointStr =
-        item.points > 0 ? '+${item.points}' : '${item.points}';
+    final pointStr = item.points > 0 ? '+${item.points}' : '${item.points}';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -878,25 +777,19 @@ class _GadikMentalMonitoringScreenState
         ),
         const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 3,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
             color: item.status == 'approved'
                 ? Colors.green.shade50
                 : (item.status == 'rejected'
-                    ? Colors.red.shade50
-                    : Colors.amber.shade50),
-            borderRadius:
-                BorderRadius.circular(AppDimensions.radiusSm),
+                      ? Colors.red.shade50
+                      : Colors.amber.shade50),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           ),
           child: Text(
             item.status == 'approved'
                 ? 'DISETUJUI'
-                : (item.status == 'rejected'
-                    ? 'DITOLAK'
-                    : 'TERTUNDA'),
+                : (item.status == 'rejected' ? 'DITOLAK' : 'TERTUNDA'),
             style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w800,
@@ -904,16 +797,14 @@ class _GadikMentalMonitoringScreenState
               color: item.status == 'approved'
                   ? Colors.green.shade700
                   : (item.status == 'rejected'
-                      ? Colors.red.shade700
-                      : Colors.amber.shade800),
+                        ? Colors.red.shade700
+                        : Colors.amber.shade800),
             ),
           ),
         ),
       ],
     );
   }
-
-  // ── Avatar ────────────────────────────────────────────────
 
   Widget _buildAvatar() {
     return Container(
@@ -926,22 +817,19 @@ class _GadikMentalMonitoringScreenState
           image: AssetImage('assets/images/default_avatar.png'),
           fit: BoxFit.cover,
         ),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 2,
-        ),
+        border: Border.all(color: Colors.grey.shade200, width: 2),
       ),
     );
   }
 
-  // ── Detail Bottom Sheet ───────────────────────────────────
-
   void _showItemDetail(InboxItem item) {
     final bool isReward = item.isReward;
-    final String detailTitle =
-        isReward ? 'Bukti Penghargaan' : 'Bukti Pelanggaran';
-    final Color mainColor =
-        isReward ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F);
+    final String detailTitle = isReward
+        ? 'Bukti Penghargaan'
+        : 'Bukti Pelanggaran';
+    final Color mainColor = isReward
+        ? const Color(0xFF2E7D32)
+        : const Color(0xFFD32F2F);
 
     final String imageUrl = isReward
         ? 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800'
@@ -953,7 +841,8 @@ class _GadikMentalMonitoringScreenState
         return Image.file(
           File(item.photoPath!),
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildImagePlaceholder(),
         );
       }
 
@@ -961,7 +850,8 @@ class _GadikMentalMonitoringScreenState
         return Image.asset(
           imageUrl,
           fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildImagePlaceholder(),
         );
       } else {
         return Image.network(
@@ -976,7 +866,8 @@ class _GadikMentalMonitoringScreenState
               ),
             );
           },
-          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildImagePlaceholder(),
         );
       }
     }
@@ -1015,7 +906,6 @@ class _GadikMentalMonitoringScreenState
             ),
             const SizedBox(height: 24),
 
-            // ── Header row ──
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1026,9 +916,7 @@ class _GadikMentalMonitoringScreenState
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    isReward
-                        ? AppIcons.thumbUp
-                        : AppIcons.thumbDown,
+                    isReward ? AppIcons.thumbUp : AppIcons.thumbDown,
                     color: mainColor,
                     size: 28,
                   ),
@@ -1036,8 +924,7 @@ class _GadikMentalMonitoringScreenState
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         detailTitle.toUpperCase(),
@@ -1066,33 +953,23 @@ class _GadikMentalMonitoringScreenState
             const Divider(),
             const SizedBox(height: 16),
 
-            // ── Info rows ──
-            _buildPopupInfoRow(
-              'Serdik',
-              item.serdikName,
-            ),
+            _buildPopupInfoRow('Serdik', item.serdikName),
             const SizedBox(height: 12),
             _buildPopupInfoRow(
               'Waktu',
-              DateFormat(
-                'dd MMMM yyyy, HH:mm',
-                'id_ID',
-              ).format(item.timestamp),
+              DateFormat('dd MMMM yyyy, HH:mm', 'id_ID').format(item.timestamp),
             ),
             const SizedBox(height: 12),
             _buildPopupInfoRow('Oleh', item.senderName),
             const SizedBox(height: 12),
             _buildPopupInfoRow(
               'Dampak Skor',
-              item.points > 0
-                  ? '+${item.points}'
-                  : '${item.points}',
+              item.points > 0 ? '+${item.points}' : '${item.points}',
               valueColor: mainColor,
               isBold: true,
             ),
             const SizedBox(height: 16),
 
-            // ── Justification ──
             const Text(
               'Keterangan Justifikasi',
               style: TextStyle(
@@ -1113,7 +990,6 @@ class _GadikMentalMonitoringScreenState
             ),
             const SizedBox(height: 24),
 
-            // ── Evidence image ──
             const Text(
               'Bukti Gambar',
               style: TextStyle(
@@ -1132,7 +1008,6 @@ class _GadikMentalMonitoringScreenState
             ),
             const SizedBox(height: 24),
 
-            // ── Close button ──
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -1168,11 +1043,7 @@ class _GadikMentalMonitoringScreenState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              AppIcons.image,
-              color: Colors.blueGrey.shade300,
-              size: 32,
-            ),
+            Icon(AppIcons.image, color: Colors.blueGrey.shade300, size: 32),
             const SizedBox(height: 8),
             Text(
               'Gagal memuat gambar bukti',
@@ -1208,17 +1079,13 @@ class _GadikMentalMonitoringScreenState
             ),
           ),
         ),
-        const Text(
-          ' :   ',
-          style: TextStyle(color: Colors.blueGrey),
-        ),
+        const Text(' :   ', style: TextStyle(color: Colors.blueGrey)),
         Expanded(
           child: Text(
             value,
             style: TextStyle(
               fontSize: 13,
-              fontWeight:
-                  isBold ? FontWeight.w800 : FontWeight.w700,
+              fontWeight: isBold ? FontWeight.w800 : FontWeight.w700,
               color: valueColor ?? _primaryNavy,
             ),
           ),

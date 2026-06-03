@@ -10,6 +10,7 @@ class FinalRecapModel {
   final String tanggalLahir;
   final String jenisKelamin;
   final int sanksiKesehatan;
+  final String pangkat;
   final Map<String, double> rawScores;
 
   FinalRecapModel({
@@ -24,21 +25,30 @@ class FinalRecapModel {
     this.tanggalLahir = '1985-01-01',
     this.jenisKelamin = 'Laki-laki',
     this.sanksiKesehatan = 0,
+    this.pangkat = '',
     this.rawScores = const {},
   });
 
-  double get average {
-    return (academicScore * 0.7) + (mentalScore * 0.2) + (physicalScore * 0.1);
+  double get nak {
+    return (academicScore * 70 + mentalScore * 20 + physicalScore * 10) / 100;
+  }
+
+  double get average => nak;
+
+  bool get isPassed {
+    return academicScore >= 70.0 &&
+        mentalScore >= 70.0 &&
+        physicalScore >= 70.0;
   }
 
   String get predicate {
     final double score = average;
-    if (score > 90.00) return 'ISTIMEWA / BERITA ACARA';
+    if (score > 90.00) return 'Istimewa (BA)';
     if (score > 85.00) return 'Sangat Memuaskan (SM)';
     if (score > 80.00) return 'Memuaskan (M)';
     if (score > 75.00) return 'Baik (B)';
     if (score >= 70.00) return 'Cukup (C)';
-    return 'Kurang (K) / TIDAK LULUS';
+    return 'Kurang (K)';
   }
 
   factory FinalRecapModel.fromJson(Map<String, dynamic> json) {
@@ -54,6 +64,7 @@ class FinalRecapModel {
       tanggalLahir: json['tanggal_lahir'] as String? ?? '1985-01-01',
       jenisKelamin: json['jenis_kelamin'] as String? ?? 'Laki-laki',
       sanksiKesehatan: json['sanksi_kesehatan'] as int? ?? 0,
+      pangkat: json['pangkat'] as String? ?? '',
       rawScores:
           (json['raw_scores'] as Map<String, dynamic>?)?.map(
             (k, e) => MapEntry(k, (e as num).toDouble()),
@@ -75,6 +86,7 @@ class FinalRecapModel {
       'tanggal_lahir': tanggalLahir,
       'jenis_kelamin': jenisKelamin,
       'sanksi_kesehatan': sanksiKesehatan,
+      'pangkat': pangkat,
       'raw_scores': rawScores,
     };
   }
@@ -91,6 +103,7 @@ class FinalRecapModel {
     String? tanggalLahir,
     String? jenisKelamin,
     int? sanksiKesehatan,
+    String? pangkat,
     Map<String, double>? rawScores,
   }) {
     return FinalRecapModel(
@@ -105,6 +118,7 @@ class FinalRecapModel {
       tanggalLahir: tanggalLahir ?? this.tanggalLahir,
       jenisKelamin: jenisKelamin ?? this.jenisKelamin,
       sanksiKesehatan: sanksiKesehatan ?? this.sanksiKesehatan,
+      pangkat: pangkat ?? this.pangkat,
       rawScores: rawScores ?? this.rawScores,
     );
   }

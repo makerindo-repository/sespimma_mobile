@@ -42,7 +42,6 @@ class GadikAssignmentMockData {
   ];
 
   static List<GadikSubmissionModel> submissions = [
-    // Submissions for GTSK-001 (Belum ada nilai)
     GadikSubmissionModel(
       id: 'SUB-001-A',
       assignmentId: 'GTSK-001',
@@ -85,7 +84,7 @@ class GadikAssignmentMockData {
       scoreKeaktifan: 90,
       catatanPengajar: 'Sangat komprehensif.',
     ),
-    // Submissions for GTSK-002
+
     GadikSubmissionModel(
       id: 'SUB-001',
       assignmentId: 'GTSK-002',

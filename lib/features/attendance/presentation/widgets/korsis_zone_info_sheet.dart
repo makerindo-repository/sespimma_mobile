@@ -117,7 +117,7 @@ class KorsisZoneInfoSheet extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        zone.name,
+                        zone.activityName,
                         style: const TextStyle(
                           fontSize: AppDimensions.fontXl,
                           fontWeight: FontWeight.w800,
@@ -126,7 +126,7 @@ class KorsisZoneInfoSheet extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        zone.activityName,
+                        zone.name,
                         style: TextStyle(
                           fontSize: AppDimensions.fontDefault,
                           fontWeight: FontWeight.w600,
@@ -142,18 +142,26 @@ class KorsisZoneInfoSheet extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: zone.isRoutine
                               ? AppColors.successGreen.withValues(alpha: 0.1)
+                              : zone.isTraining
+                              ? Colors.orange.shade700.withValues(alpha: 0.1)
                               : AppColors.primaryNavy.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusMd,
                           ),
                         ),
                         child: Text(
-                          zone.isRoutine ? 'Kegiatan Rutin' : 'Sesi Tunggal',
+                          zone.isRoutine
+                              ? 'Kegiatan Rutin'
+                              : zone.isTraining
+                              ? 'Kegiatan Pelatihan'
+                              : 'Kegiatan Pelatihan',
                           style: TextStyle(
                             fontSize: AppDimensions.fontSm,
                             fontWeight: FontWeight.bold,
                             color: zone.isRoutine
                                 ? AppColors.successGreen
+                                : zone.isTraining
+                                ? Colors.orange.shade700
                                 : AppColors.primaryNavy,
                           ),
                         ),
@@ -179,7 +187,7 @@ class KorsisZoneInfoSheet extends StatelessWidget {
                 const SizedBox(height: AppDimensions.md),
                 _buildInfoRow(
                   icon: AppIcons.warningOctagonFill,
-                  title: 'Batas Tutup Absen',
+                  title: 'Batas Absen',
                   value:
                       '${zone.cutoffTime.hour.toString().padLeft(2, '0')}:${zone.cutoffTime.minute.toString().padLeft(2, '0')} WIB',
                 ),
@@ -275,7 +283,7 @@ class KorsisZoneInfoSheet extends StatelessWidget {
                     },
                     icon: const Icon(AppIcons.qrCode, color: Colors.white),
                     label: const Text(
-                      'TAMPILKAN QR',
+                      'QR CODE',
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,

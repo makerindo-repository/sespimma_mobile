@@ -17,7 +17,6 @@ class _ReportCardItemState extends State<ReportCardItem> {
   static const Color _primaryNavy = Color(0xFF001C40);
   static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _dangerRed = Color(0xFFD32F2F);
-  static const Color _warningOrange = Color(0xFFF57C00);
 
   double _clampScore(double val) {
     if (val > 100.0) return 100.0;
@@ -28,14 +27,13 @@ class _ReportCardItemState extends State<ReportCardItem> {
   @override
   Widget build(BuildContext context) {
     final data = widget.data;
-    final bool isFailed = data.average < 70.0;
+    final bool isFailed = !data.isPassed;
 
     Color getPredicateColor(double score) {
-      if (score > 90.0) return Colors.deepPurple;
-      if (score > 85.0) return Colors.teal.shade700;
-      if (score > 80.0) return _successGreen;
-      if (score > 75.0) return Colors.blue.shade700;
-      if (score >= 70.0) return _warningOrange;
+      if (score > 85.0) return Colors.green.shade700;
+      if (score > 80.0) return Colors.lightGreen.shade600;
+      if (score > 75.0) return Colors.orange.shade700;
+      if (score >= 70.0) return Colors.amber.shade700;
       return _dangerRed;
     }
 
@@ -51,10 +49,6 @@ class _ReportCardItemState extends State<ReportCardItem> {
     final acNKP = _clampScore(ac - 0.8);
     final acKeaktifan = _clampScore(ac + 1.5);
     final acProduk = _clampScore(ac);
-    final acTataRuang = _clampScore(ac + 0.5);
-    final acMateri = _clampScore(ac + 0.5);
-    final acMenulis = _clampScore(ac - 0.2);
-    final acPaparan = _clampScore(ac + 0.8);
 
     final meMoral = _clampScore(me + 0.5);
     final meDisiplin = _clampScore(me - 1.0);
@@ -101,19 +95,11 @@ class _ReportCardItemState extends State<ReportCardItem> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: _primaryNavy.withValues(alpha: 0.05),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        AppIcons.userFill,
-                        color: _primaryNavy,
-                        size: AppDimensions.iconDefault,
-                      ),
+                  const CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Color(0xFF001C40),
+                    backgroundImage: AssetImage(
+                      'assets/images/default_avatar.png',
                     ),
                   ),
                   const SizedBox(width: AppDimensions.md),
@@ -128,14 +114,35 @@ class _ReportCardItemState extends State<ReportCardItem> {
                             fontWeight: FontWeight.w800,
                             color: _primaryNavy,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: AppDimensions.xs),
+                        const SizedBox(height: 2),
                         Text(
-                          '${data.nrp} • ${data.pokjar}',
+                          '${data.pangkat} • ${data.nosis}',
                           style: TextStyle(
                             fontSize: AppDimensions.fontMd,
                             fontWeight: FontWeight.w600,
-                            color: Colors.blueGrey.shade400,
+                            color: Colors.blueGrey.shade700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _primaryNavy.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            data.pokjar,
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontSm,
+                              fontWeight: FontWeight.w700,
+                              color: _primaryNavy,
+                            ),
                           ),
                         ),
                       ],
@@ -167,7 +174,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
                         ),
                         const SizedBox(width: AppDimensions.radiusSm),
                         Text(
-                          isFailed ? 'RISIKO' : 'LULUS',
+                          isFailed ? 'TIDAK LULUS' : 'LULUS',
                           style: TextStyle(
                             fontSize: AppDimensions.fontSm + 1,
                             fontWeight: FontWeight.w800,
@@ -225,46 +232,51 @@ class _ReportCardItemState extends State<ReportCardItem> {
                   ),
                   const SizedBox(height: AppDimensions.xl),
                   _buildRincianHeader(
-                    'AKADEMIK (70%)',
+                    'AKADEMIK',
+                    '70%',
                     AppIcons.bookOpenFill,
                     Colors.indigo,
                   ),
-                  _buildSubRow('Ujian MP', acUjian, '30%'),
-                  _buildSubRow('NKKP', acNKKP, '5%'),
-                  _buildSubRow('NPKP', acNPKP, '5%'),
-                  _buildSubRow('NKP', acNKP, '60%'),
-                  _buildSubRow('Keaktifan', acKeaktifan, '60%'),
-                  _buildSubRow('Produk', acProduk, '20%'),
-                  _buildSubRow('Tata Ruang', acTataRuang, '20%'),
-                  _buildSubRow('Materi', acMateri, '40%'),
-                  _buildSubRow('Menulis', acMenulis, '30%'),
-                  _buildSubRow('Paparan', acPaparan, '30%'),
+                  _buildSubRow('Ujian Esai Mata Pelajaran', acUjian),
+                  _buildSubRow('Naskah Kuliah Kuliah Profesi (NKKP)', acNKKP),
+                  _buildSubRow('Naskah Praktek Kerja Profesi (NPKP)', acNPKP),
+                  _buildSubRow('Naskah Karya Perseorangan (NKP)', acNKP),
+                  _buildSubRow(
+                    'Simulasi Kepemimpinan Kontemporer',
+                    acKeaktifan,
+                  ),
+                  _buildSubRow(
+                    'Naskah Program Transformasi Teknis (NPTT/Taskap)',
+                    acProduk,
+                  ),
                   const SizedBox(height: AppDimensions.md),
                   _buildRincianHeader(
-                    'MENTAL (20%)',
+                    'MENTAL',
+                    '20%',
                     AppIcons.brainFill,
                     Colors.amber.shade800,
                   ),
-                  _buildSubRow('Moral', meMoral, '20%'),
-                  _buildSubRow('Disiplin', meDisiplin, '15%'),
-                  _buildSubRow('Kepemimpinan', meKepemimpinan, '20%'),
-                  _buildSubRow('Pengendalian Diri', meDiri, '15%'),
-                  _buildSubRow('Penampilan', mePenampilan, '15%'),
-                  _buildSubRow('Sosiometri', meSosio, '60%'),
+                  _buildSubRow('Moral', meMoral),
+                  _buildSubRow('Disiplin', meDisiplin),
+                  _buildSubRow('Kepemimpinan', meKepemimpinan),
+                  _buildSubRow('Pengendalian Diri', meDiri),
+                  _buildSubRow('Penampilan', mePenampilan),
+                  _buildSubRow('Sosiometri', meSosio),
                   const SizedBox(height: AppDimensions.md),
                   _buildRincianHeader(
-                    'JASMANI (10%)',
+                    'JASMANI',
+                    '10%',
                     AppIcons.barbellFill,
                     Colors.teal,
                   ),
-                  _buildSubRow('Kes Awal', phKesAwal, 'Kes'),
-                  _buildSubRow('Kes Akhir', phKesAkhir, 'Kes'),
-                  _buildSubRow('Status Kes', phKesStatus, 'Kes'),
-                  _buildSubRow('Samapta A', phSamA, 'NK.A'),
-                  _buildSubRow('Samapta B (Pull)', phSamBPull, 'NK.B'),
-                  _buildSubRow('Samapta B (Sit)', phSamBSit, 'NK.B'),
-                  _buildSubRow('Samapta B (Push)', phSamBPush, 'NK.B'),
-                  _buildSubRow('Samapta B (Run)', phSamBRun, 'NK.B'),
+                  _buildSubRow('Kesehatan Awal', phKesAwal),
+                  _buildSubRow('Kesehatan Akhir', phKesAkhir),
+                  _buildSubRow('Status Kesehatan', phKesStatus),
+                  _buildSubRow('Samapta A (Lari/Jalan 12 Menit)', phSamA),
+                  _buildSubRow('Samapta B (Pull Up)', phSamBPull),
+                  _buildSubRow('Samapta B (Sit Up)', phSamBSit),
+                  _buildSubRow('Samapta B (Push Up)', phSamBPush),
+                  _buildSubRow('Samapta B (Shuttle Run)', phSamBRun),
                 ],
               ),
             ),
@@ -317,7 +329,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
                         style: TextStyle(
                           fontSize: AppDimensions.fontLg + 1,
                           fontWeight: FontWeight.w900,
-                          color: isFailed ? _dangerRed : _primaryNavy,
+                          color: predicateColor,
                         ),
                       ),
                       const SizedBox(width: AppDimensions.sm),
@@ -345,10 +357,10 @@ class _ReportCardItemState extends State<ReportCardItem> {
       children: [
         Text(
           score.toStringAsFixed(2),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: AppDimensions.fontXl,
             fontWeight: FontWeight.w900,
-            color: _primaryNavy,
+            color: _getScoreColor(score),
           ),
         ),
         const SizedBox(height: AppDimensions.xs / 2),
@@ -364,7 +376,12 @@ class _ReportCardItemState extends State<ReportCardItem> {
     );
   }
 
-  Widget _buildRincianHeader(String title, IconData icon, Color color) {
+  Widget _buildRincianHeader(
+    String title,
+    String weight,
+    IconData icon,
+    Color color,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -379,19 +396,43 @@ class _ReportCardItemState extends State<ReportCardItem> {
               color: color,
             ),
           ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              weight,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSubRow(String name, double score, String weight) {
+  Color _getScoreColor(double score) {
+    if (score > 85.0) return Colors.green.shade700;
+    if (score > 80.0) return Colors.lightGreen.shade600;
+    if (score > 75.0) return Colors.orange.shade700;
+    if (score >= 70.0) return Colors.amber.shade700;
+    return _dangerRed;
+  }
+
+  Widget _buildSubRow(String name, double score) {
     return Padding(
       padding: const EdgeInsets.only(left: 24, bottom: 6),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              '$name ($weight)',
+              name,
               style: TextStyle(
                 fontSize: AppDimensions.fontMd,
                 fontWeight: FontWeight.w600,
@@ -399,12 +440,19 @@ class _ReportCardItemState extends State<ReportCardItem> {
               ),
             ),
           ),
-          Text(
-            score.toStringAsFixed(2),
-            style: const TextStyle(
-              fontSize: AppDimensions.fontDefault,
-              fontWeight: FontWeight.w800,
-              color: _primaryNavy,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: _getScoreColor(score).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              score.toStringAsFixed(2),
+              style: TextStyle(
+                fontSize: AppDimensions.fontDefault,
+                fontWeight: FontWeight.w800,
+                color: _getScoreColor(score),
+              ),
             ),
           ),
         ],

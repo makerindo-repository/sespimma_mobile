@@ -7,7 +7,7 @@ class GadikRealData {
       "jabatan_struktural": "Anjak Madya Sespimma",
       "agama": "Islam",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Purwanto, S.I.K., M.Si.",
@@ -16,52 +16,57 @@ class GadikRealData {
       "jabatan_struktural": "Anjak Madya Sespimma",
       "agama": "Islam",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Efrianza, S.I.K.",
       "pangkat": "Komisaris Besar Polisi",
       "nrp_nip": "79040926",
-      "jabatan_struktural": "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
+      "jabatan_struktural":
+          "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
       "agama": "Islam",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Hidayat, S.H., S.I.K.",
       "pangkat": "Komisaris Besar Polisi",
       "nrp_nip": "76030911",
-      "jabatan_struktural": "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
+      "jabatan_struktural":
+          "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
       "agama": "Islam",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Grace Krisna D. Rahakbau, S.I.K., M.Si.",
       "pangkat": "Komisaris Besar Polisi",
       "nrp_nip": "76110038",
-      "jabatan_struktural": "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
+      "jabatan_struktural":
+          "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
       "agama": "Kristen",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Dhani Gumilar, S.H., S.I.K., M.H.",
       "pangkat": "Komisaris Besar Polisi",
       "nrp_nip": "78081568",
-      "jabatan_struktural": "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
+      "jabatan_struktural":
+          "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
       "agama": "Islam",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Didit Eko Herawanto, S.I.K., S.H.",
       "pangkat": "Komisaris Besar Polisi",
       "nrp_nip": "74090553",
-      "jabatan_struktural": "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
+      "jabatan_struktural":
+          "Widyaiswara Kepolisian Madya Tk. III Sespimma Sespim Lemdiklat Polri",
       "agama": "Islam",
       "eselon": "II B3",
-      "golongan": "IV-C"
+      "golongan": "IV-C",
     },
     {
       "nama": "Asep Kamaludin, M.M.",
@@ -70,7 +75,7 @@ class GadikRealData {
       "jabatan_struktural": "Gadik Madya Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-B"
+      "golongan": "IV-B",
     },
     {
       "nama": "Dewi Susilo Pangestuti, S.Ak.",
@@ -79,7 +84,7 @@ class GadikRealData {
       "jabatan_struktural": "Gadik Madya Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-B"
+      "golongan": "IV-B",
     },
     {
       "nama": "Santhi Rianawati, S.H.",
@@ -88,7 +93,7 @@ class GadikRealData {
       "jabatan_struktural": "Gadik Madya Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-B"
+      "golongan": "IV-B",
     },
     {
       "nama": "Lusy Juli Indriani, S.I.K.",
@@ -97,7 +102,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Kristen",
       "eselon": "III A2",
-      "golongan": "IV-A"
+      "golongan": "IV-A",
     },
     {
       "nama": "Rahmawaty Tumulo, S.I.K., M.M.",
@@ -106,7 +111,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-A"
+      "golongan": "IV-A",
     },
     {
       "nama": "Anria Rosa Piliang, S.I.K.",
@@ -115,7 +120,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-A"
+      "golongan": "IV-A",
     },
     {
       "nama": "Dina Novitasari, S.H., S.I.K., M.H.",
@@ -124,7 +129,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-A"
+      "golongan": "IV-A",
     },
     {
       "nama": "Heni Mardiyatmi, S.I.P., S.Sos., M.Sc.",
@@ -133,7 +138,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-A"
+      "golongan": "IV-A",
     },
     {
       "nama": "M. Ichwan Nugraha, S.I.K., M.Si.",
@@ -142,7 +147,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Islam",
       "eselon": "III A2",
-      "golongan": "IV-A"
+      "golongan": "IV-A",
     },
     {
       "nama": "Toto Sugiarto, S.Pd.",
@@ -151,7 +156,7 @@ class GadikRealData {
       "jabatan_struktural": "Gadik Muda Sespimma",
       "agama": "Islam",
       "eselon": "III B",
-      "golongan": "III-C"
+      "golongan": "III-C",
     },
     {
       "nama": "Rentha Uli Novita Pardede, S.H., S.I.K.",
@@ -160,7 +165,7 @@ class GadikRealData {
       "jabatan_struktural": "Widyaiswara Kepolisian Muda Tk. I Sespimma",
       "agama": "Islam",
       "eselon": "III B",
-      "golongan": "III-C"
-    }
+      "golongan": "III-C",
+    },
   ];
 }

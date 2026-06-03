@@ -94,17 +94,21 @@ class _ProfileScreenState extends State<ProfileScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildStatCards(user),
+                              if (user.roleId != 'tim_operator')
+                                _buildStatCards(user),
                               if (user.roleId != 'pimpinan' &&
-                                  user.roleId != 'tim_operator' &&
                                   user.roleId != 'pengajar_patun' &&
                                   user.roleId != 'pengajar_korsis' &&
                                   user.roleId != 'kabag_bindik' &&
-                                  user.roleId != 'pengajar_medis') ...[
+                                  user.roleId != 'pengajar_medis' &&
+                                  user.roleId != 'tim_operator') ...[
                                 const SizedBox(height: AppDimensions.lg),
                                 _buildFormalDataCard(user),
                               ],
-                              const SizedBox(height: AppDimensions.xl),
+                              if (user.roleId == 'tim_operator')
+                                const SizedBox(height: 56)
+                              else
+                                const SizedBox(height: AppDimensions.xl),
                               _buildSectionTitle('PENGATURAN AKUN'),
                               const SizedBox(height: AppDimensions.md),
                               _buildSettingsCard(context),
@@ -131,7 +135,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   String _getRoleLabel(UserEntity user) {
-    if ((user.roleId == 'pimpinan' || user.roleId == 'pengajar_patun' || user.roleId == 'pengajar_korsis') &&
+    if ((user.roleId == 'pimpinan' ||
+            user.roleId == 'pengajar_patun' ||
+            user.roleId == 'pengajar_korsis') &&
         user.jabatanSenat.isNotEmpty &&
         user.jabatanSenat != '-') {
       return user.jabatanSenat.toUpperCase();
@@ -152,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       return 'MEDIS';
     }
     if (user.roleId == 'tim_operator') {
-      return 'TIM OPERATOR';
+      return 'OPERATOR';
     }
     if (user.roleId.startsWith('pengajar')) {
       return 'GADIK';
@@ -191,7 +197,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl),
             child: Text(
-              user.name.toUpperCase(),
+              user.roleId == 'tim_operator'
+                  ? 'TIM SESPIMMA'
+                  : user.name.toUpperCase(),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: AppDimensions.fontXxl,
@@ -365,10 +373,9 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
         _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
       ];
-    } else if (user.roleId == 'pimpinan' || 
-               user.roleId == 'pengajar_korsis' || 
-               user.roleId == 'pengajar_patun' || 
-               user.roleId == 'tim_operator') {
+    } else if (user.roleId == 'pimpinan' ||
+        user.roleId == 'pengajar_korsis' ||
+        user.roleId == 'pengajar_patun') {
       rows = [
         _buildDetailRow(AppIcons.identificationCard, 'NRP/NIP', user.nrp),
         _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
@@ -378,8 +385,12 @@ class _ProfileScreenState extends State<ProfileScreen>
           _getFullPangkat(user.pangkat),
         ),
         _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
-        if (user.jabatanSenat != '-') 
-          _buildDetailRow(AppIcons.starFill, 'PERAN PENGASUHAN', user.jabatanSenat),
+        if (user.jabatanSenat != '-')
+          _buildDetailRow(
+            AppIcons.starFill,
+            'PERAN PENGASUHAN',
+            user.jabatanSenat,
+          ),
       ];
     } else {
       rows = [
@@ -413,11 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           'PENDIDIKAN TERAKHIR',
           user.pendidikanTerakhir,
         ),
-        _buildDetailRow(
-          AppIcons.mapPin,
-          'ALAMAT LENGKAP',
-          user.alamatLengkap,
-        ),
+        _buildDetailRow(AppIcons.mapPin, 'ALAMAT LENGKAP', user.alamatLengkap),
         _buildDetailRow(AppIcons.paperPlaneTiltFill, 'EMAIL', user.email),
         _buildDetailRow(
           AppIcons.deviceMobileSpeakerFill,
@@ -431,22 +438,14 @@ class _ProfileScreenState extends State<ProfileScreen>
           'TAHUN DIKTUK',
           user.tahunDiktuk,
         ),
-        _buildDetailRow(
-          AppIcons.user,
-          'PERSONEL (YA/TIDAK)',
-          user.personel,
-        ),
+        _buildDetailRow(AppIcons.user, 'PERSONEL (YA/TIDAK)', user.personel),
         _buildDetailRow(AppIcons.identificationCard, 'NRP', user.nrp),
         _buildDetailRow(
           AppIcons.medal,
           'PANGKAT',
           _getFullPangkat(user.pangkat),
         ),
-        _buildDetailRow(
-          AppIcons.starFill,
-          'JABATAN SENAT',
-          user.jabatanSenat,
-        ),
+        _buildDetailRow(AppIcons.starFill, 'JABATAN SENAT', user.jabatanSenat),
         _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
         _buildDetailRow(AppIcons.buildingsFill, 'SATKER', user.satker),
       ];

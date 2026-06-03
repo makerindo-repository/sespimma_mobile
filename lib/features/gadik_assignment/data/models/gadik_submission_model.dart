@@ -8,23 +8,19 @@ class GadikSubmissionModel {
   final DateTime? submittedAt;
   final String? fileUrl;
   final String? fileName;
-  
-  // Grading status
+
   final bool isGraded;
   final bool? isRemedial;
   final double? nilaiAkhir;
   final String? catatanPengajar;
-  
-  // NKKP & NPKP & NKP & TASKAP Components (Materi, Penulisan, Paparan, Keaktifan)
+
   final double? scoreMateri;
   final double? scorePenulisan;
   final double? scorePaparan;
   final double? scoreKeaktifan;
-  
-  // Ujian MP
+
   final double? scoreUjian;
-  
-  // NSK
+
   final double? scoreKeaktifanPerseorangan;
   final double? scoreProdukPerseorangan;
   final double? scoreTataRuang;

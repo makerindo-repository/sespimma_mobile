@@ -52,7 +52,7 @@ class AiRecommendationCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
-                  'Berdasarkan tren data nilai saat ini${selectedPokjar == 'Semua Pokjar' ? ' secara keseluruhan' : ' di $selectedPokjar'}, Serdik yang berada pada batas EWS membutuhkan pendampingan mental khusus sebelum tahap akhir penugasan.',
+                  'Berdasarkan tren data nilai saat ini${selectedPokjar == 'Semua' ? ' secara keseluruhan' : ' di $selectedPokjar'}, Serdik yang berada pada batas EWS membutuhkan pendampingan mental khusus sebelum tahap akhir penugasan.',
                   style: TextStyle(
                     color: Colors.blueGrey.shade700,
                     fontSize: AppDimensions.fontMd,

@@ -1,12 +1,12 @@
 class GadikAssignmentModel {
   final String id;
   final String judul;
-  final String jenisTugas; // Ujian MP/Esai, NKKP, NPKP, NKP, Simulasi Kepemimpinan, NPTT/Taskap
-  final String? turunanTugas; // Khusus NKP: 10 Kompetensi
+  final String jenisTugas;
+  final String? turunanTugas;
   final DateTime deadline;
   final String targetPokjar;
   final String instruksi;
-  final String status; // Belum Mulai, Sedang Mulai, Selesai
+  final String status;
   final String createdBy;
   final DateTime createdAt;
   final String? fileName;

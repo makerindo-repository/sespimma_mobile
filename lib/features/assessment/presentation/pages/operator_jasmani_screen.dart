@@ -1,4 +1,3 @@
-// lib/features/assessment/presentation/pages/operator_jasmani_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
@@ -25,16 +24,27 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
 
   String _searchQuery = '';
   String _selectedFilter = 'Semua';
+  String _selectedGolongan = 'Semua';
+  String _selectedGender = 'Semua';
+  String _selectedStatusPenilaian = 'Semua';
+
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _filterOptions = [
     'Semua',
-    'POKJAR 1',
-    'POKJAR 2',
-    'POKJAR 3',
-    'POKJAR 4',
-    'POKJAR 5',
-    'POKJAR 6'
+    'POKJAR I',
+    'POKJAR II',
+    'POKJAR III',
+    'POKJAR IV',
+    'POKJAR V',
+  ];
+
+  final List<String> _golonganOptions = [
+    'Semua',
+    'GOL I',
+    'GOL II',
+    'GOL III',
+    'GOL IV',
   ];
 
   @override
@@ -45,7 +55,7 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
 
   Color _getScoreColor(double score) {
     if (score == 0) return _primaryNavy;
-    if (score >= 90.0) return Colors.green.shade900; // SM > 90
+    if (score >= 90.0) return Colors.green.shade900;
     if (score >= 85.01) return Colors.green.shade700;
     if (score >= 80.01) return Colors.lightGreen.shade700;
     if (score >= 75.01) return Colors.orange.shade700;
@@ -81,22 +91,77 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
             final baseList = SerdikRealData.records.toList();
 
             var filteredList = baseList.where((serdik) {
-              final name = (serdik['nama_lengkap'] ?? '').toString().toLowerCase();
-              final noSerdik = (serdik['no_serdik'] ?? '').toString().toLowerCase();
+              final name = (serdik['nama_lengkap'] ?? '')
+                  .toString()
+                  .toLowerCase();
+              final noSerdik = (serdik['no_serdik'] ?? '')
+                  .toString()
+                  .toLowerCase();
               final query = _searchQuery.toLowerCase();
-              return name.contains(query) || noSerdik.contains(query);
-            }).toList();
+              if (!(name.contains(query) || noSerdik.contains(query))) {
+                return false;
+              }
 
-            if (_selectedFilter != 'Semua') {
-              filteredList = filteredList
-                  .where((serdik) => serdik['kelompok_kelas'] == _selectedFilter)
-                  .toList();
-            }
+              if (_selectedFilter != 'Semua') {
+                final Map<String, String> romanToArab = {
+                  'POKJAR I': 'POKJAR 1',
+                  'POKJAR II': 'POKJAR 2',
+                  'POKJAR III': 'POKJAR 3',
+                  'POKJAR IV': 'POKJAR 4',
+                  'POKJAR V': 'POKJAR 5',
+                };
+                final mappedFilter =
+                    romanToArab[_selectedFilter] ?? _selectedFilter;
+                if (serdik['kelompok_kelas'] != mappedFilter) {
+                  return false;
+                }
+              }
+
+              if (_selectedGolongan != 'Semua') {
+                final tanggalLahir = (serdik['tanggal_lahir'] ?? '-')
+                    .toString();
+                final gol = JasmaniLookupTables.getGolongan(tanggalLahir);
+                if (gol != _selectedGolongan) return false;
+              }
+
+              if (_selectedGender != 'Semua') {
+                final gender = (serdik['jenis_kelamin'] ?? 'Pria').toString();
+                final isPria =
+                    gender.toLowerCase() == 'laki-laki' ||
+                    gender.toLowerCase() == 'pria';
+                if (_selectedGender == 'Pria' && !isPria) return false;
+                if (_selectedGender == 'Wanita' && isPria) return false;
+              }
+
+              if (_selectedStatusPenilaian != 'Semua') {
+                final tanggalLahir = (serdik['tanggal_lahir'] ?? '-')
+                    .toString();
+                final golongan = JasmaniLookupTables.getGolongan(tanggalLahir);
+                final nosis = (serdik['no_serdik'] ?? '-').toString();
+                final data = JasmaniGradingData.getJasmaniData(nosis);
+
+                final bool isSamaptaA = data.nilaiA != null;
+                final bool isSamaptaB = data.isSamaptaBComplete;
+                final bool isFullyGraded =
+                    isSamaptaA && (golongan == 'GOL IV' ? true : isSamaptaB);
+
+                if (_selectedStatusPenilaian == 'Sudah Dinilai' &&
+                    !isFullyGraded) {
+                  return false;
+                }
+                if (_selectedStatusPenilaian == 'Belum Dinilai' &&
+                    isFullyGraded) {
+                  return false;
+                }
+              }
+
+              return true;
+            }).toList();
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeaderBlock(baseList.length),
+                _buildHeaderBlock(filteredList.length),
                 Divider(
                   height: AppDimensions.dividerHeight,
                   color: Colors.grey.shade200,
@@ -113,9 +178,7 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                         ? CustomScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
                             slivers: [
-                              SliverFillRemaining(
-                                child: _buildEmptyState(),
-                              ),
+                              SliverFillRemaining(child: _buildEmptyState()),
                             ],
                           )
                         : _buildSerdikList(filteredList),
@@ -148,7 +211,7 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                 child: AssessmentSearchBarWidget(
                   controller: _searchController,
                   searchQuery: _searchQuery,
-                  hintText: 'Cari nama atau No. Serdik...',
+                  hintText: 'Cari nama atau nomor serdik..',
                   onChanged: (value) {
                     setState(() {
                       _searchQuery = value;
@@ -162,7 +225,7 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                   },
                 ),
               ),
-              const SizedBox(width: AppDimensions.md),
+              const SizedBox(width: AppDimensions.sm),
               StatusFilterButtonWidget(
                 selectedStatus: _selectedFilter,
                 statuses: _filterOptions,
@@ -171,6 +234,48 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                     _selectedFilter = value;
                   });
                 },
+                defaultStatus: 'Semua',
+                icon: Icons.groups_rounded,
+                tooltip: 'Filter Pokjar',
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              StatusFilterButtonWidget(
+                selectedStatus: _selectedGolongan,
+                statuses: _golonganOptions,
+                onSelected: (value) {
+                  setState(() {
+                    _selectedGolongan = value;
+                  });
+                },
+                defaultStatus: 'Semua',
+                icon: Icons.military_tech_rounded,
+                tooltip: 'Filter Golongan',
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              StatusFilterButtonWidget(
+                selectedStatus: _selectedGender,
+                statuses: const ['Semua', 'Pria', 'Wanita'],
+                onSelected: (value) {
+                  setState(() {
+                    _selectedGender = value;
+                  });
+                },
+                defaultStatus: 'Semua',
+                icon: Icons.wc_rounded,
+                tooltip: 'Filter Jenis Kelamin',
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              StatusFilterButtonWidget(
+                selectedStatus: _selectedStatusPenilaian,
+                statuses: const ['Semua', 'Sudah Dinilai', 'Belum Dinilai'],
+                onSelected: (value) {
+                  setState(() {
+                    _selectedStatusPenilaian = value;
+                  });
+                },
+                defaultStatus: 'Semua',
+                icon: Icons.fact_check_rounded,
+                tooltip: 'Filter Status Penilaian',
               ),
             ],
           ),
@@ -238,7 +343,9 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                isSearching ? Icons.search_off_rounded : Icons.person_search_rounded,
+                isSearching
+                    ? Icons.search_off_rounded
+                    : Icons.person_search_rounded,
                 size: AppDimensions.iconDisplay,
                 color: Colors.grey.shade300,
               ),
@@ -272,6 +379,8 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                     _searchQuery = '';
                     _searchController.clear();
                     _selectedFilter = 'Semua';
+                    _selectedGolongan = 'Semua';
+                    _selectedGender = 'Semua';
                   });
                 },
                 icon: const Icon(Icons.refresh_rounded),
@@ -293,7 +402,8 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppDimensions.xl),
       itemCount: serdikList.length,
-      separatorBuilder: (context, index) => const SizedBox(height: AppDimensions.md),
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppDimensions.md),
       itemBuilder: (context, index) {
         return _buildSerdikCard(serdikList[index]);
       },
@@ -309,14 +419,19 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
 
     final golongan = JasmaniLookupTables.getGolongan(tanggalLahir);
     final data = JasmaniGradingData.getJasmaniData(noSerdik);
-    
+
     final bool isSamaptaA = data.nilaiA != null;
     final bool isSamaptaB = data.isSamaptaBComplete;
-    final bool isFullyGraded = isSamaptaA && (golongan == 'GOL IV' ? true : isSamaptaB);
+    final bool isFullyGraded =
+        isSamaptaA && (golongan == 'GOL IV' ? true : isSamaptaB);
     final bool isPartiallyGraded = isSamaptaA || isSamaptaB;
-    
-    final double finalScore = isPartiallyGraded ? data.getNilaiJasmani(golongan) : 0;
-    final Color scoreColor = isPartiallyGraded ? _getScoreColor(finalScore) : Colors.grey;
+
+    final double finalScore = isPartiallyGraded
+        ? data.getNilaiJasmani(golongan)
+        : 0;
+    final Color scoreColor = isPartiallyGraded
+        ? _getScoreColor(finalScore)
+        : Colors.grey;
 
     return Container(
       decoration: BoxDecoration(
@@ -359,20 +474,58 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.shade100,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            golongan,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.amber.shade900,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    (gender.toLowerCase() == 'pria' ||
+                                        gender.toLowerCase() == 'laki-laki')
+                                    ? Colors.blue.shade100
+                                    : Colors.pink.shade100,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                (gender.toLowerCase() == 'pria' ||
+                                        gender.toLowerCase() == 'laki-laki')
+                                    ? 'P'
+                                    : 'W',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color:
+                                      (gender.toLowerCase() == 'pria' ||
+                                          gender.toLowerCase() == 'laki-laki')
+                                      ? Colors.blue.shade900
+                                      : Colors.pink.shade900,
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.shade100,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                golongan,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.amber.shade900,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -392,8 +545,10 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                       spacing: 6,
                       runSpacing: 6,
                       children: [
-                        if (isSamaptaA) _buildStatusBadge('SAMAPTA A', Colors.green),
-                        if (isSamaptaB) _buildStatusBadge('SAMAPTA B', Colors.blue),
+                        if (isSamaptaA)
+                          _buildStatusBadge('SAMAPTA A', Colors.green),
+                        if (isSamaptaB)
+                          _buildStatusBadge('SAMAPTA B', Colors.blue),
                       ],
                     ),
                   ],
@@ -404,37 +559,65 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: isPartiallyGraded ? scoreColor.withValues(alpha: 0.1) : Colors.grey.shade100,
+                      color: isPartiallyGraded
+                          ? scoreColor.withValues(alpha: 0.1)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isPartiallyGraded ? scoreColor.withValues(alpha: 0.2) : Colors.grey.shade300,
+                        color: isPartiallyGraded
+                            ? scoreColor.withValues(alpha: 0.2)
+                            : Colors.grey.shade300,
                       ),
                     ),
                     child: Text(
-                      isPartiallyGraded ? 'N.JAS: ${finalScore.toStringAsFixed(2)}' : 'BELUM DINILAI',
+                      isPartiallyGraded
+                          ? 'N.JAS: ${finalScore.toStringAsFixed(2)}'
+                          : 'BELUM DINILAI',
                       style: TextStyle(
                         fontSize: AppDimensions.fontXs,
                         fontWeight: FontWeight.w800,
-                        color: isPartiallyGraded ? scoreColor : Colors.grey.shade600,
+                        color: isPartiallyGraded
+                            ? scoreColor
+                            : Colors.grey.shade600,
                       ),
                     ),
                   ),
                   const SizedBox(height: AppDimensions.sm),
                   ElevatedButton(
                     onPressed: () {
-                      _showGradingOptions(context, serdik, data, golongan, gender);
+                      _showGradingOptions(
+                        context,
+                        serdik,
+                        data,
+                        golongan,
+                        gender,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isFullyGraded ? Colors.white : AppColors.primaryNavy,
-                      foregroundColor: isFullyGraded ? AppColors.primaryNavy : Colors.white,
-                      side: isFullyGraded ? const BorderSide(color: AppColors.primaryNavy) : null,
+                      backgroundColor: isFullyGraded
+                          ? Colors.white
+                          : AppColors.primaryNavy,
+                      foregroundColor: isFullyGraded
+                          ? AppColors.primaryNavy
+                          : Colors.white,
+                      side: isFullyGraded
+                          ? const BorderSide(color: AppColors.primaryNavy)
+                          : null,
                       elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 0,
+                      ),
                       minimumSize: const Size(0, 36),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusLg,
+                        ),
                       ),
                     ),
                     child: const Text(
@@ -454,7 +637,13 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
     );
   }
 
-  void _showGradingOptions(BuildContext context, Map<String, dynamic> serdik, JasmaniGradingData data, String golongan, String gender) {
+  void _showGradingOptions(
+    BuildContext context,
+    Map<String, dynamic> serdik,
+    JasmaniGradingData data,
+    String golongan,
+    String gender,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -470,6 +659,9 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
   }
 
   Widget _buildAvatar(Map<String, dynamic> serdik) {
+    final hasPhoto =
+        serdik['foto'] != null && serdik['foto'].toString().isNotEmpty;
+
     return Container(
       width: 64,
       height: 64,
@@ -484,8 +676,13 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
             offset: const Offset(0, 2),
           ),
         ],
+        image: DecorationImage(
+          image: hasPhoto
+              ? NetworkImage(serdik['foto'].toString()) as ImageProvider
+              : const AssetImage('assets/images/default_avatar.png'),
+          fit: BoxFit.cover,
+        ),
       ),
-      child: const Icon(Icons.person, color: Colors.grey, size: 32),
     );
   }
 

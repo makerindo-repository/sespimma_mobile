@@ -1,15 +1,16 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
-import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
-import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
-import 'package:sespimma_mobile/features/leadership_report/domain/services/pdf_report_service.dart';
 import 'package:sespimma_mobile/features/leadership_report/presentation/widgets/ai_recommendation_card.dart';
 import 'package:sespimma_mobile/features/leadership_report/presentation/widgets/average_stats_card.dart';
 import 'package:sespimma_mobile/features/leadership_report/presentation/widgets/report_card_item.dart';
 import 'package:sespimma_mobile/features/leadership_report/presentation/widgets/summary_stats_cards.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
+import 'package:sespimma_mobile/features/leadership_report/presentation/pages/pimpinan_generate_report_screen.dart';
 
 class LeadershipReportScreen extends StatefulWidget {
   const LeadershipReportScreen({super.key});
@@ -22,20 +23,20 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
     with SingleTickerProviderStateMixin {
   AnimationController? _animController;
   String _searchQuery = '';
-  String _selectedPokjar = 'Semua Pokjar';
+  String _selectedPokjar = 'Semua';
   String _selectedStatusFilter = 'Semua Status';
+  bool _isSortDesc = true;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
+  static const Color _primaryNavy = Color(0xFF000B1D);
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
-  final List<String> _pokjars = [
-    'Semua Pokjar',
+  List<String> get _pokjars => [
+    'Semua',
     'POKJAR I',
     'POKJAR II',
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   final TextEditingController _searchController = TextEditingController();
@@ -57,33 +58,14 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
     super.dispose();
   }
 
-  List<FinalRecapModel> get _allReports => PimpinanMockData.sharedReportData;
-
-  String _mapRomanToArabic(String roman) {
-    switch (roman) {
-      case 'POKJAR I':
-        return 'Pokjar 1';
-      case 'POKJAR II':
-        return 'Pokjar 2';
-      case 'POKJAR III':
-        return 'Pokjar 3';
-      case 'POKJAR IV':
-        return 'Pokjar 4';
-      case 'POKJAR V':
-        return 'Pokjar 5';
-      case 'POKJAR VI':
-        return 'Pokjar 6';
-      default:
-        return roman;
-    }
-  }
+  List<FinalRecapModel> get _allReports =>
+      ScoreCalculatorService.generateRealReports();
 
   List<FinalRecapModel> get _filteredReports {
-    return _allReports.where((report) {
-      final String mappedPokjar = _mapRomanToArabic(_selectedPokjar);
-      final String selectedP = mappedPokjar.trim().toLowerCase();
+    final result = _allReports.where((report) {
+      final String selectedP = _selectedPokjar.trim().toLowerCase();
       final bool matchesPokjar =
-          selectedP == 'semua pokjar' ||
+          selectedP == 'semua' ||
           report.pokjar.trim().toLowerCase() == selectedP;
 
       final bool matchesStatus =
@@ -99,6 +81,16 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
 
       return matchesPokjar && matchesStatus && matchesSearch;
     }).toList();
+
+    result.sort((a, b) {
+      if (_isSortDesc) {
+        return b.average.compareTo(a.average);
+      } else {
+        return a.average.compareTo(b.average);
+      }
+    });
+
+    return result;
   }
 
   Widget _buildAnimatedSection({
@@ -144,12 +136,9 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
         backgroundColor: _primaryNavy,
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(AppIcons.caretLeft, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text(
-          'Laporan Kepemimpinan',
+          'Laporan Nilai',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w800,
@@ -159,7 +148,12 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
         actions: [
           IconButton(
             icon: const Icon(AppIcons.downloadSimple, color: Colors.white),
-            onPressed: () => _handleExportPdf(context, filtered),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const PimpinanGenerateReportScreen(),
+              ),
+            ),
           ),
           const SizedBox(width: AppDimensions.sm),
         ],
@@ -208,74 +202,76 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                   _buildSectionTitle('DAFTAR REKAPITULASI NILAI'),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusXl,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: AssessmentSearchBarWidget(
+                            controller: _searchController,
+                            searchQuery: _searchQuery,
+                            hintText: 'Cari Nama/NRP...',
+                            onChanged: (val) =>
+                                setState(() => _searchQuery = val),
+                            onClear: () => setState(() {
+                              _searchQuery = '';
+                              _searchController.clear();
+                            }),
+                          ),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 15,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: (val) =>
-                                  setState(() => _searchQuery = val),
-                              decoration: InputDecoration(
-                                hintText: 'Cari Nama/NRP...',
-                                hintStyle: TextStyle(
-                                  color: Colors.blueGrey.shade200,
-                                  fontSize: AppDimensions.fontDefault,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: _primaryNavy,
-                                fontSize: AppDimensions.fontDefault,
-                                fontWeight: FontWeight.w700,
-                              ),
+                        const SizedBox(width: AppDimensions.sm),
+                        StatusFilterButtonWidget(
+                          selectedStatus: _selectedPokjar,
+                          statuses: _pokjars,
+                          onSelected: (val) =>
+                              setState(() => _selectedPokjar = val),
+                          defaultStatus: 'Semua',
+                          icon: Icons.groups_rounded,
+                          tooltip: 'Filter Pokjar',
+                        ),
+                        const SizedBox(width: AppDimensions.sm),
+                        StatusFilterButtonWidget(
+                          selectedStatus: _selectedStatusFilter,
+                          statuses: const [
+                            'Semua Status',
+                            'Lulus',
+                            'Tidak Lulus',
+                          ],
+                          onSelected: (val) =>
+                              setState(() => _selectedStatusFilter = val),
+                          defaultStatus: 'Semua Status',
+                          icon: AppIcons.funnelFill,
+                          tooltip: 'Filter Status',
+                        ),
+                        const SizedBox(width: AppDimensions.sm),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusLg,
                             ),
-                          ),
-                          _buildFilterIcon(
-                            icon: AppIcons.treeStructureFill,
-                            label: 'Pokjar',
-                            value: _selectedPokjar,
-                            items: _pokjars,
-                            onChanged: (val) =>
-                                setState(() => _selectedPokjar = val!),
-                          ),
-                          const SizedBox(width: AppDimensions.sm),
-                          _buildFilterIcon(
-                            icon: AppIcons.funnelFill,
-                            label: 'Status',
-                            value: _selectedStatusFilter,
-                            items: const [
-                              'Semua Status',
-                              'Lulus',
-                              'Tidak Lulus',
+                            border: Border.all(color: Colors.grey.shade200),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
                             ],
-                            onChanged: (val) =>
-                                setState(() => _selectedStatusFilter = val!),
                           ),
-                        ],
-                      ),
+                          child: IconButton(
+                            icon: Icon(
+                              _isSortDesc ? Icons.sort : Icons.sort_by_alpha,
+                              color: _primaryNavy,
+                              size: AppDimensions.iconSm,
+                            ),
+                            tooltip: 'Urutkan NAK',
+                            onPressed: () {
+                              setState(() {
+                                _isSortDesc = !_isSortDesc;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -302,60 +298,6 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                   ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFilterIcon({
-    required IconData icon,
-    required String label,
-    required String value,
-    required List<String> items,
-    required Function(String?) onChanged,
-  }) {
-    final bool isFiltered = value != items.first;
-    return PopupMenuButton<String>(
-      onSelected: onChanged,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-      ),
-      offset: const Offset(0, 45),
-      itemBuilder: (context) => items.map((item) {
-        return PopupMenuItem(
-          value: item,
-          child: Row(
-            children: [
-              Icon(
-                item == value ? AppIcons.checkCircleFill : null,
-                size: AppDimensions.iconMd,
-                color: _primaryNavy,
-              ),
-              const SizedBox(width: AppDimensions.sm),
-              Text(
-                item,
-                style: TextStyle(
-                  fontSize: AppDimensions.fontDefault,
-                  fontWeight: item == value ? FontWeight.w800 : FontWeight.w600,
-                  color: _primaryNavy,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.sm),
-        decoration: BoxDecoration(
-          color: isFiltered
-              ? _primaryNavy.withValues(alpha: 0.08)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
-        ),
-        child: Icon(
-          icon,
-          size: AppDimensions.iconDefault,
-          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade300,
-        ),
       ),
     );
   }
@@ -398,40 +340,5 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
         ],
       ),
     );
-  }
-
-  Future<void> _handleExportPdf(
-    BuildContext context,
-    List<FinalRecapModel> data,
-  ) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) =>
-          const Center(child: CircularProgressIndicator(color: _primaryNavy)),
-    );
-
-    try {
-      await PdfReportService.generateLeadershipReport(
-        data: data,
-        pokjar: _selectedPokjar,
-      );
-      if (context.mounted) Navigator.pop(context);
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Laporan PDF berhasil diunduh'),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) Navigator.pop(context);
-      if (context.mounted) {
-        AppNotifier.showError(context, 'Gagal membuat laporan: $e');
-      }
-    }
   }
 }

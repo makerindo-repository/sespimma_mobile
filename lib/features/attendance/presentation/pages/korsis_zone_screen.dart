@@ -19,6 +19,7 @@ class KorsisZoneScreen extends StatefulWidget {
 
 class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
   List<AttendanceZone> _zones = [];
+  bool _isLocating = true;
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
     if (_zones.isEmpty) {
       AppNotifier.showWarning(
         context,
-        'Belum ada zona aktif untuk menampilkan QR Code.',
+        'Belum ada zona aktif untuk menampilkan QR Code',
       );
       return;
     }
@@ -101,8 +102,16 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
       ),
       body: GeofenceMapWidget(
         zones: _zones,
-        onLocationDetected: (zone, dist, isFake) {},
-        onGpsStateChanged: (hasError) {},
+        onLocationDetected: (zone, dist, isFake) {
+          if (_isLocating) {
+            setState(() => _isLocating = false);
+          }
+        },
+        onGpsStateChanged: (hasError) {
+          if (hasError && _isLocating) {
+            setState(() => _isLocating = false);
+          }
+        },
         onReload: _loadZones,
         fabBottomBase: fabBase,
         onRadiusTap: (tappedZone) {
@@ -110,19 +119,27 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
           _showZoneInfo(context, tappedZone);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          HapticFeedback.selectionClick();
-          final result = await Navigator.push<bool>(
-            context,
-            MaterialPageRoute(builder: (_) => const KorsisZoneMarkingScreen()),
-          );
-          if (result == true) _loadZones();
-        },
-        backgroundColor: AppColors.primaryNavy,
-        elevation: 6,
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
-      ),
+      floatingActionButton: _isLocating
+          ? null
+          : FloatingActionButton(
+              onPressed: () async {
+                HapticFeedback.selectionClick();
+                final result = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const KorsisZoneMarkingScreen(),
+                  ),
+                );
+                if (result == true) _loadZones();
+              },
+              backgroundColor: AppColors.primaryNavy,
+              elevation: 6,
+              child: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
     );
   }
 }

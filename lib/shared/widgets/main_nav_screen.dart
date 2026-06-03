@@ -47,57 +47,65 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   );
                 }).toList(),
               ),
-              bottomNavigationBar: navItems.length < 2 ? null : Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: SafeArea(
-                  top: false,
-                  bottom: true,
-                  child: BottomNavigationBar(
-                    currentIndex: safeIndex,
-                    onTap: (index) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                    type: BottomNavigationBarType.fixed,
-                    backgroundColor: Colors.white,
-                    selectedItemColor: _primaryNavy,
-                    unselectedItemColor: Colors.blueGrey.shade400,
-                    selectedFontSize: 12,
-                    unselectedFontSize: 11,
-                    selectedLabelStyle: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.2,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
-                    elevation: 0,
-                    items: navItems.map((item) {
-                      return BottomNavigationBarItem(
-                        icon: Padding(
-                          padding: const EdgeInsets.only(bottom: 6.0, top: 4.0),
-                          child: Icon(item.icon, size: 24),
+              bottomNavigationBar: navItems.length < 2
+                  ? null
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, -5),
+                          ),
+                        ],
+                      ),
+                      child: SafeArea(
+                        top: false,
+                        bottom: true,
+                        child: BottomNavigationBar(
+                          currentIndex: safeIndex,
+                          onTap: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          type: BottomNavigationBarType.fixed,
+                          backgroundColor: Colors.white,
+                          selectedItemColor: _primaryNavy,
+                          unselectedItemColor: Colors.blueGrey.shade400,
+                          selectedFontSize: 12,
+                          unselectedFontSize: 11,
+                          selectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
+                          ),
+                          unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          elevation: 0,
+                          items: navItems.map((item) {
+                            return BottomNavigationBarItem(
+                              icon: Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 6.0,
+                                  top: 4.0,
+                                ),
+                                child: Icon(item.icon, size: 24),
+                              ),
+                              activeIcon: Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 6.0,
+                                  top: 4.0,
+                                ),
+                                child: Icon(item.activeIcon, size: 24),
+                              ),
+                              label: item.label,
+                            );
+                          }).toList(),
                         ),
-                        activeIcon: Padding(
-                          padding: const EdgeInsets.only(bottom: 6.0, top: 4.0),
-                          child: Icon(item.activeIcon, size: 24),
-                        ),
-                        label: item.label,
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
+                      ),
+                    ),
             ),
           );
         }

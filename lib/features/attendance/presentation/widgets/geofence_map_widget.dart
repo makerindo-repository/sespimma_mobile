@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 import '../../domain/models/map_tile_mode.dart';
 
@@ -736,6 +737,11 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
                         );
                         _animateTo(firstZone);
                       }
+
+                      AppNotifier.showSuccess(
+                        context,
+                        'Zona telah diperbaharui',
+                      );
                     }
                   },
           ),

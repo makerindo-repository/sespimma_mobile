@@ -25,16 +25,13 @@ class GadikGradingBottomSheet extends StatefulWidget {
 class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
   final _formKey = GlobalKey<FormState>();
 
-  // Components for NKKP/NPKP/NKP/TASKAP
   late TextEditingController _materiCtrl;
   late TextEditingController _penulisanCtrl;
   late TextEditingController _paparanCtrl;
   late TextEditingController _keaktifanCtrl;
 
-  // Components for Ujian
   late TextEditingController _ujianCtrl;
 
-  // Components for Simulasi
   late TextEditingController _keaktifanPerseoranganCtrl;
   late TextEditingController _produkPerseoranganCtrl;
   late TextEditingController _tataRuangCtrl;
@@ -253,7 +250,6 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                   const Divider(),
                   const SizedBox(height: 10),
 
-                  // Rendering Form based on jenisTugas
                   _buildDynamicForm(),
 
                   const SizedBox(height: 20),
