@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import '../../data/models/gadik_assignment_model.dart';
@@ -17,7 +18,8 @@ class GadikGradingBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<GadikGradingBottomSheet> createState() => _GadikGradingBottomSheetState();
+  State<GadikGradingBottomSheet> createState() =>
+      _GadikGradingBottomSheetState();
 }
 
 class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
@@ -38,6 +40,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
   late TextEditingController _tataRuangCtrl;
 
   late TextEditingController _catatanCtrl;
+  late TextEditingController _beritaAcaraCtrl;
 
   double _calculatedNA = 0.0;
 
@@ -47,16 +50,27 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
     final s = widget.submission;
 
     _materiCtrl = TextEditingController(text: s.scoreMateri?.toString() ?? '');
-    _penulisanCtrl = TextEditingController(text: s.scorePenulisan?.toString() ?? '');
-    _paparanCtrl = TextEditingController(text: s.scorePaparan?.toString() ?? '');
-    _keaktifanCtrl = TextEditingController(text: s.scoreKeaktifan?.toString() ?? '');
+    _penulisanCtrl = TextEditingController(
+      text: s.scorePenulisan?.toString() ?? '',
+    );
+    _paparanCtrl = TextEditingController(
+      text: s.scorePaparan?.toString() ?? '',
+    );
+    _keaktifanCtrl = TextEditingController(
+      text: s.scoreKeaktifan?.toString() ?? '',
+    );
     _ujianCtrl = TextEditingController(text: s.scoreUjian?.toString() ?? '');
-    _keaktifanPerseoranganCtrl =
-        TextEditingController(text: s.scoreKeaktifanPerseorangan?.toString() ?? '');
-    _produkPerseoranganCtrl =
-        TextEditingController(text: s.scoreProdukPerseorangan?.toString() ?? '');
-    _tataRuangCtrl = TextEditingController(text: s.scoreTataRuang?.toString() ?? '');
+    _keaktifanPerseoranganCtrl = TextEditingController(
+      text: s.scoreKeaktifanPerseorangan?.toString() ?? '',
+    );
+    _produkPerseoranganCtrl = TextEditingController(
+      text: s.scoreProdukPerseorangan?.toString() ?? '',
+    );
+    _tataRuangCtrl = TextEditingController(
+      text: s.scoreTataRuang?.toString() ?? '',
+    );
     _catatanCtrl = TextEditingController(text: s.catatanPengajar ?? '');
+    _beritaAcaraCtrl = TextEditingController(text: '');
 
     _materiCtrl.addListener(_calculate);
     _penulisanCtrl.addListener(_calculate);
@@ -81,6 +95,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
     _produkPerseoranganCtrl.dispose();
     _tataRuangCtrl.dispose();
     _catatanCtrl.dispose();
+    _beritaAcaraCtrl.dispose();
     super.dispose();
   }
 
@@ -95,7 +110,8 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
     if (jenis == 'Ujian Mata Pelajaran atau Esai') {
       total = _parse(_ujianCtrl.text);
-    } else if (jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' || jenis == 'NPKP (Naskah Praktek Kerja Profesi)') {
+    } else if (jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' ||
+        jenis == 'NPKP (Naskah Praktek Kerja Profesi)') {
       double m = _parse(_materiCtrl.text);
       double p = _parse(_paparanCtrl.text);
       double k = _parse(_keaktifanCtrl.text);
@@ -121,6 +137,24 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
     });
   }
 
+  Color _getScoreColor(double score) {
+    if (score == 0) return AppColors.primaryNavy;
+    if (score < 70.01) return Colors.red.shade700;
+    if (score <= 75.00) return Colors.orange.shade700;
+    if (score <= 80.00) return Colors.blue.shade700;
+    if (score <= 85.00) return Colors.green.shade600;
+    return Colors.green.shade800;
+  }
+
+  String _getScoreCategory(double score) {
+    if (score == 0) return '-';
+    if (score < 70.01) return 'Kurang (K)';
+    if (score <= 75.00) return 'Cukup (C)';
+    if (score <= 80.00) return 'Baik (B)';
+    if (score <= 85.00) return 'Memuaskan (M)';
+    return 'Sangat Memuaskan (SM)';
+  }
+
   void _save() {
     if (_formKey.currentState!.validate()) {
       final s = GadikSubmissionModel(
@@ -133,17 +167,31 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
         fileUrl: widget.submission.fileUrl,
         isGraded: true,
         nilaiAkhir: _calculatedNA,
-        catatanPengajar: _catatanCtrl.text,
-        scoreMateri: _materiCtrl.text.isNotEmpty ? _parse(_materiCtrl.text) : null,
-        scorePenulisan: _penulisanCtrl.text.isNotEmpty ? _parse(_penulisanCtrl.text) : null,
-        scorePaparan: _paparanCtrl.text.isNotEmpty ? _parse(_paparanCtrl.text) : null,
-        scoreKeaktifan: _keaktifanCtrl.text.isNotEmpty ? _parse(_keaktifanCtrl.text) : null,
+        catatanPengajar: _calculatedNA > 90.00
+            ? 'BERITA ACARA: ${_beritaAcaraCtrl.text}\n\nCatatan: ${_catatanCtrl.text}'
+            : _catatanCtrl.text,
+        scoreMateri: _materiCtrl.text.isNotEmpty
+            ? _parse(_materiCtrl.text)
+            : null,
+        scorePenulisan: _penulisanCtrl.text.isNotEmpty
+            ? _parse(_penulisanCtrl.text)
+            : null,
+        scorePaparan: _paparanCtrl.text.isNotEmpty
+            ? _parse(_paparanCtrl.text)
+            : null,
+        scoreKeaktifan: _keaktifanCtrl.text.isNotEmpty
+            ? _parse(_keaktifanCtrl.text)
+            : null,
         scoreUjian: _ujianCtrl.text.isNotEmpty ? _parse(_ujianCtrl.text) : null,
-        scoreKeaktifanPerseorangan:
-            _keaktifanPerseoranganCtrl.text.isNotEmpty ? _parse(_keaktifanPerseoranganCtrl.text) : null,
-        scoreProdukPerseorangan:
-            _produkPerseoranganCtrl.text.isNotEmpty ? _parse(_produkPerseoranganCtrl.text) : null,
-        scoreTataRuang: _tataRuangCtrl.text.isNotEmpty ? _parse(_tataRuangCtrl.text) : null,
+        scoreKeaktifanPerseorangan: _keaktifanPerseoranganCtrl.text.isNotEmpty
+            ? _parse(_keaktifanPerseoranganCtrl.text)
+            : null,
+        scoreProdukPerseorangan: _produkPerseoranganCtrl.text.isNotEmpty
+            ? _parse(_produkPerseoranganCtrl.text)
+            : null,
+        scoreTataRuang: _tataRuangCtrl.text.isNotEmpty
+            ? _parse(_tataRuangCtrl.text)
+            : null,
       );
 
       widget.onSaved(s);
@@ -195,7 +243,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${widget.submission.serdikName} - ${widget.submission.serdikNrp}',
+                    '${widget.submission.serdikName} - ${widget.submission.serdikNosis ?? "202602003001"}',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.blueGrey.shade600,
@@ -214,7 +262,9 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                     decoration: BoxDecoration(
                       color: AppColors.primaryNavy.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryNavy.withValues(alpha: 0.2)),
+                      border: Border.all(
+                        color: AppColors.primaryNavy.withValues(alpha: 0.2),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -229,15 +279,81 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                         ),
                         Text(
                           _calculatedNA.toStringAsFixed(2),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
-                            color: AppColors.primaryNavy,
+                            color: _getScoreColor(_calculatedNA),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  if (_calculatedNA > 0) ...[
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _getScoreColor(
+                            _calculatedNA,
+                          ).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: _getScoreColor(
+                              _calculatedNA,
+                            ).withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          _getScoreCategory(_calculatedNA),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: _getScoreColor(_calculatedNA),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  if (_calculatedNA > 90.00) ...[
+                    const SizedBox(height: 20),
+                    Text(
+                      'Berita Acara (Wajib untuk Nilai > 90.00)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _beritaAcaraCtrl,
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        hintText:
+                            'Masukkan alasan / justifikasi pemberian nilai > 90.01',
+                        filled: true,
+                        fillColor: Colors.purple.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                          borderSide: BorderSide(color: Colors.purple.shade200),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (_calculatedNA > 90.00 &&
+                            (value == null || value.trim().isEmpty)) {
+                          return 'Berita Acara wajib diisi';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                   const SizedBox(height: 20),
 
                   const Text(
@@ -256,7 +372,9 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                       filled: true,
                       fillColor: Colors.grey.shade50,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
                         borderSide: BorderSide(color: Colors.grey.shade300),
                       ),
                     ),
@@ -271,7 +389,9 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                         backgroundColor: AppColors.primaryNavy,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
                         ),
                       ),
                       child: const Text(
@@ -298,7 +418,8 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
     if (jenis == 'Ujian Mata Pelajaran atau Esai') {
       return _buildInputRow('Nilai Ujian / Esai (100%)', _ujianCtrl);
-    } else if (jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' || jenis == 'NPKP (Naskah Praktek Kerja Profesi)') {
+    } else if (jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' ||
+        jenis == 'NPKP (Naskah Praktek Kerja Profesi)') {
       return Column(
         children: [
           _buildInputRow('Materi & Penulisan (35%)', _materiCtrl),
@@ -319,7 +440,10 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
     } else if (jenis == 'Simulasi Kepemimpinan Kontemporer') {
       return Column(
         children: [
-          _buildInputRow('Keaktifan Perseorangan (60%)', _keaktifanPerseoranganCtrl),
+          _buildInputRow(
+            'Keaktifan Perseorangan (60%)',
+            _keaktifanPerseoranganCtrl,
+          ),
           const SizedBox(height: 12),
           _buildInputRow('Produk Perseorangan (20%)', _produkPerseoranganCtrl),
           const SizedBox(height: 12),
@@ -342,17 +466,35 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
   }
 
   Widget _buildInputRow(String label, TextEditingController controller) {
+    final double val = _parse(controller.text);
+    final color = val > 0 ? _getScoreColor(val) : AppColors.primaryNavy;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.blueGrey.shade700,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blueGrey.shade700,
+                ),
+              ),
+              if (val > 0)
+                Text(
+                  _getScoreCategory(val),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+            ],
           ),
         ),
         SizedBox(
@@ -360,23 +502,41 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
           child: TextFormField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+              TextInputFormatter.withFunction((oldValue, newValue) {
+                if (newValue.text.isEmpty) return newValue;
+                final val = double.tryParse(newValue.text);
+                if (val == null || val > 100 || val < 0) {
+                  return oldValue;
+                }
+                return newValue;
+              }),
+            ],
             textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, color: color),
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 8,
+              ),
               filled: true,
-              fillColor: Colors.white,
+              fillColor: val > 0 ? color.withValues(alpha: 0.05) : Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(
+                  color: val > 0
+                      ? color.withValues(alpha: 0.5)
+                      : Colors.grey.shade300,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppColors.primaryNavy),
+                borderSide: BorderSide(color: color, width: 2),
               ),
             ),
             validator: (value) {

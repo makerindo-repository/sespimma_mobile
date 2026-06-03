@@ -95,8 +95,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildStatCards(user),
-                              if (user.roleId != 'pengajar_patun' &&
-                                  user.roleId != 'pengajar_korsis') ...[
+                              if (user.roleId != 'pimpinan' &&
+                                  user.roleId != 'tim_operator' &&
+                                  user.roleId != 'pengajar_patun' &&
+                                  user.roleId != 'pengajar_korsis' &&
+                                  user.roleId != 'kabag_bindik' &&
+                                  user.roleId != 'pengajar_medis') ...[
                                 const SizedBox(height: AppDimensions.lg),
                                 _buildFormalDataCard(user),
                               ],
@@ -127,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   String _getRoleLabel(UserEntity user) {
-    if ((user.roleId == 'pengajar_patun' || user.roleId == 'pengajar_korsis') &&
+    if ((user.roleId == 'pimpinan' || user.roleId == 'pengajar_patun' || user.roleId == 'pengajar_korsis') &&
         user.jabatanSenat.isNotEmpty &&
         user.jabatanSenat != '-') {
       return user.jabatanSenat.toUpperCase();
@@ -138,11 +142,17 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (user.roleId == 'pengajar_patun') {
       return 'PATUN';
     }
-    if (user.roleId == 'pengajar_medis') {
-      return 'MEDIS';
+    if (user.roleId == 'kabag_bindik') {
+      return 'KABAG BINDIK';
     }
     if (user.roleId == 'pengajar_korsis') {
       return 'KORSIS';
+    }
+    if (user.roleId == 'pengajar_medis') {
+      return 'MEDIS';
+    }
+    if (user.roleId == 'tim_operator') {
+      return 'TIM OPERATOR';
     }
     if (user.roleId.startsWith('pengajar')) {
       return 'GADIK';
@@ -152,9 +162,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Color _getRoleBadgeColor(String roleId) {
     if (roleId == 'pimpinan') return const Color(0xFFFFAC1C);
+    if (roleId == 'kabag_bindik') return const Color(0xFFC0392B);
     if (roleId == 'pengajar_patun') return const Color(0xFF8E44AD);
     if (roleId == 'pengajar_medis') return const Color(0xFF27AE60);
     if (roleId == 'pengajar_korsis') return const Color(0xFF16A085);
+    if (roleId == 'tim_operator') return const Color(0xFF3498DB);
     if (roleId.startsWith('pengajar')) return const Color(0xFF2980B9);
     return const Color(0xFF7F8C8D);
   }
@@ -336,11 +348,38 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
         _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
       ];
-    } else if (user.roleId == 'pengajar' || user.roleId.startsWith('pengajar_')) {
+    } else if (user.roleId == 'pengajar' || user.roleId == 'pengajar_gadik') {
       rows = [
         _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
         _buildDetailRow(AppIcons.chartBar, 'ESELON', user.eselon),
         _buildDetailRow(AppIcons.chartBar, 'GOLONGAN', user.golongan),
+      ];
+    } else if (user.roleId == 'pengajar_medis') {
+      rows = [
+        _buildDetailRow(AppIcons.identificationCard, 'NRP/NIP', user.nrp),
+        _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
+        _buildDetailRow(
+          AppIcons.medal,
+          'PANGKAT',
+          _getFullPangkat(user.pangkat),
+        ),
+        _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
+      ];
+    } else if (user.roleId == 'pimpinan' || 
+               user.roleId == 'pengajar_korsis' || 
+               user.roleId == 'pengajar_patun' || 
+               user.roleId == 'tim_operator') {
+      rows = [
+        _buildDetailRow(AppIcons.identificationCard, 'NRP/NIP', user.nrp),
+        _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
+        _buildDetailRow(
+          AppIcons.medal,
+          'PANGKAT',
+          _getFullPangkat(user.pangkat),
+        ),
+        _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
+        if (user.jabatanSenat != '-') 
+          _buildDetailRow(AppIcons.starFill, 'PERAN PENGASUHAN', user.jabatanSenat),
       ];
     } else {
       rows = [

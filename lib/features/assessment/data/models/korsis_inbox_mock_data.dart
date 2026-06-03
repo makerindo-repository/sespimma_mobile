@@ -1,8 +1,13 @@
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/patun_real_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/korsis_real_data.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 
+/// Represents a single reward/punishment inbox entry.
+///
+/// Used by both Korsis (inbox approval) and Gadik
+/// (monitoring penilaian) features.
 class InboxItem {
   final String id;
   final String serdikName;
@@ -16,6 +21,7 @@ class InboxItem {
   final String description;
   final String rewardPunishmentName;
   String status;
+  final String? photoPath;
 
   InboxItem({
     required this.id,
@@ -30,22 +36,62 @@ class InboxItem {
     required this.description,
     required this.rewardPunishmentName,
     this.status = 'pending',
+    this.photoPath,
   });
 }
 
+/// Persistent, in-memory mock data store for Korsis inbox items.
+///
+/// Data is generated once and held in a static list so that
+/// records added by Gadik are immediately visible to the Korsis
+/// inbox screen without a restart.
 class KorsisInboxMockData {
-  static List<InboxItem> generateMockData() {
+  KorsisInboxMockData._();
+
+  static List<InboxItem>? _items;
+
+  /// Returns the shared, persistent list of inbox items.
+  ///
+  /// The list is lazily initialized on first access. Subsequent
+  /// calls always return the same instance.
+  static List<InboxItem> get items {
+    _items ??= _generateInitialData();
+    return _items!;
+  }
+
+  /// Convenience alias that preserves backwards-compatibility
+  /// with existing callers that used `generateMockData()`.
+  static List<InboxItem> generateMockData() => items;
+
+  /// Inserts a new [InboxItem] at the front of the shared list.
+  ///
+  /// Called from the Gadik mental form screen after the user
+  /// saves a new reward/punishment entry.
+  static void addRecord(InboxItem item) {
+    items.insert(0, item);
+  }
+
+  /// Resets the mock data (useful for testing or hard-refresh).
+  static void reset() {
+    _items = null;
+  }
+
+  // ── Private helpers ───────────────────────────────────────
+
+  static List<InboxItem> _generateInitialData() {
     final now = DateTime.now();
-    final List<InboxItem> items = [];
+    final List<InboxItem> result = [];
 
     final serdiks = SerdikRealData.records.toList();
     final patuns = PatunRealData.records;
     final korsis = KorsisRealData.records;
+    final gadiks = GadikRealData.records;
     final rules = RewardPunishmentData.rules;
 
     final senders = [
       ...patuns.map((p) => p['nama'] as String),
       ...korsis.map((k) => k['nama'] as String),
+      ...gadiks.map((g) => g['nama'] as String),
     ];
 
     final rewardRules = rules.where((r) => r.type == 'REWARD').toList();
@@ -61,7 +107,7 @@ class KorsisInboxMockData {
       final timestamp = now.subtract(Duration(hours: i * 3, minutes: i * 22));
       final senderName = senders[i % senders.length];
 
-      items.add(
+      result.add(
         InboxItem(
           id: 'mock_inbox_$i',
           serdikName: serdik['nama_lengkap'] ?? '-',
@@ -73,13 +119,14 @@ class KorsisInboxMockData {
           timestamp: timestamp,
           points: rule.point,
           description:
-              'Telah dilakukan observasi dan pencatatan oleh pengasuh terkait kedisiplinan dan kinerja serdik.',
+              'Telah dilakukan observasi dan pencatatan oleh '
+              'pengasuh terkait kedisiplinan dan kinerja serdik.',
           rewardPunishmentName: rule.description,
           status: 'pending',
         ),
       );
     }
 
-    return items;
+    return result;
   }
 }

@@ -3,13 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
-import 'package:sespimma_mobile/core/theme/app_colors.dart';
-import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
 import '../../data/models/gadik_assignment_model.dart';
 import '../../data/datasources/gadik_assignment_mock_data.dart';
-import 'gadik_create_assignment_screen.dart';
 import 'gadik_assignment_detail_screen.dart';
+import 'gadik_create_assignment_screen.dart';
 
 class GadikAssignmentMonitoringScreen extends StatefulWidget {
   const GadikAssignmentMonitoringScreen({super.key});
@@ -21,44 +20,39 @@ class GadikAssignmentMonitoringScreen extends StatefulWidget {
 
 class _GadikAssignmentMonitoringScreenState
     extends State<GadikAssignmentMonitoringScreen> {
-  static const Color _primaryNavy = AppColors.primaryNavy;
-  static const Color _lightGrey = AppColors.background;
+  static const Color _primaryNavy = Color(0xFF000B1D);
+  static const Color _lightGrey = Color(0xFFF8F9FA);
+
+  String _searchQuery = '';
+  String _selectedCategory = 'Semua Kategori';
+  bool _sortAscending = false;
+  DateTime? _selectedDate;
 
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  
-  // Sort Logic: false = Descending (Paling banyak submit), true = Ascending (Paling sedikit submit)
-  bool _isSortAscending = false;
 
-  // Date Filter Logic
-  DateTime? _selectedFilterDate;
-
-  String _selectedCategory = 'Semua Kategori';
   final List<String> _categoryOptions = [
     'Semua Kategori',
     'Ujian Mata Pelajaran atau Esai',
-    'NKKP (Naskah Kuliah Kerja Profesi)',
-    'NPKP (Naskah Praktek Kerja Profesi)',
-    'NKP (Naskah Karya Perseorangan)',
-    'Simulasi Kepemimpinan Kontemporer',
-    'NPTT (Naskah Program Transformasi Teknis)'
+    'Naskah Kuliah Kerja Profesi (NKKP)',
+    'Naskah Praktek Kerja Profesi (NPKP)',
+    'Naskah Program Transformasi Teknis (NPTT)',
+    'Naskah Karya Perseorangan (NKP)',
+    'Simulasi Kepemimpinan Kontemporer'
   ];
 
-  List<GadikAssignmentModel> _assignments = [];
+  String _getDynamicCategoryName(String rawCategory) {
+    if (rawCategory.contains('NKKP')) return 'NKKP';
+    if (rawCategory.contains('NPKP')) return 'NPKP';
+    if (rawCategory.contains('NPTT')) return 'NPTT';
+    if (rawCategory.contains('NKP')) return 'NKP';
+    if (rawCategory.contains('Ujian')) return 'Ujian / Esai';
+    return rawCategory;
+  }
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('id_ID', null);
-    _loadData();
-  }
-
-  void _loadData() {
-    setState(() {
-      _assignments = GadikAssignmentMockData.assignments
-          .where((t) => t.createdBy == 'Efrianza')
-          .toList();
-    });
   }
 
   @override
@@ -78,37 +72,31 @@ class _GadikAssignmentMonitoringScreenState
         .length;
   }
 
-  int _getGradedCount(String assignmentId, int submittedCount) {
-    // Mocking logic for "DINILAI"
-    if (submittedCount == 0) return 0;
-    int hash = assignmentId.hashCode.abs();
-    int graded = hash % (submittedCount + 1);
-    return graded;
+  int _getGradedCount(String assignmentId) {
+    return GadikAssignmentMockData.submissions
+        .where((s) => s.assignmentId == assignmentId && s.isGraded)
+        .length;
   }
 
-  String _formatDeadline(DateTime date) {
-    return DateFormat('EEEE, dd MMMM yyyy, \'Pukul\' HH:mm \'WIB\'', 'id_ID').format(date);
-  }
-
-  bool _isSameDate(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-           date1.month == date2.month &&
-           date1.day == date2.day;
-  }
-
-  Future<void> _pickDateFilter() async {
+  Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedFilterDate ?? DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
+          data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
               primary: _primaryNavy,
               onPrimary: Colors.white,
-              onSurface: _primaryNavy,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+            dialogTheme: DialogThemeData(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+              ),
             ),
           ),
           child: child!,
@@ -117,47 +105,50 @@ class _GadikAssignmentMonitoringScreenState
     );
     if (picked != null) {
       setState(() {
-        _selectedFilterDate = picked;
+        _selectedDate = picked;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<GadikAssignmentModel> filteredAssignments = _assignments.where((t) {
-      if (_searchQuery.isNotEmpty) {
-        if (!t.judul.toLowerCase().contains(_searchQuery.toLowerCase())) {
+    var filteredList = GadikAssignmentMockData.assignments.where((task) {
+      final title = task.judul.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      if (!title.contains(query)) return false;
+
+      if (_selectedCategory != 'Semua Kategori') {
+        if (task.jenisTugas != _selectedCategory) return false;
+      }
+
+      if (_selectedDate != null) {
+        if (task.createdAt.year != _selectedDate!.year ||
+            task.createdAt.month != _selectedDate!.month ||
+            task.createdAt.day != _selectedDate!.day) {
           return false;
         }
       }
-      if (_selectedCategory != 'Semua Kategori' && t.jenisTugas != _selectedCategory) {
-        return false;
-      }
-      if (_selectedFilterDate != null) {
-        // Assume deadline implies the date grouping they want to see, or we mock a creation date.
-        // Usually tasks mock data only has deadline. We will filter by deadline date.
-        if (!_isSameDate(t.deadline, _selectedFilterDate!)) {
-          return false;
-        }
-      }
+
       return true;
     }).toList();
 
-    // Sorting by submit count & date
-    filteredAssignments.sort((a, b) {
-      final aCount = _getSubmittedCount(a.id);
-      final bCount = _getSubmittedCount(b.id);
-      
-      if (aCount != bCount) {
-        return _isSortAscending 
-            ? aCount.compareTo(bCount)   // Paling sedikit submit di atas
-            : bCount.compareTo(aCount);  // Paling banyak submit di atas
+    filteredList.sort((a, b) {
+      final submissionsA = _getSubmittedCount(a.id);
+      final submissionsB = _getSubmittedCount(b.id);
+      if (_sortAscending) {
+        if (submissionsA == submissionsB) {
+          return a.createdAt.compareTo(b.createdAt);
+        }
+        return submissionsA.compareTo(submissionsB);
+      } else {
+        if (submissionsA == submissionsB) {
+          return b.createdAt.compareTo(a.createdAt);
+        }
+        return submissionsB.compareTo(submissionsA);
       }
-      // If submit count is same, sort by date
-      return _isSortAscending
-          ? a.deadline.compareTo(b.deadline)
-          : b.deadline.compareTo(a.deadline);
     });
+
+    final totalTasks = GadikAssignmentMockData.assignments.length;
 
     return Scaffold(
       backgroundColor: _lightGrey,
@@ -170,252 +161,39 @@ class _GadikAssignmentMonitoringScreenState
           'Monitoring Tugas',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w800,
             fontSize: AppDimensions.fontXxl,
+            letterSpacing: -0.5,
           ),
         ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppDimensions.xl,
-              vertical: AppDimensions.lg,
-            ),
-            child: AssessmentSearchBarWidget(
-              controller: _searchController,
-              searchQuery: _searchQuery,
-              hintText: 'Cari nama tugas...',
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              onClear: () {
-                setState(() {
-                  _searchQuery = '';
-                  _searchController.clear();
-                });
-              },
-            ),
-          ),
+          _buildHeaderBlock(totalTasks),
           Divider(
-            height: AppDimensions.dividerHeight,
+            height: 1,
             color: Colors.grey.shade200,
-            thickness: AppDimensions.dividerHeight,
+            thickness: 1,
           ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                setState(() {
-                  _loadData();
-                });
+                setState(() {});
                 await Future.delayed(const Duration(milliseconds: 500));
               },
               color: _primaryNavy,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              'DAFTAR TUGAS',
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontLg,
-                                fontWeight: FontWeight.w800,
-                                color: _primaryNavy,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _primaryNavy,
-                                borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusLg,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.description_rounded,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${filteredAssignments.length}',
-                                    style: const TextStyle(
-                                      fontSize: AppDimensions.fontSm + 1,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            // Date Filter Toggle
-                            InkWell(
-                              onTap: _pickDateFilter,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                              child: Container(
-                                padding: const EdgeInsets.all(AppDimensions.sm),
-                                decoration: BoxDecoration(
-                                  color: _selectedFilterDate != null 
-                                      ? _primaryNavy 
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                                  border: Border.all(
-                                    color: _selectedFilterDate != null 
-                                        ? _primaryNavy 
-                                        : Colors.grey.shade300,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.calendar_month_rounded,
-                                  size: 20,
-                                  color: _selectedFilterDate != null 
-                                      ? Colors.white 
-                                      : _primaryNavy,
-                                ),
-                              ),
-                            ),
-                            if (_selectedFilterDate != null) ...[
-                              const SizedBox(width: 4),
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedFilterDate = null;
-                                  });
-                                },
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                                child: Container(
-                                  padding: const EdgeInsets.all(AppDimensions.sm),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.shade50,
-                                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                                    border: Border.all(color: Colors.red.shade200),
-                                  ),
-                                  child: Icon(
-                                    Icons.clear_rounded,
-                                    size: 20,
-                                    color: Colors.red.shade700,
-                                  ),
-                                ),
-                              ),
-                            ],
-                            const SizedBox(width: 8),
-                            
-                            // Sort Toggle
-                            InkWell(
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                setState(() {
-                                  _isSortAscending = !_isSortAscending;
-                                });
-                              },
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                              child: Container(
-                                padding: const EdgeInsets.all(AppDimensions.sm),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                                  border: Border.all(color: Colors.grey.shade300),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      _isSortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                                      size: 16,
-                                      color: _primaryNavy,
-                                    ),
-                                    const SizedBox(width: 2),
-                                    const Icon(
-                                      Icons.sort_rounded,
-                                      size: 20,
-                                      color: _primaryNavy,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            
-                            // Category Filter
-                            _buildFilterDropdown(
-                              icon: Icons.filter_list_rounded,
-                              value: _selectedCategory,
-                              options: _categoryOptions,
-                              onChanged: (val) {
-                                setState(() => _selectedCategory = val);
-                              },
-                              isCategory: true,
-                            ),
-                          ],
+              child: filteredList.isEmpty
+                  ? CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: _buildEmptyState(),
                         ),
                       ],
-                    ),
-                    if (_selectedFilterDate != null) ...[
-                      const SizedBox(height: AppDimensions.md),
-                      Text(
-                        'Menampilkan tugas untuk tanggal: ${DateFormat('dd MMMM yyyy', 'id_ID').format(_selectedFilterDate!)}',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontSm,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blueGrey.shade600,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: AppDimensions.md),
-                    if (filteredAssignments.isEmpty)
-                      _buildEmptyState()
-                    else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: filteredAssignments.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: AppDimensions.md),
-                        itemBuilder: (context, index) {
-                          final task = filteredAssignments[index];
-                          final totalTarget = _getTotalSerdik(task.targetPokjar);
-                          final submittedCount = _getSubmittedCount(task.id);
-                          final gradedCount = _getGradedCount(task.id, submittedCount);
-
-                          String shortCat = task.jenisTugas;
-                          if (shortCat.contains('(')) {
-                            shortCat = shortCat.substring(0, shortCat.indexOf('(')).trim();
-                          } else if (shortCat.toLowerCase().contains('ujian')) {
-                            shortCat = 'Ujian MP';
-                          }
-
-                          return _buildTaskCard(
-                            task, 
-                            shortCat, 
-                            submittedCount, 
-                            totalTarget,
-                            gradedCount,
-                          );
-                        },
-                      ),
-                  ],
-                ),
-              ),
+                    )
+                  : _buildTaskList(filteredList),
             ),
           ),
         ],
@@ -429,91 +207,184 @@ class _GadikAssignmentMonitoringScreenState
             ),
           );
           if (result == true) {
-            _loadData();
+            if (!context.mounted) return;
+            setState(() {});
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Tugas berhasil dibuat dan didistribusikan.', style: TextStyle(fontWeight: FontWeight.w700)),
+                backgroundColor: const Color(0xFF10B981), // Emerald 500
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+                duration: const Duration(seconds: 3),
+              ),
+            );
           }
         },
         backgroundColor: _primaryNavy,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'Buat Tugas',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        elevation: 4,
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: const Text('Buat Tugas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
       ),
     );
   }
 
-  Widget _buildFilterDropdown({
-    required IconData icon,
-    required String value,
-    required List<String> options,
-    required Function(String) onChanged,
-    Color? iconColor,
-    bool isCategory = false,
-  }) {
-    return PopupMenuButton<String>(
-      onSelected: onChanged,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.sm),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: iconColor ?? _primaryNavy),
-            const SizedBox(width: 4),
-            Icon(Icons.arrow_drop_down, size: 16, color: Colors.grey.shade600),
-          ],
-        ),
+  Widget _buildHeaderBlock(int totalTasks) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.xl,
+        vertical: AppDimensions.xl,
       ),
-      itemBuilder: (BuildContext context) {
-        return options.map((String choice) {
-          String displayChoice = choice;
-          if (isCategory && choice.contains('(')) {
-            displayChoice = choice.substring(0, choice.indexOf('(')).trim();
-          }
-
-          return PopupMenuItem<String>(
-            value: choice,
-            child: Row(
-              children: [
-                Icon(
-                  value == choice
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  color: value == choice ? _primaryNavy : Colors.grey,
-                  size: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: AssessmentSearchBarWidget(
+                  controller: _searchController,
+                  searchQuery: _searchQuery,
+                  hintText: 'Cari tugas...',
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  onClear: () {
+                    setState(() {
+                      _searchQuery = '';
+                      _searchController.clear();
+                    });
+                  },
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    displayChoice,
-                    style: TextStyle(
-                      fontWeight: value == choice
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                      color: value == choice ? _primaryNavy : Colors.black87,
-                      fontSize: AppDimensions.fontSm + 1,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(width: AppDimensions.md),
+              Expanded(
+                flex: 2,
+                child: StatusFilterButtonWidget(
+                  selectedStatus: _selectedCategory,
+                  statuses: _categoryOptions,
+                  defaultStatus: 'Semua Kategori',
+                  onSelected: (value) {
+                    setState(() {
+                      _selectedCategory = value;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.xl),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'DAFTAR TUGAS',
+                style: TextStyle(
+                  color: _primaryNavy,
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontLg,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _primaryNavy.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                ),
+                child: Text(
+                  '$totalTasks Total',
+                  style: const TextStyle(
+                    color: _primaryNavy,
+                    fontWeight: FontWeight.w800,
+                    fontSize: AppDimensions.fontXs,
                   ),
                 ),
-              ],
-            ),
-          );
-        }).toList();
-      },
+              ),
+              const Spacer(),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _pickDate,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _selectedDate != null ? _primaryNavy.withValues(alpha: 0.08) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      border: Border.all(color: _selectedDate != null ? _primaryNavy.withValues(alpha: 0.2) : Colors.grey.shade200),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 16,
+                          color: _selectedDate != null ? _primaryNavy : Colors.blueGrey.shade400,
+                        ),
+                        if (_selectedDate != null) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            DateFormat('dd MMM', 'id_ID').format(_selectedDate!),
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontSm,
+                              fontWeight: FontWeight.w700,
+                              color: _primaryNavy,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    setState(() {
+                      _sortAscending = !_sortAscending;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      border: Border.all(color: Colors.grey.shade200),
+                      color: Colors.grey.shade50,
+                    ),
+                    child: AnimatedRotation(
+                      turns: _sortAscending ? 0.5 : 0.0,
+                      duration: const Duration(milliseconds: 300),
+                      child: const Icon(
+                        Icons.swap_vert_rounded,
+                        size: 16,
+                        color: _primaryNavy,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildEmptyState() {
+    final isSearching = _searchQuery.isNotEmpty;
+    final isFiltered = _selectedCategory != 'Semua Kategori' || _selectedDate != null;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.xxxl),
@@ -521,312 +392,297 @@ class _GadikAssignmentMonitoringScreenState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 88,
-              height: 88,
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: _primaryNavy.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.search_off_rounded,
-                size: AppDimensions.iconDisplay,
-                color: Colors.grey.shade300,
+              child: Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Icon(
+                    isSearching ? Icons.search_off_rounded : Icons.assignment_outlined,
+                    size: 32,
+                    color: _primaryNavy,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: AppDimensions.xl),
+            const SizedBox(height: AppDimensions.xxl),
             Text(
-              'Tidak Ditemukan',
-              style: TextStyle(
+              isSearching ? 'Tidak Ditemukan' : 'Belum Ada Tugas',
+              style: const TextStyle(
                 fontSize: AppDimensions.fontXxl,
                 fontWeight: FontWeight.w800,
-                color: Colors.grey.shade500,
+                color: _primaryNavy,
+                letterSpacing: -0.5,
               ),
             ),
             const SizedBox(height: AppDimensions.sm),
             Text(
-              'Tidak ada tugas yang sesuai dengan pencarian atau filter Anda.',
+              isSearching
+                  ? 'Tidak ada tugas yang cocok dengan kata kunci "$_searchQuery".'
+                  : isFiltered
+                      ? 'Tidak ada tugas yang sesuai dengan filter.'
+                      : 'Mulai dengan menekan tombol "Buat Tugas" di bawah.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: AppDimensions.fontLg,
-                color: Colors.grey.shade400,
+                color: Colors.blueGrey.shade400,
+                fontWeight: FontWeight.w500,
                 height: 1.5,
               ),
             ),
+            if (isSearching || isFiltered) ...[
+              const SizedBox(height: AppDimensions.xl),
+              ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _searchQuery = '';
+                    _searchController.clear();
+                    _selectedCategory = 'Semua Kategori';
+                    _selectedDate = null;
+                  });
+                },
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Reset Filter'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _primaryNavy,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  ),
+                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTaskCard(
-    GadikAssignmentModel task,
-    String shortCat,
-    int submittedCount,
-    int totalTarget,
-    int gradedCount,
-  ) {
-    // Determine Status Logic for the Left-side Icon
-    IconData statusIcon;
-    Color statusColor;
-    String statusTooltip;
+  Widget _buildTaskList(List<GadikAssignmentModel> tasks) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(AppDimensions.xl, AppDimensions.lg, AppDimensions.xl, 100),
+          itemCount: tasks.length,
+          separatorBuilder: (context, index) =>
+              const SizedBox(height: AppDimensions.lg),
+          itemBuilder: (context, index) {
+            return _buildTaskCard(tasks[index]);
+          },
+        ),
+      ),
+    );
+  }
 
-    if (submittedCount == 0) {
+  Widget _buildTaskCard(GadikAssignmentModel task) {
+    final int totalTarget = _getTotalSerdik(task.targetPokjar);
+    final int submitted = _getSubmittedCount(task.id);
+    final int graded = _getGradedCount(task.id);
+    
+    final bool allGraded = submitted > 0 && graded == submitted;
+    final bool hasSubmissions = submitted > 0;
+    
+    Color statusColor = Colors.grey.shade400;
+    Color statusBgColor = Colors.grey.shade100;
+    IconData statusIcon = Icons.assignment_outlined;
+
+    if (allGraded) {
+      statusColor = const Color(0xFF10B981); // Emerald 500
+      statusBgColor = const Color(0xFF10B981).withValues(alpha: 0.1);
+      statusIcon = Icons.check_circle_rounded;
+    } else if (hasSubmissions) {
+      statusColor = const Color(0xFFF59E0B); // Amber 500
+      statusBgColor = const Color(0xFFF59E0B).withValues(alpha: 0.1);
       statusIcon = Icons.pending_actions_rounded;
-      statusColor = Colors.blueGrey;
-      statusTooltip = "Tugas Sedang Berlangsung";
-    } else if (gradedCount < totalTarget) {
-      statusIcon = Icons.drive_file_rename_outline_rounded;
-      statusColor = Colors.blue.shade700;
-      statusTooltip = "Sudah & Sedang Dinilai";
-    } else {
-      statusIcon = Icons.verified_rounded;
-      statusColor = Colors.green.shade700;
-      statusTooltip = "Sudah Dinilai Semua & Submit Kabag Bindik";
     }
+
+    String shortCat = _getDynamicCategoryName(task.jenisTugas);
+    final progressPct = totalTarget > 0 ? (submitted / totalTarget) : 0.0;
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+        border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.01),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-          onTap: () {
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
+          onTap: () async {
             HapticFeedback.selectionClick();
-            Navigator.push(
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => GadikAssignmentDetailScreen(assignment: task),
+                builder: (context) => GadikAssignmentDetailScreen(assignment: task),
               ),
             );
+            if (!context.mounted) return;
+            if (result == 'deleted') {
+              setState(() {
+                GadikAssignmentMockData.assignments.removeWhere((a) => a.id == task.id);
+              });
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: const Text('Tugas berhasil dihapus.', style: TextStyle(fontWeight: FontWeight.w700)),
+                  backgroundColor: const Color(0xFFEF4444), // Red 500
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
+                ),
+              );
+            } else {
+              setState(() {});
+            }
           },
           child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.lg),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            padding: const EdgeInsets.all(AppDimensions.xl),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // The Full Centered Status Icon
-                Tooltip(
-                  message: statusTooltip,
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 14),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: statusColor.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(statusIcon, color: Colors.white, size: 24),
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.judul,
-                        style: const TextStyle(
-                          fontSize: AppDimensions.fontLg,
-                          fontWeight: FontWeight.w800,
-                          color: _primaryNavy,
-                          height: 1.3,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppDimensions.sm),
-                      Wrap(
-                        spacing: AppDimensions.sm,
-                        runSpacing: AppDimensions.sm,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _primaryNavy,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                            ),
-                            child: Text(
-                              shortCat,
-                              style: const TextStyle(
-                                fontSize: AppDimensions.fontXs + 1,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _primaryNavy,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                            ),
-                            child: Text(
-                              task.targetPokjar.toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: AppDimensions.fontXs + 1,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppDimensions.md),
-                      Row(
-                        children: [
-                          Icon(
-                            AppIcons.clock,
-                            size: 14,
-                            color: Colors.red.shade600,
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              _formatDeadline(task.deadline),
-                              style: TextStyle(
-                                fontSize: AppDimensions.fontSm,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.red.shade600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: AppDimensions.md),
-                // Right side: DINILAI and SUBMIT counts
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      margin: const EdgeInsets.only(right: AppDimensions.sm),
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
+                        color: statusBgColor,
                         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                        border: Border.all(
-                          color: Colors.blue.shade200,
-                        ),
                       ),
+                      child: Icon(statusIcon, color: statusColor, size: 24),
+                    ),
+                    const SizedBox(width: AppDimensions.lg),
+                    Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'DINILAI',
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontXs,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.blue.shade800,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
                             children: [
-                              Text(
-                                gradedCount.toString(),
-                                style: TextStyle(
-                                  fontSize: AppDimensions.fontLg,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.blue.shade800,
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: _lightGrey,
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                                ),
+                                child: Text(
+                                  shortCat,
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontXs,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.blueGrey.shade600,
+                                    letterSpacing: 0.5,
+                                  ),
                                 ),
                               ),
-                              Text(
-                                '/$totalTarget',
-                                style: TextStyle(
-                                  fontSize: AppDimensions.fontXs,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.blue.shade800,
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  task.targetPokjar,
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontXs,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.blueGrey.shade400,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: AppDimensions.sm),
+                          Text(
+                            task.judul,
+                            style: const TextStyle(
+                              fontSize: AppDimensions.fontLg,
+                              fontWeight: FontWeight.w800,
+                              color: _primaryNavy,
+                              height: 1.3,
+                              letterSpacing: -0.3,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: AppDimensions.xl),
+                Row(
+                  children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                        border: Border.all(
-                          color: Colors.orange.shade200,
-                        ),
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                      child: Row(
                         children: [
+                          Icon(Icons.timer_outlined, size: 16, color: Colors.blueGrey.shade600),
+                          const SizedBox(width: 6),
                           Text(
-                            'SUBMIT',
+                            DateFormat('dd MMM yy, HH:mm', 'id_ID').format(task.deadline),
                             style: TextStyle(
-                              fontSize: AppDimensions.fontXs,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.orange.shade800,
-                              letterSpacing: 0.5,
+                              fontSize: AppDimensions.fontSm,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.blueGrey.shade700,
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(
-                                submittedCount.toString(),
-                                style: TextStyle(
-                                  fontSize: AppDimensions.fontLg,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.orange.shade800,
-                                ),
-                              ),
-                              Text(
-                                '/$totalTarget',
-                                style: TextStyle(
-                                  fontSize: AppDimensions.fontXs,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.orange.shade800,
-                                ),
-                              ),
-                            ],
                           ),
                         ],
                       ),
+                    ),
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$submitted / $totalTarget Dikumpul',
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w800,
+                            color: _primaryNavy,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        SizedBox(
+                          width: 100,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: LinearProgressIndicator(
+                              value: progressPct,
+                              backgroundColor: Colors.grey.shade200,
+                              valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                              minHeight: 4,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -9,6 +9,8 @@ class GadikAssignmentModel {
   final String status; // Belum Mulai, Sedang Mulai, Selesai
   final String createdBy;
   final DateTime createdAt;
+  final String? fileName;
+  final String? fileUrl;
 
   const GadikAssignmentModel({
     required this.id,
@@ -21,5 +23,7 @@ class GadikAssignmentModel {
     required this.status,
     required this.createdBy,
     required this.createdAt,
+    this.fileName,
+    this.fileUrl,
   });
 }

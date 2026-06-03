@@ -47,7 +47,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                   );
                 }).toList(),
               ),
-              bottomNavigationBar: Container(
+              bottomNavigationBar: navItems.length < 2 ? null : Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [

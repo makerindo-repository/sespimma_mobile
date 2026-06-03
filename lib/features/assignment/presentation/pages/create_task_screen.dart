@@ -51,9 +51,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
   String? _attachedFileName;
   bool _isAttaching = false;
 
-  static const Color _primaryNavy = Color(0xFF001C40);
-  static const Color _lightGrey = Color(0xFFF8F9FA);
-  static const Color _successGreen = Color(0xFF2E7D32);
+  // Pro Max Premium Color Palette
+  static const Color _primaryNavy = Color(0xFF0F172A); // Slate 900
+  static const Color _lightGrey = Color(0xFFF8FAFC); // Slate 50
+  static const Color _successGreen = Color(0xFF10B981); // Emerald 500
+  static const Color _surfaceColor = Colors.white;
 
   final List<String> _pokjarList = [
     'Semua POKJAR',
@@ -286,6 +288,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
             color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: AppDimensions.fontXxl,
+            letterSpacing: -0.5,
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -311,12 +314,13 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
                           const Text(
                             'Informasi Tugas',
                             style: TextStyle(
-                              fontSize: AppDimensions.fontXl,
+                              fontSize: AppDimensions.fontXxl,
                               fontWeight: FontWeight.w800,
                               color: _primaryNavy,
+                              letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.xl),
 
                           _buildTextField(
                             controller: _judulController,
@@ -324,26 +328,26 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
                             hint: 'Masukkan judul tugas...',
                             icon: Icons.title_rounded,
                           ),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.xl),
 
                           _buildSubjectDropdownField(),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.xl),
 
                           if (_selectedSubject ==
                               'NKP (Naskah Karya Perseorangan)') ...[
                             _buildKompetensiDropdownField(),
-                            const SizedBox(height: AppDimensions.md),
+                            const SizedBox(height: AppDimensions.xl),
                           ] else if (_selectedSubject ==
                               'Mental Kepribadian') ...[
                             _buildMentalDropdownField(),
-                            const SizedBox(height: AppDimensions.md),
+                            const SizedBox(height: AppDimensions.xl),
                           ],
 
                           _buildDropdownField(),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.xl),
 
                           _buildDeadlineField(),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.xl),
 
                           _buildTextField(
                             controller: _deskripsiController,
@@ -352,10 +356,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
                             icon: Icons.description_outlined,
                             maxLines: 5,
                           ),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.xl),
 
                           _buildAttachmentField(),
-                          const SizedBox(height: AppDimensions.lg),
+                          const SizedBox(height: AppDimensions.xl * 2),
                         ],
                       ),
                     ),
@@ -392,75 +396,68 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         Text(
           label,
           style: const TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        const SizedBox(height: AppDimensions.md),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '$label wajib diisi';
+            }
+            return null;
+          },
+          style: const TextStyle(
+            fontSize: AppDimensions.fontLg,
+            fontWeight: FontWeight.w600,
+            color: _primaryNavy,
           ),
-          child: TextFormField(
-            controller: controller,
-            maxLines: maxLines,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return '$label wajib diisi';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: Colors.blueGrey.shade300,
-                fontSize: AppDimensions.fontLg,
-              ),
-              prefixIcon: maxLines == 1
-                  ? Icon(
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: Colors.blueGrey.shade400,
+              fontSize: AppDimensions.fontLg,
+              fontWeight: FontWeight.normal,
+            ),
+            prefixIcon: maxLines == 1
+                ? Icon(
+                    icon,
+                    color: Colors.blueGrey.shade400,
+                    size: AppDimensions.iconLg,
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    child: Icon(
                       icon,
                       color: Colors.blueGrey.shade400,
-                      size: AppDimensions.iconDefault,
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      child: Icon(
-                        icon,
-                        color: Colors.blueGrey.shade400,
-                        size: AppDimensions.iconDefault,
-                      ),
+                      size: AppDimensions.iconLg,
                     ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.red.shade300),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+                  ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: const BorderSide(color: _primaryNavy, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.red.shade400),
+            ),
+            filled: true,
+            fillColor: _surfaceColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 18,
             ),
           ),
         ),
@@ -475,87 +472,74 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         const Text(
           'Mata Pelajaran',
           style: TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        const SizedBox(height: AppDimensions.md),
+        DropdownButtonFormField<String>(
+          initialValue: _selectedSubject,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.blueGrey.shade400,
           ),
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedSubject,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.menu_book_rounded,
               color: Colors.blueGrey.shade400,
+              size: AppDimensions.iconLg,
             ),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.menu_book_rounded,
-                color: Colors.blueGrey.shade400,
-                size: AppDimensions.iconDefault,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            hint: Text(
-              'Pilih mata pelajaran',
-              style: TextStyle(
-                color: Colors.blueGrey.shade300,
-                fontSize: AppDimensions.fontLg,
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            items: _subjectList.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w600,
-                    color: _primaryNavy,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _selectedSubject = newValue;
-                if (_selectedSubject != 'NKP (Naskah Karya Perseorangan)') {
-                  _selectedKompetensi = null;
-                }
-                if (_selectedSubject != 'Mental Kepribadian') {
-                  _selectedMental = null;
-                }
-              });
-            },
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: const BorderSide(color: _primaryNavy, width: 2),
+            ),
+            filled: true,
+            fillColor: _surfaceColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 18,
+            ),
           ),
+          hint: Text(
+            'Pilih mata pelajaran',
+            style: TextStyle(
+              color: Colors.blueGrey.shade400,
+              fontSize: AppDimensions.fontLg,
+            ),
+          ),
+          items: _subjectList.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryNavy,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _selectedSubject = newValue;
+              if (_selectedSubject != 'NKP (Naskah Karya Perseorangan)') {
+                _selectedKompetensi = null;
+              }
+              if (_selectedSubject != 'Mental Kepribadian') {
+                _selectedMental = null;
+              }
+            });
+          },
         ),
       ],
     );
@@ -568,83 +552,70 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         const Text(
           'Kompetensi Inti Kepemimpinan (NKP)',
           style: TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        const SizedBox(height: AppDimensions.md),
+        DropdownButtonFormField<String>(
+          isExpanded: true,
+          initialValue: _selectedKompetensi,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.blueGrey.shade400,
           ),
-          child: DropdownButtonFormField<String>(
-            isExpanded: true,
-            initialValue: _selectedKompetensi,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.psychology_rounded,
               color: Colors.blueGrey.shade400,
+              size: AppDimensions.iconLg,
             ),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.psychology_rounded,
-                color: Colors.blueGrey.shade400,
-                size: AppDimensions.iconDefault,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            hint: Text(
-              'Pilih 10 kompetensi inti',
-              style: TextStyle(
-                color: Colors.blueGrey.shade300,
-                fontSize: AppDimensions.fontLg,
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            items: _kompetensiList.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w600,
-                    color: _primaryNavy,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _selectedKompetensi = newValue;
-              });
-            },
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: const BorderSide(color: _primaryNavy, width: 2),
+            ),
+            filled: true,
+            fillColor: _surfaceColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 18,
+            ),
           ),
+          hint: Text(
+            'Pilih 10 kompetensi inti',
+            style: TextStyle(
+              color: Colors.blueGrey.shade400,
+              fontSize: AppDimensions.fontLg,
+            ),
+          ),
+          items: _kompetensiList.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryNavy,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _selectedKompetensi = newValue;
+            });
+          },
         ),
       ],
     );
@@ -657,83 +628,70 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         const Text(
           'Aspek Penilaian Mental Kepribadian',
           style: TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        const SizedBox(height: AppDimensions.md),
+        DropdownButtonFormField<String>(
+          isExpanded: true,
+          initialValue: _selectedMental,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.blueGrey.shade400,
           ),
-          child: DropdownButtonFormField<String>(
-            isExpanded: true,
-            initialValue: _selectedMental,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.psychology_alt_rounded,
               color: Colors.blueGrey.shade400,
+              size: AppDimensions.iconLg,
             ),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.psychology_alt_rounded,
-                color: Colors.blueGrey.shade400,
-                size: AppDimensions.iconDefault,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            hint: Text(
-              'Pilih Aspek Penilaian Mental',
-              style: TextStyle(
-                color: Colors.blueGrey.shade300,
-                fontSize: AppDimensions.fontLg,
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            items: _mentalList.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w600,
-                    color: _primaryNavy,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _selectedMental = newValue;
-              });
-            },
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: const BorderSide(color: _primaryNavy, width: 2),
+            ),
+            filled: true,
+            fillColor: _surfaceColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 18,
+            ),
           ),
+          hint: Text(
+            'Pilih Aspek Penilaian Mental',
+            style: TextStyle(
+              color: Colors.blueGrey.shade400,
+              fontSize: AppDimensions.fontLg,
+            ),
+          ),
+          items: _mentalList.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryNavy,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _selectedMental = newValue;
+            });
+          },
         ),
       ],
     );
@@ -746,81 +704,68 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         const Text(
           'Target Distribusi (POKJAR)',
           style: TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        const SizedBox(height: AppDimensions.md),
+        DropdownButtonFormField<String>(
+          initialValue: _selectedPokjar,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.blueGrey.shade400,
           ),
-          child: DropdownButtonFormField<String>(
-            initialValue: _selectedPokjar,
-            icon: Icon(
-              Icons.keyboard_arrow_down_rounded,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.groups_rounded,
               color: Colors.blueGrey.shade400,
+              size: AppDimensions.iconLg,
             ),
-            decoration: InputDecoration(
-              prefixIcon: Icon(
-                Icons.groups_rounded,
-                color: Colors.blueGrey.shade400,
-                size: AppDimensions.iconDefault,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: BorderSide(color: Colors.grey.shade200),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            hint: Text(
-              'Pilih kelompok belajar sasaran',
-              style: TextStyle(
-                color: Colors.blueGrey.shade300,
-                fontSize: AppDimensions.fontLg,
-              ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
-            items: _pokjarList.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w600,
-                    color: _primaryNavy,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _selectedPokjar = newValue;
-              });
-            },
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+              borderSide: const BorderSide(color: _primaryNavy, width: 2),
+            ),
+            filled: true,
+            fillColor: _surfaceColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 18,
+            ),
           ),
+          hint: Text(
+            'Pilih kelompok belajar sasaran',
+            style: TextStyle(
+              color: Colors.blueGrey.shade400,
+              fontSize: AppDimensions.fontLg,
+            ),
+          ),
+          items: _pokjarList.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryNavy,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _selectedPokjar = newValue;
+            });
+          },
         ),
       ],
     );
@@ -837,73 +782,63 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         const Text(
           'Tenggat Waktu',
           style: TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
-            border: Border.all(
-              color: _selectedDeadline != null
-                  ? _primaryNavy
-                  : Colors.grey.shade200,
-              width: _selectedDeadline != null ? 1.5 : 1.0,
-            ),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-              onTap: _selectDeadline,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
+        const SizedBox(height: AppDimensions.md),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+            onTap: _selectDeadline,
+            child: Ink(
+              decoration: BoxDecoration(
+                color: _surfaceColor,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                border: Border.all(
+                  color: _selectedDeadline != null
+                      ? _primaryNavy
+                      : Colors.grey.shade300,
+                  width: _selectedDeadline != null ? 2.0 : 1.0,
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_month_rounded,
-                      color: _selectedDeadline != null
-                          ? _primaryNavy
-                          : Colors.blueGrey.shade400,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 18,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    color: _selectedDeadline != null
+                        ? _primaryNavy
+                        : Colors.blueGrey.shade400,
+                    size: AppDimensions.iconLg,
+                  ),
+                  const SizedBox(width: AppDimensions.md),
+                  Expanded(
+                    child: Text(
+                      displayDate,
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontLg,
+                        fontWeight: _selectedDeadline != null
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: _selectedDeadline != null
+                            ? _primaryNavy
+                            : Colors.blueGrey.shade400,
+                      ),
+                    ),
+                  ),
+                  if (_selectedDeadline != null)
+                    const Icon(
+                      Icons.check_circle_rounded,
+                      color: _successGreen,
                       size: AppDimensions.iconDefault,
                     ),
-                    const SizedBox(width: AppDimensions.md - 4),
-                    Expanded(
-                      child: Text(
-                        displayDate,
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontLg,
-                          fontWeight: _selectedDeadline != null
-                              ? FontWeight.w700
-                              : FontWeight.normal,
-                          color: _selectedDeadline != null
-                              ? _primaryNavy
-                              : Colors.blueGrey.shade300,
-                        ),
-                      ),
-                    ),
-                    if (_selectedDeadline != null)
-                      const Icon(
-                        Icons.check_circle_rounded,
-                        color: _successGreen,
-                        size: AppDimensions.iconDefault,
-                      ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
@@ -914,34 +849,35 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
 
   Widget _buildBottomActionButton() {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.lg),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _surfaceColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
       child: SafeArea(
         child: SizedBox(
           width: double.infinity,
+          height: 56,
           child: ElevatedButton.icon(
             onPressed: _publishTask,
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryNavy,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               ),
-              elevation: 2,
+              elevation: 4,
+              shadowColor: _primaryNavy.withValues(alpha: 0.4),
             ),
             icon: const Icon(
               Icons.send_rounded,
-              size: AppDimensions.iconDefault,
+              size: AppDimensions.iconLg,
             ),
             label: const Text(
               'PUBLIKASIKAN TUGAS',
@@ -964,98 +900,102 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
         const Text(
           'Lampiran',
           style: TextStyle(
-            fontSize: AppDimensions.fontDefault,
+            fontSize: AppDimensions.fontLg,
             fontWeight: FontWeight.w700,
             color: _primaryNavy,
           ),
         ),
-        const SizedBox(height: AppDimensions.sm),
-        InkWell(
-          onTap: _isAttaching ? null : _pickFile,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-          child: Container(
-            padding: const EdgeInsets.all(AppDimensions.md),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-              border: Border.all(
-                color: _attachedFileName != null
-                    ? _primaryNavy.withValues(alpha: 0.5)
-                    : Colors.grey.shade300,
-                width: _attachedFileName != null ? 1.5 : 1.0,
+        const SizedBox(height: AppDimensions.md),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _isAttaching ? null : _pickFile,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+            child: Ink(
+              padding: const EdgeInsets.all(AppDimensions.md),
+              decoration: BoxDecoration(
+                color: _surfaceColor,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                border: Border.all(
+                  color: _attachedFileName != null
+                      ? _primaryNavy
+                      : Colors.grey.shade300,
+                  width: _attachedFileName != null ? 2.0 : 1.0,
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.sm + 2),
-                  decoration: BoxDecoration(
-                    color: _attachedFileName != null
-                        ? _primaryNavy.withValues(alpha: 0.1)
-                        : _lightGrey,
-                    shape: BoxShape.circle,
-                  ),
-                  child: _isAttaching
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: _primaryNavy,
-                          ),
-                        )
-                      : Icon(
-                          _attachedFileName != null
-                              ? Icons.description_rounded
-                              : Icons.attach_file_rounded,
-                          color: _attachedFileName != null
-                              ? _primaryNavy
-                              : Colors.blueGrey.shade400,
-                          size: AppDimensions.iconDefault,
-                        ),
-                ),
-                const SizedBox(width: AppDimensions.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _attachedFileName ?? 'Pilih file lampiran tugas',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontLg,
-                          fontWeight: _attachedFileName != null
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                          color: _attachedFileName != null
-                              ? _primaryNavy
-                              : Colors.blueGrey.shade400,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (_attachedFileName == null)
-                        Text(
-                          'Format: PDF, DOC, PPT',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontMd,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                if (_attachedFileName != null)
-                  IconButton(
-                    onPressed: () => setState(() => _attachedFileName = null),
-                    icon: Icon(
-                      Icons.close_rounded,
-                      color: Colors.red.shade400,
-                      size: AppDimensions.iconDefault,
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppDimensions.sm + 4),
+                    decoration: BoxDecoration(
+                      color: _attachedFileName != null
+                          ? _primaryNavy.withValues(alpha: 0.1)
+                          : Colors.blueGrey.shade50,
+                      shape: BoxShape.circle,
                     ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                    child: _isAttaching
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: _primaryNavy,
+                            ),
+                          )
+                        : Icon(
+                            _attachedFileName != null
+                                ? Icons.description_rounded
+                                : Icons.attach_file_rounded,
+                            color: _attachedFileName != null
+                                ? _primaryNavy
+                                : Colors.blueGrey.shade400,
+                            size: AppDimensions.iconLg,
+                          ),
                   ),
-              ],
+                  const SizedBox(width: AppDimensions.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _attachedFileName ?? 'Pilih file lampiran tugas',
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontLg,
+                            fontWeight: _attachedFileName != null
+                                ? FontWeight.w700
+                                : FontWeight.w600,
+                            color: _attachedFileName != null
+                                ? _primaryNavy
+                                : Colors.blueGrey.shade400,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if (_attachedFileName == null)
+                          Text(
+                            'Format: PDF, DOC, PPT',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontMd,
+                              color: Colors.blueGrey.shade300,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (_attachedFileName != null)
+                    IconButton(
+                      onPressed: () => setState(() => _attachedFileName = null),
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: Colors.red.shade400,
+                        size: AppDimensions.iconLg,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

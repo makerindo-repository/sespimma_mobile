@@ -3,12 +3,15 @@ class GadikSubmissionModel {
   final String assignmentId;
   final String serdikName;
   final String serdikNrp;
+  final String? serdikPangkat;
+  final String? serdikNosis;
   final DateTime? submittedAt;
   final String? fileUrl;
   final String? fileName;
   
   // Grading status
   final bool isGraded;
+  final bool? isRemedial;
   final double? nilaiAkhir;
   final String? catatanPengajar;
   
@@ -31,10 +34,13 @@ class GadikSubmissionModel {
     required this.assignmentId,
     required this.serdikName,
     required this.serdikNrp,
+    this.serdikPangkat,
+    this.serdikNosis,
     this.submittedAt,
     this.fileUrl,
     this.fileName,
     this.isGraded = false,
+    this.isRemedial = false,
     this.nilaiAkhir,
     this.catatanPengajar,
     this.scoreMateri,

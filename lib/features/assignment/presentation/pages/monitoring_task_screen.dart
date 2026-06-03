@@ -2,6 +2,8 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
@@ -44,11 +46,13 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     super.dispose();
   }
 
-  static const Color _primaryNavy = Color(0xFF001C40);
-  static const Color _lightGrey = Color(0xFFF8F9FA);
-  static const Color _successGreen = Color(0xFF2E7D32);
-  static const Color _dangerRed = Color(0xFFD32F2F);
-  static const Color _warningOrange = Color(0xFFF57C00);
+  // Pro Max Premium Color Palette
+  static const Color _primaryNavy = Color(0xFF0F172A); // Slate 900
+  static const Color _lightGrey = Color(0xFFF8FAFC); // Slate 50
+  static const Color _successGreen = Color(0xFF10B981); // Emerald 500
+  static const Color _dangerRed = Color(0xFFEF4444); // Red 500
+  static const Color _warningOrange = Color(0xFFF59E0B); // Amber 500
+  static const Color _surfaceColor = Colors.white;
 
   List<Map<String, dynamic>> _getSubmissionsForTask(String taskId) {
     return PimpinanMockData.getSubmissionsForTask(taskId);
@@ -64,15 +68,16 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent, // We wrap with our own Container
       builder: (context) {
-        return Padding(
+        return Container(
+          decoration: const BoxDecoration(
+            color: _surfaceColor,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+          ),
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 24,
+            top: 12,
             left: 24,
             right: 24,
           ),
@@ -82,6 +87,17 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Container(
+                    width: 48,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.xl),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -91,30 +107,42 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                         fontSize: AppDimensions.fontXxl,
                         fontWeight: FontWeight.w800,
                         color: _primaryNavy,
+                        letterSpacing: -0.5,
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.blueGrey,
+                        size: AppDimensions.iconLg,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppDimensions.md),
                 Container(
-                  padding: const EdgeInsets.all(AppDimensions.md),
+                  padding: const EdgeInsets.all(AppDimensions.lg),
                   decoration: BoxDecoration(
-                    color: Colors.blueGrey.shade50,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                    border: Border.all(color: Colors.blueGrey.shade100),
+                    color: _lightGrey,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                    border: Border.all(color: Colors.grey.shade200),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.picture_as_pdf_rounded,
-                        color: _dangerRed,
-                        size: AppDimensions.iconXxl,
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: _dangerRed.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.picture_as_pdf_rounded,
+                          color: _dangerRed,
+                          size: AppDimensions.iconXl,
+                        ),
                       ),
-                      const SizedBox(width: AppDimensions.md - 4),
+                      const SizedBox(width: AppDimensions.md),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,7 +150,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                             Text(
                               submission['file'] ?? 'Tidak ada file',
                               style: const TextStyle(
-                                fontSize: AppDimensions.fontDefault,
+                                fontSize: AppDimensions.fontLg,
                                 fontWeight: FontWeight.w700,
                                 color: _primaryNavy,
                               ),
@@ -133,15 +161,14 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                             Text(
                               'Diserahkan: ${submission['time']}',
                               style: TextStyle(
-                                fontSize: AppDimensions.fontSm + 1,
+                                fontSize: AppDimensions.fontMd,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.blueGrey.shade600,
+                                color: Colors.blueGrey.shade500,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: AppDimensions.sm),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -149,265 +176,21 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                             icon: const Icon(
                               Icons.visibility_rounded,
                               color: _primaryNavy,
-                              size: AppDimensions.iconDefault,
+                              size: AppDimensions.iconLg,
                             ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
                             onPressed: () {
                               final filename =
                                   submission['file'] ?? 'document.pdf';
-                              showDialog(
-                                context: context,
-                                builder: (ctx) => Dialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.radiusLg,
-                                    ),
-                                  ),
-                                  insetPadding: const EdgeInsets.all(
-                                    AppDimensions.xl - 4,
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Container(
-                                    width: double.infinity,
-                                    height:
-                                        MediaQuery.of(context).size.height *
-                                        0.6,
-                                    color: Colors.grey.shade100,
-                                    child: Column(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 12,
-                                          ),
-                                          color: _primaryNavy,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  'Pratinjau: $filename',
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: AppDimensions
-                                                        .fontDefault,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                padding: EdgeInsets.zero,
-                                                constraints:
-                                                    const BoxConstraints(),
-                                                icon: const Icon(
-                                                  Icons.close_rounded,
-                                                  color: Colors.white,
-                                                  size:
-                                                      AppDimensions.iconDefault,
-                                                ),
-                                                onPressed: () =>
-                                                    Navigator.pop(ctx),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Center(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Icon(
-                                                  Icons.description_rounded,
-                                                  size:
-                                                      AppDimensions.iconDisplay,
-                                                  color: Colors.blueGrey,
-                                                ),
-                                                const SizedBox(
-                                                  height: AppDimensions.md,
-                                                ),
-                                                Text(
-                                                  'Simulasi Pratinjau Dokumen\n($filename)',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors
-                                                        .blueGrey
-                                                        .shade600,
-                                                    fontSize:
-                                                        AppDimensions.fontLg,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
+                              _showPreviewDialog(filename);
                             },
                           ),
-                          const SizedBox(width: AppDimensions.sm),
                           IconButton(
                             icon: const Icon(
                               Icons.file_download_outlined,
                               color: _primaryNavy,
-                              size: AppDimensions.iconDefault,
+                              size: AppDimensions.iconLg,
                             ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                            onPressed: () async {
-                              final filename =
-                                  submission['file'] ?? 'document.pdf';
-                              final scaffoldMsg = ScaffoldMessenger.of(context);
-                              final navigator = Navigator.of(context);
-
-                              final String? selectedFolder =
-                                  await showDialog<String>(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      surfaceTintColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          AppDimensions.radiusLg,
-                                        ),
-                                      ),
-                                      title: const Text(
-                                        'Pilih Lokasi Penyimpanan',
-                                        style: TextStyle(
-                                          fontSize: AppDimensions.fontXl,
-                                          fontWeight: FontWeight.w700,
-                                          color: _primaryNavy,
-                                        ),
-                                      ),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          ListTile(
-                                            leading: const Icon(
-                                              Icons.folder_shared,
-                                              color: _primaryNavy,
-                                            ),
-                                            title: const Text(
-                                              'Internal Storage / SESPIMMA',
-                                              style: TextStyle(
-                                                fontSize: AppDimensions.fontLg,
-                                                fontWeight: FontWeight.w600,
-                                                color: _primaryNavy,
-                                              ),
-                                            ),
-                                            onTap: () => Navigator.pop(
-                                              ctx,
-                                              '/storage/emulated/0/SESPIMMA',
-                                            ),
-                                          ),
-                                          ListTile(
-                                            leading: const Icon(
-                                              Icons.download_rounded,
-                                              color: _primaryNavy,
-                                            ),
-                                            title: const Text(
-                                              'Internal Storage / Download',
-                                              style: TextStyle(
-                                                fontSize: AppDimensions.fontLg,
-                                                fontWeight: FontWeight.w600,
-                                                color: _primaryNavy,
-                                              ),
-                                            ),
-                                            onTap: () => Navigator.pop(
-                                              ctx,
-                                              '/storage/emulated/0/Download',
-                                            ),
-                                          ),
-                                          ListTile(
-                                            leading: const Icon(
-                                              Icons.sd_storage_rounded,
-                                              color: _primaryNavy,
-                                            ),
-                                            title: const Text(
-                                              'SD Card / Documents',
-                                              style: TextStyle(
-                                                fontSize: AppDimensions.fontLg,
-                                                fontWeight: FontWeight.w600,
-                                                color: _primaryNavy,
-                                              ),
-                                            ),
-                                            onTap: () => Navigator.pop(
-                                              ctx,
-                                              '/storage/extSdCard/Documents',
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-
-                              if (selectedFolder == null) return;
-                              if (!context.mounted) return;
-
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (ctx) => AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  surfaceTintColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.radiusLg,
-                                    ),
-                                  ),
-                                  content: Row(
-                                    children: [
-                                      const CircularProgressIndicator(
-                                        color: _primaryNavy,
-                                      ),
-                                      const SizedBox(width: AppDimensions.xl),
-                                      Expanded(
-                                        child: Text('Mengunduh $filename...'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-
-                              await Future.delayed(const Duration(seconds: 2));
-
-                              if (!context.mounted) return;
-                              navigator.pop();
-                              scaffoldMsg.showSnackBar(
-                                SnackBar(
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        '✅ Unduhan Selesai',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Tersimpan di: $selectedFolder/$filename',
-                                        style: const TextStyle(
-                                          fontSize: AppDimensions.fontMd,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  backgroundColor: _successGreen,
-                                  behavior: SnackBarBehavior.floating,
-                                  duration: const Duration(seconds: 4),
-                                ),
-                              );
-                            },
+                            onPressed: () => _downloadFile(submission['file'] ?? 'document.pdf'),
                           ),
                         ],
                       ),
@@ -418,7 +201,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                 const Text(
                   'Beri Nilai (0 - 100)',
                   style: TextStyle(
-                    fontSize: AppDimensions.fontDefault,
+                    fontSize: AppDimensions.fontLg,
                     fontWeight: FontWeight.w700,
                     color: _primaryNavy,
                   ),
@@ -430,8 +213,8 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                     decimal: true,
                   ),
                   style: const TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w600,
+                    fontSize: AppDimensions.fontXl,
+                    fontWeight: FontWeight.w800,
                     color: _primaryNavy,
                   ),
                   validator: (value) {
@@ -451,42 +234,49 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                     hintText: 'Contoh: 85.5',
                     hintStyle: TextStyle(
                       color: Colors.blueGrey.shade300,
-                      fontSize: AppDimensions.fontDefault,
+                      fontSize: AppDimensions.fontXl,
+                      fontWeight: FontWeight.w600,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
+                        AppDimensions.radiusLg,
+                      ),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
                       ),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
+                        AppDimensions.radiusLg,
                       ),
                       borderSide: const BorderSide(
                         color: _primaryNavy,
-                        width: 1.5,
+                        width: 2.0,
                       ),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
+                        AppDimensions.radiusLg,
                       ),
-                      borderSide: BorderSide(color: Colors.red.shade300),
+                      borderSide: BorderSide(color: Colors.red.shade400),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
+                      horizontal: 20,
+                      vertical: 18,
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: _surfaceColor,
                   ),
                 ),
-                const SizedBox(height: AppDimensions.md),
+                const SizedBox(height: AppDimensions.xl),
                 const Text(
                   'Catatan Pengajar (Opsional)',
                   style: TextStyle(
-                    fontSize: AppDimensions.fontDefault,
+                    fontSize: AppDimensions.fontLg,
                     fontWeight: FontWeight.w700,
                     color: _primaryNavy,
                   ),
@@ -503,32 +293,40 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                   decoration: InputDecoration(
                     hintText: 'Berikan masukan atau evaluasi untuk Serdik...',
                     hintStyle: TextStyle(
-                      color: Colors.blueGrey.shade300,
-                      fontSize: AppDimensions.fontDefault,
+                      color: Colors.blueGrey.shade400,
+                      fontSize: AppDimensions.fontLg,
+                      fontWeight: FontWeight.normal,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
+                        AppDimensions.radiusLg,
+                      ),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
                       ),
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
+                        AppDimensions.radiusLg,
                       ),
                       borderSide: const BorderSide(
                         color: _primaryNavy,
-                        width: 1.5,
+                        width: 2.0,
                       ),
                     ),
-                    contentPadding: const EdgeInsets.all(AppDimensions.md),
+                    contentPadding: const EdgeInsets.all(20),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: _surfaceColor,
                   ),
                 ),
-                const SizedBox(height: AppDimensions.lg),
+                const SizedBox(height: AppDimensions.xl * 1.5),
                 SizedBox(
                   width: double.infinity,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
@@ -575,12 +373,13 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryNavy,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusMd,
+                          AppDimensions.radiusLg,
                         ),
                       ),
+                      elevation: 4,
+                      shadowColor: _primaryNavy.withValues(alpha: 0.4),
                     ),
                     child: const Text(
                       'SIMPAN NILAI',
@@ -592,12 +391,170 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: AppDimensions.lg),
+                const SizedBox(height: AppDimensions.xl),
               ],
             ),
           ),
         );
       },
+    );
+  }
+
+  void _showPreviewDialog(String filename) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+            AppDimensions.radiusXl,
+          ),
+        ),
+        insetPadding: const EdgeInsets.all(AppDimensions.xl),
+        clipBehavior: Clip.antiAlias,
+        child: Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.65,
+          color: _lightGrey,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                color: _primaryNavy,
+                child: Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Pratinjau: $filename',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppDimensions.fontLg,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white,
+                        size: AppDimensions.iconLg,
+                      ),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.description_rounded,
+                          size: 80,
+                          color: _primaryNavy,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.xl),
+                      Text(
+                        'Simulasi Pratinjau Dokumen\n($filename)',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.blueGrey.shade600,
+                          fontSize: AppDimensions.fontLg,
+                          fontWeight: FontWeight.w600,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _downloadFile(String filename) async {
+    final navigator = Navigator.of(context);
+
+    final String? selectedFolder = await FilePicker.getDirectoryPath(
+      dialogTitle: 'Pilih Folder Penyimpanan',
+    );
+
+    if (selectedFolder == null) return;
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        ),
+        content: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              const CircularProgressIndicator(
+                color: _primaryNavy,
+              ),
+              const SizedBox(width: AppDimensions.xl),
+              Expanded(
+                child: Text(
+                  'Mengunduh $filename...',
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontLg,
+                    fontWeight: FontWeight.w600,
+                    color: _primaryNavy,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final file = File('$selectedFolder/$filename');
+      await file.writeAsString('Simulasi file dokumen $filename');
+      await Future.delayed(const Duration(seconds: 1));
+    } catch (e) {
+      // ignore
+    }
+
+    if (!mounted) return;
+    navigator.pop();
+    AppNotifier.showSuccess(
+      context,
+      'Selesai! Disimpan ke: .../${selectedFolder.split('/').last}/$filename',
+      duration: const Duration(seconds: 3),
     );
   }
 
@@ -607,24 +564,25 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppDimensions.lg),
+            padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
               color: Colors.blueGrey.shade50,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.person_search_rounded,
-              size: AppDimensions.iconDisplay,
+              size: 64,
               color: Colors.blueGrey.shade300,
             ),
           ),
-          const SizedBox(height: AppDimensions.lg),
+          const SizedBox(height: AppDimensions.xl),
           const Text(
             'Data Serdik Tidak Ditemukan',
             style: TextStyle(
               fontSize: AppDimensions.fontXxl,
               fontWeight: FontWeight.w800,
               color: _primaryNavy,
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: AppDimensions.sm),
@@ -721,9 +679,18 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
             color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: AppDimensions.fontXxl,
+            letterSpacing: -0.5,
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          if (task.id != 'DUMMY')
+            IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+              tooltip: 'Hapus Tugas',
+              onPressed: () => _showDeleteConfirmationDialog(context, task),
+            ),
+        ],
       ),
       body: Column(
         children: [
@@ -732,7 +699,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
           Expanded(
             child: RefreshIndicator(
               color: _primaryNavy,
-              backgroundColor: Colors.white,
+              backgroundColor: _surfaceColor,
               onRefresh: () async {
                 HapticFeedback.mediumImpact();
                 await Future.delayed(const Duration(seconds: 1));
@@ -751,7 +718,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
-                        vertical: 8,
+                        vertical: 16,
                       ),
                       itemCount: filteredSubmissions.length,
                       itemBuilder: (context, index) {
@@ -801,13 +768,13 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppDimensions.xl - 4),
+      padding: const EdgeInsets.all(AppDimensions.xl),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _surfaceColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
@@ -822,26 +789,37 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      task.mapel.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontSm + 1,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.blueGrey.shade400,
-                        letterSpacing: 1.0,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _primaryNavy.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                      ),
+                      child: Text(
+                        task.mapel.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontSm,
+                          fontWeight: FontWeight.w800,
+                          color: _primaryNavy,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: AppDimensions.sm),
+                    const SizedBox(height: AppDimensions.md),
                     Text(
                       task.judul,
                       style: const TextStyle(
-                        fontSize: AppDimensions.fontXl,
+                        fontSize: AppDimensions.fontXxl,
                         fontWeight: FontWeight.w800,
                         color: _primaryNavy,
                         height: 1.3,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: AppDimensions.sm),
+                    const SizedBox(height: AppDimensions.md),
                     Row(
                       children: [
                         const Icon(
@@ -849,11 +827,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                           size: AppDimensions.fontLg,
                           color: _warningOrange,
                         ),
-                        const SizedBox(width: AppDimensions.xs),
+                        const SizedBox(width: AppDimensions.sm),
                         Text(
                           'Batas Waktu: ${task.deadline.day.toString().padLeft(2, '0')}/${task.deadline.month.toString().padLeft(2, '0')}/${task.deadline.year} ${task.deadline.hour.toString().padLeft(2, '0')}:${task.deadline.minute.toString().padLeft(2, '0')} WIB',
                           style: const TextStyle(
-                            fontSize: AppDimensions.fontMd,
+                            fontSize: AppDimensions.fontLg,
                             fontWeight: FontWeight.w700,
                             color: _warningOrange,
                           ),
@@ -863,46 +841,26 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () => _showDeleteConfirmationDialog(context, task),
-                icon: const Icon(
-                  Icons.delete_outline_rounded,
-                  color: _dangerRed,
-                ),
-                tooltip: 'Hapus Tugas',
-                style: IconButton.styleFrom(
-                  backgroundColor: _dangerRed.withValues(alpha: 0.1),
-                  padding: const EdgeInsets.all(AppDimensions.md),
-                ),
-              ),
             ],
           ),
-          const SizedBox(height: AppDimensions.md),
+          const SizedBox(height: AppDimensions.xl),
           Container(
-            padding: const EdgeInsets.all(AppDimensions.md),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             decoration: BoxDecoration(
               color: _lightGrey,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               border: Border.all(color: Colors.grey.shade200),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStatItem(
-                  'Total',
-                  total.toString(),
-                  Colors.blueGrey.shade600,
-                ),
+                _buildStatItem('Total', total.toString(), Colors.blueGrey.shade700),
                 _buildDivider(),
                 _buildStatItem('Sudah', sudah.toString(), _successGreen),
                 _buildDivider(),
                 _buildStatItem('Belum', belum.toString(), _dangerRed),
                 _buildDivider(),
-                _buildStatItem(
-                  'Terlambat',
-                  terlambat.toString(),
-                  _warningOrange,
-                ),
+                _buildStatItem('Terlambat', terlambat.toString(), _warningOrange),
               ],
             ),
           ),
@@ -927,7 +885,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
               color: _dangerRed,
               size: AppDimensions.iconXl,
             ),
-            SizedBox(width: AppDimensions.md - 4),
+            SizedBox(width: AppDimensions.md),
             Text(
               'Hapus Tugas',
               style: TextStyle(
@@ -953,6 +911,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
               style: TextStyle(
                 color: Colors.blueGrey,
                 fontWeight: FontWeight.w700,
+                fontSize: AppDimensions.fontLg,
               ),
             ),
           ),
@@ -965,24 +924,26 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
               );
 
               Navigator.pop(ctx);
-              Navigator.pop(context);
               AppNotifier.showSuccess(
                 context,
-                '✅ Tugas "${task.judul}" berhasil dihapus!',
+                'Tugas "${task.judul}" berhasil dihapus!',
               );
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: _dangerRed,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd + 2),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               ),
-              elevation: 0,
+              elevation: 2,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
             child: const Text(
               'Ya, Hapus',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
+                fontSize: AppDimensions.fontLg,
               ),
             ),
           ),
@@ -997,18 +958,19 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         Text(
           value,
           style: TextStyle(
-            fontSize: AppDimensions.fontXxl,
+            fontSize: AppDimensions.fontXxl + 4,
             fontWeight: FontWeight.w800,
             color: color,
+            height: 1.0,
           ),
         ),
         const SizedBox(height: AppDimensions.xs),
         Text(
           label,
           style: TextStyle(
-            fontSize: AppDimensions.fontSm,
-            fontWeight: FontWeight.w700,
-            color: Colors.blueGrey.shade400,
+            fontSize: AppDimensions.fontMd,
+            fontWeight: FontWeight.w600,
+            color: Colors.blueGrey.shade500,
             letterSpacing: 0.5,
           ),
         ),
@@ -1017,38 +979,38 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
   }
 
   Widget _buildDivider() {
-    return Container(height: 24, width: 1, color: Colors.grey.shade300);
+    return Container(height: 32, width: 1.5, color: Colors.grey.shade300);
   }
 
   Widget _buildSearchAndFilterRow() {
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+      color: _surfaceColor,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              height: 48.0,
+              height: 52.0,
               decoration: BoxDecoration(
                 color: _lightGrey,
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                 border: Border.all(color: Colors.grey.shade200),
               ),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: 'Cari nama atau NRP serdik...',
+                  hintText: 'Cari nama atau NRP...',
                   hintStyle: TextStyle(
-                    color: Colors.blueGrey.shade300,
-                    fontSize: AppDimensions.fontDefault,
+                    color: Colors.blueGrey.shade400,
+                    fontSize: AppDimensions.fontLg,
                   ),
                   prefixIcon: Icon(
                     Icons.search_rounded,
                     color: Colors.blueGrey.shade400,
-                    size: AppDimensions.iconDefault,
+                    size: AppDimensions.iconLg,
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 style: const TextStyle(
                   fontSize: AppDimensions.fontLg,
@@ -1058,7 +1020,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
               ),
             ),
           ),
-          const SizedBox(width: AppDimensions.md - 4),
+          const SizedBox(width: AppDimensions.md),
           _buildStatusFilterDropdown(),
           const SizedBox(width: AppDimensions.sm),
           _buildPokjarFilterDropdown(),
@@ -1076,9 +1038,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         });
         _animController.forward(from: 0.0);
       },
-      offset: const Offset(0, 45),
+      offset: const Offset(0, 52),
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
       ),
       itemBuilder: (context) {
         return ['Semua', 'Sudah', 'Belum', 'Terlambat'].map((item) {
@@ -1090,13 +1054,13 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                 Icon(
                   _resolveSelectionIcon(isSel),
                   color: _resolveSelectionColor(isSel),
-                  size: AppDimensions.iconDefault,
+                  size: AppDimensions.iconLg,
                 ),
-                const SizedBox(width: AppDimensions.sm + 2),
+                const SizedBox(width: AppDimensions.sm),
                 Text(
                   item,
                   style: TextStyle(
-                    fontSize: AppDimensions.fontDefault,
+                    fontSize: AppDimensions.fontLg,
                     color: _primaryNavy,
                     fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
                   ),
@@ -1107,21 +1071,21 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         }).toList();
       },
       child: Container(
-        height: 48.0,
-        width: 48.0,
+        height: 52.0,
+        width: 52.0,
         decoration: BoxDecoration(
           color: isFiltered
-              ? _primaryNavy.withValues(alpha: 0.05)
-              : Colors.white,
+              ? _primaryNavy.withValues(alpha: 0.08)
+              : _surfaceColor,
           border: Border.all(
-            color: isFiltered ? _primaryNavy : Colors.grey.shade300,
+            color: isFiltered ? _primaryNavy : Colors.grey.shade200,
           ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         ),
         child: Icon(
           Icons.filter_list_rounded,
-          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade500,
-          size: AppDimensions.iconDefault + 2,
+          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade400,
+          size: AppDimensions.iconLg,
         ),
       ),
     );
@@ -1145,9 +1109,11 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         });
         _animController.forward(from: 0.0);
       },
-      offset: const Offset(0, 45),
+      offset: const Offset(0, 52),
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
       ),
       itemBuilder: (context) {
         return pokjars.map((item) {
@@ -1159,13 +1125,13 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                 Icon(
                   _resolveSelectionIcon(isSel),
                   color: _resolveSelectionColor(isSel),
-                  size: AppDimensions.iconDefault,
+                  size: AppDimensions.iconLg,
                 ),
-                const SizedBox(width: AppDimensions.sm + 2),
+                const SizedBox(width: AppDimensions.sm),
                 Text(
                   item,
                   style: TextStyle(
-                    fontSize: AppDimensions.fontDefault,
+                    fontSize: AppDimensions.fontLg,
                     color: _primaryNavy,
                     fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
                   ),
@@ -1176,21 +1142,21 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         }).toList();
       },
       child: Container(
-        height: 48.0,
-        width: 48.0,
+        height: 52.0,
+        width: 52.0,
         decoration: BoxDecoration(
           color: isFiltered
-              ? _primaryNavy.withValues(alpha: 0.05)
-              : Colors.white,
+              ? _primaryNavy.withValues(alpha: 0.08)
+              : _surfaceColor,
           border: Border.all(
-            color: isFiltered ? _primaryNavy : Colors.grey.shade300,
+            color: isFiltered ? _primaryNavy : Colors.grey.shade200,
           ),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         ),
         child: Icon(
           Icons.groups_rounded,
-          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade500,
-          size: AppDimensions.iconDefault + 2,
+          color: isFiltered ? _primaryNavy : Colors.blueGrey.shade400,
+          size: AppDimensions.iconLg,
         ),
       ),
     );
@@ -1203,7 +1169,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
 
   Color _resolveSelectionColor(bool isSel) {
     if (isSel) return _primaryNavy;
-    return Colors.grey;
+    return Colors.grey.shade400;
   }
 
   Widget _buildSerdikItem(Map<String, dynamic> submission) {
@@ -1213,7 +1179,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     IconData statusIcon;
 
     if (status == 'sudah') {
-      statusColor = Colors.blue.shade700;
+      statusColor = Colors.blue.shade600;
       statusText = 'Menunggu Penilaian';
       statusIcon = Icons.drive_folder_upload_rounded;
     } else if (status == 'dinilai') {
@@ -1233,28 +1199,42 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
     final bool hasFile = submission['file'] != null;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        border: Border.all(color: Colors.grey.shade100),
+        color: _surfaceColor,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
           onTap: hasFile ? () => _showGradeDialog(submission) : null,
           child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.md),
+            padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundColor: statusColor.withValues(alpha: 0.1),
-                  child: Icon(Icons.person, color: statusColor),
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: statusColor, width: 2),
+                  ),
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor: statusColor.withValues(alpha: 0.1),
+                    child: Icon(Icons.person, color: statusColor, size: 28),
+                  ),
                 ),
-                const SizedBox(width: AppDimensions.md),
+                const SizedBox(width: AppDimensions.lg),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1262,7 +1242,7 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                       Text(
                         submission['name'],
                         style: const TextStyle(
-                          fontSize: AppDimensions.fontLg,
+                          fontSize: AppDimensions.fontXl,
                           fontWeight: FontWeight.w700,
                           color: _primaryNavy,
                         ),
@@ -1278,39 +1258,47 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
                           color: Colors.blueGrey.shade500,
                         ),
                       ),
-                      const SizedBox(height: AppDimensions.sm),
-                      Row(
-                        children: [
-                          Icon(
-                            statusIcon,
-                            size: AppDimensions.fontLg,
-                            color: statusColor,
-                          ),
-                          const SizedBox(width: AppDimensions.xs),
-                          Text(
-                            statusText,
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontSm + 1,
-                              fontWeight: FontWeight.w700,
+                      const SizedBox(height: AppDimensions.md),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              statusIcon,
+                              size: AppDimensions.iconSm,
                               color: statusColor,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: AppDimensions.xs),
+                            Text(
+                              statusText,
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontSm,
+                                fontWeight: FontWeight.w800,
+                                color: statusColor,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
                 if (hasFile)
                   Container(
-                    padding: const EdgeInsets.all(AppDimensions.sm + 2),
+                    padding: const EdgeInsets.all(AppDimensions.sm + 4),
                     decoration: BoxDecoration(
                       color: _primaryNavy.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
-                      Icons.remove_red_eye_rounded,
+                      Icons.arrow_forward_ios_rounded,
                       color: _primaryNavy,
-                      size: AppDimensions.iconDefault,
+                      size: AppDimensions.iconSm,
                     ),
                   ),
               ],

@@ -35,9 +35,11 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
     super.dispose();
   }
 
-  static const Color _primaryNavy = Color(0xFF001C40);
-  static const Color _lightGrey = Color(0xFFF8F9FA);
-  static const Color _successGreen = Color(0xFF2E7D32);
+  // Pro Max Premium Color Palette
+  static const Color _primaryNavy = Color(0xFF0F172A); // Slate 900
+  static const Color _lightGrey = Color(0xFFF8FAFC); // Slate 50
+  static const Color _successGreen = Color(0xFF10B981); // Emerald 500
+  static const Color _surfaceColor = Colors.white;
 
   List<TugasModel> get _mockTasks {
     return PimpinanMockData.sharedTasks;
@@ -80,6 +82,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
             color: Colors.white,
             fontWeight: FontWeight.w700,
             fontSize: AppDimensions.fontXxl,
+            letterSpacing: -0.5,
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -99,7 +102,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 12,
+                          vertical: 20,
                         ),
                         itemCount: tasks.length,
                         itemBuilder: (context, index) {
@@ -136,7 +139,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
           });
         },
         backgroundColor: _primaryNavy,
-        elevation: 4,
+        elevation: 6,
         icon: const Icon(Icons.add_task_rounded, color: Colors.white),
         label: const Text(
           'Buat Tugas',
@@ -152,49 +155,61 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
 
   Widget _buildSearchAndFilter() {
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      decoration: BoxDecoration(
+        color: _surfaceColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Expanded(
-                child: TextField(
-                  onChanged: (val) {
-                    setState(() {
-                      _searchQuery = val;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Cari tugas atau mapel...',
-                    hintStyle: TextStyle(
-                      color: Colors.blueGrey.shade300,
-                      fontSize: AppDimensions.fontDefault,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search_rounded,
-                      color: Colors.blueGrey.shade300,
-                      size: AppDimensions.iconDefault,
-                    ),
-                    filled: true,
-                    fillColor: _lightGrey,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
-                      ),
-                      borderSide: BorderSide.none,
-                    ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: _lightGrey,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                    border: Border.all(color: Colors.grey.shade200),
                   ),
-                  style: const TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w600,
-                    color: _primaryNavy,
+                  child: TextField(
+                    onChanged: (val) {
+                      setState(() {
+                        _searchQuery = val;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Cari tugas atau mapel...',
+                      hintStyle: TextStyle(
+                        color: Colors.blueGrey.shade300,
+                        fontSize: AppDimensions.fontDefault,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search_rounded,
+                        color: Colors.blueGrey.shade400,
+                        size: AppDimensions.iconLg,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
+                      ),
+                    ),
+                    style: const TextStyle(
+                      fontSize: AppDimensions.fontLg,
+                      fontWeight: FontWeight.w600,
+                      color: _primaryNavy,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: AppDimensions.md - 4),
+              const SizedBox(width: AppDimensions.md),
               PopupMenuButton<String>(
                 initialValue: _selectedFilter,
                 onSelected: (val) {
@@ -203,60 +218,36 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                   });
                 },
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                 ),
                 color: Colors.white,
-                elevation: 4,
-                offset: const Offset(0, 48),
+                elevation: 12,
+                shadowColor: Colors.black.withValues(alpha: 0.1),
+                offset: const Offset(0, 56),
                 itemBuilder: (ctx) => [
-                  const PopupMenuItem(
-                    value: 'Semua',
-                    child: Text(
-                      'Semua Status',
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontDefault,
-                        fontWeight: FontWeight.w600,
-                        color: _primaryNavy,
-                      ),
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'Sedang Berjalan',
-                    child: Text(
-                      'Sedang Berjalan',
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontDefault,
-                        fontWeight: FontWeight.w600,
-                        color: _primaryNavy,
-                      ),
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'Ditutup',
-                    child: Text(
-                      'Ditutup',
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontDefault,
-                        fontWeight: FontWeight.w600,
-                        color: _primaryNavy,
-                      ),
-                    ),
-                  ),
+                  _buildPopupMenuItem('Semua', 'Semua Status'),
+                  _buildPopupMenuItem('Sedang Berjalan', 'Sedang Berjalan'),
+                  _buildPopupMenuItem('Ditutup', 'Ditutup'),
                 ],
                 child: Container(
-                  padding: const EdgeInsets.all(AppDimensions.md),
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: _selectedFilter != 'Semua'
                         ? _primaryNavy
                         : _lightGrey,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                    border: Border.all(
+                      color: _selectedFilter != 'Semua'
+                          ? _primaryNavy
+                          : Colors.grey.shade200,
+                    ),
                   ),
                   child: Icon(
                     Icons.filter_list_rounded,
                     color: _selectedFilter != 'Semua'
                         ? Colors.white
-                        : _primaryNavy,
-                    size: AppDimensions.iconDefault,
+                        : Colors.blueGrey.shade600,
+                    size: AppDimensions.iconLg,
                   ),
                 ),
               ),
@@ -267,20 +258,55 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
     );
   }
 
+  PopupMenuItem<String> _buildPopupMenuItem(String value, String label) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: AppDimensions.fontDefault,
+          fontWeight: _selectedFilter == value ? FontWeight.w700 : FontWeight.w500,
+          color: _selectedFilter == value ? _primaryNavy : Colors.blueGrey.shade700,
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.assignment_add, size: 80, color: Colors.blueGrey.shade100),
-          const SizedBox(height: AppDimensions.md),
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.blueGrey.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.assignment_add,
+              size: 64,
+              color: Colors.blueGrey.shade200,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.xl),
+          const Text(
+            'Belum ada tugas',
+            style: TextStyle(
+              fontSize: AppDimensions.fontXxl,
+              fontWeight: FontWeight.w800,
+              color: _primaryNavy,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: AppDimensions.sm),
           Text(
-            'Belum ada tugas yang dipublikasikan.\nTekan tombol di bawah untuk membuat tugas baru.',
+            'Tekan tombol "Buat Tugas" di bawah\nuntuk mempublikasikan tugas baru.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: AppDimensions.fontLg,
               fontWeight: FontWeight.w500,
-              color: Colors.blueGrey.shade300,
+              color: Colors.blueGrey.shade400,
               height: 1.5,
             ),
           ),
@@ -292,21 +318,21 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
   Widget _buildTaskItem(BuildContext context, TugasModel task) {
     final bool isAktif = task.status.toLowerCase() == 'aktif';
     final String displayStatus = isAktif ? 'SEDANG BERJALAN' : 'DITUTUP';
-    final Color statusColor = isAktif ? _successGreen : Colors.blueGrey;
+    final Color statusColor = isAktif ? _successGreen : Colors.blueGrey.shade500;
     final IconData statusIcon = isAktif
-        ? Icons.run_circle_outlined
+        ? Icons.run_circle_rounded
         : Icons.lock_clock_rounded;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        color: _surfaceColor,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
         border: Border.all(
@@ -318,9 +344,9 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
           onTap: () {
             Navigator.pushNamed(
               context,
@@ -331,7 +357,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
             });
           },
           child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.xl - 4),
+            padding: const EdgeInsets.all(AppDimensions.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -344,13 +370,13 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
+                              horizontal: 12,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
                               color: statusColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
-                                AppDimensions.radiusSm,
+                                AppDimensions.radiusMd,
                               ),
                             ),
                             child: Row(
@@ -368,23 +394,24 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                                     fontSize: AppDimensions.fontSm,
                                     fontWeight: FontWeight.w800,
                                     color: statusColor,
-                                    letterSpacing: 1.0,
+                                    letterSpacing: 0.8,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: AppDimensions.md),
+                          const SizedBox(height: AppDimensions.lg),
                           Text(
                             task.judul,
                             style: const TextStyle(
-                              fontSize: AppDimensions.fontLg + 1,
+                              fontSize: AppDimensions.fontXl,
                               fontWeight: FontWeight.w800,
                               color: _primaryNavy,
                               height: 1.3,
+                              letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: AppDimensions.radiusSm),
+                          const SizedBox(height: AppDimensions.xs),
                           Text(
                             task.mapel,
                             style: TextStyle(
@@ -393,16 +420,16 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                               color: Colors.blueGrey.shade400,
                             ),
                           ),
-                          const SizedBox(height: AppDimensions.sm),
+                          const SizedBox(height: AppDimensions.md),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                              horizontal: 10,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.blueGrey.shade50,
                               borderRadius: BorderRadius.circular(
-                                AppDimensions.radiusXs,
+                                AppDimensions.radiusSm,
                               ),
                             ),
                             child: Row(
@@ -410,7 +437,7 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                               children: [
                                 Icon(
                                   Icons.person_outline_rounded,
-                                  size: AppDimensions.iconXs,
+                                  size: AppDimensions.iconSm,
                                   color: Colors.blueGrey.shade600,
                                 ),
                                 const SizedBox(width: AppDimensions.xs),
@@ -432,26 +459,26 @@ class _GadikTaskListScreenState extends State<GadikTaskListScreen>
                     Container(
                       padding: const EdgeInsets.all(AppDimensions.md),
                       decoration: BoxDecoration(
-                        color: Colors.blueGrey.shade50,
+                        color: _primaryNavy.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                        Icons.analytics_outlined,
+                        Icons.arrow_forward_ios_rounded,
                         color: _primaryNavy,
-                        size: AppDimensions.iconLg,
+                        size: AppDimensions.iconSm,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.md),
-                Divider(height: 1, color: Colors.grey.shade100),
+                const SizedBox(height: AppDimensions.lg),
+                Divider(height: 1, color: Colors.grey.shade200),
                 const SizedBox(height: AppDimensions.md),
                 Row(
                   children: [
                     Icon(
-                      Icons.timer_outlined,
+                      Icons.event_rounded,
                       size: AppDimensions.iconSm,
-                      color: Colors.blueGrey.shade300,
+                      color: Colors.blueGrey.shade400,
                     ),
                     const SizedBox(width: AppDimensions.sm),
                     Text(

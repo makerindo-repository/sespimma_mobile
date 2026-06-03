@@ -6,12 +6,14 @@ import '../../features/report/presentation/pages/report_screen.dart';
 import '../../features/attendance/presentation/pages/attendance_screen.dart';
 import '../../features/assignment/presentation/pages/assignment_screen.dart';
 import '../../features/dashboard/presentation/pages/home_screen.dart';
-import '../../features/assessment/presentation/pages/patun_sociometry_monitoring_screen.dart';
-import '../../features/assessment/presentation/pages/gadik_assessment_screen.dart';
-import '../../features/assessment/presentation/pages/patun_academic_monitoring_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_sociometry_monitoring_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/medis_health_monitoring_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/operator_jasmani_screen.dart';
+import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_academic_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/patun_mental_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/patun_physical_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/korsis_inbox_screen.dart';
+import '../../features/assessment/presentation/pages/gadik_mental_monitoring_screen.dart';
 import '../../features/gadik_assignment/presentation/pages/gadik_assignment_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/korsis_mental_monitoring_screen.dart';
 import '../../features/assessment/presentation/pages/korsis_sociometry_monitoring_screen.dart';
@@ -20,6 +22,7 @@ import '../../features/leadership_ews/presentation/pages/ews_screen.dart';
 import '../../features/leadership_dashboard/presentation/pages/pimpinan_home_screen.dart';
 import '../../features/attendance/presentation/pages/patun_attendance_monitoring_screen.dart';
 import '../../features/attendance/presentation/pages/korsis_zone_screen.dart';
+
 
 class NavItem {
   final String label;
@@ -73,6 +76,12 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: GadikAssignmentMonitoringScreen(),
         ),
         NavItem(
+          label: 'Penilaian',
+          icon: AppIcons.shieldCheck,
+          activeIcon: AppIcons.shieldCheckFill,
+          screen: GadikMentalMonitoringScreen(),
+        ),
+        NavItem(
           label: 'Profil',
           icon: AppIcons.user,
           activeIcon: AppIcons.userFill,
@@ -121,16 +130,10 @@ List<NavItem> getNavItemsByRole(String roleId) {
     case 'pengajar_medis':
       return const [
         NavItem(
-          label: 'Akademik',
-          icon: AppIcons.bookOpen,
-          activeIcon: AppIcons.bookOpenFill,
-          screen: PatunAcademicMonitoringScreen(),
-        ),
-        NavItem(
-          label: 'Penilaian',
-          icon: AppIcons.pencilSimple,
-          activeIcon: AppIcons.pencilSimpleFill,
-          screen: GadikAssessmentScreen(),
+          label: 'Kesehatan',
+          icon: Icons.monitor_heart_outlined,
+          activeIcon: Icons.monitor_heart,
+          screen: MedisHealthMonitoringScreen(),
         ),
         NavItem(
           label: 'Profil',
@@ -164,6 +167,21 @@ List<NavItem> getNavItemsByRole(String roleId) {
           icon: AppIcons.mapPin,
           activeIcon: AppIcons.mapPinFill,
           screen: KorsisZoneScreen(),
+        ),
+        NavItem(
+          label: 'Profil',
+          icon: AppIcons.user,
+          activeIcon: AppIcons.userFill,
+          screen: ProfileScreen(),
+        ),
+      ];
+    case 'tim_operator':
+      return const [
+        NavItem(
+          label: 'Jasmani',
+          icon: Icons.directions_run_outlined,
+          activeIcon: Icons.directions_run,
+          screen: OperatorJasmaniScreen(),
         ),
         NavItem(
           label: 'Profil',

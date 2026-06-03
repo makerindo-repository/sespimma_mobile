@@ -6,17 +6,19 @@ class StatusFilterButtonWidget extends StatelessWidget {
   final String selectedStatus;
   final List<String> statuses;
   final ValueChanged<String> onSelected;
+  final String defaultStatus;
 
   const StatusFilterButtonWidget({
     super.key,
     required this.selectedStatus,
     required this.statuses,
     required this.onSelected,
+    this.defaultStatus = 'Semua Status',
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool hasActiveFilter = selectedStatus != 'Semua Status';
+    final bool hasActiveFilter = selectedStatus != defaultStatus;
     return Container(
       height: AppDimensions.inputHeight,
       width: AppDimensions.inputHeight,
@@ -60,20 +62,24 @@ class StatusFilterButtonWidget extends StatelessWidget {
               value: filter,
               child: Row(
                 children: [
-                  Text(
-                    filter,
-                    style: TextStyle(
-                      fontWeight: isSelected
-                          ? FontWeight.w700
-                          : FontWeight.w500,
-                      color: isSelected
-                          ? AppColors.primaryNavy
-                          : Colors.black87,
-                      fontSize: AppDimensions.fontDefault,
+                  Expanded(
+                    child: Text(
+                      filter,
+                      style: TextStyle(
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? AppColors.primaryNavy
+                            : Colors.black87,
+                        fontSize: AppDimensions.fontDefault,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (isSelected) ...[
-                    const Spacer(),
+                    const SizedBox(width: AppDimensions.sm),
                     const Icon(
                       Icons.check_circle_rounded,
                       size: AppDimensions.iconSm,

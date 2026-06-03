@@ -5,6 +5,9 @@ import 'serdik_real_data.dart';
 import 'patun_real_data.dart';
 import 'korsis_real_data.dart';
 import 'gadik_real_data.dart';
+import 'medis_real_data.dart';
+import 'operator_real_data.dart';
+import 'pimpinan_real_data.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 
 class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
@@ -261,28 +264,32 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       );
     }
 
-    if (request.nrp == '75060001') {
+    final pimpinanRecord = PimpinanRealData.records
+        .where((r) => r['nrp_nip'] == request.nrp)
+        .firstOrNull;
+
+    if (pimpinanRecord != null) {
       return LoginResponse(
-        userId: 'USR-003',
-        name: 'KOMBES POL. FAJAR NUGROHO, S.H., S.I.K., M.H.',
+        userId: 'USR-${pimpinanRecord['nrp_nip']}',
+        name: pimpinanRecord['nama'] ?? '-',
         roleId: 'pimpinan',
         pokjar: '-',
-        nrp: '75060001',
-        nosis: '2026060175',
-        pangkat: 'KOMBES POL',
+        nrp: pimpinanRecord['nrp_nip'] ?? '-',
+        nosis: '-',
+        pangkat: pimpinanRecord['pangkat'] ?? '-',
         angkatan: '-',
-        agama: 'Islam',
-        jenisKelamin: 'Laki-laki',
-        jabatan: 'KA SESPIMPOLRI',
-        tanggalLahir: '1975-06-01',
+        agama: '-',
+        jenisKelamin: '-',
+        jabatan: pimpinanRecord['jabatan_struktural'] ?? '-',
+        tanggalLahir: '-',
         noSerdik: '-',
-        nik: '3201012345678906',
-        jabatanSenat: '-',
-        tempatLahir: 'Makassar',
-        noHandphone: '081234567895',
-        pendidikanTerakhir: 'S2 Hukum',
-        alamatLengkap: 'Jl. Ahmad Yani, Makassar',
-        email: 'fajar@example.com',
+        nik: '-',
+        jabatanSenat: pimpinanRecord['peran_pengasuhan'] ?? '-',
+        tempatLahir: '-',
+        noHandphone: '-',
+        pendidikanTerakhir: '-',
+        alamatLengkap: '-',
+        email: '-',
         noTelepon: '-',
         kelompok: '-',
         diktukAwal: '-',
@@ -295,8 +302,51 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
-        accessToken: 'dummy_token_pimpinan',
-        refreshToken: 'dummy_refresh_pimpinan',
+        accessToken: 'dummy_token_pimpinan_real',
+        refreshToken: 'dummy_refresh_pimpinan_real',
+      );
+    }
+
+    final operatorRecord = OperatorRealData.records
+        .where((r) => r['nrp_nip'] == request.nrp)
+        .firstOrNull;
+
+    if (operatorRecord != null) {
+      return LoginResponse(
+        userId: 'USR-${operatorRecord['nrp_nip']}',
+        name: operatorRecord['nama'] ?? '-',
+        roleId: 'tim_operator',
+        pokjar: '-',
+        nrp: operatorRecord['nrp_nip'] ?? '-',
+        nosis: '-',
+        pangkat: operatorRecord['pangkat'] ?? '-',
+        angkatan: '-',
+        agama: '-',
+        jenisKelamin: '-',
+        jabatan: operatorRecord['jabatan_struktural'] ?? '-',
+        tanggalLahir: '-',
+        noSerdik: '-',
+        nik: '-',
+        jabatanSenat: operatorRecord['peran_pengasuhan'] ?? '-',
+        tempatLahir: '-',
+        noHandphone: '-',
+        pendidikanTerakhir: '-',
+        alamatLengkap: '-',
+        email: '-',
+        noTelepon: '-',
+        kelompok: '-',
+        diktukAwal: '-',
+        tahunDiktuk: '-',
+        personel: 'Ya',
+        satker: '-',
+        eselon: '-',
+        golongan: '-',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_operator_real',
+        refreshToken: 'dummy_refresh_operator_real',
       );
     }
 
@@ -383,6 +433,49 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         nilaiJasmani: 0.0,
         accessToken: 'dummy_token_gadik_real',
         refreshToken: 'dummy_refresh_gadik_real',
+      );
+    }
+
+    final medisRecord = MedisRealData.records
+        .where((r) => r['nrp_nip'] == request.nrp)
+        .firstOrNull;
+
+    if (medisRecord != null) {
+      return LoginResponse(
+        userId: 'USR-${medisRecord['nrp_nip']}',
+        name: medisRecord['nama'] ?? '-',
+        roleId: 'pengajar_medis',
+        pokjar: '-',
+        nrp: medisRecord['nrp_nip'] ?? '-',
+        nosis: '-',
+        pangkat: medisRecord['pangkat'] ?? '-',
+        angkatan: '-',
+        agama: '-',
+        jenisKelamin: '-',
+        jabatan: medisRecord['jabatan_struktural'] ?? '-',
+        tanggalLahir: '-',
+        noSerdik: '-',
+        nik: '-',
+        jabatanSenat: medisRecord['peran_pengasuhan'] ?? '-',
+        tempatLahir: '-',
+        noHandphone: '-',
+        pendidikanTerakhir: '-',
+        alamatLengkap: '-',
+        email: '-',
+        noTelepon: '-',
+        kelompok: '-',
+        diktukAwal: '-',
+        tahunDiktuk: '-',
+        personel: 'Ya',
+        satker: 'Sespimma',
+        eselon: '-',
+        golongan: '-',
+        isNakApproved: false,
+        nilaiAkademik: 0.0,
+        nilaiMental: 0.0,
+        nilaiJasmani: 0.0,
+        accessToken: 'dummy_token_medis_real',
+        refreshToken: 'dummy_refresh_medis_real',
       );
     }
 

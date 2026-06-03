@@ -35,5 +35,12 @@ class KorsisRealData {
       "jabatan_struktural": "Banum Subbag Giatjarnat Korsis Sespimma",
       "peran_pengasuhan": "Anggota",
     },
+    {
+      "nama": "Viva Prihanto, S. Pd.",
+      "pangkat": "Ajun Komisaris Polisi",
+      "nrp_nip": "70020108",
+      "jabatan_struktural": "Pamin Subbag Pimtajas Korsis",
+      "peran_pengasuhan": "Koord. Pengumpulan Nilai",
+    },
   ];
 }

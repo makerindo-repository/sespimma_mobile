@@ -1,14 +1,19 @@
-import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
-import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
+import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
+import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+
+// lib/features/auth/presentation/pages/login_screen.dart
+
+const Color _primaryNavy = Color(0xFF000B1D);
+const Color _lightGrey = Color(0xFFF8F9FA);
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,29 +22,19 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _nrpController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _secureStorage = const FlutterSecureStorage();
-
-  bool _isPasswordVisible = false;
-  bool _rememberMe = false;
-
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  static const Color _primaryNavy = Color(0xFF000B1D);
-  static const Color _lightGrey = Color(0xFFF8F9FA);
-  static const String _nrpStorageKey = 'saved_nrp';
-  bool _isNip = false;
-
   @override
   void initState() {
     super.initState();
+    _setupSystemUI();
+    _initAnimations();
+  }
 
+  void _setupSystemUI() {
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
@@ -51,18 +46,9 @@ class _LoginScreenState extends State<LoginScreen>
         systemNavigationBarDividerColor: Colors.transparent,
       ),
     );
+  }
 
-    _loadSavedNrp();
-
-    _nrpController.addListener(() {
-      final isNipNow = _nrpController.text.length > 10;
-      if (isNipNow != _isNip) {
-        setState(() {
-          _isNip = isNipNow;
-        });
-      }
-    });
-
+  void _initAnimations() {
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -72,15 +58,175 @@ class _LoginScreenState extends State<LoginScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
 
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0.0, 0.05), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOutQuart,
-          ),
-        );
+    _slideAnimation = Tween<Offset>(begin: const Offset(0.0, 0.05), end: Offset.zero).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutQuart),
+    );
 
     _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _lightGrey,
+      body: BlocListener<AuthBloc, AuthState>(
+        listener: _handleAuthState,
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isSmallScreen = constraints.maxHeight < 700;
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.0,
+                        vertical: isSmallScreen ? 16.0 : 32.0,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 420),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            LoginHeader(isSmallScreen: isSmallScreen),
+                            SizedBox(height: isSmallScreen ? AppDimensions.lg : AppDimensions.avatarMd),
+                            FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: SlideTransition(
+                                position: _slideAnimation,
+                                child: LoginForm(isSmallScreen: isSmallScreen),
+                              ),
+                            ),
+                            SizedBox(height: isSmallScreen ? AppDimensions.xl : AppDimensions.xxl + 16),
+                            LoginFooter(isSmallScreen: isSmallScreen),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleAuthState(BuildContext context, AuthState state) {
+    if (state is AuthSuccess) {
+      Navigator.pushReplacementNamed(context, '/main');
+    } else if (state is AuthFailure) {
+      AppNotifier.showError(context, state.message);
+    }
+  }
+}
+
+class LoginHeader extends StatelessWidget {
+  final bool isSmallScreen;
+
+  const LoginHeader({super.key, required this.isSmallScreen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _buildAppIcon(),
+        SizedBox(height: isSmallScreen ? AppDimensions.md : AppDimensions.lg),
+        _buildAppTitle(),
+        const SizedBox(height: AppDimensions.sm),
+        _buildAppSubtitle(),
+      ],
+    );
+  }
+
+  Widget _buildAppIcon() {
+    return Image.asset(
+      'assets/images/icon.png',
+      height: isSmallScreen ? 100 : 140,
+      errorBuilder: (context, error, stackTrace) => Icon(
+        Icons.local_police,
+        size: isSmallScreen ? 80 : 120,
+        color: _primaryNavy,
+      ),
+    );
+  }
+
+  Widget _buildAppTitle() {
+    return Text(
+      'SESPIMMA',
+      style: TextStyle(
+        fontSize: isSmallScreen ? AppDimensions.fontDisplay : AppDimensions.fontDisplayXl,
+        fontWeight: FontWeight.w800,
+        color: _primaryNavy,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  Widget _buildAppSubtitle() {
+    return Text(
+      'SISTEM EVALUASI DAN PENGAWASAN INDIVIDU MEMBENTUK SUMBER DAYA MANUSIA MAJU',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: isSmallScreen ? AppDimensions.fontSm + 1 : AppDimensions.fontMd,
+        fontWeight: FontWeight.w600,
+        color: Colors.blueGrey.shade400,
+        letterSpacing: isSmallScreen ? 0.5 : 1.2,
+      ),
+    );
+  }
+}
+
+class LoginForm extends StatefulWidget {
+  final bool isSmallScreen;
+
+  const LoginForm({super.key, required this.isSmallScreen});
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nrpController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _secureStorage = const FlutterSecureStorage();
+  
+  static const String _nrpStorageKey = 'saved_nrp';
+
+  bool _isPasswordVisible = false;
+  bool _rememberMe = false;
+  bool _isNip = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedNrp();
+    _nrpController.addListener(_checkIfNip);
+  }
+
+  @override
+  void dispose() {
+    _nrpController.removeListener(_checkIfNip);
+    _nrpController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _checkIfNip() {
+    final isNipNow = _nrpController.text.length > 10;
+    if (isNipNow != _isNip) {
+      setState(() => _isNip = isNipNow);
+    }
   }
 
   Future<void> _loadSavedNrp() async {
@@ -100,10 +246,7 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _handleRememberMeStorage() async {
     try {
       if (_rememberMe) {
-        await _secureStorage.write(
-          key: _nrpStorageKey,
-          value: _nrpController.text.trim(),
-        );
+        await _secureStorage.write(key: _nrpStorageKey, value: _nrpController.text.trim());
       } else {
         await _secureStorage.delete(key: _nrpStorageKey);
       }
@@ -112,18 +255,10 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _nrpController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
   void _submitLogin() {
     FocusScope.of(context).unfocus();
-
     if (_formKey.currentState!.validate()) {
+      _handleRememberMeStorage();
       context.read<AuthBloc>().add(
         LoginSubmitted(
           nrp: _nrpController.text.trim(),
@@ -136,128 +271,9 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _lightGrey,
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) async {
-          if (state is AuthSuccess) {
-            await _handleRememberMeStorage();
-            if (!context.mounted) return;
-            Navigator.pushReplacementNamed(context, '/main');
-          } else if (state is AuthFailure) {
-            AppNotifier.showError(context, state.message);
-          }
-        },
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isSmallScreen = constraints.maxHeight < 700;
-              return CustomScrollView(
-                slivers: [
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.0,
-                          vertical: isSmallScreen ? 16.0 : 32.0,
-                        ),
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 420),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _buildHeader(isSmallScreen),
-                              SizedBox(
-                                height: isSmallScreen
-                                    ? AppDimensions.lg
-                                    : AppDimensions.avatarMd,
-                              ),
-                              FadeTransition(
-                                opacity: _fadeAnimation,
-                                child: SlideTransition(
-                                  position: _slideAnimation,
-                                  child: _buildFormCard(isSmallScreen),
-                                ),
-                              ),
-                              SizedBox(
-                                height: isSmallScreen
-                                    ? AppDimensions.xl
-                                    : AppDimensions.xxl + 16,
-                              ),
-                              _buildFooter(isSmallScreen),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(bool isSmallScreen) {
-    return Column(
-      children: [
-        Image.asset(
-          'assets/images/icon.png',
-          height: isSmallScreen ? 100 : 140,
-          errorBuilder: (context, error, stackTrace) => Icon(
-            Icons.local_police,
-            size: isSmallScreen ? 80 : 120,
-            color: _primaryNavy,
-          ),
-        ),
-        SizedBox(height: isSmallScreen ? AppDimensions.md : AppDimensions.lg),
-        Text(
-          'SESPIMMA',
-          style: TextStyle(
-            fontSize: isSmallScreen
-                ? AppDimensions.fontDisplay
-                : AppDimensions.fontDisplayXl,
-            fontWeight: FontWeight.w800,
-            color: _primaryNavy,
-            letterSpacing: 0.5,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.sm),
-        Text(
-          'SISTEM EVALUASI DAN PENGAWASAN INDIVIDU MEMBENTUK SUMBER DAYA MANUSIA MAJU',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: isSmallScreen
-                ? AppDimensions.fontSm + 1
-                : AppDimensions.fontMd,
-            fontWeight: FontWeight.w600,
-            color: Colors.blueGrey.shade400,
-            letterSpacing: isSmallScreen ? 0.5 : 1.2,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFormCard(bool isSmallScreen) {
     return Container(
-      padding: EdgeInsets.all(
-        isSmallScreen ? AppDimensions.lg : AppDimensions.xxl + 4,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
+      padding: EdgeInsets.all(widget.isSmallScreen ? AppDimensions.lg : AppDimensions.xxl + 4),
+      decoration: _buildCardDecoration(),
       child: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -266,213 +282,34 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             _buildTextFieldLabel(_isNip ? 'NIP' : 'NRP'),
             const SizedBox(height: AppDimensions.sm),
-            TextFormField(
-              controller: _nrpController,
-              keyboardType: TextInputType.number,
-              textInputAction: TextInputAction.next,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return '${_isNip ? 'NIP' : 'NRP'} tidak boleh kosong';
-                }
-                if (value.length < 5) {
-                  return '${_isNip ? 'NIP' : 'NRP'} tidak valid';
-                }
-                return null;
-              },
-              decoration:
-                  _inputDecoration(
-                    hint: 'Masukkan ${_isNip ? 'NIP' : 'NRP'}',
-                    icon: AppIcons.user,
-                  ).copyWith(
-                    suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                      valueListenable: _nrpController,
-                      builder: (context, value, child) {
-                        return value.text.isNotEmpty
-                            ? IconButton(
-                                icon: Icon(
-                                  AppIcons.xCircle,
-                                  color: Colors.grey.shade400,
-                                  size: AppDimensions.iconDefault,
-                                ),
-                                onPressed: () {
-                                  _nrpController.clear();
-                                },
-                              )
-                            : const SizedBox.shrink();
-                      },
-                    ),
-                  ),
-            ),
-            SizedBox(
-              height: isSmallScreen ? AppDimensions.lg : AppDimensions.xl,
-            ),
+            _buildNrpField(),
+            SizedBox(height: widget.isSmallScreen ? AppDimensions.lg : AppDimensions.xl),
             _buildTextFieldLabel('Password'),
             const SizedBox(height: AppDimensions.sm),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: !_isPasswordVisible,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _submitLogin(),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Password tidak boleh kosong';
-                }
-                if (value.length < 6) {
-                  return 'Password minimal 6 karakter';
-                }
-                return null;
-              },
-              decoration:
-                  _inputDecoration(
-                    hint: 'Masukkan Password',
-                    icon: AppIcons.lockKey,
-                  ).copyWith(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible ? AppIcons.eyeSlash : AppIcons.eye,
-                        color: Colors.grey.shade500,
-                        size: AppDimensions.iconDefault + 2,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                  ),
-            ),
-            SizedBox(
-              height: isSmallScreen ? AppDimensions.sm : AppDimensions.md,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            });
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppDimensions.radiusXs,
-                            ),
-                          ),
-                          side: BorderSide(color: Colors.grey.shade400),
-                          activeColor: _primaryNavy,
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.sm),
-                      Flexible(
-                        child: Text(
-                          'Ingat Saya',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontDefault,
-                            color: Colors.grey.shade600,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/forgot-password');
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 8,
-                    ),
-                    minimumSize: const Size(44, 44),
-                    tapTargetSize: MaterialTapTargetSize.padded,
-                  ),
-                  child: const Text(
-                    'Lupa Password?',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontDefault,
-                      fontWeight: FontWeight.w700,
-                      color: _primaryNavy,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: isSmallScreen ? AppDimensions.lg : AppDimensions.xxl + 4,
-            ),
-            BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, state) {
-                final isLoading = state is AuthLoading;
-                return ElevatedButton(
-                  onPressed: isLoading ? null : _submitLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryNavy,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
-                      ),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                      : const Text(
-                          'MASUK',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontLg + 1,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                );
-              },
-            ),
-            SizedBox(
-              height: isSmallScreen ? AppDimensions.lg : AppDimensions.xl,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  AppIcons.shieldCheckFill,
-                  size: AppDimensions.iconDefault,
-                  color: Colors.green.shade600,
-                ),
-                const SizedBox(width: AppDimensions.sm),
-                Text(
-                  'SECURE ACCESS',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontMd,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade500,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
+            _buildPasswordField(),
+            SizedBox(height: widget.isSmallScreen ? AppDimensions.sm : AppDimensions.md),
+            _buildFormActions(context),
+            SizedBox(height: widget.isSmallScreen ? AppDimensions.lg : AppDimensions.xxl + 4),
+            _buildSubmitButton(),
+            SizedBox(height: widget.isSmallScreen ? AppDimensions.lg : AppDimensions.xl),
+            _buildSecureBadge(),
           ],
         ),
       ),
+    );
+  }
+
+  BoxDecoration _buildCardDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 24,
+          offset: const Offset(0, 10),
+        ),
+      ],
     );
   }
 
@@ -487,35 +324,187 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildFooter(bool isSmallScreen) {
-    return Text(
-      '© ${DateTime.now().year} SESPIMMA LEMDIKLAT POLRI. ALL RIGHTS RESERVED.',
-      style: TextStyle(
-        fontSize: isSmallScreen
-            ? AppDimensions.fontSm
-            : AppDimensions.fontSm + 1,
-        fontWeight: FontWeight.w600,
+  Widget _buildNrpField() {
+    return TextFormField(
+      controller: _nrpController,
+      keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.next,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      validator: _validateNrp,
+      decoration: _inputDecoration(
+        hint: 'Masukkan ${_isNip ? 'NIP' : 'NRP'}',
+        icon: AppIcons.user,
+      ).copyWith(suffixIcon: _buildNrpClearIcon()),
+    );
+  }
+
+  String? _validateNrp(String? value) {
+    if (value == null || value.isEmpty) return '${_isNip ? 'NIP' : 'NRP'} tidak boleh kosong';
+    if (value.length < 5) return '${_isNip ? 'NIP' : 'NRP'} tidak valid';
+    return null;
+  }
+
+  Widget _buildNrpClearIcon() {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: _nrpController,
+      builder: (context, value, child) {
+        if (value.text.isEmpty) return const SizedBox.shrink();
+        return IconButton(
+          icon: Icon(AppIcons.xCircle, color: Colors.grey.shade400, size: AppDimensions.iconDefault),
+          onPressed: _nrpController.clear,
+        );
+      },
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: !_isPasswordVisible,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _submitLogin(),
+      validator: _validatePassword,
+      decoration: _inputDecoration(
+        hint: 'Masukkan Password',
+        icon: AppIcons.lockKey,
+      ).copyWith(suffixIcon: _buildPasswordToggleIcon()),
+    );
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return 'Password tidak boleh kosong';
+    if (value.length < 6) return 'Password minimal 6 karakter';
+    return null;
+  }
+
+  Widget _buildPasswordToggleIcon() {
+    return IconButton(
+      icon: Icon(
+        _isPasswordVisible ? AppIcons.eyeSlash : AppIcons.eye,
         color: Colors.grey.shade500,
-        letterSpacing: 0.5,
+        size: AppDimensions.iconDefault + 2,
+      ),
+      onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+    );
+  }
+
+  Widget _buildFormActions(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildRememberMeCheckbox(),
+        _buildForgotPasswordButton(context),
+      ],
+    );
+  }
+
+  Widget _buildRememberMeCheckbox() {
+    return Expanded(
+      child: Row(
+        children: [
+          SizedBox(
+            height: 24,
+            width: 24,
+            child: Checkbox(
+              value: _rememberMe,
+              onChanged: (value) => setState(() => _rememberMe = value ?? false),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusXs)),
+              side: BorderSide(color: Colors.grey.shade400),
+              activeColor: _primaryNavy,
+            ),
+          ),
+          const SizedBox(width: AppDimensions.sm),
+          Flexible(
+            child: Text(
+              'Ingat Saya',
+              style: TextStyle(
+                fontSize: AppDimensions.fontDefault,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  InputDecoration _inputDecoration({
-    required String hint,
-    required IconData icon,
-  }) {
+  Widget _buildForgotPasswordButton(BuildContext context) {
+    return TextButton(
+      onPressed: () => Navigator.pushNamed(context, '/forgot-password'),
+      style: TextButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        minimumSize: const Size(44, 44),
+        tapTargetSize: MaterialTapTargetSize.padded,
+      ),
+      child: const Text(
+        'Lupa Password?',
+        style: TextStyle(
+          fontSize: AppDimensions.fontDefault,
+          fontWeight: FontWeight.w700,
+          color: _primaryNavy,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        final isLoading = state is AuthLoading;
+        return ElevatedButton(
+          onPressed: isLoading ? null : _submitLogin,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _primaryNavy,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMd)),
+            elevation: 0,
+          ),
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                )
+              : const Text(
+                  'MASUK',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontLg + 1,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSecureBadge() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(AppIcons.shieldCheckFill, size: AppDimensions.iconDefault, color: Colors.green.shade600),
+        const SizedBox(width: AppDimensions.sm),
+        Text(
+          'SECURE ACCESS',
+          style: TextStyle(
+            fontSize: AppDimensions.fontMd,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade500,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration({required String hint, required IconData icon}) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(
-        color: Colors.blueGrey.shade300,
-        fontSize: AppDimensions.fontLg,
-      ),
-      prefixIcon: Icon(
-        icon,
-        color: Colors.blueGrey.shade400,
-        size: AppDimensions.iconDefault + 2,
-      ),
+      hintStyle: TextStyle(color: Colors.blueGrey.shade300, fontSize: AppDimensions.fontLg),
+      prefixIcon: Icon(icon, color: Colors.blueGrey.shade400, size: AppDimensions.iconDefault + 2),
       filled: true,
       fillColor: const Color(0xFFFAFAFA),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -534,6 +523,25 @@ class _LoginScreenState extends State<LoginScreen>
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
         borderSide: BorderSide(color: Colors.red.shade400),
+      ),
+    );
+  }
+}
+
+class LoginFooter extends StatelessWidget {
+  final bool isSmallScreen;
+
+  const LoginFooter({super.key, required this.isSmallScreen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '© ${DateTime.now().year} SESPIMMA LEMDIKLAT POLRI. ALL RIGHTS RESERVED.',
+      style: TextStyle(
+        fontSize: isSmallScreen ? AppDimensions.fontSm : AppDimensions.fontSm + 1,
+        fontWeight: FontWeight.w600,
+        color: Colors.grey.shade500,
+        letterSpacing: 0.5,
       ),
     );
   }
