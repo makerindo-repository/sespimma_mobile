@@ -28,6 +28,7 @@ class GeofenceMapWidget extends StatefulWidget {
   final Function(AttendanceZone tappedZone)? onRadiusTap;
 
   final double? fabBottomBase;
+  final Widget? customFab;
 
   const GeofenceMapWidget({
     super.key,
@@ -37,6 +38,7 @@ class GeofenceMapWidget extends StatefulWidget {
     this.onReload,
     this.onRadiusTap,
     this.fabBottomBase,
+    this.customFab,
   });
 
   @override
@@ -329,6 +331,12 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
       children: [
         _buildMap(),
         _buildMapControls(),
+        if (widget.customFab != null)
+          Positioned(
+            right: 16,
+            bottom: 16 + MediaQuery.of(context).padding.bottom,
+            child: widget.customFab!,
+          ),
         if (_isLoading) _buildLoadingOverlay(),
         _buildAuditDebugPanel(),
         if (_gpsErrorMessage != null) _buildGpsErrorOverlay(),

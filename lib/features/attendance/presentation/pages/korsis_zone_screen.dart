@@ -20,6 +20,7 @@ class KorsisZoneScreen extends StatefulWidget {
 class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
   List<AttendanceZone> _zones = [];
   bool _isLocating = true;
+  bool _hasLocationError = false;
 
   @override
   void initState() {
@@ -90,14 +91,22 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(AppIcons.qrCode, color: Colors.white),
-            tooltip: 'Tampilkan QR Code Zona',
-            onPressed: () {
-              HapticFeedback.selectionClick();
-              _showQrCodes();
-            },
-          ),
+          if (!_hasLocationError)
+            IconButton(
+              icon: Icon(
+                AppIcons.qrCode,
+                color: _isLocating
+                    ? Colors.white.withValues(alpha: 0.3)
+                    : Colors.white,
+              ),
+              tooltip: 'Tampilkan QR Code Zona',
+              onPressed: _isLocating
+                  ? null
+                  : () {
+                      HapticFeedback.selectionClick();
+                      _showQrCodes();
+                    },
+            ),
         ],
       ),
       body: GeofenceMapWidget(
@@ -108,6 +117,9 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
           }
         },
         onGpsStateChanged: (hasError) {
+          if (_hasLocationError != hasError) {
+            setState(() => _hasLocationError = hasError);
+          }
           if (hasError && _isLocating) {
             setState(() => _isLocating = false);
           }
@@ -118,28 +130,30 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
           HapticFeedback.selectionClick();
           _showZoneInfo(context, tappedZone);
         },
-      ),
-      floatingActionButton: _isLocating
-          ? null
-          : FloatingActionButton(
-              onPressed: () async {
-                HapticFeedback.selectionClick();
-                final result = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const KorsisZoneMarkingScreen(),
-                  ),
-                );
-                if (result == true) _loadZones();
-              },
-              backgroundColor: AppColors.primaryNavy,
-              elevation: 6,
-              child: const Icon(
-                Icons.add_rounded,
-                color: Colors.white,
-                size: 28,
+        customFab: _hasLocationError
+            ? null
+            : FloatingActionButton(
+                onPressed: _isLocating
+                    ? null
+                    : () async {
+                        HapticFeedback.selectionClick();
+                        final result = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const KorsisZoneMarkingScreen(),
+                          ),
+                        );
+                        if (result == true) _loadZones();
+                      },
+                backgroundColor: AppColors.primaryNavy,
+                elevation: 6,
+                child: const Icon(
+                  Icons.add_rounded,
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
-            ),
+      ),
     );
   }
 }
