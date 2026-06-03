@@ -145,6 +145,33 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
       widget.gender.toLowerCase() == 'laki-laki' ||
       widget.gender.toLowerCase() == 'pria';
 
+  Color _getScoreBgColor(double score) {
+    if (score == 0) return Colors.blueGrey.shade50;
+    if (score > 85.00) return Colors.green.shade50;
+    if (score > 80.00) return Colors.lightGreen.shade50;
+    if (score > 75.00) return Colors.orange.shade50;
+    if (score >= 70.00) return Colors.amber.shade50;
+    return Colors.red.shade50;
+  }
+
+  Color _getScoreTextColor(double score) {
+    if (score == 0) return const Color(0xFF001C40);
+    if (score > 85.00) return Colors.green.shade800;
+    if (score > 80.00) return Colors.lightGreen.shade800;
+    if (score > 75.00) return Colors.orange.shade800;
+    if (score >= 70.00) return Colors.amber.shade900;
+    return Colors.red.shade800;
+  }
+
+  Color _getScoreBorderColor(double score) {
+    if (score == 0) return Colors.grey.shade200;
+    if (score > 85.00) return Colors.green.shade200;
+    if (score > 80.00) return Colors.lightGreen.shade200;
+    if (score > 75.00) return Colors.orange.shade200;
+    if (score >= 70.00) return Colors.amber.shade200;
+    return Colors.red.shade200;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,28 +207,30 @@ class _SamaptaBScreenState extends State<SamaptaBScreen> {
             Container(
               padding: const EdgeInsets.all(AppDimensions.lg),
               decoration: BoxDecoration(
-                color: AppColors.primaryNavy,
+                color: _getScoreBgColor(_ngbTotal),
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                border: Border.all(
+                  color: _getScoreBorderColor(_ngbTotal),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Total NGB:',
                     style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+                      color: _getScoreTextColor(
+                        _ngbTotal,
+                      ).withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w800,
                       fontSize: AppDimensions.fontLg,
                     ),
                   ),
                   Text(
                     _ngbTotal.toStringAsFixed(2),
                     style: TextStyle(
-                      color: _ngbTotal == 0.0
-                          ? Colors.redAccent
-                          : (_ngbTotal >= 70
-                                ? Colors.greenAccent
-                                : Colors.orangeAccent),
+                      color: _getScoreTextColor(_ngbTotal),
                       fontWeight: FontWeight.w900,
                       fontSize: AppDimensions.fontXxl,
                     ),

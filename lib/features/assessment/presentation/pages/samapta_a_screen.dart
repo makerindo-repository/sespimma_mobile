@@ -64,6 +64,7 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
   }
 
   void _saveData() {
+    FocusScope.of(context).unfocus();
     if (_ngaScore == 0) {
       AppNotifier.showError(context, 'Jarak belum diisi atau tidak valid');
       return;
@@ -75,6 +76,33 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
     AppNotifier.showSuccess(context, 'Nilai Samapta A berhasil disimpan');
 
     Navigator.pop(context);
+  }
+
+  Color _getScoreBgColor(double score) {
+    if (score == 0) return Colors.blueGrey.shade50;
+    if (score > 85.00) return Colors.green.shade50;
+    if (score > 80.00) return Colors.lightGreen.shade50;
+    if (score > 75.00) return Colors.orange.shade50;
+    if (score >= 70.00) return Colors.amber.shade50;
+    return Colors.red.shade50;
+  }
+
+  Color _getScoreTextColor(double score) {
+    if (score == 0) return const Color(0xFF001C40);
+    if (score > 85.00) return Colors.green.shade800;
+    if (score > 80.00) return Colors.lightGreen.shade800;
+    if (score > 75.00) return Colors.orange.shade800;
+    if (score >= 70.00) return Colors.amber.shade900;
+    return Colors.red.shade800;
+  }
+
+  Color _getScoreBorderColor(double score) {
+    if (score == 0) return Colors.grey.shade200;
+    if (score > 85.00) return Colors.green.shade200;
+    if (score > 80.00) return Colors.lightGreen.shade200;
+    if (score > 75.00) return Colors.orange.shade200;
+    if (score >= 70.00) return Colors.amber.shade200;
+    return Colors.red.shade200;
   }
 
   @override
@@ -187,16 +215,12 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
                         width: 80,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: _ngaScore >= 70
-                              ? Colors.green.shade50
-                              : Colors.red.shade50,
+                          color: _getScoreBgColor(_ngaScore),
                           borderRadius: BorderRadius.circular(
                             AppDimensions.radiusMd,
                           ),
                           border: Border.all(
-                            color: _ngaScore >= 70
-                                ? Colors.green.shade200
-                                : Colors.red.shade200,
+                            color: _getScoreBorderColor(_ngaScore),
                           ),
                         ),
                         child: Center(
@@ -205,9 +229,7 @@ class _SamaptaAScreenState extends State<SamaptaAScreen> {
                             style: TextStyle(
                               fontSize: AppDimensions.fontLg,
                               fontWeight: FontWeight.w800,
-                              color: _ngaScore >= 70
-                                  ? Colors.green.shade700
-                                  : Colors.red.shade700,
+                              color: _getScoreTextColor(_ngaScore),
                             ),
                           ),
                         ),
