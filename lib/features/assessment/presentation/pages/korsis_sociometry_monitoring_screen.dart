@@ -658,21 +658,66 @@ class _KorsisSociometryMonitoringScreenState
                             ],
                           ),
                           const SizedBox(height: AppDimensions.md),
-                          ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: serdikList.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: AppDimensions.md),
-                            itemBuilder: (context, index) {
-                              return _buildPeerTile(
-                                context,
-                                index,
-                                serdikList,
-                                allSerdik,
-                              );
-                            },
-                          ),
+                          if (serdikList.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppDimensions.xxxl,
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(
+                                        AppDimensions.xl,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blueGrey.shade50,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        AppIcons.usersFill,
+                                        size: 48,
+                                        color: Colors.blueGrey.shade300,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppDimensions.lg),
+                                    Text(
+                                      'Tidak ada data sosiometri',
+                                      style: TextStyle(
+                                        fontSize: AppDimensions.fontLg,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.blueGrey.shade400,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppDimensions.sm),
+                                    Text(
+                                      'Coba ubah filter pokjar atau status',
+                                      style: TextStyle(
+                                        fontSize: AppDimensions.fontSm,
+                                        color: Colors.blueGrey.shade300,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          else
+                            ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: serdikList.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: AppDimensions.md),
+                              itemBuilder: (context, index) {
+                                return _buildPeerTile(
+                                  context,
+                                  index,
+                                  serdikList,
+                                  allSerdik,
+                                );
+                              },
+                            ),
                           const SizedBox(height: AppDimensions.xl),
                         ],
                       ),

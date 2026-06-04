@@ -43,7 +43,7 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
               'Buka menu "Monitoring". Anda dapat melihat daftar Serdik berdasarkan tingkat risikonya. Klik pada Serdik untuk melihat rincian kompetensi dan "Log Pelanggaran" secara dinamis.',
         },
         {
-          'q': 'Bagaimana cara mengunduh Laporan Nilai Akhir?',
+          'q': 'Bagaimana cara mengunduh laporan nilai akhir?',
           'a':
               'Di menu "Laporan", Anda akan melihat rekapitulasi nilai Serdik. Klik ikon unduh (PDF) di pojok kanan atas, sesuaikan nama dan pangkat penandatangan, lalu klik "Generate Laporan".',
         },
@@ -58,24 +58,65 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
               'Sistem (IDMS) akan mengakumulasi nilai dari Patun, Gadik, dan Korsis secara otomatis. Bobot penilaian terdiri dari Akademik (70%), Mental Kepribadian (20%), dan Jasmani (10%).',
         },
       ];
-    } else if (role == 'tim_operator') {
+    } else if (role == 'operator') {
       return [
         {
-          'q': 'Bagaimana cara membuat Zona Kegiatan?',
+          'q': 'Bagaimana cara membuat zona kegiatan?',
           'a':
               'Gunakan menu "Zona". Anda dapat menandai koordinat lokasi dan menentukan batas radiusnya, lalu sistem akan memantau kehadiran Serdik secara otomatis.',
         },
         {
-          'q': 'Bagaimana cara menginput Nilai Jasmani?',
+          'q': 'Bagaimana cara menginput nilai jasmani?',
           'a':
               'Gunakan menu "Jasmani" untuk mencari Serdik dan memasukkan nilai ujian kesamaptaan jasmani secara real-time.',
+        },
+      ];
+    } else if (role == 'korsis') {
+      return [
+        {
+          'q': 'Bagaimana memantau pencatatan inbox?',
+          'a':
+              'Gunakan menu "Inbox" untuk memantau pencatatan Serdik. Anda dapat memfilter berdasarkan Pokjar (I-V) atau status pencatatan.',
+        },
+        {
+          'q': 'Bagaimana cara mengisi form mental kepribadian?',
+          'a':
+              'Pilih menu "Mental" di navigasi bawah, lalu gunakan form penilaian mental kepribadian untuk merekam perkembangan atau pelanggaran Serdik secara dinamis.',
+        },
+        {
+          'q': 'Bagaimana memantau pengisian sosiometri?',
+          'a':
+              'Buka menu "Sosiometri". Anda dapat memonitor progres pengisian (prosentase tuntas) oleh Serdik secara real-time untuk fase Awal maupun Akhir.',
+        },
+        {
+          'q': 'Bagaimana cara membuat zona absensi?',
+          'a':
+              'Masuk ke menu "Zona" dan klik tombol tambah. Anda bebas membuat zona Lingkaran (radius) maupun zona Poligon (bentuk khusus).',
+        },
+      ];
+    } else if (role == 'medis') {
+      return [
+        {
+          'q': 'Bagaimana cara memantau status kesehatan serdik?',
+          'a':
+              'Gunakan menu "Kesehatan" pada bilah bawah. Anda dapat mencari nama atau nomor Serdik spesifik, atau menggunakan filter berdasarkan kelompok POKJAR I hingga V.',
+        },
+        {
+          'q': 'Bagaimana sistem perhitungan nilai kesehatan?',
+          'a':
+              'Sistem secara dinamis menghitung N.KES = (A + B + C) / 3. Nilai C akan otomatis berkurang secara progresif bila Serdik tercatat berkunjung ke Poliklinik atau menjalani Rawat Inap (TPS/RS).',
+        },
+        {
+          'q': 'Bagaimana cara merekam rawat inap atau berobat?',
+          'a':
+              'Dari layar monitoring, pilih Serdik, ketuk form "Status Kesehatan Pendidikan", lengkapi informasi jenis rawat dan durasi harinya, lalu ambil bukti foto langsung menggunakan kamera sebelum menekan SIMPAN.',
         },
       ];
     }
 
     return [
       {
-        'q': 'Bagaimana cara Absensi Geofencing?',
+        'q': 'Bagaimana cara absensi geofencing?',
         'a':
             'Gunakan menu "Apel" di navigasi bawah. Pastikan fitur GPS aktif dan Anda berada di dalam radius Geofencing.',
       },
@@ -85,7 +126,7 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
             'Sistem penilaian menerapkan pembobotan transparan: 70% Akademik, 20% Mental & Kepribadian, dan 10% Jasmani.',
       },
       {
-        'q': 'Bagaimana cara mengumpulkan Tugas Harian?',
+        'q': 'Bagaimana cara mengumpulkan tugas harian?',
         'a':
             'Masuk ke menu "Tugas", pilih Tugas aktif, lalu klik "Unggah Bukti" sebelum batas waktu berakhir.',
       },
@@ -390,7 +431,7 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
                 size: AppDimensions.iconDefault + 2,
               ),
               label: const Text(
-                'Hubungi via WhatsApp',
+                'Hubungi WhatsApp',
                 style: TextStyle(
                   fontSize: AppDimensions.fontLg,
                   fontWeight: FontWeight.w800,

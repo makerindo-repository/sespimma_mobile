@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class LeaveFormSheet extends StatefulWidget {
   final VoidCallback onSuccess;
@@ -166,11 +167,9 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     if (attachedFileName == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Harap lampirkan dokumen bukti izin!'),
-                          backgroundColor: AppColors.dangerRed,
-                        ),
+                      AppNotifier.showError(
+                        context,
+                        'Harap lampirkan dokumen bukti izin!',
                       );
                       return;
                     }

@@ -66,7 +66,7 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: ProfileScreen(),
         ),
       ];
-    case 'pengajar':
+    case 'gadik':
       return const [
         NavItem(
           label: 'Tugas',
@@ -87,7 +87,7 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: ProfileScreen(),
         ),
       ];
-    case 'pengajar_patun':
+    case 'patun':
       return const [
         NavItem(
           label: 'Akademik',
@@ -126,7 +126,7 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: ProfileScreen(),
         ),
       ];
-    case 'pengajar_medis':
+    case 'medis':
       return const [
         NavItem(
           label: 'Kesehatan',
@@ -141,7 +141,7 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: ProfileScreen(),
         ),
       ];
-    case 'pengajar_korsis':
+    case 'korsis':
       return const [
         NavItem(
           label: 'Inbox',
@@ -174,7 +174,7 @@ List<NavItem> getNavItemsByRole(String roleId) {
           screen: ProfileScreen(),
         ),
       ];
-    case 'tim_operator':
+    case 'operator':
       return const [
         NavItem(
           label: 'Jasmani',

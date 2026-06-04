@@ -94,18 +94,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (user.roleId != 'tim_operator')
+                              if (user.roleId != 'operator')
                                 _buildStatCards(user),
                               if (user.roleId != 'pimpinan' &&
-                                  user.roleId != 'pengajar_patun' &&
-                                  user.roleId != 'pengajar_korsis' &&
+                                  user.roleId != 'patun' &&
+                                  user.roleId != 'korsis' &&
                                   user.roleId != 'kabag_bindik' &&
-                                  user.roleId != 'pengajar_medis' &&
-                                  user.roleId != 'tim_operator') ...[
+                                  user.roleId != 'medis' &&
+                                  user.roleId != 'operator') ...[
                                 const SizedBox(height: AppDimensions.lg),
                                 _buildFormalDataCard(user),
                               ],
-                              if (user.roleId == 'tim_operator')
+                              if (user.roleId == 'operator')
                                 const SizedBox(height: 56)
                               else
                                 const SizedBox(height: AppDimensions.xl),
@@ -136,8 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   String _getRoleLabel(UserEntity user) {
     if ((user.roleId == 'pimpinan' ||
-            user.roleId == 'pengajar_patun' ||
-            user.roleId == 'pengajar_korsis') &&
+            user.roleId == 'patun' ||
+            user.roleId == 'korsis') &&
         user.jabatanSenat.isNotEmpty &&
         user.jabatanSenat != '-') {
       return user.jabatanSenat.toUpperCase();
@@ -145,22 +145,22 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (user.roleId == 'pimpinan') {
       return 'PIMPINAN';
     }
-    if (user.roleId == 'pengajar_patun') {
+    if (user.roleId == 'patun') {
       return 'PATUN';
     }
     if (user.roleId == 'kabag_bindik') {
       return 'KABAG BINDIK';
     }
-    if (user.roleId == 'pengajar_korsis') {
+    if (user.roleId == 'korsis') {
       return 'KORSIS';
     }
-    if (user.roleId == 'pengajar_medis') {
+    if (user.roleId == 'medis') {
       return 'MEDIS';
     }
-    if (user.roleId == 'tim_operator') {
+    if (user.roleId == 'operator') {
       return 'OPERATOR';
     }
-    if (user.roleId.startsWith('pengajar')) {
+    if (user.roleId.startsWith('gadik')) {
       return 'GADIK';
     }
     return 'SERDIK';
@@ -169,11 +169,11 @@ class _ProfileScreenState extends State<ProfileScreen>
   Color _getRoleBadgeColor(String roleId) {
     if (roleId == 'pimpinan') return const Color(0xFFFFAC1C);
     if (roleId == 'kabag_bindik') return const Color(0xFFC0392B);
-    if (roleId == 'pengajar_patun') return const Color(0xFF8E44AD);
-    if (roleId == 'pengajar_medis') return const Color(0xFF27AE60);
-    if (roleId == 'pengajar_korsis') return const Color(0xFF16A085);
-    if (roleId == 'tim_operator') return const Color(0xFF3498DB);
-    if (roleId.startsWith('pengajar')) return const Color(0xFF2980B9);
+    if (roleId == 'patun') return const Color(0xFF8E44AD);
+    if (roleId == 'medis') return const Color(0xFF27AE60);
+    if (roleId == 'korsis') return const Color(0xFF16A085);
+    if (roleId == 'operator') return const Color(0xFF3498DB);
+    if (roleId.startsWith('gadik')) return const Color(0xFF2980B9);
     return const Color(0xFF7F8C8D);
   }
 
@@ -197,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl),
             child: Text(
-              user.roleId == 'tim_operator'
+              user.roleId == 'operator'
                   ? 'TIM SESPIMMA'
                   : user.name.toUpperCase(),
               style: const TextStyle(
@@ -356,13 +356,13 @@ class _ProfileScreenState extends State<ProfileScreen>
         ),
         _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
       ];
-    } else if (user.roleId == 'pengajar' || user.roleId == 'pengajar_gadik') {
+    } else if (user.roleId == 'gadik') {
       rows = [
         _buildDetailRow(AppIcons.bookOpen, 'AGAMA', user.agama),
         _buildDetailRow(AppIcons.chartBar, 'ESELON', user.eselon),
         _buildDetailRow(AppIcons.chartBar, 'GOLONGAN', user.golongan),
       ];
-    } else if (user.roleId == 'pengajar_medis') {
+    } else if (user.roleId == 'medis') {
       rows = [
         _buildDetailRow(AppIcons.identificationCard, 'NRP/NIP', user.nrp),
         _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),
@@ -374,8 +374,8 @@ class _ProfileScreenState extends State<ProfileScreen>
         _buildDetailRow(AppIcons.clipboardText, 'JABATAN', user.jabatan),
       ];
     } else if (user.roleId == 'pimpinan' ||
-        user.roleId == 'pengajar_korsis' ||
-        user.roleId == 'pengajar_patun') {
+        user.roleId == 'korsis' ||
+        user.roleId == 'patun') {
       rows = [
         _buildDetailRow(AppIcons.identificationCard, 'NRP/NIP', user.nrp),
         _buildDetailRow(AppIcons.user, 'NAMA LENGKAP', user.name),

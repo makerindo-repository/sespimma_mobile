@@ -5,6 +5,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../data/models/gadik_assignment_model.dart';
 import '../../data/datasources/gadik_assignment_mock_data.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
@@ -32,32 +33,18 @@ class _GadikCreateAssignmentScreenState
   final _judulController = TextEditingController();
   final _instruksiController = TextEditingController();
 
-  String _jenisTugas = 'Ujian Mata Pelajaran atau Esai';
-  String? _turunanTugas;
+  String _jenisTugas = 'Ujian Mata Pelajaran atau Esai (NUMP)';
   DateTime? _deadline;
   String _targetPokjar = 'Semua Pokjar';
   String? _fileName;
 
   final List<String> _jenisTugasList = [
-    'Ujian Mata Pelajaran atau Esai',
+    'Ujian Mata Pelajaran atau Esai (NUMP)',
     'Naskah Kuliah Kerja Profesi (NKKP)',
     'Naskah Praktek Kerja Profesi (NPKP)',
     'Naskah Karya Perseorangan (NKP)',
-    'Simulasi Kepemimpinan Kontemporer',
+    'Simulasi Kepemimpinan Kontemporer (NSK)',
     'Naskah Program Transformasi Teknis (NPTT)',
-  ];
-
-  final List<String> _kompetensiNKP = [
-    'Kemampuan Membuat Keputusan Strategis',
-    'Kecerdasan Emosional (EQ)',
-    'Komunikasi Efektif',
-    'Kemampuan Membangun dan Memimpin',
-    'Adaptabilitas & Pembelajaran Kontinu',
-    'Visi & Strategic Thinking',
-    'Integritas & Etika',
-    'Kemampuan Mendayagunakan Teknologi',
-    'Empati & Pelayanan',
-    'Resilience & Ketahanan Mental',
   ];
 
   final List<String> _pokjarList = [
@@ -72,22 +59,7 @@ class _GadikCreateAssignmentScreenState
   void _saveTask() {
     if (_formKey.currentState!.validate()) {
       if (_deadline == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'Batas pengumpulan wajib diisi',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            ),
-          ),
-        );
+        AppNotifier.showError(context, 'Batas pengumpulan wajib diisi');
         return;
       }
 
@@ -97,9 +69,6 @@ class _GadikCreateAssignmentScreenState
         id: id,
         judul: _judulController.text,
         jenisTugas: _jenisTugas,
-        turunanTugas: _jenisTugas == 'Naskah Karya Perseorangan (NKP)'
-            ? _turunanTugas
-            : null,
         deadline: _deadline!,
         targetPokjar: _targetPokjar,
         instruksi: _instruksiController.text,
@@ -312,48 +281,10 @@ class _GadikCreateAssignmentScreenState
                         onChanged: (val) {
                           setState(() {
                             _jenisTugas = val!;
-                            if (_jenisTugas ==
-                                'Naskah Karya Perseorangan (NKP)') {
-                              _turunanTugas = _kompetensiNKP.first;
-                            } else {
-                              _turunanTugas = null;
-                            }
                           });
                         },
                       ),
                       const SizedBox(height: AppDimensions.xl),
-
-                      if (_jenisTugas == 'Naskah Karya Perseorangan (NKP)') ...[
-                        _buildLabel('Kompetensi Utama'),
-                        DropdownButtonFormField<String>(
-                          initialValue: _turunanTugas,
-                          icon: const Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: _primaryNavy,
-                          ),
-                          decoration: _inputDecoration('Pilih kompetensi'),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: _primaryNavy,
-                            fontSize: AppDimensions.fontLg,
-                          ),
-                          items: _kompetensiNKP
-                              .map(
-                                (k) => DropdownMenuItem(
-                                  value: k,
-                                  child: Text(
-                                    k,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (val) =>
-                              setState(() => _turunanTugas = val),
-                        ),
-                        const SizedBox(height: AppDimensions.xl),
-                      ],
 
                       const Divider(height: 32, color: Color(0xFFF1F5F9)),
                       _buildSectionTitle('Pengaturan Distribusi'),
@@ -496,10 +427,10 @@ class _GadikCreateAssignmentScreenState
                       ),
 
                       const Divider(height: 32, color: Color(0xFFF1F5F9)),
-                      _buildSectionTitle('Detail & Lampiran'),
+                      _buildSectionTitle('Lampiran Dokumen'),
                       const SizedBox(height: AppDimensions.md),
 
-                      _buildLabel('Instruksi Tambahan (Opsional)'),
+                      _buildLabel('Instruksi Tambahan'),
                       TextFormField(
                         controller: _instruksiController,
                         maxLines: 4,
@@ -641,7 +572,7 @@ class _GadikCreateAssignmentScreenState
                               Icon(Icons.send_rounded, size: 20),
                               SizedBox(width: 8),
                               Text(
-                                'Terbitkan Tugas',
+                                'TERBITKAN TUGAS',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: AppDimensions.fontLg,

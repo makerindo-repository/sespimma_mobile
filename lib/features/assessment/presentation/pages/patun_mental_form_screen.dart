@@ -6,6 +6,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class PatunMentalFormScreen extends StatefulWidget {
   final bool isReward;
@@ -276,18 +277,9 @@ class _PatunMentalFormScreenState extends State<PatunMentalFormScreen> {
                   ? () {
                       HapticFeedback.heavyImpact();
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Catatan berhasil disimpan ke Draft!',
-                            style: TextStyle(fontWeight: FontWeight.w700),
-                          ),
-                          backgroundColor: _primaryNavy,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                      AppNotifier.showSuccess(
+                        context,
+                        'Catatan berhasil disimpan ke Draft!',
                       );
                       final navigator = Navigator.of(context);
                       Future.delayed(const Duration(seconds: 1), () {

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
@@ -37,7 +38,6 @@ class _GadikMentalMonitoringScreenState
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   final List<String> _statusOptions = ['Semua Status', 'Reward', 'Punishment'];
@@ -72,7 +72,6 @@ class _GadikMentalMonitoringScreenState
       'POKJAR III': 'POKJAR 3',
       'POKJAR IV': 'POKJAR 4',
       'POKJAR V': 'POKJAR 5',
-      'POKJAR VI': 'POKJAR 6',
     };
     return mapping[roman] ?? roman;
   }
@@ -203,9 +202,7 @@ class _GadikMentalMonitoringScreenState
         actions: [
           IconButton(
             icon: Icon(
-              _selectedDateRange != null
-                  ? AppIcons.calendarFill
-                  : AppIcons.calendarBlank,
+              Icons.calendar_month_rounded,
               color: _selectedDateRange != null
                   ? Colors.tealAccent
                   : Colors.white,
@@ -221,11 +218,6 @@ class _GadikMentalMonitoringScreenState
         children: [
           _buildFiltersBlock(),
           _buildActiveDateFilter(),
-          Divider(
-            height: AppDimensions.dividerHeight,
-            color: Colors.grey.shade200,
-            thickness: AppDimensions.dividerHeight,
-          ),
           _buildListHeader(),
           Expanded(
             child: RefreshIndicator(
@@ -270,82 +262,38 @@ class _GadikMentalMonitoringScreenState
     );
   }
 
+  void _showInputBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _InputBottomSheet(
+        onReward: () {
+          Navigator.pop(context);
+          _openFormScreen(true);
+        },
+        onPunishment: () {
+          Navigator.pop(context);
+          _openFormScreen(false);
+        },
+      ),
+    );
+  }
+
   Widget _buildFab() {
-    return PopupMenuButton<bool>(
-      onSelected: _openFormScreen,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      offset: const Offset(0, -120),
-      itemBuilder: (_) => [
-        PopupMenuItem<bool>(
-          value: true,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  AppIcons.thumbUp,
-                  color: Colors.green.shade700,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Beri Reward',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Colors.green.shade800,
-                ),
-              ),
-            ],
-          ),
+    return FloatingActionButton.extended(
+      heroTag: null,
+      onPressed: () => _showInputBottomSheet(context),
+      backgroundColor: _primaryNavy,
+      elevation: 6,
+      icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+      label: const Text(
+        'Input Nilai',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: AppDimensions.fontMd,
         ),
-        PopupMenuItem<bool>(
-          value: false,
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  AppIcons.thumbDown,
-                  color: Colors.red.shade700,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Beri Punishment',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: Colors.red.shade800,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: _primaryNavy,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: _primaryNavy.withValues(alpha: 0.3),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
     );
   }
@@ -363,7 +311,7 @@ class _GadikMentalMonitoringScreenState
             child: AssessmentSearchBarWidget(
               controller: _searchController,
               searchQuery: _searchQuery,
-              hintText: 'Cari nama atau No. Serdik...',
+              hintText: 'Cari nama atau nomor serdik...',
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
@@ -518,16 +466,21 @@ class _GadikMentalMonitoringScreenState
   }
 
   Widget _buildListHeader() {
-    final titlePokjar = _selectedPokjar == 'Semua Pokjar'
-        ? 'POKJAR I - V'
-        : _selectedPokjar;
-
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.grey.shade200,
+            width: AppDimensions.dividerHeight,
+          ),
+        ),
+      ),
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.xl,
-        AppDimensions.lg,
+        0,
         AppDimensions.xl,
-        AppDimensions.sm,
+        AppDimensions.md,
       ),
       child: Row(
         children: [
@@ -540,23 +493,25 @@ class _GadikMentalMonitoringScreenState
               letterSpacing: 0.5,
             ),
           ),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: _primaryNavy,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-            ),
-            child: Text(
-              titlePokjar,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: AppDimensions.fontSm,
+          if (_selectedPokjar != 'Semua Pokjar') ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: _primaryNavy,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+              ),
+              child: Text(
+                _selectedPokjar,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontSm,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: AppDimensions.sm),
+          ],
+          const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
@@ -569,7 +524,7 @@ class _GadikMentalMonitoringScreenState
                 const Icon(Icons.people_alt, color: Colors.white, size: 16),
                 const SizedBox(width: 6),
                 Text(
-                  '${_filteredItems.length} Data',
+                  '${_filteredItems.length} Serdik',
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -615,10 +570,10 @@ class _GadikMentalMonitoringScreenState
               ),
               child: Text(
                 dateStr,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: AppDimensions.fontLg,
                   fontWeight: FontWeight.w800,
-                  color: Colors.blueGrey.shade700,
+                  color: _primaryNavy,
                   letterSpacing: 0.5,
                 ),
               ),
@@ -764,6 +719,24 @@ class _GadikMentalMonitoringScreenState
   Widget _buildScoreBadge(InboxItem item, Color statusColor) {
     final pointStr = item.points > 0 ? '+${item.points}' : '${item.points}';
 
+    IconData statusIconData = item.status == 'approved'
+        ? Icons.check_circle_rounded
+        : (item.status == 'rejected'
+              ? Icons.cancel_rounded
+              : Icons.access_time_filled_rounded);
+
+    Color badgeColor = item.status == 'approved'
+        ? Colors.green.shade50
+        : (item.status == 'rejected'
+              ? Colors.red.shade50
+              : Colors.amber.shade50);
+
+    Color iconColor = item.status == 'approved'
+        ? Colors.green.shade700
+        : (item.status == 'rejected'
+              ? Colors.red.shade700
+              : Colors.amber.shade800);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -777,30 +750,12 @@ class _GadikMentalMonitoringScreenState
         ),
         const SizedBox(height: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: item.status == 'approved'
-                ? Colors.green.shade50
-                : (item.status == 'rejected'
-                      ? Colors.red.shade50
-                      : Colors.amber.shade50),
+            color: badgeColor,
             borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           ),
-          child: Text(
-            item.status == 'approved'
-                ? 'DISETUJUI'
-                : (item.status == 'rejected' ? 'DITOLAK' : 'TERTUNDA'),
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.5,
-              color: item.status == 'approved'
-                  ? Colors.green.shade700
-                  : (item.status == 'rejected'
-                        ? Colors.red.shade700
-                        : Colors.amber.shade800),
-            ),
-          ),
+          child: Icon(statusIconData, size: 14, color: iconColor),
         ),
       ],
     );
@@ -831,11 +786,6 @@ class _GadikMentalMonitoringScreenState
         ? const Color(0xFF2E7D32)
         : const Color(0xFFD32F2F);
 
-    final String imageUrl = isReward
-        ? 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800'
-        : 'assets/images/images.jpeg';
-    final bool isLocalAsset = !isReward;
-
     Widget buildEvidenceImage() {
       if (item.photoPath != null && item.photoPath!.isNotEmpty) {
         return Image.file(
@@ -846,30 +796,7 @@ class _GadikMentalMonitoringScreenState
         );
       }
 
-      if (isLocalAsset) {
-        return Image.asset(
-          imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              _buildImagePlaceholder(),
-        );
-      } else {
-        return Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, chunk) {
-            if (chunk == null) return child;
-            return Container(
-              color: Colors.grey.shade100,
-              child: const Center(
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) =>
-              _buildImagePlaceholder(),
-        );
-      }
+      return _buildImagePlaceholder();
     }
 
     showModalBottomSheet(
@@ -1091,6 +1018,169 @@ class _GadikMentalMonitoringScreenState
           ),
         ),
       ],
+    );
+  }
+}
+
+class _InputBottomSheet extends StatelessWidget {
+  final VoidCallback onReward;
+  final VoidCallback onPunishment;
+
+  const _InputBottomSheet({required this.onReward, required this.onPunishment});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppDimensions.xl,
+            AppDimensions.lg,
+            AppDimensions.xl,
+            AppDimensions.xl,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: AppDimensions.handleWidth,
+                  height: AppDimensions.bottomSheetHandle,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(
+                      AppDimensions.radiusFull,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xl),
+              const Text(
+                'Input Nilai Mental',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXxl,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF000B1D),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xs),
+              Text(
+                'Pilih jenis penilaian yang akan diinput',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontLg,
+                  color: Colors.blueGrey.shade400,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xxl),
+              Row(
+                children: [
+                  Expanded(
+                    child: _SheetOptionCard(
+                      title: 'Reward',
+                      subtitle: 'Penilaian Positif',
+                      icon: Icons.thumb_up_rounded,
+                      color: const Color(0xFF1B5E20),
+                      bgColor: const Color(0xFFE8F5E9),
+                      onTap: onReward,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.lg),
+                  Expanded(
+                    child: _SheetOptionCard(
+                      title: 'Punishment',
+                      subtitle: 'Penilaian Negatif',
+                      icon: Icons.thumb_down_rounded,
+                      color: const Color(0xFFC62828),
+                      bgColor: const Color(0xFFFFEBEE),
+                      onTap: onPunishment,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimensions.sm),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SheetOptionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
+  final VoidCallback onTap;
+
+  const _SheetOptionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.bgColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: AppDimensions.xl,
+            horizontal: AppDimensions.lg,
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: color.withValues(alpha: 0.3),
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(icon, color: color, size: AppDimensions.iconXl),
+              ),
+              const SizedBox(height: AppDimensions.md),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXl,
+                  fontWeight: FontWeight.w800,
+                  color: color,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.xs),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: AppDimensions.fontSm,
+                  fontWeight: FontWeight.w500,
+                  color: color.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

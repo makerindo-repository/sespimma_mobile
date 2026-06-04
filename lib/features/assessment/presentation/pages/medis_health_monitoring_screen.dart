@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
@@ -31,12 +32,11 @@ class _MedisHealthMonitoringScreenState
 
   final List<String> _filterOptions = [
     'Semua',
-    'POKJAR 1',
-    'POKJAR 2',
-    'POKJAR 3',
-    'POKJAR 4',
-    'POKJAR 5',
-    'POKJAR 6',
+    'POKJAR I',
+    'POKJAR II',
+    'POKJAR III',
+    'POKJAR IV',
+    'POKJAR V',
   ];
 
   @override
@@ -91,12 +91,7 @@ class _MedisHealthMonitoringScreenState
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Data berhasil dikunci.'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              AppNotifier.showSuccess(context, 'Data berhasil dikunci.');
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text(
@@ -127,27 +122,21 @@ class _MedisHealthMonitoringScreenState
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_isAllHealthScoresFilled) {
             _showLockDialog();
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Belum semua Serdik dinilai A dan B.'),
-                backgroundColor: Colors.red,
-              ),
+            AppNotifier.showError(
+              context,
+              'Belum semua Serdik dinilai A dan B.',
             );
           }
         },
         backgroundColor: _isAllHealthScoresFilled
             ? AppColors.primaryNavy
             : Colors.grey,
-        icon: const Icon(Icons.lock_outline, color: Colors.white),
-        label: const Text(
-          'Kunci Nilai',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        child: const Icon(Icons.lock_outline, color: Colors.white),
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
@@ -166,17 +155,24 @@ class _MedisHealthMonitoringScreenState
             }).toList();
 
             if (_selectedFilter != 'Semua') {
+              final Map<String, String> pokjarMap = {
+                'POKJAR I': 'POKJAR 1',
+                'POKJAR II': 'POKJAR 2',
+                'POKJAR III': 'POKJAR 3',
+                'POKJAR IV': 'POKJAR 4',
+                'POKJAR V': 'POKJAR 5',
+              };
+              final targetPokjar =
+                  pokjarMap[_selectedFilter] ?? _selectedFilter;
               filteredList = filteredList
-                  .where(
-                    (serdik) => serdik['kelompok_kelas'] == _selectedFilter,
-                  )
+                  .where((serdik) => serdik['kelompok_kelas'] == targetPokjar)
                   .toList();
             }
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeaderBlock(baseList.length),
+                _buildHeaderBlock(filteredList.length),
                 Divider(
                   height: AppDimensions.dividerHeight,
                   color: Colors.grey.shade200,
@@ -226,7 +222,7 @@ class _MedisHealthMonitoringScreenState
                 child: AssessmentSearchBarWidget(
                   controller: _searchController,
                   searchQuery: _searchQuery,
-                  hintText: 'Cari nama atau No. Serdik...',
+                  hintText: 'Cari nama atau nomor serdik....',
                   onChanged: (value) {
                     setState(() {
                       _searchQuery = value;
@@ -387,6 +383,18 @@ class _MedisHealthMonitoringScreenState
     final noSerdik = (serdik['no_serdik'] ?? '-').toString();
     final pangkat = (serdik['pangkat'] ?? '-').toString();
 
+    final String rawPokjar = (serdik['kelompok_kelas'] ?? '-')
+        .toString()
+        .toUpperCase();
+    final Map<String, String> pokjarMap = {
+      'POKJAR 1': 'POKJAR I',
+      'POKJAR 2': 'POKJAR II',
+      'POKJAR 3': 'POKJAR III',
+      'POKJAR 4': 'POKJAR IV',
+      'POKJAR 5': 'POKJAR V',
+    };
+    final String displayPokjar = pokjarMap[rawPokjar] ?? rawPokjar;
+
     final data = HealthMonitoringData.getHealthData(noSerdik);
     final bool isGraded = data.nilaiA != null && data.nilaiB != null;
     final double finalScore = isGraded ? data.nilaiAkhir : 0;
@@ -442,6 +450,27 @@ class _MedisHealthMonitoringScreenState
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: AppDimensions.xs),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppDimensions.xs,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey.shade50,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusSm,
+                        ),
+                      ),
+                      child: Text(
+                        displayPokjar,
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.blueGrey.shade600,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: AppDimensions.sm),
                     Wrap(
                       spacing: 6,
@@ -450,7 +479,7 @@ class _MedisHealthMonitoringScreenState
                         if (data.nilaiA != null)
                           _buildStatusBadge('A', Colors.green),
                         if (data.nilaiB != null)
-                          _buildStatusBadge('B', Colors.blue),
+                          _buildStatusBadge('B', Colors.green),
                         if (data.records.isNotEmpty)
                           _buildStatusNote(data.records.length),
                       ],

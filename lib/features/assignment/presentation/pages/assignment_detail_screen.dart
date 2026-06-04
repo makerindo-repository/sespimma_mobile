@@ -6,6 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/assignment_model.dart';
 import 'package:sespimma_mobile/features/assignment/presentation/widgets/assignment_widgets.dart';
+import 'package:sespimma_mobile/features/gadik_assignment/data/models/gadik_submission_model.dart';
+import 'package:sespimma_mobile/features/gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
+import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
 class AssignmentDetailScreen extends StatefulWidget {
   const AssignmentDetailScreen({super.key});
@@ -97,8 +100,29 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
     });
   }
 
-  Future<void> _submitTask() async {
+  Future<void> _submitTask(AssignmentModel a) async {
     await HapticFeedback.heavyImpact();
+
+    final newSubmission = GadikSubmissionModel(
+      id: 'SUB-${DateTime.now().millisecondsSinceEpoch}',
+      assignmentId: a.id,
+      serdikName: 'Agus Subiyanto',
+      serdikNrp: '202602003097',
+      serdikPangkat: 'KOMPOL',
+      serdikNosis: '2026.012',
+      submittedAt: DateTime.now(),
+      fileName: _fileName,
+      fileUrl: 'https://example.com/$_fileName',
+      isGraded: false,
+    );
+    GadikAssignmentMockData.submissions.add(newSubmission);
+
+    final idx = PimpinanMockData.sharedTasks.indexWhere((t) => t.id == a.id);
+    if (idx != -1) {
+      final t = PimpinanMockData.sharedTasks[idx];
+      PimpinanMockData.sharedTasks[idx] = t.copyWith(status: 'Selesai');
+    }
+
     if (!mounted) return;
     AssignmentSnackbars.showSuccess(context, 'Tugas berhasil dikumpulkan');
     Navigator.pop(context);
@@ -123,16 +147,17 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
     }
   }
 
-  void _showSubmitSheet(bool isExpired) => showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
-    builder: (_) => AssignmentSubmitConfirmationSheet(
-      isExpired: isExpired,
-      fileName: _fileName,
-      onConfirm: _submitTask,
-    ),
-  );
+  void _showSubmitSheet(bool isExpired, AssignmentModel a) =>
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        builder: (_) => AssignmentSubmitConfirmationSheet(
+          isExpired: isExpired,
+          fileName: _fileName,
+          onConfirm: () => _submitTask(a),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +189,7 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
                 isFileAttached: _isFileAttached,
                 onPressed: () {
                   HapticFeedback.mediumImpact();
-                  _showSubmitSheet(isExpired);
+                  _showSubmitSheet(isExpired, a);
                 },
               ),
           ],

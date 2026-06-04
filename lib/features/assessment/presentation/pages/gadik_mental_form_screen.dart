@@ -41,7 +41,6 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   @override
@@ -57,7 +56,6 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
       'POKJAR III': 'POKJAR 3',
       'POKJAR IV': 'POKJAR 4',
       'POKJAR V': 'POKJAR 5',
-      'POKJAR VI': 'POKJAR 6',
     };
     return mapping[roman] ?? roman;
   }
@@ -333,7 +331,10 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
         padding: const EdgeInsets.all(AppDimensions.lg),
         child: Row(
           children: [
-            _buildAvatar(isSelected ? _selectedSerdik!['profile_photo'] : null),
+            _buildAvatar(
+              isSelected ? _selectedSerdik!['profile_photo'] : null,
+              isPlaceholder: !isSelected,
+            ),
             const SizedBox(width: AppDimensions.md),
             Expanded(
               child: Column(
@@ -889,7 +890,25 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
     );
   }
 
-  Widget _buildAvatar(String? photoPath) {
+  Widget _buildAvatar(String? photoPath, {bool isPlaceholder = false}) {
+    if (isPlaceholder) {
+      return Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey.shade100,
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Icon(
+          Icons.person_rounded,
+          color: Colors.grey.shade400,
+          size: 28,
+        ),
+      );
+    }
+
+    final hasPhoto = photoPath != null && photoPath.isNotEmpty;
     return Container(
       width: 50,
       height: 50,
@@ -898,7 +917,7 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
         color: Colors.grey.shade200,
         border: Border.all(color: Colors.grey.shade300),
         image: DecorationImage(
-          image: (photoPath != null && photoPath.isNotEmpty)
+          image: hasPhoto
               ? FileImage(File(photoPath)) as ImageProvider
               : const AssetImage('assets/images/default_avatar.png'),
           fit: BoxFit.cover,
@@ -955,7 +974,7 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                           onChanged: (val) =>
                               setModalState(() => _serdikSearchQuery = val),
                           decoration: InputDecoration(
-                            hintText: 'Cari nama atau No. Serdik...',
+                            hintText: 'Cari nama atau nomor serdik...',
                             prefixIcon: const Icon(
                               Icons.search,
                               color: Colors.grey,

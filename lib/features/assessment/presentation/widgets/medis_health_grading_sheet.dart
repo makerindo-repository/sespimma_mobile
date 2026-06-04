@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/health_monitoring_data.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/medis_health_record_screen.dart';
 
@@ -80,9 +81,7 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                 borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
               ),
               title: Text(
-                type == 'A'
-                    ? 'Input Nilai A (Tes Awal)'
-                    : 'Input Nilai B (Tes Akhir)',
+                type == 'A' ? 'Tes Kesehatan Awal' : 'Tes Kesehatan Akhir',
                 style: const TextStyle(
                   color: _primaryNavy,
                   fontWeight: FontWeight.w800,
@@ -200,11 +199,9 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                       widget.onDataChanged();
                       Navigator.pop(context);
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Nilai berhasil disimpan'),
-                          backgroundColor: Colors.green,
-                        ),
+                      AppNotifier.showSuccess(
+                        context,
+                        'Nilai berhasil disimpan',
                       );
                     }
                   },
@@ -273,22 +270,22 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
           ),
           const SizedBox(height: AppDimensions.xl),
           _buildActionCard(
-            'Nilai A (Tes Kesehatan Awal)',
-            'Pemeriksaan intensif awal pendidikan',
+            'Tes Kesehatan Awal',
+            'Pemeriksaan Intensif II Plus',
             Icons.medical_information,
             () => _showInputDialog('A'),
           ),
           const SizedBox(height: AppDimensions.md),
           _buildActionCard(
-            'Nilai B (Tes Kesehatan Akhir)',
-            'Pemeriksaan akhir sebelum penutupan',
+            'Tes Kesehatan Akhir',
+            'Pemeriksaan akhir dalam periode pendidikan',
             Icons.fact_check,
             () => _showInputDialog('B'),
           ),
           const SizedBox(height: AppDimensions.md),
           _buildActionCard(
-            'Catat Rawat Inap (Nilai C)',
-            'Kunjungan poliklinik & rawat inap',
+            'Status Kesehatan Pendidikan',
+            'Catat rawat inap kunjungan ke poliklinik, dirawat inap TPS, atau dirawat inap RS',
             Icons.local_hospital,
             _navigateToRecordScreen,
           ),

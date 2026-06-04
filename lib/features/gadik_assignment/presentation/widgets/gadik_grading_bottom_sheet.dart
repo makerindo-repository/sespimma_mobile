@@ -41,6 +41,17 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
   double _calculatedNA = 0.0;
 
+  String _getAssignmentCode(String jenis) {
+    final lower = jenis.toLowerCase();
+    if (lower.contains('ujian') || lower.contains('esai')) return 'NUMP';
+    if (lower.contains('nkkp')) return 'NKKP';
+    if (lower.contains('npkp')) return 'NPKP';
+    if (lower.contains('simulasi') || lower.contains('nsk')) return 'NSK';
+    if (lower.contains('nptt') || lower.contains('taskap')) return 'NPTT';
+    if (lower.contains('nkp')) return 'NKP';
+    return 'NILAI';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -107,22 +118,27 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
     if (jenis == 'Ujian Mata Pelajaran atau Esai') {
       total = _parse(_ujianCtrl.text);
-    } else if (jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' ||
+    } else if (jenis == 'Naskah Kuliah Kerja Profesi (NKKP)' ||
+        jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' ||
+        jenis == 'Naskah Praktek Kerja Profesi (NPKP)' ||
         jenis == 'NPKP (Naskah Praktek Kerja Profesi)') {
       double m = _parse(_materiCtrl.text);
       double p = _parse(_paparanCtrl.text);
       double k = _parse(_keaktifanCtrl.text);
       total = ((m * 35) + (p * 35) + (k * 30)) / 100;
-    } else if (jenis == 'NKP (Naskah Karya Perseorangan)') {
+    } else if (jenis == 'Naskah Karya Perseorangan (NKP)' ||
+        jenis == 'NKP (Naskah Karya Perseorangan)') {
       double m = _parse(_materiCtrl.text);
       double p = _parse(_paparanCtrl.text);
       total = ((m * 50) + (p * 50)) / 100;
-    } else if (jenis == 'Simulasi Kepemimpinan Kontemporer') {
+    } else if (jenis == 'Simulasi Kepemimpinan Kontemporer' ||
+        jenis == 'Simulasi Kepemimpinan Kontemporer (NSK)') {
       double k = _parse(_keaktifanPerseoranganCtrl.text);
       double p = _parse(_produkPerseoranganCtrl.text);
       double t = _parse(_tataRuangCtrl.text);
       total = ((k * 60) + (p * 20) + (t * 20)) / 100;
-    } else if (jenis == 'NPTT (Naskah Program Transformasi Teknis)') {
+    } else if (jenis == 'Naskah Program Transformasi Teknis (NPTT)' ||
+        jenis == 'NPTT (Naskah Program Transformasi Teknis)') {
       double m = _parse(_materiCtrl.text);
       double pe = _parse(_penulisanCtrl.text);
       double p = _parse(_paparanCtrl.text);
@@ -136,11 +152,11 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
   Color _getScoreColor(double score) {
     if (score == 0) return AppColors.primaryNavy;
-    if (score < 70.01) return Colors.red.shade700;
-    if (score <= 75.00) return Colors.orange.shade700;
-    if (score <= 80.00) return Colors.blue.shade700;
-    if (score <= 85.00) return Colors.green.shade600;
-    return Colors.green.shade800;
+    if (score > 85.00) return Colors.green.shade800;
+    if (score > 80.00) return Colors.green.shade500;
+    if (score > 75.00) return Colors.lime.shade700;
+    if (score > 70.00) return Colors.amber.shade500;
+    return Colors.red.shade700;
   }
 
   String _getScoreCategory(double score) {
@@ -159,6 +175,8 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
         assignmentId: widget.submission.assignmentId,
         serdikName: widget.submission.serdikName,
         serdikNrp: widget.submission.serdikNrp,
+        serdikPangkat: widget.submission.serdikPangkat,
+        serdikNosis: widget.submission.serdikNosis,
         submittedAt: widget.submission.submittedAt,
         fileName: widget.submission.fileName,
         fileUrl: widget.submission.fileUrl,
@@ -198,6 +216,9 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final code = _getAssignmentCode(widget.assignment.jenisTugas);
+    final serdikNosis = widget.submission.serdikNosis ?? '202602003001';
+
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -230,19 +251,49 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    'Penilaian Serdik',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryNavy,
-                    ),
+
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Penilaian Serdik',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryNavy,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryNavy.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                        ),
+                        child: Text(
+                          code,
+                          style: const TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.primaryNavy,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
+
                   Text(
-                    '${widget.submission.serdikName} - ${widget.submission.serdikNosis ?? "202602003001"}',
+                    '${widget.submission.serdikName} · $serdikNosis',
                     style: TextStyle(
                       fontSize: 14,
+                      fontWeight: FontWeight.w600,
                       color: Colors.blueGrey.shade600,
                     ),
                   ),
@@ -256,21 +307,25 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryNavy.withValues(alpha: 0.05),
+                      color: _getScoreColor(
+                        _calculatedNA,
+                      ).withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.primaryNavy.withValues(alpha: 0.2),
+                        color: _getScoreColor(
+                          _calculatedNA,
+                        ).withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Kalkulasi Nilai Akhir:',
+                        Text(
+                          'Kalkulasi $code:',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primaryNavy,
+                            color: _getScoreColor(_calculatedNA),
                           ),
                         ),
                         Text(
@@ -319,7 +374,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                   if (_calculatedNA > 90.00) ...[
                     const SizedBox(height: 20),
                     Text(
-                      'Berita Acara (Wajib untuk Nilai > 90.00)',
+                      'Berita Acara',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.purple.shade700,
@@ -331,7 +386,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                       maxLines: 2,
                       decoration: InputDecoration(
                         hintText:
-                            'Masukkan alasan / justifikasi pemberian nilai > 90.01',
+                            'Masukkan justifikasi pemberian nilai di atas 90',
                         filled: true,
                         fillColor: Colors.purple.shade50,
                         border: OutlineInputBorder(
@@ -391,11 +446,12 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
                         ),
                       ),
                       child: const Text(
-                        'Simpan Nilai',
+                        'SIMPAN NILAI',
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
                           color: Colors.white,
+                          letterSpacing: 1.0,
                         ),
                       ),
                     ),
@@ -411,11 +467,11 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
 
   Widget _buildDynamicForm() {
     final jenis = widget.assignment.jenisTugas;
+    final lower = jenis.toLowerCase();
 
-    if (jenis == 'Ujian Mata Pelajaran atau Esai') {
-      return _buildInputRow('Nilai Ujian / Esai (100%)', _ujianCtrl);
-    } else if (jenis == 'NKKP (Naskah Kuliah Kerja Profesi)' ||
-        jenis == 'NPKP (Naskah Praktek Kerja Profesi)') {
+    if (lower.contains('ujian') || lower.contains('esai')) {
+      return _buildInputRow('Nilai Ujian MP / Esai (100%)', _ujianCtrl);
+    } else if (lower.contains('nkkp') || lower.contains('npkp')) {
       return Column(
         children: [
           _buildInputRow('Materi & Penulisan (35%)', _materiCtrl),
@@ -425,7 +481,9 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
           _buildInputRow('Keaktifan (30%)', _keaktifanCtrl),
         ],
       );
-    } else if (jenis == 'NKP (Naskah Karya Perseorangan)') {
+    } else if (lower.contains('nkp') &&
+        !lower.contains('nkkp') &&
+        !lower.contains('npkp')) {
       return Column(
         children: [
           _buildInputRow('Materi & Penulisan (50%)', _materiCtrl),
@@ -433,7 +491,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
           _buildInputRow('Paparan (50%)', _paparanCtrl),
         ],
       );
-    } else if (jenis == 'Simulasi Kepemimpinan Kontemporer') {
+    } else if (lower.contains('simulasi') || lower.contains('nsk')) {
       return Column(
         children: [
           _buildInputRow(
@@ -446,12 +504,12 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
           _buildInputRow('Tata Ruang Kelompok (20%)', _tataRuangCtrl),
         ],
       );
-    } else if (jenis == 'NPTT (Naskah Program Transformasi Teknis)') {
+    } else if (lower.contains('nptt') || lower.contains('taskap')) {
       return Column(
         children: [
-          _buildInputRow('Materi NPTT/Taskap (40%)', _materiCtrl),
+          _buildInputRow('Materi (40%)', _materiCtrl),
           const SizedBox(height: 12),
-          _buildInputRow('Penulisan Efektif (30%)', _penulisanCtrl),
+          _buildInputRow('Penulisan (30%)', _penulisanCtrl),
           const SizedBox(height: 12),
           _buildInputRow('Paparan & Diskusi (30%)', _paparanCtrl),
         ],

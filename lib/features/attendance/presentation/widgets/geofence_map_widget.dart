@@ -241,7 +241,8 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
     bool isFakeGps, {
     List<AttendanceZone>? overrideZones,
   }) {
-    final zonesToUse = overrideZones ?? widget.zones;
+    final zonesToUse = List<AttendanceZone>.from(overrideZones ?? widget.zones)
+      ..sort((a, b) => a.radiusMeters.compareTo(b.radiusMeters));
 
     if (zonesToUse.isEmpty) {
       if (mounted) {

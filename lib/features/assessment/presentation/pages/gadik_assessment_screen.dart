@@ -44,7 +44,6 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   @override
@@ -260,8 +259,6 @@ class _GadikAssessmentScreenState extends State<GadikAssessmentScreen>
         return 'POKJAR 4';
       case 'POKJAR V':
         return 'POKJAR 5';
-      case 'POKJAR VI':
-        return 'POKJAR 6';
       default:
         return roman;
     }

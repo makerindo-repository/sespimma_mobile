@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
@@ -10,6 +11,7 @@ class EvidenceBottomSheet {
     required String timeText,
     required String points,
     required String type,
+    String? photoPath,
   }) {
     final bool isReward = type == 'reward';
 
@@ -19,18 +21,6 @@ class EvidenceBottomSheet {
         .trim();
 
     String detailTitle = isReward ? "Bukti Penghargaan" : "Bukti Pelanggaran";
-    String imageUrl = "assets/images/images.jpeg";
-    bool isLocalAsset = true;
-
-    if (isReward) {
-      if (cleanTitle.toLowerCase().contains("imam")) {
-        imageUrl = "assets/images/kheldoun-imad-IqsenI0kT1I-unsplash.jpg";
-      } else {
-        imageUrl =
-            "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800";
-        isLocalAsset = false;
-      }
-    }
 
     final Color mainColor = isReward
         ? const Color(0xFF2E7D32)
@@ -155,76 +145,7 @@ class EvidenceBottomSheet {
               borderRadius: BorderRadius.circular(16),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: isLocalAsset
-                    ? Image.asset(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, err, stack) {
-                          return Container(
-                            color: Colors.grey.shade100,
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    AppIcons.image,
-                                    color: Colors.blueGrey.shade300,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Gagal memuat gambar bukti",
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.blueGrey.shade500,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, chunk) {
-                          if (chunk == null) return child;
-                          return Container(
-                            color: Colors.grey.shade100,
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, err, stack) {
-                          return Container(
-                            color: Colors.grey.shade100,
-                            child: Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    AppIcons.image,
-                                    color: Colors.blueGrey.shade300,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Gagal memuat gambar bukti",
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.blueGrey.shade500,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                child: _buildEvidenceImage(photoPath),
               ),
             ),
             const SizedBox(height: 24),
@@ -288,6 +209,42 @@ class EvidenceBottomSheet {
           ),
         ),
       ],
+    );
+  }
+
+  static Widget _buildEvidenceImage(String? photoPath) {
+    if (photoPath != null && photoPath.isNotEmpty) {
+      return Image.file(
+        File(photoPath),
+        fit: BoxFit.cover,
+        errorBuilder: (context, err, stack) {
+          return _buildImagePlaceholder();
+        },
+      );
+    }
+    return _buildImagePlaceholder();
+  }
+
+  static Widget _buildImagePlaceholder() {
+    return Container(
+      color: Colors.grey.shade100,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(AppIcons.image, color: Colors.blueGrey.shade300, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              "Belum ada bukti gambar",
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.blueGrey.shade500,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

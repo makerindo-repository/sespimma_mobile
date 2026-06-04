@@ -608,8 +608,6 @@ class _MonitoringTaskScreenState extends State<MonitoringTaskScreen>
         return 'POKJAR 4';
       case 'POKJAR V':
         return 'POKJAR 5';
-      case 'POKJAR VI':
-        return 'POKJAR 6';
       default:
         return roman;
     }

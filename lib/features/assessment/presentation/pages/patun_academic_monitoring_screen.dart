@@ -159,8 +159,6 @@ class _PatunAcademicMonitoringScreenState
         return 'POKJAR IV';
       case 'POKJAR 5':
         return 'POKJAR V';
-      case 'POKJAR 6':
-        return 'POKJAR VI';
       default:
         return arabic;
     }

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class PatunSenatValidationSheet extends StatefulWidget {
   final List<Map<String, dynamic>> pokjarMembers;
@@ -36,19 +37,9 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
 
   void _submitValidation() {
     Navigator.pop(context, true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle_rounded, color: Colors.white),
-            SizedBox(width: 8),
-            Expanded(child: Text('Validasi reward senat berhasil disimpan.')),
-          ],
-        ),
-        backgroundColor: Colors.green.shade700,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
+    AppNotifier.showSuccess(
+      context,
+      'Validasi reward senat berhasil disimpan.',
     );
   }
 

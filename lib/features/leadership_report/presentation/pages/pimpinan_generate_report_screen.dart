@@ -10,6 +10,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class PimpinanGenerateReportScreen extends StatefulWidget {
   const PimpinanGenerateReportScreen({super.key});
@@ -269,20 +270,16 @@ class _PimpinanGenerateReportScreenState
       await file.writeAsBytes(await pdf.save());
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Laporan berhasil dibuat! Membuka file...'),
-            backgroundColor: Colors.green,
-          ),
+        AppNotifier.showSuccess(
+          context,
+          'Laporan berhasil dibuat! Membuka file...',
         );
       }
 
       await OpenFilex.open(file.path);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Gagal membuat laporan: $e')));
+        AppNotifier.showError(context, 'Gagal membuat laporan: $e');
       }
     }
   }

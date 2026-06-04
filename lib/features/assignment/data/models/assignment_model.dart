@@ -32,7 +32,7 @@ class AssignmentModel {
       id: json['id'] as String? ?? '',
       judul: json['judul'] as String? ?? '',
       mapel: json['mapel'] as String? ?? '',
-      pengajar: json['pengajar'] as String? ?? '',
+      pengajar: json['gadik'] as String? ?? '',
       deadline: json['deadline'] != null
           ? DateTime.parse(json['deadline'])
           : DateTime.now(),
@@ -51,7 +51,7 @@ class AssignmentModel {
       'id': id,
       'judul': judul,
       'mapel': mapel,
-      'pengajar': pengajar,
+      'gadik': pengajar,
       'deadline': deadline.toIso8601String(),
       'status': status,
       'deskripsi': deskripsi,

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +36,6 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
     'POKJAR III',
     'POKJAR IV',
     'POKJAR V',
-    'POKJAR VI',
   ];
 
   final List<String> _statusOptions = ['Semua Status', 'Reward', 'Punishment'];
@@ -73,8 +73,6 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
         return 'POKJAR 4';
       case 'POKJAR V':
         return 'POKJAR 5';
-      case 'POKJAR VI':
-        return 'POKJAR 6';
       default:
         return roman;
     }
@@ -609,12 +607,46 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
               },
               color: AppColors.primaryNavy,
               child: _filteredItems.isEmpty
-                  ? ListView(
+                  ? SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      children: const [
-                        SizedBox(height: 200),
-                        Center(child: Text('Tidak ada pencatatan ditemukan')),
-                      ],
+                      child: Container(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(AppDimensions.xl),
+                              decoration: BoxDecoration(
+                                color: Colors.blueGrey.shade50,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                AppIcons.fileText,
+                                size: 48,
+                                color: Colors.blueGrey.shade300,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.lg),
+                            Text(
+                              'Tidak ada pencatatan ditemukan',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontLg,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.blueGrey.shade400,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimensions.sm),
+                            Text(
+                              'Belum ada data pencatatan baru yang masuk',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontSm,
+                                color: Colors.blueGrey.shade300,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     )
                   : _buildGroupedList(),
             ),
@@ -925,10 +957,19 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
         ? const Color(0xFF2E7D32)
         : const Color(0xFFD32F2F);
 
-    String imageUrl = isReward
-        ? "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800"
-        : "assets/images/images.jpeg";
-    bool isLocalAsset = !isReward;
+    Widget buildEvidenceImage() {
+      if (item.photoPath != null && item.photoPath!.isNotEmpty) {
+        return Image.file(
+          File(item.photoPath!),
+          fit: BoxFit.cover,
+          errorBuilder: (context, err, stack) {
+            return _buildImageErrorPlaceholder();
+          },
+        );
+      }
+
+      return _buildImageErrorPlaceholder();
+    }
 
     showModalBottomSheet(
       context: context,
@@ -1055,30 +1096,7 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
               borderRadius: BorderRadius.circular(16),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: isLocalAsset
-                    ? Image.asset(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, err, stack) {
-                          return _buildImageErrorPlaceholder();
-                        },
-                      )
-                    : Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, chunk) {
-                          if (chunk == null) return child;
-                          return Container(
-                            color: Colors.grey.shade100,
-                            child: const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, err, stack) {
-                          return _buildImageErrorPlaceholder();
-                        },
-                      ),
+                child: buildEvidenceImage(),
               ),
             ),
             const SizedBox(height: 24),

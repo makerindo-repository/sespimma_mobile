@@ -442,7 +442,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             _buildInfoRow('Jabatan', user.jabatan),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Satker', user.satker),
-          ] else if (user.roleId == 'pengajar_medis') ...[
+          ] else if (user.roleId == 'medis') ...[
             _buildInfoRow(user.nrp.length > 10 ? 'NIP' : 'NRP', user.nrp),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Nama Lengkap', user.name),
@@ -450,14 +450,14 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             _buildInfoRow('Pangkat', _getFullPangkat(user.pangkat)),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Jabatan', user.jabatan),
-          ] else if (user.roleId == 'tim_operator') ...[
+          ] else if (user.roleId == 'operator') ...[
             _buildInfoRow('NRP', user.nrp),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Nama Lengkap', user.name),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Jabatan', 'Operator'),
-          ] else if (user.roleId == 'pengajar_patun' ||
-              user.roleId == 'pengajar_korsis' ||
+          ] else if (user.roleId == 'patun' ||
+              user.roleId == 'korsis' ||
               user.roleId == 'pimpinan' ||
               user.roleId == 'kabag_bindik') ...[
             _buildInfoRow(user.nrp.length > 10 ? 'NIP' : 'NRP', user.nrp),
@@ -469,8 +469,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             _buildInfoRow('Jabatan Struktural', user.jabatan),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Jabatan Kepanitiaan', user.jabatanSenat),
-          ] else if (user.roleId == 'pengajar' ||
-              user.roleId == 'pengajar_gadik') ...[
+          ] else if (user.roleId == 'gadik') ...[
             _buildInfoRow(user.nrp.length > 10 ? 'NIP' : 'NRP', user.nrp),
             const SizedBox(height: AppDimensions.md),
             _buildInfoRow('Nama Lengkap', user.name),

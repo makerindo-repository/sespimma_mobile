@@ -7,6 +7,7 @@ import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessm
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
 import '../../data/models/gadik_assignment_model.dart';
 import '../../data/datasources/gadik_assignment_mock_data.dart';
+import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'gadik_assignment_detail_screen.dart';
 import 'gadik_create_assignment_screen.dart';
 
@@ -24,20 +25,20 @@ class _GadikAssignmentMonitoringScreenState
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
   String _searchQuery = '';
-  String _selectedCategory = 'Semua Kategori';
+  String _selectedCategory = 'Semua Jenis Tugas';
   bool _sortAscending = false;
-  DateTime? _selectedDate;
+  DateTimeRange? _selectedDateRange;
 
   final TextEditingController _searchController = TextEditingController();
 
   final List<String> _categoryOptions = [
-    'Semua Kategori',
-    'Ujian Mata Pelajaran atau Esai',
+    'Semua Jenis Tugas',
+    'Ujian Mata Pelajaran atau Esai (NUMP)',
     'Naskah Kuliah Kerja Profesi (NKKP)',
     'Naskah Praktek Kerja Profesi (NPKP)',
-    'Naskah Program Transformasi Teknis (NPTT)',
     'Naskah Karya Perseorangan (NKP)',
-    'Simulasi Kepemimpinan Kontemporer',
+    'Simulasi Kepemimpinan Kontemporer (NSK)',
+    'Naskah Program Transformasi Teknis (NPTT)',
   ];
 
   String _getDynamicCategoryName(String rawCategory) {
@@ -45,8 +46,20 @@ class _GadikAssignmentMonitoringScreenState
     if (rawCategory.contains('NPKP')) return 'NPKP';
     if (rawCategory.contains('NPTT')) return 'NPTT';
     if (rawCategory.contains('NKP')) return 'NKP';
-    if (rawCategory.contains('Ujian')) return 'Ujian / Esai';
+    if (rawCategory.contains('NSK')) return 'NSK';
+    if (rawCategory.contains('Ujian')) return 'NUMP';
     return rawCategory;
+  }
+
+  String _getDisplayPokjar(String target) {
+    final t = target.toLowerCase();
+    if (t.contains('semua')) return 'SELURUH POKJAR';
+    if (t.contains('1') || t.contains('i')) return 'POKJAR I';
+    if (t.contains('2') || t.contains('ii')) return 'POKJAR II';
+    if (t.contains('3') || t.contains('iii')) return 'POKJAR III';
+    if (t.contains('4') || t.contains('iv')) return 'POKJAR IV';
+    if (t.contains('5') || t.contains('v')) return 'POKJAR V';
+    return target.toUpperCase();
   }
 
   @override
@@ -79,9 +92,9 @@ class _GadikAssignmentMonitoringScreenState
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showDateRangePicker(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
+      initialDateRange: _selectedDateRange,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
       builder: (context, child) {
@@ -105,7 +118,7 @@ class _GadikAssignmentMonitoringScreenState
     );
     if (picked != null) {
       setState(() {
-        _selectedDate = picked;
+        _selectedDateRange = picked;
       });
     }
   }
@@ -117,14 +130,20 @@ class _GadikAssignmentMonitoringScreenState
       final query = _searchQuery.toLowerCase();
       if (!title.contains(query)) return false;
 
-      if (_selectedCategory != 'Semua Kategori') {
-        if (task.jenisTugas != _selectedCategory) return false;
+      if (_selectedCategory != 'Semua Jenis Tugas') {
+        final catFilter = _getDynamicCategoryName(_selectedCategory);
+        final catTask = _getDynamicCategoryName(task.jenisTugas);
+        if (catFilter != catTask) return false;
       }
 
-      if (_selectedDate != null) {
-        if (task.createdAt.year != _selectedDate!.year ||
-            task.createdAt.month != _selectedDate!.month ||
-            task.createdAt.day != _selectedDate!.day) {
+      if (_selectedDateRange != null) {
+        final date = task.createdAt;
+        final taskDate = DateTime(date.year, date.month, date.day);
+        final start = _selectedDateRange!.start;
+        final end = _selectedDateRange!.end;
+        final startDate = DateTime(start.year, start.month, start.day);
+        final endDate = DateTime(end.year, end.month, end.day);
+        if (taskDate.isBefore(startDate) || taskDate.isAfter(endDate)) {
           return false;
         }
       }
@@ -148,7 +167,7 @@ class _GadikAssignmentMonitoringScreenState
       }
     });
 
-    final totalTasks = GadikAssignmentMockData.assignments.length;
+    final totalTasks = filteredList.length;
 
     return Scaffold(
       backgroundColor: _lightGrey,
@@ -166,6 +185,14 @@ class _GadikAssignmentMonitoringScreenState
             letterSpacing: -0.5,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month_rounded, color: Colors.white),
+            onPressed: _pickDate,
+            tooltip: 'Filter Tanggal',
+          ),
+          const SizedBox(width: AppDimensions.sm),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -205,19 +232,9 @@ class _GadikAssignmentMonitoringScreenState
           if (result == true) {
             if (!context.mounted) return;
             setState(() {});
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text(
-                  'Tugas berhasil dibuat dan didistribusikan.',
-                  style: TextStyle(fontWeight: FontWeight.w700),
-                ),
-                backgroundColor: const Color(0xFF10B981),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                ),
-                duration: const Duration(seconds: 3),
-              ),
+            AppNotifier.showSuccess(
+              context,
+              'Tugas berhasil dibuat dan didistribusikan.',
             );
           }
         },
@@ -249,11 +266,11 @@ class _GadikAssignmentMonitoringScreenState
           Row(
             children: [
               Expanded(
-                flex: 3,
+                flex: 4,
                 child: AssessmentSearchBarWidget(
                   controller: _searchController,
                   searchQuery: _searchQuery,
-                  hintText: 'Cari tugas...',
+                  hintText: 'Cari judul tugas...',
                   onChanged: (value) {
                     setState(() {
                       _searchQuery = value;
@@ -269,11 +286,11 @@ class _GadikAssignmentMonitoringScreenState
               ),
               const SizedBox(width: AppDimensions.md),
               Expanded(
-                flex: 2,
+                flex: 1,
                 child: StatusFilterButtonWidget(
                   selectedStatus: _selectedCategory,
                   statuses: _categoryOptions,
-                  defaultStatus: 'Semua Kategori',
+                  defaultStatus: 'Semua Jenis Tugas',
                   onSelected: (value) {
                     setState(() {
                       _selectedCategory = value;
@@ -299,76 +316,30 @@ class _GadikAssignmentMonitoringScreenState
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
+                  horizontal: 12,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: _primaryNavy.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                  color: _primaryNavy,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
                 ),
-                child: Text(
-                  '$totalTasks Total',
-                  style: const TextStyle(
-                    color: _primaryNavy,
-                    fontWeight: FontWeight.w800,
-                    fontSize: AppDimensions.fontXs,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.assignment, color: Colors.white, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      '$totalTasks',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: AppDimensions.fontSm,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: _pickDate,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _selectedDate != null
-                          ? _primaryNavy.withValues(alpha: 0.08)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusLg,
-                      ),
-                      border: Border.all(
-                        color: _selectedDate != null
-                            ? _primaryNavy.withValues(alpha: 0.2)
-                            : Colors.grey.shade200,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.calendar_today_rounded,
-                          size: 16,
-                          color: _selectedDate != null
-                              ? _primaryNavy
-                              : Colors.blueGrey.shade400,
-                        ),
-                        if (_selectedDate != null) ...[
-                          const SizedBox(width: 6),
-                          Text(
-                            DateFormat(
-                              'dd MMM',
-                              'id_ID',
-                            ).format(_selectedDate!),
-                            style: const TextStyle(
-                              fontSize: AppDimensions.fontSm,
-                              fontWeight: FontWeight.w700,
-                              color: _primaryNavy,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
               Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -392,7 +363,7 @@ class _GadikAssignmentMonitoringScreenState
                       turns: _sortAscending ? 0.5 : 0.0,
                       duration: const Duration(milliseconds: 300),
                       child: const Icon(
-                        Icons.swap_vert_rounded,
+                        Icons.arrow_upward_rounded,
                         size: 16,
                         color: _primaryNavy,
                       ),
@@ -410,7 +381,7 @@ class _GadikAssignmentMonitoringScreenState
   Widget _buildEmptyState() {
     final isSearching = _searchQuery.isNotEmpty;
     final isFiltered =
-        _selectedCategory != 'Semua Kategori' || _selectedDate != null;
+        _selectedCategory != 'Semua Jenis Tugas' || _selectedDateRange != null;
 
     return Center(
       child: Padding(
@@ -482,8 +453,8 @@ class _GadikAssignmentMonitoringScreenState
                   setState(() {
                     _searchQuery = '';
                     _searchController.clear();
-                    _selectedCategory = 'Semua Kategori';
-                    _selectedDate = null;
+                    _selectedCategory = 'Semua Jenis Tugas';
+                    _selectedDateRange = null;
                   });
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -510,10 +481,29 @@ class _GadikAssignmentMonitoringScreenState
   }
 
   Widget _buildTaskList(List<GadikAssignmentModel> tasks) {
+    final Map<String, List<GadikAssignmentModel>> groupedTasks = {};
+    for (var task in tasks) {
+      final dateStr = DateFormat(
+        'dd MMMM yyyy',
+        'id_ID',
+      ).format(task.createdAt);
+      if (!groupedTasks.containsKey(dateStr)) {
+        groupedTasks[dateStr] = [];
+      }
+      groupedTasks[dateStr]!.add(task);
+    }
+
+    final sortedDates = groupedTasks.keys.toList();
+    sortedDates.sort((a, b) {
+      final dateA = DateFormat('dd MMMM yyyy', 'id_ID').parse(a);
+      final dateB = DateFormat('dd MMMM yyyy', 'id_ID').parse(b);
+      return _sortAscending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
+    });
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 800),
-        child: ListView.separated(
+        child: ListView.builder(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(
             AppDimensions.xl,
@@ -521,11 +511,34 @@ class _GadikAssignmentMonitoringScreenState
             AppDimensions.xl,
             100,
           ),
-          itemCount: tasks.length,
-          separatorBuilder: (context, index) =>
-              const SizedBox(height: AppDimensions.lg),
+          itemCount: sortedDates.length,
           itemBuilder: (context, index) {
-            return _buildTaskCard(tasks[index]);
+            final dateKey = sortedDates[index];
+            final dailyTasks = groupedTasks[dateKey]!;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (index > 0) const SizedBox(height: AppDimensions.xl),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppDimensions.md),
+                  child: Text(
+                    dateKey,
+                    style: const TextStyle(
+                      fontSize: AppDimensions.fontLg,
+                      fontWeight: FontWeight.w800,
+                      color: _primaryNavy,
+                    ),
+                  ),
+                ),
+                ...dailyTasks.map((task) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppDimensions.lg),
+                    child: _buildTaskCard(task),
+                  );
+                }),
+              ],
+            );
           },
         ),
       ),
@@ -576,35 +589,20 @@ class _GadikAssignmentMonitoringScreenState
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
           onTap: () async {
-            HapticFeedback.selectionClick();
-            final scaffoldMessenger = ScaffoldMessenger.of(context);
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    GadikAssignmentDetailScreen(assignment: task),
+                builder: (_) => GadikAssignmentDetailScreen(assignment: task),
               ),
             );
-            if (!context.mounted) return;
+            if (!mounted) return;
             if (result == 'deleted') {
               setState(() {
                 GadikAssignmentMockData.assignments.removeWhere(
                   (a) => a.id == task.id,
                 );
               });
-              scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: const Text(
-                    'Tugas berhasil dihapus.',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  backgroundColor: const Color(0xFFEF4444),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                  ),
-                ),
-              );
+              AppNotifier.showSuccess(context, 'Tugas berhasil dihapus.');
             } else {
               setState(() {});
             }
@@ -656,19 +654,6 @@ class _GadikAssignmentMonitoringScreenState
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  task.targetPokjar,
-                                  style: TextStyle(
-                                    fontSize: AppDimensions.fontXs,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.blueGrey.shade400,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: AppDimensions.sm),
@@ -695,7 +680,7 @@ class _GadikAssignmentMonitoringScreenState
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
+                        color: Colors.red.shade50,
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusMd,
                         ),
@@ -705,18 +690,50 @@ class _GadikAssignmentMonitoringScreenState
                           Icon(
                             Icons.timer_outlined,
                             size: 16,
-                            color: Colors.blueGrey.shade600,
+                            color: Colors.red.shade700,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             DateFormat(
-                              'dd MMM yy, HH:mm',
+                              'dd MMMM yyyy, HH:mm',
                               'id_ID',
                             ).format(task.deadline),
                             style: TextStyle(
                               fontSize: AppDimensions.fontSm,
                               fontWeight: FontWeight.w700,
-                              color: Colors.blueGrey.shade700,
+                              color: Colors.red.shade700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade600,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.track_changes_outlined,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _getDisplayPokjar(task.targetPokjar),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: AppDimensions.fontXs + 1,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ],
@@ -727,7 +744,7 @@ class _GadikAssignmentMonitoringScreenState
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '$submitted / $totalTarget Dikumpul',
+                          '$submitted / $totalTarget',
                           style: const TextStyle(
                             fontSize: AppDimensions.fontSm,
                             fontWeight: FontWeight.w800,

@@ -112,7 +112,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-${patunRecord['nrp_nip']}',
         name: patunRecord['nama'] ?? '-',
-        roleId: 'pengajar_patun',
+        roleId: 'patun',
         pokjar: patunRecord['pokjar'] ?? '-',
         nrp: patunRecord['nrp_nip'] ?? '-',
         nosis: '-',
@@ -151,7 +151,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-002',
         name: 'KOMPOL Reza Mahendra, S.T., M.M.',
-        roleId: 'pengajar',
+        roleId: 'gadik',
         pokjar: '-',
         nrp: '80101234',
         nosis: '2026101080',
@@ -190,7 +190,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-PATUN',
         name: 'KOMPOL Budi Prakoso, S.I.K., M.H.',
-        roleId: 'pengajar_patun',
+        roleId: 'patun',
         pokjar: '-',
         nrp: '80102222',
         nosis: '2026021480',
@@ -229,7 +229,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-MEDIS',
         name: 'dr. Siti Aminah, Sp.PD.',
-        roleId: 'pengajar_medis',
+        roleId: 'medis',
         pokjar: '-',
         nrp: '80103333',
         nosis: '2026040483',
@@ -315,7 +315,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-${operatorRecord['nrp_nip']}',
         name: operatorRecord['nama'] ?? '-',
-        roleId: 'tim_operator',
+        roleId: 'operator',
         pokjar: '-',
         nrp: operatorRecord['nrp_nip'] ?? '-',
         nosis: '-',
@@ -358,7 +358,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-${korsisRecord['nrp_nip']}',
         name: korsisRecord['nama'] ?? '-',
-        roleId: 'pengajar_korsis',
+        roleId: 'korsis',
         pokjar: '-',
         nrp: korsisRecord['nrp_nip'] ?? '-',
         nosis: '-',
@@ -401,7 +401,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-${gadikRecord['nrp_nip']}',
         name: gadikRecord['nama'] ?? '-',
-        roleId: 'pengajar',
+        roleId: 'gadik',
         pokjar: '-',
         nrp: gadikRecord['nrp_nip'] ?? '-',
         nosis: '-',
@@ -444,7 +444,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       return LoginResponse(
         userId: 'USR-${medisRecord['nrp_nip']}',
         name: medisRecord['nama'] ?? '-',
-        roleId: 'pengajar_medis',
+        roleId: 'medis',
         pokjar: '-',
         nrp: medisRecord['nrp_nip'] ?? '-',
         nosis: '-',
