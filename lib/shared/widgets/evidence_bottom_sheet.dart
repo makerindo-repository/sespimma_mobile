@@ -218,7 +218,16 @@ class EvidenceBottomSheet {
         File(photoPath),
         fit: BoxFit.cover,
         errorBuilder: (context, err, stack) {
-          return _buildImagePlaceholder();
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Failed to load image at:\n$photoPath\n\nError: $err',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.red, fontSize: 10),
+              ),
+            ),
+          );
         },
       );
     }

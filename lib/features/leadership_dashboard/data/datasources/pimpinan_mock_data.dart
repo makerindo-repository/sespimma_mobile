@@ -2,6 +2,8 @@ import 'package:sespimma_mobile/features/leadership_ews/data/models/ews_model.da
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
+import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
 
 class PimpinanMockData {
   static const String pimpinanNrp = '75060001';
@@ -65,93 +67,72 @@ class PimpinanMockData {
     };
   }
 
-  static final List<Map<String, dynamic>> serdikAttendanceHistory = [
-    {
-      'id': 'att_001',
-      'title': 'Apel Pagi Siswa',
-      'date': _getFormattedDate(0),
-      'time': '07:05 WIB',
-      'dateTime': DateTime.now().subtract(const Duration(hours: 1)),
-      'status': 'Hadir',
-      'type': 'hadir',
-      'method': 'Geofencing',
-      'verification': 'Valid',
-      'location': 'Lapangan Apel Utama Sespimma',
-      'device': 'Samsung Galaxy S23 Ultra',
-      'image': 'assets/images/avatar.png',
-    },
-    {
-      'id': 'att_002',
-      'title': 'Kelas Kepemimpinan',
-      'date': _getFormattedDate(0),
-      'time': '08:30 WIB',
-      'dateTime': DateTime.now().subtract(const Duration(minutes: 30)),
-      'status': 'Hadir',
-      'type': 'hadir',
-      'method': 'QR Code',
-      'verification': 'Valid',
-      'location': 'Gedung Pancasila (Ruang 104)',
-      'device': 'Samsung Galaxy S23 Ultra',
-      'image': 'assets/images/avatar.png',
-    },
-    {
-      'id': 'att_003',
-      'title': 'Diskusi Kelompok (POKJAR)',
-      'date': _getFormattedDate(1),
-      'time': '10:00 WIB',
-      'dateTime': DateTime.now().subtract(const Duration(days: 1)),
-      'status': 'Hadir',
-      'type': 'hadir',
-      'method': 'Manual',
-      'verification': 'Valid',
-      'location': 'Ruang Diskusi',
-      'device': '-',
-      'image': 'assets/images/avatar.png',
-    },
-    {
-      'id': 'att_004',
-      'title': 'Apel Pagi Siswa',
-      'date': _getFormattedDate(2),
-      'time': '07:15 WIB',
-      'dateTime': DateTime.now().subtract(const Duration(days: 2)),
-      'status': 'Telat',
-      'type': 'telat',
-      'method': 'Geofencing',
-      'verification': 'Valid',
-      'location': 'Gerbang Utama Sespimma',
-      'device': 'Samsung Galaxy S23 Ultra',
-      'image': 'assets/images/avatar.png',
-    },
-    {
-      'id': 'att_005',
-      'title': 'Kelas Manajemen',
-      'date': _getFormattedDate(3),
-      'time': '08:30 WIB',
-      'dateTime': DateTime.now().subtract(const Duration(days: 3)),
-      'status': 'Izin',
-      'type': 'izin',
-      'method': 'Pengajuan Surat',
-      'verification': 'Valid',
-      'location': '-',
-      'device': '-',
-      'image': '',
-      'attachment': 'Surat_Sakit.pdf',
-    },
-    {
-      'id': 'att_006',
-      'title': 'Olahraga Bersama',
-      'date': _getFormattedDate(4),
-      'time': '06:00 WIB',
-      'dateTime': DateTime.now().subtract(const Duration(days: 4)),
-      'status': 'Alpha',
-      'type': 'alpha',
-      'method': '-',
-      'verification': 'Tidak Valid',
-      'location': '-',
-      'device': '-',
-      'image': '',
-    },
-  ];
+  static final List<Map<String, dynamic>> _manualAttendances = [];
+
+  static List<Map<String, dynamic>> get serdikAttendanceHistory {
+    final List<Map<String, dynamic>> results = List.from(_manualAttendances);
+    final now = DateTime.now();
+
+    // Parse Izin from inbox
+    for (var inbox in KorsisInboxMockData.items) {
+      if (inbox.rewardPunishmentName.toLowerCase().contains('izin') && inbox.status == 'disetujui') {
+        final existing = results.any((r) => r['id'] == 'izin_${inbox.id}');
+        if (!existing) {
+          results.add({
+            'id': 'izin_${inbox.id}',
+            'title': 'Izin Kegiatan',
+            'date': _getFormattedDateFrom(inbox.timestamp),
+            'time': '${inbox.timestamp.hour.toString().padLeft(2, '0')}:${inbox.timestamp.minute.toString().padLeft(2, '0')} WIB',
+            'dateTime': inbox.timestamp,
+            'status': 'Izin',
+            'type': 'izin',
+            'method': 'Pengajuan Surat',
+            'verification': 'Valid',
+            'location': '-',
+            'device': '-',
+            'image': null,
+          });
+        }
+      }
+    }
+
+    // Parse Alpha/Tanpa Keterangan from missed zones
+    for (var zone in AttendanceZones.activeZones) {
+      if (now.isAfter(zone.cutoffTime)) {
+        final attended = results.any((r) => r['title'] == zone.name || r['title'] == zone.activityName);
+        if (!attended) {
+          results.add({
+            'id': 'alpha_${zone.id}',
+            'title': zone.name,
+            'date': _getFormattedDateFrom(zone.cutoffTime),
+            'time': '-',
+            'dateTime': zone.cutoffTime,
+            'status': 'Tanpa Keterangan',
+            'type': 'alpha',
+            'method': '-',
+            'verification': '-',
+            'location': '-',
+            'device': '-',
+            'image': null,
+          });
+        }
+      }
+    }
+
+    results.sort((a, b) => (b['dateTime'] as DateTime).compareTo(a['dateTime'] as DateTime));
+    return results;
+  }
+
+  static void addAttendance(Map<String, dynamic> attendance) {
+    _manualAttendances.insert(0, attendance);
+  }
+
+  static String _getFormattedDateFrom(DateTime target) {
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    final dayIndex = target.weekday == 7 ? 0 : target.weekday;
+    return '${days[dayIndex]}, ${target.day} ${months[target.month - 1]} ${target.year}';
+  }
 
   static final List<Map<String, dynamic>> sharedTaskSubmissions = [
     {
@@ -292,32 +273,4 @@ class PimpinanMockData {
     ),
   ];
 
-  static String _getFormattedDate(int daysAgo) {
-    final target = DateTime.now().subtract(Duration(days: daysAgo));
-    const months = [
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
-    ];
-    const days = [
-      'Minggu',
-      'Senin',
-      'Selasa',
-      'Rabu',
-      'Kamis',
-      'Jumat',
-      'Sabtu',
-    ];
-    final dayIndex = target.weekday == 7 ? 0 : target.weekday;
-    return '${days[dayIndex]}, ${target.day} ${months[target.month - 1]} ${target.year}';
-  }
 }

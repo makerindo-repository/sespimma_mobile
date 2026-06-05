@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
+import 'package:sespimma_mobile/features/assessment/utils/reward_punishment_eligibility.dart';
 import '../../data/models/korsis_inbox_mock_data.dart';
 
 class GadikMentalFormScreen extends StatefulWidget {
@@ -202,7 +203,7 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
 
     if (!mounted) return;
     Navigator.pop(context);
-    AppNotifier.showSuccess(context, 'Catatan berhasil dikirim ke Korsis!');
+    AppNotifier.showSuccess(context, 'Penilaian berhasil dikirim ke Korsis!');
   }
 
   @override
@@ -840,7 +841,7 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
         elevation: 0,
       ),
       child: const Text(
-        'SIMPAN KE SISTEM',
+        'SIMPAN NILAI',
         style: TextStyle(
           fontSize: AppDimensions.fontLg,
           fontWeight: FontWeight.w800,
@@ -1164,8 +1165,24 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                         const SizedBox(height: AppDimensions.md),
                     itemBuilder: (context, index) {
                       final opt = filteredList[index];
+                      
+                      EligibilityStatus eligibility = EligibilityStatus(true);
+                      if (_selectedSerdik != null && _selectedSerdik!['no_serdik'] != null) {
+                        eligibility = RewardPunishmentEligibility.checkEligibility(_selectedSerdik!['no_serdik'], opt);
+                      }
+                      final bool isGreyedOut = !eligibility.isEligible;
+                      final Color effectiveColor = isGreyedOut ? Colors.grey.shade400 : pointColor;
+
                       return InkWell(
                         onTap: () {
+                          if (_selectedSerdik == null) {
+                            AppNotifier.showError(context, "Silakan pilih serdik terlebih dahulu");
+                            return;
+                          }
+                          if (isGreyedOut) {
+                            AppNotifier.showError(context, eligibility.message ?? "Item ini sudah mencapai batas maksimum");
+                            return;
+                          }
                           setState(() => _selectedCategory = opt);
                           Navigator.pop(context);
                         },
@@ -1175,7 +1192,7 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(AppDimensions.lg),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: isGreyedOut ? Colors.grey.shade50 : Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusLg,
@@ -1194,14 +1211,14 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: pointColor.withValues(alpha: 0.1),
+                                  color: effectiveColor.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   widget.isReward
                                       ? Icons.stars_rounded
                                       : Icons.warning_rounded,
-                                  color: pointColor,
+                                  color: effectiveColor,
                                   size: AppDimensions.iconLg,
                                 ),
                               ),
@@ -1217,10 +1234,11 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                                         Expanded(
                                           child: Text(
                                             opt.description,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               fontSize: AppDimensions.fontMd,
-                                              color: _primaryNavy,
+                                              color: isGreyedOut ? Colors.grey.shade500 : _primaryNavy,
+                                              decoration: isGreyedOut ? TextDecoration.lineThrough : null,
                                             ),
                                           ),
                                         ),
@@ -1245,7 +1263,7 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                                             style: TextStyle(
                                               fontSize: AppDimensions.fontLg,
                                               fontWeight: FontWeight.w900,
-                                              color: pointColor,
+                                              color: effectiveColor,
                                             ),
                                           ),
                                         ),

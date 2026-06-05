@@ -8,11 +8,17 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../notification/presentation/pages/notification_screen.dart';
 import '../../../activity/presentation/pages/activity_history_screen.dart';
+import '../../../assessment/data/models/korsis_inbox_mock_data.dart';
+import '../../../notification/data/datasources/notification_mock_data.dart';
 import '../../../attendance/presentation/pages/attendance_history_screen.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
 import '../../../assessment/data/models/sociometry_period_config.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import '../../../auth/data/datasources/serdik_real_data.dart';
+import '../../../gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
+import '../../../attendance/domain/models/map_tile_mode.dart';
+import '../../../leadership_report/domain/services/score_calculator_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -48,33 +54,172 @@ class _HomeScreenState extends State<HomeScreen>
   static const Color _dangerRed = Color(0xFFD32F2F);
   static const Color _warningYellow = Color(0xFFFBC02D);
 
-  final double _rewardPoints = 4.50;
-  final double _punishmentPoints = -1.25;
+  double get _rewardPoints {
+    return KorsisInboxMockData.items
+        .where((i) => i.status == 'disetujui' && i.isReward)
+        .fold(0.0, (sum, item) => sum + item.points);
+  }
 
-  final List<Map<String, dynamic>> _mockActivities = [
-    {
-      'title': 'Reward: Menjadi Imam Shalat',
-      'subtitle': 'Diberikan oleh Patun A - Hari ini, 18:30 WIB',
-      'points': '+0.50',
-      'isReward': true,
-      'isTask': false,
-    },
-    {
-      'title': 'Tugas: Resume Kepemimpinan',
-      'subtitle': 'Selesai dan telah dikumpulkan - Kemarin, 14:00 WIB',
-      'points': '',
-      'isReward': true,
-      'isTask': true,
-    },
-    {
-      'title': 'Punishment: Terlambat Apel Pagi',
-      'subtitle': 'Sistem Geofencing - 2 Hari lalu, 07:15 WIB',
-      'points': '-0.50',
-      'isReward': false,
-      'isTask': false,
-    },
-  ];
+  double get _punishmentPoints {
+    return KorsisInboxMockData.items
+        .where((i) => i.status == 'disetujui' && !i.isReward)
+        .fold(0.0, (sum, item) => sum + item.points);
+  }
 
+  String _getDynamicDateStr(DateTime target) {
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    ];
+    final monthName = months[target.month - 1];
+    final dayStr = target.day.toString().padLeft(2, '0');
+    return '$dayStr $monthName ${target.year}';
+  }
+
+  String _formatDynamicTime(DateTime target) {
+    final hourStr = target.hour.toString().padLeft(2, '0');
+    final minStr = target.minute.toString().padLeft(2, '0');
+    return '$hourStr.$minStr';
+  }
+
+  String _getGadikFullName(String sender) {
+    if (sender == 'Gadik A') return 'Kombes Pol. Anton Suratto';
+    if (sender == 'Gadik B') return 'Kombes Pol. Budi Santoso';
+    if (sender == 'Gadik C') return 'Kombes Pol. Candra Muka';
+    if (sender == 'Korsis A') return 'Kombes Pol. Ahmad Setiawan';
+    if (sender == 'Patun A') return 'Kombes Pol. Bambang Sugeng';
+    return sender;
+  }
+
+  List<Map<String, dynamic>> _getMockActivities(UserEntity user) {
+    final today = DateTime.now();
+    final role = user.roleId.toLowerCase();
+    final List<Map<String, dynamic>> list = [];
+
+    if (role == 'siswa') {
+      if (SociometryPeriodConfig.isAnyActive()) {
+        final filledCount = SociometryPeriodConfig.getFilledCount();
+        if (filledCount > 0) {
+          final totalCount = SociometryPeriodConfig.getTotalCount();
+          final phase = SociometryPeriodConfig.isAkhirActive() ? 'Akhir' : 'Awal';
+          final phaseStart = SociometryPeriodConfig.isAkhirActive() ? SociometryPeriodConfig.akhirStartDate : SociometryPeriodConfig.awalStartDate;
+          final fillDate = phaseStart.add(const Duration(days: 1, hours: 14, minutes: 30));
+          list.add({
+            'id': 'act_dyn_sosiometri',
+            'title': 'Pengisian Sosiometri $phase',
+            'subtitle': 'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
+            'timeRaw': _formatDynamicTime(fillDate),
+            'date': _getDynamicDateStr(fillDate),
+            'dateTime': fillDate,
+            'points': '',
+            'type': 'task',
+          });
+        }
+      }
+
+      for (var inbox in KorsisInboxMockData.items) {
+        if (inbox.status == 'disetujui') {
+          final isReward = inbox.isReward;
+          final typeStr = isReward ? 'reward' : 'punishment';
+          final pointStr = isReward ? '+${inbox.points.toStringAsFixed(2)}' : inbox.points.toStringAsFixed(2);
+          list.add({
+            'id': inbox.id,
+            'title': inbox.rewardPunishmentName,
+            'subtitle': 'Diberikan oleh ${_getGadikFullName(inbox.senderName)}',
+            'timeRaw': _formatDynamicTime(inbox.timestamp),
+            'date': _getDynamicDateStr(inbox.timestamp),
+            'dateTime': inbox.timestamp,
+            'points': pointStr,
+            'type': typeStr,
+            'photoPath': inbox.photoPath,
+          });
+        }
+      }
+
+      for (var zone in AttendanceZones.activeZones) {
+        list.add({
+          'id': 'zone_${zone.id}',
+          'title': zone.activityName,
+          'subtitle': '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
+          'timeRaw': _formatDynamicTime(zone.startTime),
+          'date': _getDynamicDateStr(zone.startTime),
+          'dateTime': zone.startTime,
+          'points': '',
+          'type': 'zone',
+        });
+      }
+
+      for (var task in GadikAssignmentMockData.assignments) {
+        if (task.status == 'Belum Mulai' || task.status == 'Sedang Berjalan') {
+          list.add({
+            'id': 'task_${task.id}',
+            'title': task.judul,
+            'subtitle': 'Segera kumpulkan tugas sebelum tenggat waktu ${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)}.',
+            'timeRaw': _formatDynamicTime(task.createdAt),
+            'date': _getDynamicDateStr(task.createdAt),
+            'dateTime': task.createdAt,
+            'points': '',
+            'type': 'task',
+          });
+        } else if (task.status == 'Selesai') {
+          list.add({
+            'id': 'task_${task.id}',
+            'title': task.judul,
+            'subtitle': 'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
+            'timeRaw': _formatDynamicTime(task.createdAt),
+            'date': _getDynamicDateStr(task.createdAt),
+            'dateTime': task.createdAt,
+            'points': '',
+            'type': 'task_dikirim',
+          });
+        } else if (task.status == 'Dinilai') {
+          list.add({
+            'id': 'task_${task.id}',
+            'title': task.judul,
+            'subtitle': 'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera',
+            'timeRaw': _formatDynamicTime(task.createdAt),
+            'date': _getDynamicDateStr(task.createdAt),
+            'dateTime': task.createdAt,
+            'points': '',
+            'type': 'task_dinilai',
+          });
+        } else if (task.status == 'Remedial') {
+          list.add({
+            'id': 'task_${task.id}',
+            'title': task.judul,
+            'subtitle': 'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)})',
+            'timeRaw': _formatDynamicTime(task.createdAt),
+            'date': _getDynamicDateStr(task.createdAt),
+            'dateTime': task.createdAt,
+            'points': '',
+            'type': 'task_remedial',
+          });
+        }
+      }
+
+    } else if (role == 'gadik' || role == 'patun' || role == 'instruktur') {
+      if (SociometryPeriodConfig.isAnyActive()) {
+        list.add({
+          'id': 'act_gadik_dyn_sosiometri',
+          'title': 'Memonitor Progres Sosiometri',
+          'subtitle': 'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
+          'timeRaw': _formatDynamicTime(today.subtract(const Duration(hours: 1))),
+          'date': _getDynamicDateStr(today),
+          'dateTime': today,
+          'points': '',
+          'type': 'task',
+        });
+      }
+    }
+
+    list.sort((a, b) {
+      final dtA = a['dateTime'] as DateTime;
+      final dtB = b['dateTime'] as DateTime;
+      return dtB.compareTo(dtA);
+    });
+
+    return list.take(3).toList();
+  }
   String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 11) {
@@ -96,9 +241,22 @@ class _HomeScreenState extends State<HomeScreen>
         builder: (context, state) {
           if (state is AuthSuccess) {
             final user = state.user;
-            final double nilaiAkademik = user.nilaiAkademik;
-            final double nilaiMental = user.nilaiMental;
-            final double nilaiJasmani = user.nilaiJasmani;
+            
+            // Hitung skor dinamis
+            final serdikData = SerdikRealData.records.firstWhere(
+                (r) => r['nrp'] == user.nrp,
+                orElse: () => SerdikRealData.records.first);
+            final String noSerdik = serdikData['no_serdik'] ?? '';
+            
+            final raw = ScoreCalculatorService.generateSimulatedScores(noSerdik);
+            raw['reward_mental'] = _rewardPoints;
+            raw['punishment_mental'] = _punishmentPoints;
+            
+            final finalRecap = ScoreCalculatorService.calculateFinalRecap(serdikData, raw);
+
+            final double nilaiAkademik = finalRecap.academicScore;
+            final double nilaiMental = finalRecap.mentalScore;
+            final double nilaiJasmani = finalRecap.physicalScore;
 
             return SafeArea(
               top: false,
@@ -158,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 const SizedBox(height: AppDimensions.md),
                                 _buildAnimatedSection(
                                   context: context,
-                                  child: _buildActivityFeed(context),
+                                  child: _buildActivityFeed(context, user),
                                   beginInterval: 0.5,
                                   endInterval: 1.0,
                                 ),
@@ -246,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   child: Text(
                     user.roleId == 'siswa'
-                        ? 'NOSIS: ${user.noSerdik}'
+                        ? user.noSerdik
                         : 'NRP: ${user.nrp}',
                     style: const TextStyle(
                       color: Colors.white,
@@ -271,28 +429,34 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 );
               },
-              child: Badge(
-                backgroundColor: _dangerRed,
-                label: const Text(
-                  '2',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppDimensions.fontSm,
-                  ),
-                ),
-                child: Container(
-                  padding: const EdgeInsets.all(AppDimensions.sm + 2),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    AppIcons.bell,
-                    color: Colors.white,
-                    size: AppDimensions.iconLg,
-                  ),
-                ),
+              child: ValueListenableBuilder<int>(
+                valueListenable: NotificationMockData.unreadCountNotifier,
+                builder: (context, unreadCount, child) {
+                  return Badge(
+                    isLabelVisible: unreadCount > 0,
+                    backgroundColor: _dangerRed,
+                    label: Text(
+                      unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppDimensions.fontSm,
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppDimensions.sm + 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        AppIcons.bell,
+                        color: Colors.white,
+                        size: AppDimensions.iconLg,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -388,7 +552,7 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
             const SizedBox(height: AppDimensions.lg),
-            _buildAiRecommendation(akademik, mental, jasmani),
+            _buildAiRecommendation(akademik, mental, jasmani, _rewardPoints, _punishmentPoints),
           ],
         ),
       ),
@@ -449,50 +613,65 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildAiRecommendation(double ak, double ment, double jas) {
-    String title = 'Rekomendasi';
+  Widget _buildAiRecommendation(double ak, double ment, double jas, double reward, double punishment) {
+    String title = 'Rekomendasi Pintar';
     String message = '';
+    Color cardColor;
+    Color iconColor;
+    IconData iconData;
 
-    if (ak >= 85 && ment >= 85 && jas >= 85) {
+    final double rataRata = (ak + ment + jas) / 3;
+
+    if (punishment > reward && punishment >= 2) {
+      cardColor = const Color(0xFFFFF0F0);
+      iconColor = const Color(0xFFD32F2F);
+      iconData = AppIcons.warningOctagonFill;
       message =
-          'Luar biasa! Seluruh pilar penilaian Anda seimbang dan berada di kategori prima. Teruskan disiplin kepemimpinan ini.';
-    } else if (jas <= ak && jas <= ment) {
+          'PERINGATAN: Poin pelanggaran (punishment) Anda melebihi batas wajar. Segera perbaiki kedisiplinan dan hindari pelanggaran lanjutan untuk menyelamatkan Nilai Mental Anda.';
+    } else if (rataRata >= 85 && punishment == 0) {
+      cardColor = const Color(0xFFF0FDF4);
+      iconColor = const Color(0xFF2E7D32);
+      iconData = AppIcons.checkCircleFill;
       message =
-          'Pertahankan tren positif Anda di aspek teoritis. Fokus tingkatkan intensitas latihan Jasmani berkala untuk mengamankan ketahanan fisik.';
-    } else if (ment <= ak && ment <= jas) {
+          'Luar biasa! Seluruh pilar penilaian Anda seimbang di kategori prima, dan Anda bebas dari pelanggaran. Teruskan disiplin kepemimpinan ini.';
+    } else if (reward > 0 && rataRata >= 80) {
+      cardColor = const Color(0xFFF0FDF4);
+      iconColor = const Color(0xFF2E7D32);
+      iconData = AppIcons.thumbUp;
       message =
-          'Pilar Akademik Anda sudah sangat baik. Tingkatkan aspek kepemimpinan, etika, dan kedisiplinan harian untuk mendongkrak Nilai Mental.';
-    } else if (ak <= jas && ak <= ment) {
+          'Kerja bagus! Anda mendapat reward positif dan akumulasi nilai yang aman. Pertahankan tren positif ini di setiap kegiatan.';
+    } else if (jas <= ak && jas <= ment && jas < 80) {
+      cardColor = const Color(0xFFFFFDE7);
+      iconColor = const Color(0xFFFBC02D);
+      iconData = AppIcons.userFill;
       message =
-          'Ketahanan Jasmani dan Mental Anda sangat prima. Fokus maksimalkan pilar Akademik dengan pengumpulan tugas mendalam tepat waktu.';
+          'Perhatian: Nilai Jasmani Anda tertinggal. Tingkatkan intensitas olahraga dan pastikan keikutsertaan penuh pada jadwal kesamaptaan rutin.';
+    } else if (ment <= ak && ment <= jas && ment < 80) {
+      cardColor = const Color(0xFFFFFDE7);
+      iconColor = const Color(0xFFFBC02D);
+      iconData = AppIcons.shieldCheckFill;
+      message =
+          'Pilar Mental Anda perlu perhatian khusus. Tingkatkan keaktifan sosiometri, kedisiplinan harian, serta perbanyak kontribusi positif (reward).';
     } else {
+      cardColor = const Color(0xFFFFFDE7);
+      iconColor = const Color(0xFFFBC02D);
+      iconData = AppIcons.infoFill;
       message =
-          'Pertahankan keseimbangan ini. Pastikan untuk terus mengevaluasi capaian mingguan agar tetap berada di batas atas standar kelulusan.';
+          'Pertahankan keseimbangan capaian Anda. Terus pantau jadwal kegiatan agar Anda senantiasa berada di atas standar kelulusan minimal.';
     }
 
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.md),
+      padding: const EdgeInsets.all(AppDimensions.lg),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: cardColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(color: iconColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(AppDimensions.sm),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade100,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              AppIcons.sparkleFill,
-              color: Colors.blue.shade700,
-              size: AppDimensions.iconDefault,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.md - 4),
+          Icon(iconData, color: iconColor, size: 24),
+          const SizedBox(width: AppDimensions.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,18 +679,17 @@ class _HomeScreenState extends State<HomeScreen>
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.blue.shade900,
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w800,
+                    fontSize: AppDimensions.fontMd,
+                    fontWeight: FontWeight.w700,
+                    color: iconColor,
                   ),
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
                   message,
-                  style: TextStyle(
-                    color: Colors.blueGrey.shade700,
-                    fontSize: AppDimensions.fontMd,
-                    fontWeight: FontWeight.w500,
+                  style: const TextStyle(
+                    fontSize: AppDimensions.fontSm,
+                    color: Colors.black87,
                     height: 1.4,
                   ),
                 ),
@@ -749,7 +927,7 @@ class _HomeScreenState extends State<HomeScreen>
                 Container(width: 1, height: 40, color: Colors.grey.shade200),
                 Expanded(
                   child: _buildAttendanceItem(
-                    'Alpha',
+                    'Tanpa Keterangan',
                     alpha.toString(),
                     _dangerRed,
                   ),
@@ -793,7 +971,8 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildActivityFeed(BuildContext context) {
+  Widget _buildActivityFeed(BuildContext context, UserEntity user) {
+      final mockActivities = _getMockActivities(user);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -810,54 +989,54 @@ class _HomeScreenState extends State<HomeScreen>
                   color: _primaryNavy,
                 ),
               ),
-              if (_mockActivities.isNotEmpty)
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ActivityHistoryScreen(),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ActivityHistoryScreen(),
                       ),
-                      child: Text(
-                        'Lihat Semua',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontDefault,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.blue.shade700,
-                        ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: Text(
+                      'Lihat Semua',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontMd,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.blue.shade700,
                       ),
                     ),
                   ),
                 ),
+              ),
             ],
           ),
           const SizedBox(height: AppDimensions.md),
-          _mockActivities.isEmpty
+          mockActivities.isEmpty
               ? _buildEmptyActivityState()
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
-                  itemCount: _mockActivities.length,
+                  itemCount: mockActivities.length,
                   itemBuilder: (context, index) {
-                    final item = _mockActivities[index];
+                    final item = mockActivities[index];
                     return _ActivityTile(
                       title: item['title'] as String,
                       subtitle: item['subtitle'] as String,
                       time: item['timeRaw'] as String? ?? '',
+                      date: item['date'] as String? ?? '',
                       points: item['points'] as String,
-                      isReward: (item['isReward'] as bool?) ?? false,
-                      isTask: (item['isTask'] as bool?) ?? false,
+                      type: item['type'] as String,
+                      photoPath: item['photoPath'] as String?,
                     );
                   },
                 ),
@@ -1023,28 +1202,52 @@ class _ActivityTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final String time;
+  final String date;
   final String points;
-  final bool isReward;
-  final bool isTask;
+  final String type;
+  final String? photoPath;
 
   const _ActivityTile({
     required this.title,
     required this.subtitle,
     required this.time,
+    required this.date,
     required this.points,
-    required this.isReward,
-    this.isTask = false,
+    required this.type,
+    this.photoPath,
   });
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor = isTask
-        ? Colors.blue.shade600
-        : (isReward ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F));
+    Color iconColor;
+    IconData iconData;
 
-    final IconData iconData = isTask
-        ? AppIcons.clipboardTextFill
-        : (isReward ? AppIcons.thumbUp : AppIcons.thumbDown);
+    switch (type) {
+      case 'task':
+      case 'task_dikirim':
+      case 'task_dinilai':
+      case 'task_remedial':
+        iconColor = Colors.blue.shade600;
+        iconData = AppIcons.clipboardTextFill;
+        break;
+      case 'reward':
+        iconColor = const Color(0xFF2E7D32);
+        iconData = AppIcons.thumbUp;
+        break;
+      case 'punishment':
+        iconColor = const Color(0xFFD32F2F);
+        iconData = AppIcons.thumbDown;
+        break;
+      case 'zone':
+        iconColor = Colors.teal.shade600;
+        iconData = AppIcons.mapPinLineFill;
+        break;
+      case 'info':
+      default:
+        iconColor = Colors.amber.shade700;
+        iconData = AppIcons.infoFill;
+        break;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1064,9 +1267,8 @@ class _ActivityTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-          onTap: isTask
-              ? null
-              : () {
+          onTap: (type == 'reward' || type == 'punishment')
+              ? () {
                   EvidenceBottomSheet.show(
                     context,
                     title: title,
@@ -1074,12 +1276,15 @@ class _ActivityTile extends StatelessWidget {
                     evaluatorName: subtitle,
                     timeText: time,
                     points: points,
-                    type: isReward ? 'reward' : 'punishment',
+                    type: type,
+                    photoPath: photoPath,
                   );
-                },
+                }
+              : null,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                   padding: const EdgeInsets.all(AppDimensions.md),
@@ -1115,6 +1320,40 @@ class _ActivityTile extends StatelessWidget {
                           color: Colors.blueGrey.shade400,
                         ),
                       ),
+                      const SizedBox(height: AppDimensions.xs / 2),
+                      Row(
+                        children: [
+                          Icon(
+                            AppIcons.calendarBlank,
+                            size: AppDimensions.fontSm,
+                            color: Colors.blueGrey.shade300,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            date,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontSm,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey.shade400,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            AppIcons.clock,
+                            size: AppDimensions.fontSm,
+                            color: Colors.blueGrey.shade300,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            time,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontSm,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey.shade400,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -1126,9 +1365,7 @@ class _ActivityTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: AppDimensions.fontLg + 1,
                         fontWeight: FontWeight.w800,
-                        color: isReward
-                            ? const Color(0xFF2E7D32)
-                            : const Color(0xFFD32F2F),
+                        color: iconColor,
                       ),
                     ),
                   ),

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
+import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
 
 class PatunGeofenceMapWidget extends StatefulWidget {
   final String pokjar;
@@ -30,6 +30,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
   String? _gpsErrorMessage;
   bool _isPermissionError = false;
   LatLng? _userLatLng;
+  Timer? _refreshTimer;
 
   StreamSubscription<Position>? _positionStreamSubscription;
   StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
@@ -71,6 +72,13 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
 
     _checkPermissionsAndStartTracking();
     _generateMockSerdikData();
+
+    // Timer untuk menarik data real-time dari Backend setiap 10 detik
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        _generateMockSerdikData();
+      }
+    });
   }
 
   void _setupPulseAnimation() {
@@ -143,7 +151,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     _positionStreamSubscription =
         Geolocator.getPositionStream(locationSettings: locationSettings).listen(
           (Position pos) {
-            if (mounted) {
+            if (mounted && pos.latitude.isFinite && pos.longitude.isFinite) {
               setState(() {
                 _userLatLng = LatLng(pos.latitude, pos.longitude);
               });
@@ -159,7 +167,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
           accuracy: LocationAccuracy.high,
         ),
       );
-      if (mounted) {
+      if (mounted && current.latitude.isFinite && current.longitude.isFinite) {
         setState(() {
           _userLatLng = LatLng(current.latitude, current.longitude);
         });
@@ -187,6 +195,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _refreshTimer?.cancel();
     _serviceStatusSubscription?.cancel();
     _positionStreamSubscription?.cancel();
     _pulseController.dispose();
@@ -201,60 +210,61 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
         )
         .toList();
 
-    final LatLng center = _firstZoneLatLng;
-    final double radius = _zones.isNotEmpty ? _zones.first.radiusMeters : 100.0;
-    final Random random = Random(42);
-
     final List<Map<String, dynamic>> generated = [];
+    const Distance distanceCalc = Distance();
 
     for (int i = 0; i < baseList.length; i++) {
       final serdik = Map<String, dynamic>.from(baseList[i]);
-      int mod = i % 10;
+      final noSerdik = serdik['no_serdik']?.toString() ?? '';
+      
+      // Ambil data asli dari Sinkronisasi Backend Tiruan
+      final backendData = MockBackendDatabase.serdikLocations[noSerdik];
 
-      double distanceOffset = 0;
-      String status = '';
-      Color color = Colors.grey;
+      // Jika serdik belum pernah mengirim lokasi (belum absen / buka app), jangan tampilkan di peta!
+      if (backendData == null) continue;
 
-      if (mod == 0) {
-        status = 'Tidak Aktif';
-        color = Colors.grey.shade500;
-        distanceOffset = radius * 5;
-      } else if (mod == 1) {
-        status = 'Izin';
-        color = Colors.blue.shade600;
-        distanceOffset = radius * 3;
-      } else if (mod == 2 || mod == 3) {
-        status = 'Belum Absen (Luar Zona)';
-        color = Colors.red.shade600;
-        distanceOffset = radius * 2;
-      } else if (mod == 4) {
-        status = 'Belum Absen (Dalam Zona)';
-        color = Colors.orange.shade500;
-        distanceOffset = radius * 0.5;
-      } else {
-        final method = random.nextBool() ? 'Geofencing' : 'QR Code';
-        status = 'Hadir';
-        serdik['mock_method'] = method;
-        color = Colors.green.shade600;
-        distanceOffset = radius * 0.7 * random.nextDouble();
+      final double lat = backendData['latitude'];
+      final double lng = backendData['longitude'];
+      
+      double distanceOffset = 999999.0;
+      if (_zones.isNotEmpty) {
+        distanceOffset = distanceCalc.as(
+          LengthUnit.Meter,
+          LatLng(lat, lng),
+          LatLng(_zones.first.latitude, _zones.first.longitude),
+        );
       }
 
-      final angle = random.nextDouble() * 2 * pi;
+      String status = 'Belum Absen';
+      Color color = Colors.grey;
 
-      final latOffset = (distanceOffset * cos(angle)) / 111320;
-      final lngOffset =
-          (distanceOffset * sin(angle)) /
-          (111320 * cos(center.latitude * pi / 180));
+      if (_zones.isNotEmpty) {
+        final zone = _zones.first;
+        final now = DateTime.now();
+        if (distanceOffset <= zone.radiusMeters) {
+          if (now.isAfter(zone.deadline)) {
+            status = 'Telat';
+            color = Colors.yellow.shade700;
+          } else {
+            status = 'Hadir';
+            color = Colors.grey;
+          }
+        } else {
+          if (now.isAfter(zone.cutoffTime)) {
+            status = 'Tanpa Keterangan';
+            color = Colors.red.shade600;
+          } else {
+            status = 'Belum Absen';
+            color = Colors.grey;
+          }
+        }
+      }
 
-      final LatLng pos = LatLng(
-        center.latitude + latOffset,
-        center.longitude + lngOffset,
-      );
-
-      serdik['mock_lat'] = pos.latitude;
-      serdik['mock_lng'] = pos.longitude;
+      serdik['mock_lat'] = lat;
+      serdik['mock_lng'] = lng;
       serdik['mock_status'] = status;
       serdik['mock_color'] = color;
+      serdik['mock_distance'] = distanceOffset;
 
       generated.add(serdik);
     }
@@ -286,11 +296,23 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     final String pangkat = serdik['pangkat'] ?? '-';
     final String noSerdik = serdik['no_serdik'] ?? '-';
     final String status = serdik['mock_status'] ?? '-';
-    final String? method = serdik['mock_method'];
-    final Color color = serdik['mock_color'] ?? Colors.grey;
-    final double lat = serdik['mock_lat'] ?? 0.0;
-    final double lng = serdik['mock_lng'] ?? 0.0;
+    final double distance = serdik['mock_distance'] ?? 999.0;
     final String? profilePhoto = serdik['profile_photo'];
+
+    final bool isInsideZone = _zones.isNotEmpty && distance <= _zones.first.radiusMeters;
+    final zoneName = _zones.isNotEmpty ? _zones.first.name : '-';
+    final activityName = _zones.isNotEmpty ? _zones.first.activityName : '-';
+
+    Color badgeColor = Colors.grey;
+    if (status == 'Hadir') {
+      badgeColor = Colors.green.shade600;
+    } else if (status == 'Telat') {
+      badgeColor = Colors.yellow.shade700;
+    } else if (status == 'Tanpa Keterangan') {
+      badgeColor = Colors.red.shade600;
+    } else if (status == 'Sakit') {
+      badgeColor = Colors.pink.shade400; // Merah Muda
+    }
 
     showModalBottomSheet(
       context: context,
@@ -362,58 +384,61 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: color.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: color.withValues(alpha: 0.3),
-                                  ),
-                                ),
-                                child: Text(
-                                  status,
-                                  style: TextStyle(
-                                    fontSize: AppDimensions.fontXs,
-                                    fontWeight: FontWeight.w800,
-                                    color: color,
-                                  ),
-                                ),
+                          if (status == 'Izin')
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.blue.shade200),
                               ),
-                              if (method != null)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueGrey.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.blueGrey.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    method,
-                                    style: const TextStyle(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Izin',
+                                    style: TextStyle(
                                       fontSize: AppDimensions.fontXs,
                                       fontWeight: FontWeight.w800,
-                                      color: Colors.blueGrey,
+                                      color: Colors.blue.shade700,
                                     ),
                                   ),
+                                  const SizedBox(width: 8),
+                                  Icon(Icons.person, size: 12, color: Colors.blue.shade700),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'AKBP Budi Setiawan',
+                                    style: TextStyle(
+                                      fontSize: AppDimensions.fontXs,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.blue.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: badgeColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: badgeColor.withValues(alpha: 0.3),
                                 ),
-                            ],
-                          ),
+                              ),
+                              child: Text(
+                                status,
+                                style: TextStyle(
+                                  fontSize: AppDimensions.fontXs,
+                                  fontWeight: FontWeight.w800,
+                                  color: badgeColor,
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -439,21 +464,23 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Koordinat Realtime',
+                              'Lokasi Realtime',
                               style: TextStyle(
                                 fontSize: AppDimensions.fontXs,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.blueGrey,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 4),
                             Text(
-                              '${lat.toStringAsFixed(6)}, ${lng.toStringAsFixed(6)}',
+                              isInsideZone
+                                  ? 'Kegiatan: $activityName\n$zoneName'
+                                  : 'Luar Zona',
                               style: const TextStyle(
                                 fontSize: AppDimensions.fontMd,
                                 fontWeight: FontWeight.w800,
                                 color: _primaryNavy,
-                                fontFamily: 'monospace',
+                                height: 1.4,
                               ),
                             ),
                           ],
@@ -721,7 +748,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                   height: 44,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.blueAccent.withValues(alpha: 0.35),
+                    color: _primaryNavy.withValues(alpha: 0.35),
                   ),
                 ),
               ),
@@ -731,11 +758,11 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
               height: 18,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.blueAccent,
+                color: _primaryNavy,
                 border: Border.all(color: Colors.white, width: 2.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blueAccent.withValues(alpha: 0.5),
+                    color: _primaryNavy.withValues(alpha: 0.5),
                     blurRadius: 8,
                   ),
                 ],

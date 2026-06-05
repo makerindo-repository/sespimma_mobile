@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
 
 class PatunSenatValidationSheet extends StatefulWidget {
   final List<Map<String, dynamic>> pokjarMembers;
@@ -36,10 +37,35 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
   }
 
   void _submitValidation() {
+    final now = DateTime.now();
+    for (var member in _senatMembers) {
+      final id = member['no_serdik'] as String;
+      final isApproved = _approvalStatus[id] ?? false;
+
+      if (isApproved) {
+        KorsisInboxMockData.addRecord(
+          InboxItem(
+            id: 'senat_val_${DateTime.now().millisecondsSinceEpoch}_$id',
+            serdikName: member['nama_lengkap'] ?? '-',
+            pangkat: member['pangkat'] ?? '-',
+            nosis: member['no_serdik'] ?? '-',
+            pokjar: member['kelompok_kelas'] ?? '-',
+            isReward: true,
+            senderName: 'Sistem (Validasi Patun)',
+            timestamp: now,
+            points: 0.25,
+            description: 'Validasi keaktifan senat disetujui oleh Patun.',
+            rewardPunishmentName: 'Validasi Keaktifan Senat',
+            status: 'pending',
+          ),
+        );
+      }
+    }
+
     Navigator.pop(context, true);
     AppNotifier.showSuccess(
       context,
-      'Validasi reward senat berhasil disimpan.',
+      'Validasi reward senat berhasil dikirim ke Inbox Korsis.',
     );
   }
 
@@ -193,19 +219,40 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
-                    vertical: 2,
+                    vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: _primaryNavy.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    role,
-                    style: const TextStyle(
-                      fontSize: AppDimensions.fontXs,
-                      fontWeight: FontWeight.w700,
-                      color: _primaryNavy,
+                    color: const Color(
+                      0xFF1A237E,
+                    ).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(
+                      AppDimensions.radiusMd,
                     ),
+                    border: Border.all(
+                      color: const Color(
+                        0xFF1A237E,
+                      ).withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        size: 10,
+                        color: Color(0xFF1A237E),
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        role,
+                        style: const TextStyle(
+                          fontSize: AppDimensions.fontXs,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A237E),
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

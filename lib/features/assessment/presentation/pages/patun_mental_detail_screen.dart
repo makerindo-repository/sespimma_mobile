@@ -4,10 +4,11 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_activity_history_screen.dart';
-import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
+import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 
 class PatunMentalDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdik;
@@ -18,92 +19,51 @@ class PatunMentalDetailScreen extends StatelessWidget {
   static const Color _lightGrey = Color(0xFFF8F9FA);
 
   List<Map<String, dynamic>> _getDynamicActivities() {
-    final rewards = RewardPunishmentData.rewards;
-    final punishments = RewardPunishmentData.punishments;
-    final now = DateTime.now();
+    final String noSerdik = (serdik['no_serdik'] as String?) ?? '-';
+    
+    final approvedItems = KorsisInboxMockData.items
+        .where((item) => (item.status == 'Setuju' || item.status == 'approved') && item.nosis == noSerdik)
+        .toList();
+
+    approvedItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     String fmt(DateTime dt) =>
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} WIB';
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 
     String dateStr(DateTime dt) {
       const m = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
+        'Januari', // 0-index fallback
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
         'Mei',
-        'Jun',
-        'Jul',
-        'Ags',
-        'Sep',
-        'Okt',
-        'Nov',
-        'Des',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember',
       ];
-      return '${dt.day} ${m[dt.month - 1]} ${dt.year}';
+      final dayStr = dt.day.toString().padLeft(2, '0');
+      return '$dayStr ${m[dt.month]} ${dt.year}';
     }
 
-    final d1 = DateTime(now.year, now.month, now.day, 8, 30);
-    final d2 = DateTime(now.year, now.month, now.day - 1, 6, 15);
-    final d3 = DateTime(now.year, now.month, now.day - 2, 14, 0);
-    final d4 = DateTime(now.year, now.month, now.day - 10, 9, 0);
-
-    return [
-      {
-        'title': rewards.isNotEmpty
-            ? rewards[0].description
-            : 'Pujian Tertulis',
-        'desc': 'Diberikan oleh Patun Kelas',
-        'justification':
-            'Serdik menunjukkan inisiatif tinggi dengan sukarela membantu rekan seangkatannya yang mengalami kesulitan selama masa perkuliahan tanpa diminta.',
-        'sender': 'Patun Kelas',
-        'time': fmt(d1),
-        'dateStr': dateStr(d1),
-        'dateTime': d1,
-        'isReward': true,
-        'point': rewards.isNotEmpty ? rewards[0].point : 0.25,
-      },
-      {
-        'title': punishments.isNotEmpty
-            ? punishments[0].description
-            : 'Teguran Lisan',
-        'desc': 'Diberikan oleh Piket Batalyon',
-        'justification':
-            'Serdik tidak mengindahkan peringatan dari piket terkait kerapian seragam dan tata rambut saat pelaksanaan apel pagi.',
-        'sender': 'Piket Batalyon',
-        'time': fmt(d2),
-        'dateStr': dateStr(d2),
-        'dateTime': d2,
-        'isReward': false,
-        'point': punishments.isNotEmpty ? punishments[0].point : -0.70,
-      },
-      {
-        'title': rewards.length > 2 ? rewards[2].description : 'Pujian Lisan',
-        'desc': 'Diberikan oleh Gadik',
-        'justification':
-            'Serdik memberikan kontribusi yang signifikan melalui gagasan visioner saat simulasi pemecahan masalah operasional kepolisian.',
-        'sender': 'Gadik',
-        'time': fmt(d3),
-        'dateStr': dateStr(d3),
-        'dateTime': d3,
-        'isReward': true,
-        'point': rewards.length > 2 ? rewards[2].point : 0.25,
-      },
-      {
-        'title': punishments.length > 1
-            ? punishments[1].description
-            : 'Teguran Tertulis',
-        'desc': 'Diberikan oleh Patun Kelas',
-        'justification':
-            'Serdik mengulangi kesalahan fatal terkait pelanggaran batas waktu kehadiran setelah sebelumnya sudah mendapat teguran lisan.',
-        'sender': 'Patun Kelas',
-        'time': fmt(d4),
-        'dateStr': dateStr(d4),
-        'dateTime': d4,
-        'isReward': false,
-        'point': punishments.length > 1 ? punishments[1].point : -0.30,
-      },
-    ];
+    return approvedItems.map((item) {
+      return {
+        'title': item.rewardPunishmentName,
+        'desc': 'Diberikan oleh ${item.senderName}',
+        'justification': item.description,
+        'sender': item.senderName,
+        'time': fmt(item.timestamp),
+        'dateStr': dateStr(item.timestamp),
+        'dateTime': item.timestamp,
+        'isReward': item.isReward,
+        'point': item.points,
+        'photoPath': item.photoPath,
+      };
+    }).toList();
   }
 
   @override
@@ -115,9 +75,17 @@ class PatunMentalDetailScreen extends StatelessWidget {
         serdik['profile_photo'] ?? serdik['profilePhoto'];
 
     final realScores = SerdikMentalScores.getScores(noSerdik);
-    final double score = realScores != null
+    final double baseScore = realScores != null
         ? (realScores['nilai'] as num).toDouble()
         : (serdik['_mock_score'] as num?)?.toDouble() ?? 80.0;
+
+    final dynamicActivities = _getDynamicActivities();
+    double totalDynamicPoints = 0.0;
+    for (var act in dynamicActivities) {
+      totalDynamicPoints += (act['point'] as num).toDouble();
+    }
+
+    final double score = (baseScore + totalDynamicPoints).clamp(0.0, 100.0);
 
     final String status;
     if (score >= 80.0) {
@@ -371,31 +339,39 @@ class PatunMentalDetailScreen extends StatelessWidget {
   Widget _buildMentalTrendChart() {
     final double score = (serdik['_mock_score'] as num?)?.toDouble() ?? 80.0;
 
-    String insightText = '';
-    String badgeText = '';
-    Color insightColor;
-    Color insightBgColor;
-    IconData insightIcon;
+    List<FlSpot> chartSpots;
 
     if (score < 70) {
-      insightText = 'Perlu perhatian khusus';
-      badgeText = 'Kritis';
-      insightColor = Colors.red.shade700;
-      insightBgColor = Colors.red.shade50;
-      insightIcon = Icons.warning_rounded;
-    } else if (score < 76) {
-      insightText = 'Mulai menunjukkan penurunan';
-      badgeText = 'Warning';
-      insightColor = Colors.orange.shade700;
-      insightBgColor = Colors.orange.shade50;
-      insightIcon = Icons.info_outline_rounded;
+      chartSpots = [
+        FlSpot(0, score + 8),
+        FlSpot(1, score + 5),
+        FlSpot(2, score + 2),
+        FlSpot(3, score),
+      ];
+    } else if (score < 80) {
+      chartSpots = [
+        FlSpot(0, score),
+        FlSpot(1, score),
+        FlSpot(2, score),
+        FlSpot(3, score),
+      ];
     } else {
-      insightText = 'Perkembangan mental stabil';
-      badgeText = 'Aman';
-      insightColor = Colors.green.shade700;
-      insightBgColor = Colors.green.shade50;
-      insightIcon = Icons.trending_up_rounded;
+      chartSpots = [
+        FlSpot(0, score - 6),
+        FlSpot(1, score - 3),
+        FlSpot(2, score - 1),
+        FlSpot(3, score),
+      ];
     }
+
+    // Di backend, ini akan merepresentasikan bulan saat ini (misal: Mg 1 Juni)
+    // namun secara UI hanya ditampilkan Mg 1, Mg 2, dll agar lebih bersih.
+    final dynamicTitles = [
+      'Mg 1',
+      'Mg 2',
+      'Mg 3',
+      'Mg 4',
+    ];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -512,13 +488,12 @@ class PatunMentalDetailScreen extends StatelessWidget {
                             reservedSize: 22,
                             interval: 1,
                             getTitlesWidget: (value, meta) {
-                              final titles = ['Mg 1', 'Mg 2', 'Mg 3', 'Mg 4'];
                               if (value.toInt() >= 0 &&
-                                  value.toInt() < titles.length) {
+                                  value.toInt() < dynamicTitles.length) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: Text(
-                                    titles[value.toInt()],
+                                    dynamicTitles[value.toInt()],
                                     style: TextStyle(
                                       color: Colors.blueGrey.shade600,
                                       fontSize: AppDimensions.fontXs,
@@ -559,12 +534,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                       ),
                       lineBarsData: [
                         LineChartBarData(
-                          spots: const [
-                            FlSpot(0, 80),
-                            FlSpot(1, 85),
-                            FlSpot(2, 75),
-                            FlSpot(3, 82.5),
-                          ],
+                          spots: chartSpots,
                           isCurved: true,
                           color: _primaryNavy,
                           barWidth: 3,
@@ -587,51 +557,6 @@ class PatunMentalDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.xl),
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.md),
-                  decoration: BoxDecoration(
-                    color: insightBgColor,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(insightIcon, color: insightColor),
-                      const SizedBox(width: AppDimensions.sm),
-                      Expanded(
-                        child: Text(
-                          insightText,
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontSm,
-                            fontWeight: FontWeight.w700,
-                            color: insightColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppDimensions.sm),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: insightColor,
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusSm,
-                          ),
-                        ),
-                        child: Text(
-                          badgeText,
-                          style: const TextStyle(
-                            fontSize: AppDimensions.fontXs,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
@@ -732,6 +657,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                   (act['time'] as String?) ?? '-',
                   (act['isReward'] as bool?) ?? true,
                   (act['point'] as num?)?.toDouble() ?? 0.0,
+                  act['photoPath'] as String?,
                 ),
               ),
             ),
@@ -774,6 +700,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
     String time,
     bool isReward,
     double point,
+    String? photoPath,
   ) {
     final iconColor = isReward
         ? const Color(0xFF1B5E20)
@@ -812,6 +739,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
               timeText: time,
               points: pointsStr,
               type: isReward ? 'reward' : 'punishment',
+              photoPath: photoPath,
             );
           },
           child: Padding(
@@ -850,7 +778,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$desc · $sender',
+                        'Diberikan oleh $sender',
                         style: TextStyle(
                           fontSize: AppDimensions.fontMd,
                           fontWeight: FontWeight.w500,
@@ -860,12 +788,22 @@ class PatunMentalDetailScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        time,
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontSm,
-                          color: Colors.blueGrey.shade300,
-                        ),
+                      Row(
+                        children: [
+                          Icon(
+                            AppIcons.clock,
+                            size: 14,
+                            color: Colors.blueGrey.shade300,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            time,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontSm,
+                              color: Colors.blueGrey.shade300,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -901,21 +839,56 @@ class PatunMentalDetailScreen extends StatelessWidget {
     final scores = SerdikMentalScores.getScores(noSerdik);
     final double base = baseScore == 0 ? 0.0 : baseScore;
 
+    double moralPoints = 0.0;
+    double disiplinPoints = 0.0;
+    double kepemimpinanPoints = 0.0;
+    double pdPoints = 0.0;
+    double penampilanPoints = 0.0;
+
+    final approvedItems = KorsisInboxMockData.items
+        .where((item) => (item.status == 'Setuju' || item.status == 'approved') && item.nosis == noSerdik);
+
+    for (var item in approvedItems) {
+      if (item.rewardPunishmentId != null) {
+        final rules = RewardPunishmentData.rules.where((r) => r.id == item.rewardPunishmentId);
+        if (rules.isNotEmpty) {
+          final aspect = rules.first.aspect;
+          switch (aspect) {
+            case 'MORAL':
+              moralPoints += item.points;
+              break;
+            case 'DISIPLIN':
+              disiplinPoints += item.points;
+              break;
+            case 'KEPEMIMPINAN':
+              kepemimpinanPoints += item.points;
+              break;
+            case 'PENGENDALIAN DIRI':
+              pdPoints += item.points;
+              break;
+            case 'PENAMPILAN':
+              penampilanPoints += item.points;
+              break;
+          }
+        }
+      }
+    }
+
     final double moral = scores != null
-        ? (scores['moral'] as num).toDouble()
-        : (base + 1.2).clamp(0, 100);
+        ? ((scores['moral'] as num).toDouble() + moralPoints).clamp(0, 100)
+        : (base + 1.2 + moralPoints).clamp(0, 100);
     final double disiplin = scores != null
-        ? (scores['disiplin'] as num).toDouble()
-        : (base + 0.5).clamp(0, 100);
+        ? ((scores['disiplin'] as num).toDouble() + disiplinPoints).clamp(0, 100)
+        : (base + 0.5 + disiplinPoints).clamp(0, 100);
     final double kepemimpinan = scores != null
-        ? (scores['kepemimpinan'] as num).toDouble()
-        : (base - 0.2).clamp(0, 100);
+        ? ((scores['kepemimpinan'] as num).toDouble() + kepemimpinanPoints).clamp(0, 100)
+        : (base - 0.2 + kepemimpinanPoints).clamp(0, 100);
     final double pengendalianDiri = scores != null
-        ? (scores['pengendalian_diri'] as num).toDouble()
-        : (base + 1.5).clamp(0, 100);
+        ? ((scores['pengendalian_diri'] as num).toDouble() + pdPoints).clamp(0, 100)
+        : (base + 1.5 + pdPoints).clamp(0, 100);
     final double penampilan = scores != null
-        ? (scores['penampilan'] as num).toDouble()
-        : (base - 1.0).clamp(0, 100);
+        ? ((scores['penampilan'] as num).toDouble() + penampilanPoints).clamp(0, 100)
+        : (base - 1.0 + penampilanPoints).clamp(0, 100);
     final double sosiometriAwal = scores != null
         ? (scores['sosiometri_awal'] as num).toDouble()
         : (base - 2).clamp(0, 100);
@@ -1152,11 +1125,16 @@ class PatunMentalDetailScreen extends StatelessWidget {
   }
 
   Widget _buildRecommendationCard(double score, String status) {
-    final isWarning = status != 'Aman';
+    final isWarning = status == 'Warning';
+    final isKritis = status == 'Kritis';
+    final isAman = status == 'Aman';
     final isExcellent = score >= 85.0;
 
     final String insight;
-    if (isWarning) {
+    if (isKritis) {
+      insight =
+          'Sistem mendeteksi adanya pelanggaran disiplin berat atau akumulasi penilaian yang sangat kurang. Segera lakukan sidang atau tindakan pembinaan khusus.';
+    } else if (isWarning) {
       insight =
           'Sistem mendeteksi adanya indikator kedisiplinan dan pengendalian diri yang perlu diperhatikan. Mohon segera berkonsultasi secara intensif dengan Pengasuh/Patun.';
     } else if (isExcellent) {
@@ -1167,14 +1145,38 @@ class PatunMentalDetailScreen extends StatelessWidget {
           'Aspek Mental Kepribadian Serdik masuk kategori baik. Terus tingkatkan inisiatif dan interaksi positif (Sosiometri) dengan rekan sejawat agar penilaian karakter semakin optimal.';
     }
 
+    Color bgColor;
+    Color borderColor;
+    Color iconColor;
+    Color iconBgColor;
+    Color titleColor;
+
+    if (isAman) {
+      bgColor = Colors.green.shade50;
+      borderColor = Colors.green.shade100;
+      iconColor = Colors.green.shade700;
+      iconBgColor = Colors.green.shade100;
+      titleColor = Colors.green.shade900;
+    } else if (isWarning) {
+      bgColor = Colors.orange.shade50;
+      borderColor = Colors.orange.shade100;
+      iconColor = Colors.orange.shade700;
+      iconBgColor = Colors.orange.shade100;
+      titleColor = Colors.orange.shade900;
+    } else {
+      bgColor = Colors.red.shade50;
+      borderColor = Colors.red.shade100;
+      iconColor = Colors.red.shade700;
+      iconBgColor = Colors.red.shade100;
+      titleColor = Colors.red.shade900;
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.lg),
       decoration: BoxDecoration(
-        color: isWarning ? Colors.red.shade50 : Colors.blue.shade50,
+        color: bgColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-        border: Border.all(
-          color: isWarning ? Colors.red.shade100 : Colors.blue.shade100,
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1182,12 +1184,12 @@ class PatunMentalDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppDimensions.sm),
             decoration: BoxDecoration(
-              color: isWarning ? Colors.red.shade100 : Colors.blue.shade100,
+              color: iconBgColor,
               shape: BoxShape.circle,
             ),
             child: Icon(
               AppIcons.sparkleFill,
-              color: isWarning ? Colors.red.shade700 : Colors.blue.shade700,
+              color: iconColor,
               size: AppDimensions.iconSm,
             ),
           ),
@@ -1199,9 +1201,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
                 Text(
                   'Rekomendasi Karakter',
                   style: TextStyle(
-                    color: isWarning
-                        ? Colors.red.shade900
-                        : Colors.blue.shade900,
+                    color: titleColor,
                     fontSize: AppDimensions.fontSm,
                     fontWeight: FontWeight.w800,
                   ),
@@ -1226,10 +1226,10 @@ class PatunMentalDetailScreen extends StatelessWidget {
 
   Color _getScoreColor(double s) {
     if (s == 0) return Colors.blueGrey.shade800;
-    if (s > 85.00) return const Color(0xFF1B5E20);
-    if (s > 80.00) return const Color(0xFF2E7D32);
-    if (s > 75.00) return const Color(0xFF827717);
-    if (s > 70.00) return const Color(0xFFF9A825);
-    return const Color(0xFFB71C1C);
+    if (s > 85.00) return Colors.green.shade800;
+    if (s > 80.00) return Colors.green.shade500;
+    if (s > 75.00) return Colors.lime.shade700;
+    if (s > 70.00) return Colors.amber.shade500;
+    return Colors.red.shade700;
   }
 }

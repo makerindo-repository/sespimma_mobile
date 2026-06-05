@@ -14,6 +14,7 @@ import 'package:sespimma_mobile/features/attendance/presentation/widgets/attenda
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_action_buttons.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -50,10 +51,15 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       parent: _chipController,
       curve: Curves.elasticOut,
     );
+    
+    // AKTIFKAN BACKGROUND LOCATION SYNC KE BACKEND (Pondasi Arsitektur)
+    // Di aplikasi nyata, NRP ini didapatkan dari User Provider / AuthBloc
+    LocationSyncService().startSyncing('202602003001');
   }
 
   @override
   void dispose() {
+    LocationSyncService().stopSyncing();
     _chipController.dispose();
     super.dispose();
   }

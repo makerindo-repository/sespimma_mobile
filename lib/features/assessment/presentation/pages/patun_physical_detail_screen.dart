@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/serdik_physical_scores.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
+
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_physical_medical_history_screen.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/health_monitoring_data.dart';
 
 class PatunPhysicalDetailScreen extends StatefulWidget {
   final Map<String, dynamic> serdik;
@@ -21,44 +24,7 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
 
   late AnimationController _animController;
 
-  static final List<Map<String, dynamic>> _mockMedicalRecords = [
-    {
-      'title': 'Kunjungan Poliklinik - Flu Ringan',
-      'desc': 'Diberikan paracetamol & vitamin C. Istirahat 1 hari',
-      'sender': 'dr. Sarah Dewi (Poliklinik Sespimma)',
-      'time': '29 Mei 2026, 09:15 WIB',
-      'category': 'Poliklinik',
-      'dateStr': '29 Mei 2026',
-      'date': DateTime(2026, 5, 29, 9, 15),
-    },
-    {
-      'title': 'Tes Kesehatan Awal (A) Selesai',
-      'desc': 'Parameter normal. Kolesterol sedikit di atas batas',
-      'sender': 'Tim Medis Sespimma',
-      'time': '15 Mei 2026, 08:00 WIB',
-      'category': 'Tes Medis',
-      'dateStr': '15 Mei 2026',
-      'date': DateTime(2026, 5, 15, 8, 0),
-    },
-    {
-      'title': 'Rawat Inap - ISPA',
-      'desc': 'Dirawat selama 2 hari. Kondisi membaik',
-      'sender': 'dr. Budi Santoso (RS Polri)',
-      'time': '8 Mei 2026, 14:00 WIB',
-      'category': 'Rawat Inap',
-      'dateStr': '8 Mei 2026',
-      'date': DateTime(2026, 5, 8, 14, 0),
-    },
-    {
-      'title': 'Kunjungan Poliklinik - Sakit Kepala',
-      'desc': 'Diberikan analgetik. Tidak perlu istirahat',
-      'sender': 'dr. Sarah Dewi (Poliklinik Sespimma)',
-      'time': '20 April 2026, 10:30 WIB',
-      'category': 'Poliklinik',
-      'dateStr': '20 April 2026',
-      'date': DateTime(2026, 4, 20, 10, 30),
-    },
-  ];
+
 
   @override
   void initState() {
@@ -85,13 +51,78 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
     return const Color(0xFFB71C1C);
   }
 
+  String _formatDate(DateTime dt) {
+    final indonesianMonths = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    final month = indonesianMonths[dt.month - 1];
+    return '${dt.day.toString().padLeft(2, '0')} $month ${dt.year}, ${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
+  }
+
+  List<Map<String, dynamic>> _getDynamicMedicalRecords(String noSerdik) {
+    final data = HealthMonitoringData.getHealthData(noSerdik);
+    final List<Map<String, dynamic>> list = [];
+
+    for (var r in data.records) {
+      String title = r.type;
+      if (title == 'Rawat Inap Tempat Perawatan Sementara') {
+        title = 'Rawat Inap TPS';
+      } else if (title == 'Rawat Inap Rumah Sakit') {
+        title = 'Rawat Inap RS';
+      } else if (title.contains('Kunjungan Poliklinik')) {
+        title = 'Kunjungan Poliklinik';
+      }
+
+      list.add({
+        'title': title,
+        'desc': r.description,
+        'sender': r.medisName,
+        'time': _formatDate(r.timestamp),
+        'category': title.contains('Rawat Inap') ? 'Rawat Inap' : 'Poliklinik',
+        'date': r.timestamp,
+        'photoPath': r.photoPath,
+      });
+    }
+
+    if (data.nilaiA != null) {
+      final dt = DateTime.now().subtract(const Duration(days: 20));
+      list.add({
+        'title': 'Tes Kesehatan Awal Selesai',
+        'desc': data.catatanDokterA ?? '',
+        'sender': 'Tim Medis Sespimma',
+        'time': _formatDate(dt),
+        'category': 'Tes Medis',
+        'date': dt,
+      });
+    }
+    
+    if (data.nilaiB != null) {
+      final dt = DateTime.now().subtract(const Duration(days: 2));
+      list.add({
+        'title': 'Tes Kesehatan Akhir Selesai',
+        'desc': data.catatanDokterB ?? '',
+        'sender': 'Tim Medis Sespimma',
+        'time': _formatDate(dt),
+        'category': 'Tes Medis',
+        'date': dt,
+      });
+    }
+
+    list.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     final name = widget.serdik['nama_lengkap'] ?? '-';
     final noSerdik = widget.serdik['no_serdik'] ?? '-';
     final pangkat = widget.serdik['pangkat'] ?? '-';
-    final double score = (widget.serdik['_mock_score'] as double?) ?? 0.0;
-    final String status = widget.serdik['_mock_status'] ?? '-';
+    
+    final physicalScores = SerdikPhysicalScores.getScores(noSerdik);
+    final double score = (physicalScores['nKj'] as num?)?.toDouble() ?? 0.0;
+    
+    final String status = score >= 70 ? 'LULUS' : 'TIDAK LULUS';
     final String? profilePhoto =
         widget.serdik['profile_photo'] ?? widget.serdik['profilePhoto'];
 
@@ -134,9 +165,9 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
                     score,
                     profilePhoto,
                   ),
-                  _buildHealthScoresSection(score),
-                  _buildMedicalHistorySection(),
-                  _buildPhysicalScoresSection(score),
+                  _buildHealthScoresSection(noSerdik),
+                  _buildMedicalHistorySection(noSerdik),
+                  _buildPhysicalScoresSection(noSerdik),
                   _buildRecommendationSection(),
                   const SizedBox(height: AppDimensions.xxxl),
                 ],
@@ -304,10 +335,11 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
     );
   }
 
-  Widget _buildHealthScoresSection(double baseScore) {
-    final double scoreA = (baseScore + 2).clamp(0, 100);
-    final double scoreC = (baseScore - 2).clamp(0, 100);
-    final double scoreB = (baseScore + 1.5).clamp(0, 100);
+  Widget _buildHealthScoresSection(String noSerdik) {
+    final physicalScores = SerdikPhysicalScores.getScores(noSerdik);
+    final double scoreA = (physicalScores['tes_awal'] as num?)?.toDouble() ?? 0.0;
+    final double scoreB = (physicalScores['tes_akhir'] as num?)?.toDouble() ?? 0.0;
+    final double scoreC = (physicalScores['status_kesehatan'] as num?)?.toDouble() ?? 0.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -323,12 +355,12 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
             padding: const EdgeInsets.only(bottom: AppDimensions.md),
             child: _buildSectionTitle('SELURUH NILAI KESEHATAN', '40%'),
           ),
-          _buildScoreGroup('Tes Kesehatan Awal (A)', '', scoreA, []),
+          _buildScoreGroup('Tes Kesehatan Awal', '', scoreA, []),
           const SizedBox(height: AppDimensions.sm),
-          _buildScoreGroup('Tes Kesehatan Akhir (B)', '', scoreB, []),
+          _buildScoreGroup('Tes Kesehatan Akhir', '', scoreB, []),
           const SizedBox(height: AppDimensions.sm),
           _buildScoreGroup(
-            'Status Kesehatan Selama Pendidikan (C)',
+            'Status Kesehatan Selama Pendidikan',
             '',
             scoreC,
             [],
@@ -339,7 +371,9 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
     );
   }
 
-  Widget _buildMedicalHistorySection() {
+  Widget _buildMedicalHistorySection(String noSerdik) {
+    final dynamicRecords = _getDynamicMedicalRecords(noSerdik);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.xl,
@@ -354,45 +388,57 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(child: _buildSectionTitle('RIWAYAT CATATAN MEDIS')),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PatunPhysicalMedicalHistoryScreen(
-                        initialRecords: _mockMedicalRecords,
+              if (dynamicRecords.isNotEmpty)
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PatunPhysicalMedicalHistoryScreen(
+                          initialRecords: dynamicRecords,
+                        ),
                       ),
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blueGrey.shade600,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.sm,
+                      vertical: AppDimensions.xs,
                     ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blueGrey.shade600,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppDimensions.sm,
-                    vertical: AppDimensions.xs,
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontMd,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(Icons.chevron_right_rounded, size: 20),
+                    ],
                   ),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Lihat Semua',
-                      style: TextStyle(
-                        fontSize: AppDimensions.fontMd,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(Icons.chevron_right_rounded, size: 20),
-                  ],
-                ),
-              ),
             ],
           ),
           const SizedBox(height: AppDimensions.lg),
-          ..._mockMedicalRecords
-              .take(2)
-              .map((item) => _buildMedicalRecordCard(item)),
+          if (dynamicRecords.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppDimensions.xl),
+                child: Text(
+                  'Belum ada catatan riwayat kesehatan',
+                  style: TextStyle(color: Colors.blueGrey.shade400),
+                ),
+              ),
+            )
+          else
+            ...dynamicRecords
+                .take(2)
+                .map((item) => _buildMedicalRecordCard(item)),
         ],
       ),
     );
@@ -425,6 +471,7 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
     final Color color = _categoryColor(category);
     final Color bgColor = color.withValues(alpha: 0.1);
     final IconData icon = _categoryIcon(category);
+    final String desc = (item['desc'] as String?) ?? '';
 
     return FadeTransition(
       opacity: _animController,
@@ -498,23 +545,54 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppDimensions.xs),
-                      Text(
-                        '${item['desc']} · ${item['sender']}',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontSm,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blueGrey.shade400,
+                      if (desc.isNotEmpty) ...[
+                        const SizedBox(height: AppDimensions.xs),
+                        Text(
+                          desc,
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontSm,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueGrey.shade700,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppDimensions.xs / 2),
-                      Text(
-                        (item['time'] as String?) ?? '-',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontSm,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueGrey.shade400,
-                        ),
+                      ],
+                      const SizedBox(height: AppDimensions.sm),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: Colors.blueGrey.shade400,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            (item['time'] as String?) ?? '-',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontSm,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey.shade400,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.person,
+                            size: 14,
+                            color: Colors.blueGrey.shade400,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              (item['sender'] as String?) ?? '-',
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontSm,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blueGrey.shade400,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -527,12 +605,10 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
     );
   }
 
-  Widget _buildPhysicalScoresSection(double baseScore) {
-    final double scoreA = (baseScore + 3).clamp(0, 100);
-    final double scorePullUp = (baseScore - 1).clamp(0, 100);
-    final double scoreSitUp = (baseScore + 1).clamp(0, 100);
-    final double scorePushUp = baseScore.clamp(0, 100);
-    final double scoreShuttle = (baseScore - 2).clamp(0, 100);
+  Widget _buildPhysicalScoresSection(String noSerdik) {
+    final physicalScores = SerdikPhysicalScores.getScores(noSerdik);
+    final double scoreA = (physicalScores['nga'] as num?)?.toDouble() ?? 0.0;
+    final double scoreB = (physicalScores['ngb'] as num?)?.toDouble() ?? 0.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -555,15 +631,12 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
           _buildScoreGroup(
             'Samapta B',
             '',
-            ((scorePullUp + scoreSitUp + scorePushUp + scoreShuttle) / 4).clamp(
-              0,
-              100,
-            ),
+            scoreB,
             [
-              _buildSubScoreItem('Pull Up (1 menit)', scorePullUp),
-              _buildSubScoreItem('Sit Up (1 menit)', scoreSitUp),
-              _buildSubScoreItem('Push Up (1 menit)', scorePushUp),
-              _buildSubScoreItem('Shuttle Run 6x10m', scoreShuttle),
+              _buildSubScoreItem('Pull Up (1 menit)', scoreB),
+              _buildSubScoreItem('Sit Up (1 menit)', scoreB),
+              _buildSubScoreItem('Push Up (1 menit)', scoreB),
+              _buildSubScoreItem('Shuttle Run 6x10m', scoreB),
             ],
           ),
           const SizedBox(height: AppDimensions.lg),

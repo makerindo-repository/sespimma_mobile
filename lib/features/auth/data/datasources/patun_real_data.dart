@@ -20,7 +20,7 @@ class PatunRealData {
       "nama": "Diki Riyadi Suhendi",
       "pangkat": "Pengatur",
       "nrp_nip": "198412142014121002",
-      "jabatan_struktural": "Banum Subbag Pimtajas Korsis",
+      "jabatan_struktural": "Banum Subbag Pi  wmtajas Korsis",
       "peran_pengasuhan": "Bamin Pokjar",
       "pokjar": "POKJAR 1",
     },

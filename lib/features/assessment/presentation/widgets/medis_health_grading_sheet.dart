@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/health_monitoring_data.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/serdik_physical_scores.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/medis_health_record_screen.dart';
 
 class MedisHealthGradingSheet extends StatefulWidget {
@@ -59,12 +60,15 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
     Navigator.pop(context);
 
     final TextEditingController controller = TextEditingController();
+    final TextEditingController noteController = TextEditingController();
     final noSerdik = widget.serdik['no_serdik'].toString();
     final data = HealthMonitoringData.getHealthData(noSerdik);
     if (type == 'A' && data.nilaiA != null) {
       controller.text = data.nilaiA.toString();
+      noteController.text = data.catatanDokterA ?? '';
     } else if (type == 'B' && data.nilaiB != null) {
       controller.text = data.nilaiB.toString();
+      noteController.text = data.catatanDokterB ?? '';
     }
 
     showDialog(
@@ -168,6 +172,28 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: AppDimensions.lg),
+                  TextField(
+                    controller: noteController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Catatan Dokter (opsional)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
+                        borderSide: const BorderSide(
+                          color: _primaryNavy,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               actions: [
@@ -191,10 +217,13 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                   onPressed: () {
                     final val = double.tryParse(controller.text);
                     if (val != null) {
+                      final catatan = noteController.text.trim();
                       if (type == 'A') {
-                        HealthMonitoringData.updateNilaiA(noSerdik, val);
+                        HealthMonitoringData.updateNilaiA(noSerdik, val, catatan: catatan.isEmpty ? null : catatan);
+                        SerdikPhysicalScores.updateScore(noSerdik, 'tes_awal', val);
                       } else {
-                        HealthMonitoringData.updateNilaiB(noSerdik, val);
+                        HealthMonitoringData.updateNilaiB(noSerdik, val, catatan: catatan.isEmpty ? null : catatan);
+                        SerdikPhysicalScores.updateScore(noSerdik, 'tes_akhir', val);
                       }
                       widget.onDataChanged();
                       Navigator.pop(context);

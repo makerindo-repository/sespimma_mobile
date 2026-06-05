@@ -21,11 +21,19 @@ class HealthRecord {
 class SerdikHealthData {
   final String noSerdik;
   double? nilaiA;
+  String? catatanDokterA;
   double? nilaiB;
+  String? catatanDokterB;
   int baseNilaiC = 80;
   List<HealthRecord> records = [];
 
-  SerdikHealthData({required this.noSerdik, this.nilaiA, this.nilaiB});
+  SerdikHealthData({
+    required this.noSerdik,
+    this.nilaiA,
+    this.catatanDokterA,
+    this.nilaiB,
+    this.catatanDokterB,
+  });
 
   int get currentNilaiC {
     int totalMinus = 0;
@@ -53,12 +61,16 @@ class HealthMonitoringData {
     return _data[noSerdik]!;
   }
 
-  static void updateNilaiA(String noSerdik, double score) {
-    getHealthData(noSerdik).nilaiA = score;
+  static void updateNilaiA(String noSerdik, double score, {String? catatan}) {
+    final data = getHealthData(noSerdik);
+    data.nilaiA = score;
+    if (catatan != null) data.catatanDokterA = catatan;
   }
 
-  static void updateNilaiB(String noSerdik, double score) {
-    getHealthData(noSerdik).nilaiB = score;
+  static void updateNilaiB(String noSerdik, double score, {String? catatan}) {
+    final data = getHealthData(noSerdik);
+    data.nilaiB = score;
+    if (catatan != null) data.catatanDokterB = catatan;
   }
 
   static void addHealthRecord(

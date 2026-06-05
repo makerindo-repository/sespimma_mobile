@@ -4,11 +4,13 @@ import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:file_picker/file_picker.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/domain/entities/user_entity.dart';
+import '../../../auth/data/datasources/korsis_real_data.dart';
+import '../../../auth/data/datasources/operator_real_data.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
 
@@ -58,8 +60,99 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
     }
   }
 
+  String _getZoneCreatorFullName(String creator) {
+    if (creator.toLowerCase() == 'korsis') {
+      return KorsisRealData.records.first['nama'] as String;
+    }
+    for (var k in KorsisRealData.records) {
+      if (k['nama'].toString().toLowerCase().contains(creator.toLowerCase())) {
+        return k['nama'] as String;
+      }
+    }
+    for (var o in OperatorRealData.records) {
+      if (o['nama'].toString().toLowerCase().contains(creator.toLowerCase())) {
+        return o['nama'] as String;
+      }
+    }
+    return creator;
+  }
+
+  String _formatDate(DateTime target) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    final monthName = months[target.month - 1];
+    return '${target.day.toString().padLeft(2, '0')} $monthName ${target.year}';
+  }
+
+  String _formatTime(DateTime target) {
+    return '${target.hour.toString().padLeft(2, '0')}.${target.minute.toString().padLeft(2, '0')}';
+  }
+
   List<Map<String, dynamic>> _getAttendances() {
-    return PimpinanMockData.serdikAttendanceHistory;
+    final List<Map<String, dynamic>> result = [];
+
+    final activeZones = AttendanceZones.activeZones;
+    for (var zone in activeZones) {
+      final dt = zone.startTime;
+      final startStr =
+          '${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
+      final endStr =
+          '${zone.endTime.hour.toString().padLeft(2, '0')}.${zone.endTime.minute.toString().padLeft(2, '0')}';
+      final deadlineStr =
+          '${zone.deadline.hour.toString().padLeft(2, '0')}.${zone.deadline.minute.toString().padLeft(2, '0')}';
+
+      result.add({
+        'id': 'zone_${zone.id}',
+        'title': zone.activityName,
+        'date': _formatDate(dt),
+        'time': _formatTime(dt),
+        'dateTime': dt,
+        'status': 'Hadir',
+        'type': 'hadir',
+        'location': zone.name,
+        'method': 'Geofencing',
+        'waktuPelaksanaan': '$startStr - $endStr',
+        'waktuBatasAbsen': deadlineStr,
+        'pembuatZona': _getZoneCreatorFullName(zone.creator),
+      });
+    }
+
+    for (var att in PimpinanMockData.serdikAttendanceHistory) {
+      final dt = att['dateTime'] as DateTime;
+      result.add({
+        'id': att['id'],
+        'title': att['title'],
+        'date': _formatDate(dt),
+        'time': _formatTime(dt),
+        'dateTime': dt,
+        'status': att['status'] == 'Alpha' ? 'Tanpa Keterangan' : att['status'],
+        'type': att['type'],
+        'location': att['location'] ?? '-',
+        'method': att['method'] ?? '-',
+        'attachment': att['attachment'],
+        'waktuPelaksanaan': '07.00 - 09.00',
+        'waktuBatasAbsen': '07.30',
+        'pembuatZona': KorsisRealData.records.first['nama'],
+      });
+    }
+
+    result.sort(
+      (a, b) =>
+          (b['dateTime'] as DateTime).compareTo(a['dateTime'] as DateTime),
+    );
+    return result;
   }
 
   @override
@@ -69,7 +162,13 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
   }
 
   String _selectedFilter = 'Semua';
-  final List<String> _filters = ['Semua', 'Hadir', 'Telat', 'Izin', 'Alpha'];
+  final List<String> _filters = [
+    'Semua',
+    'Hadir',
+    'Telat',
+    'Izin',
+    'Tanpa Keterangan',
+  ];
   DateTimeRange? _selectedDateRange;
 
   Future<void> _pickDateRange() async {
@@ -196,7 +295,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
             if (_selectedFilter == 'Hadir') return a['type'] == 'hadir';
             if (_selectedFilter == 'Telat') return a['type'] == 'telat';
             if (_selectedFilter == 'Izin') return a['type'] == 'izin';
-            if (_selectedFilter == 'Alpha') return a['type'] == 'alpha';
+            if (_selectedFilter == 'Tanpa Keterangan') {
+              return a['type'] == 'alpha';
+            }
             return true;
           }).toList();
 
@@ -324,6 +425,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
             ),
             onSelected: (value) {
               if (value == 'refresh') {
+                setState(() {});
                 _animController.forward(from: 0.0);
                 AppNotifier.showSuccess(context, 'Data berhasil diperbarui');
               } else if (value == 'clear_filter') {
@@ -459,6 +561,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                                       time: item['time'],
                                       status: item['status'],
                                       type: item['type'],
+                                      location: item['location'],
                                       animation: animation,
                                       onTap: () => _showAttendanceDetails(
                                         context,
@@ -497,13 +600,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
         : isTelat
         ? const Color(0xFFFBC02D)
         : (isIzin ? AppColors.warningOrange : AppColors.dangerRed);
-
-    final String waktuLabel = isIzin
-        ? 'Waktu Izin'
-        : (isAlpha ? 'Waktu Kegiatan' : 'Waktu Presensi');
-    final String lokasiLabel = isAlpha
-        ? 'Lokasi Kegiatan'
-        : 'Lokasi Terdeteksi';
 
     showModalBottomSheet(
       context: context,
@@ -582,69 +678,44 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
               ),
               const SizedBox(height: AppDimensions.xxl + 4),
               _buildDetailRow(
-                AppIcons.clockFill,
-                waktuLabel,
-                '${item['date'].toString().split(', ')[1]} • ${item['time']}',
+                AppIcons.mapPinLineFill,
+                'Lokasi Kegiatan',
+                item['location'] ?? '-',
               ),
               const SizedBox(height: AppDimensions.md),
-              if (isIzin)
-                InkWell(
-                  onTap: () async {
-                    try {
-                      String? selectedDirectory =
-                          await FilePicker.getDirectoryPath();
-
-                      if (selectedDirectory != null) {
-                        final fileName = item['attachment'] ?? 'Surat_Izin.pdf';
-                        final file = File('$selectedDirectory/$fileName');
-
-                        await file.writeAsString(
-                          'Simulasi dokumen surat izin Sespimma.',
-                        );
-
-                        if (context.mounted) {
-                          AppNotifier.showSuccess(
-                            context,
-                            'File berhasil disimpan ke:\n$selectedDirectory',
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        AppNotifier.showError(
-                          context,
-                          'Gagal menyimpan file: $e',
-                        );
-                      }
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-                  child: _buildDetailRow(
-                    AppIcons.filePdfFill,
-                    'Bukti Lampiran',
-                    item['attachment'] ?? 'Surat_Izin.pdf',
-                    valueColor: Colors.blue.shade800,
-                  ),
-                )
-              else if (!isAlpha)
+              _buildDetailRow(
+                AppIcons.clockFill,
+                'Waktu Pelaksanaan',
+                item['waktuPelaksanaan'] ?? '00.00 - 00.00',
+              ),
+              const SizedBox(height: AppDimensions.md),
+              if (!isIzin && !isAlpha)
+                _buildDetailRow(
+                  AppIcons.timerFill,
+                  'Waktu Batas Absen',
+                  item['waktuBatasAbsen'] ?? '00.00',
+                ),
+              if (!isIzin && !isAlpha) const SizedBox(height: AppDimensions.md),
+              _buildDetailRow(
+                AppIcons.userFocusFill,
+                'Pembuat Zona',
+                item['pembuatZona'] ?? '-',
+              ),
+              const SizedBox(height: AppDimensions.md),
+              if (!isAlpha && !isIzin)
                 _buildDetailRow(
                   AppIcons.fingerprintFill,
-                  'Metode Verifikasi',
+                  'Metode Presensi',
                   item['method'] ?? 'Geofencing',
                 ),
-              if (isIzin || !isAlpha) const SizedBox(height: AppDimensions.md),
-              _buildDetailRow(
-                AppIcons.mapPinLineFill,
-                lokasiLabel,
-                item['location'] ??
-                    (isIzin ? '-6.815234, 107.618645' : 'Sespimma Lembang'),
-              ),
-              const SizedBox(height: AppDimensions.md),
-              _buildDetailRow(
-                AppIcons.deviceMobileSpeakerFill,
-                'Informasi Perangkat',
-                _appInfo,
-              ),
+              if (!isAlpha) ...[
+                const SizedBox(height: AppDimensions.md),
+                _buildDetailRow(
+                  AppIcons.deviceMobileSpeakerFill,
+                  'Informasi Perangkat',
+                  _appInfo,
+                ),
+              ],
               const SizedBox(height: AppDimensions.xl),
               SizedBox(
                 width: double.infinity,
@@ -734,6 +805,7 @@ class _AnimatedAttendanceTile extends StatelessWidget {
   final String time;
   final String status;
   final String type;
+  final String location;
   final Animation<double> animation;
   final VoidCallback onTap;
 
@@ -743,6 +815,7 @@ class _AnimatedAttendanceTile extends StatelessWidget {
     required this.time,
     required this.status,
     required this.type,
+    required this.location,
     required this.animation,
     required this.onTap,
   });
@@ -763,7 +836,7 @@ class _AnimatedAttendanceTile extends StatelessWidget {
         ? AppIcons.checkCircleFill
         : isTelat
         ? AppIcons.clockFill
-        : (isIzin ? AppIcons.warningCircleFill : AppIcons.xCircleFill);
+        : (isIzin ? AppIcons.fileTextFill : AppIcons.xCircleFill);
 
     return FadeTransition(
       opacity: animation,
@@ -825,12 +898,31 @@ class _AnimatedAttendanceTile extends StatelessWidget {
                           ),
                           const SizedBox(height: AppDimensions.xs),
                           Text(
-                            time,
+                            location,
                             style: TextStyle(
                               fontSize: AppDimensions.fontMd,
                               fontWeight: FontWeight.w500,
-                              color: Colors.blueGrey.shade400,
+                              color: Colors.blueGrey.shade600,
                             ),
+                          ),
+                          const SizedBox(height: AppDimensions.xs),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.login,
+                                size: AppDimensions.fontMd + 2,
+                                color: Colors.blueGrey.shade400,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                time,
+                                style: TextStyle(
+                                  fontSize: AppDimensions.fontMd,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.blueGrey.shade400,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

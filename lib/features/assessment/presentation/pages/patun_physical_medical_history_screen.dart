@@ -569,23 +569,54 @@ class _AnimatedMedicalRecordTile extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppDimensions.xs),
-                      Text(
-                        '$desc · $sender',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontMd,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueGrey.shade400,
+                      if (desc.isNotEmpty) ...[
+                        const SizedBox(height: AppDimensions.xs),
+                        Text(
+                          desc,
+                          style: TextStyle(
+                            fontSize: AppDimensions.fontMd,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueGrey.shade700,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppDimensions.xs / 2),
-                      Text(
-                        time,
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontMd,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.blueGrey.shade400,
-                        ),
+                      ],
+                      const SizedBox(height: AppDimensions.sm),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: Colors.blueGrey.shade400,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            time,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontMd,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blueGrey.shade400,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.person,
+                            size: 14,
+                            color: Colors.blueGrey.shade400,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              sender,
+                              style: TextStyle(
+                                fontSize: AppDimensions.fontMd,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.blueGrey.shade400,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -13,7 +13,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart'
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_form_screen.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_detail_screen.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/patun_senat_validation_sheet.dart';
-import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_kakorsis_outbox_screen.dart';
+
 
 class PatunMentalMonitoringScreen extends StatefulWidget {
   const PatunMentalMonitoringScreen({super.key});
@@ -91,62 +91,47 @@ class _PatunMentalMonitoringScreenState
           ),
         ),
         actions: [
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.description_rounded,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PatunKakorsisOutboxScreen(),
-                    ),
-                  );
-                },
-                tooltip: 'Draft Penilaian',
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
           const SizedBox(width: AppDimensions.sm),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: null,
-        onPressed: () => _showInputBottomSheet(context),
-        backgroundColor: _primaryNavy,
-        elevation: 6,
-        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
-        label: const Text(
-          'Input Nilai',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: AppDimensions.fontMd,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (_isSenatBannerVisible) ...[
+            FloatingActionButton.extended(
+              heroTag: 'senat_val_fab',
+              onPressed: _showSenatValidationSheet,
+              backgroundColor: Colors.amber.shade700,
+              elevation: 6,
+              icon: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 22),
+              label: const Text(
+                'Validasi Senat',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontMd,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.md),
+          ],
+          FloatingActionButton.extended(
+            heroTag: 'input_nilai_fab',
+            onPressed: () => _showInputBottomSheet(context),
+            backgroundColor: _primaryNavy,
+            elevation: 6,
+            icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+            label: const Text(
+              'Input Nilai',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: AppDimensions.fontMd,
+              ),
+            ),
           ),
-        ),
+        ],
       ),
       body: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
@@ -254,17 +239,13 @@ class _PatunMentalMonitoringScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (_isSenatBannerVisible) ...[
-            _buildSenatBanner(),
-            const SizedBox(height: AppDimensions.lg),
-          ],
           Row(
             children: [
               Expanded(
                 child: AssessmentSearchBarWidget(
                   controller: _searchController,
                   searchQuery: _searchQuery,
-                  hintText: 'Cari nama atau No. Serdik...',
+                  hintText: 'Cari nama atau nomor serdik...',
                   onChanged: (value) {
                     setState(() {
                       _searchQuery = value;
@@ -293,18 +274,35 @@ class _PatunMentalMonitoringScreenState
           const SizedBox(height: AppDimensions.lg),
           Row(
             children: [
-              Expanded(
+              const Text(
+                'DAFTAR SERDIK',
+                style: TextStyle(
+                  color: _primaryNavy,
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontLg,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _primaryNavy,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                ),
                 child: Text(
-                  'DAFTAR SERDIK ${pokjar.toUpperCase()}',
+                  pokjar.toUpperCase(),
                   style: const TextStyle(
-                    color: _primaryNavy,
-                    fontWeight: FontWeight.w800,
-                    fontSize: AppDimensions.fontLg,
-                    letterSpacing: 0.5,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: AppDimensions.fontSm,
                   ),
                 ),
               ),
-              const SizedBox(width: AppDimensions.md),
+              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,
@@ -573,15 +571,31 @@ class _PatunMentalMonitoringScreenState
                                 borderRadius: BorderRadius.circular(
                                   AppDimensions.radiusMd,
                                 ),
-                              ),
-                              child: Text(
-                                senatRole,
-                                style: const TextStyle(
-                                  fontSize: AppDimensions.fontXs,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF1A237E),
-                                  letterSpacing: 0.3,
+                                border: Border.all(
+                                  color: const Color(
+                                    0xFF1A237E,
+                                  ).withValues(alpha: 0.2),
                                 ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.star_rounded,
+                                    size: 10,
+                                    color: Color(0xFF1A237E),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    senatRole,
+                                    style: const TextStyle(
+                                      fontSize: AppDimensions.fontXs,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF1A237E),
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -658,74 +672,6 @@ class _PatunMentalMonitoringScreenState
 
   List<Map<String, dynamic>> _getDynamicList() {
     return _currentPokjarList;
-  }
-
-  Widget _buildSenatBanner() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
-        border: Border.all(color: Colors.orange.shade300),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.orange.shade100,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.notifications_active_rounded,
-              color: Colors.orange.shade800,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Saatnya Validasi Reward Senat',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    color: Colors.orange.shade900,
-                    fontSize: AppDimensions.fontMd,
-                  ),
-                ),
-                Text(
-                  'Batas waktu validasi minggu ini segera berakhir.',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontSm,
-                    color: Colors.orange.shade800,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: _showSenatValidationSheet,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange.shade600,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              minimumSize: Size.zero,
-            ),
-            child: const Text(
-              'Validasi',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showSenatValidationSheet() async {

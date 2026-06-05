@@ -181,7 +181,7 @@ class _PatunAcademicMonitoringScreenState
                 child: AssessmentSearchBarWidget(
                   controller: _searchController,
                   searchQuery: _searchQuery,
-                  hintText: 'Cari nama atau No. Serdik...',
+                  hintText: 'Cari nama atau nomor serdik...',
                   onChanged: (value) {
                     setState(() {
                       _searchQuery = value;
@@ -210,18 +210,35 @@ class _PatunAcademicMonitoringScreenState
           const SizedBox(height: AppDimensions.lg),
           Row(
             children: [
-              Expanded(
+              const Text(
+                'DAFTAR SERDIK',
+                style: TextStyle(
+                  color: _primaryNavy,
+                  fontWeight: FontWeight.w800,
+                  fontSize: AppDimensions.fontLg,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(width: AppDimensions.sm),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _primaryNavy,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
+                ),
                 child: Text(
-                  'DAFTAR SERDIK ${displayPokjar.toUpperCase()}',
+                  displayPokjar.toUpperCase(),
                   style: const TextStyle(
-                    color: _primaryNavy,
-                    fontWeight: FontWeight.w800,
-                    fontSize: AppDimensions.fontLg,
-                    letterSpacing: 0.5,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: AppDimensions.fontSm,
                   ),
                 ),
               ),
-              const SizedBox(width: AppDimensions.md),
+              const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,

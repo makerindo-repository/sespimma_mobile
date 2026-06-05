@@ -190,22 +190,33 @@ class _PatunSociometryMonitoringScreenState
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
+                                  horizontal: 12,
+                                  vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: _primaryNavy.withValues(alpha: 0.05),
+                                  color: _primaryNavy,
                                   borderRadius: BorderRadius.circular(
-                                    AppDimensions.radiusSm,
+                                    AppDimensions.radiusXl,
                                   ),
                                 ),
-                                child: Text(
-                                  'Total: ${serdikList.length}',
-                                  style: const TextStyle(
-                                    fontSize: AppDimensions.fontSm + 1,
-                                    fontWeight: FontWeight.w800,
-                                    color: _primaryNavy,
-                                  ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.group_rounded,
+                                      color: Colors.white,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${serdikList.length} Serdik',
+                                      style: const TextStyle(
+                                        fontSize: AppDimensions.fontSm,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],

@@ -6,7 +6,7 @@ class ScoreCalculatorService {
     return SerdikRealData.records.map((serdik) {
       final String noSerdik = serdik['no_serdik'] ?? '';
 
-      final raw = _generateSimulatedScores(noSerdik);
+      final raw = generateSimulatedScores(noSerdik);
 
       return calculateFinalRecap(serdik, raw);
     }).toList();
@@ -109,7 +109,7 @@ class ScoreCalculatorService {
     return p;
   }
 
-  static Map<String, dynamic> _generateSimulatedScores(String noSerdik) {
+  static Map<String, dynamic> generateSimulatedScores(String noSerdik) {
     int hash = noSerdik.hashCode;
 
     double sim(double base, int varianceIndex) {

@@ -18,6 +18,7 @@ class InboxItem {
   final String rewardPunishmentName;
   String status;
   final String? photoPath;
+  final String? rewardPunishmentId;
 
   InboxItem({
     required this.id,
@@ -33,6 +34,7 @@ class InboxItem {
     required this.rewardPunishmentName,
     this.status = 'pending',
     this.photoPath,
+    this.rewardPunishmentId,
   });
 }
 
@@ -85,24 +87,25 @@ class KorsisInboxMockData {
       final timestamp = now.subtract(Duration(hours: i * 3, minutes: i * 22));
       final senderName = senders[i % senders.length];
 
-      result.add(
-        InboxItem(
-          id: 'mock_inbox_$i',
-          serdikName: serdik['nama_lengkap'] ?? '-',
-          pangkat: serdik['pangkat'] ?? '-',
-          nosis: serdik['no_serdik'] ?? '-',
-          pokjar: serdik['kelompok_kelas'] ?? '-',
-          isReward: isReward,
-          senderName: senderName,
-          timestamp: timestamp,
-          points: rule.point,
-          description:
-              'Telah dilakukan observasi dan pencatatan oleh '
-              'pengasuh terkait kedisiplinan dan kinerja serdik.',
-          rewardPunishmentName: rule.description,
-          status: 'pending',
-        ),
-      );
+        result.add(
+          InboxItem(
+            id: 'mock_inbox_$i',
+            serdikName: serdik['nama_lengkap'] ?? '-',
+            pangkat: serdik['pangkat'] ?? '-',
+            nosis: serdik['no_serdik'] ?? '-',
+            pokjar: serdik['kelompok_kelas'] ?? '-',
+            isReward: isReward,
+            senderName: senderName,
+            timestamp: timestamp,
+            points: rule.point,
+            description:
+                'Telah dilakukan observasi dan pencatatan oleh '
+                'pengasuh terkait kedisiplinan dan kinerja serdik.',
+            rewardPunishmentName: rule.description,
+            status: i < 5 ? 'Setuju' : 'pending', // First 5 items are approved for demo
+            rewardPunishmentId: rule.id,
+          ),
+        );
     }
 
     return result;

@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
@@ -8,7 +9,7 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/domain/entities/user_entity.dart';
-import '../../../assessment/data/models/sociometry_period_config.dart';
+import '../../data/datasources/notification_mock_data.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -20,292 +21,25 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
-  late List<Map<String, dynamic>> _mockNotifications;
   bool _isDataPopulated = false;
-
-  String _getDynamicDateStr(int daysAgo) {
-    final target = DateTime.now().subtract(Duration(days: daysAgo));
-    const months = [
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
-    ];
-    const days = [
-      'Minggu',
-      'Senin',
-      'Selasa',
-      'Rabu',
-      'Kamis',
-      'Jumat',
-      'Sabtu',
-    ];
-
-    final dayIndex = target.weekday == 7 ? 0 : target.weekday;
-    final dayName = days[dayIndex];
-    final monthName = months[target.month - 1];
-    return '$dayName, ${target.day} $monthName ${target.year}';
-  }
 
   @override
   void initState() {
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 600),
     );
     _animController.forward();
-    _mockNotifications = [];
   }
 
   void _populateNotifications(UserEntity user) {
-    final today = DateTime.now();
-    final yesterday = today.subtract(const Duration(days: 1));
-    final role = user.roleId.toLowerCase();
-
-    final List<Map<String, dynamic>> list = [];
-
-    if (role == 'siswa') {
-      if (SociometryPeriodConfig.isAnyActive()) {
-        final count = SociometryPeriodConfig.getFilledCount();
-        final total = SociometryPeriodConfig.getTotalCount();
-        final remaining = total - count;
-
-        list.add({
-          'id': 'notif_sosio_start',
-          'title': 'Sosiometri Peleton Dimulai',
-          'body':
-              'Hari ini sosiometri telah dimulai. Silakan isi penilaian untuk seluruh rekan peleton Anda.',
-          'date': _getDynamicDateStr(0),
-          'time': '07:00 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'sosiometri_start',
-        });
-
-        if (remaining > 0) {
-          list.add({
-            'id': 'notif_sosio_remind',
-            'title': 'Pengingat Sosiometri',
-            'body':
-                '$remaining rekan lagi belum Anda isi sosiometrinya. Tenggat waktu hampir habis, segera lengkapi.',
-            'date': _getDynamicDateStr(0),
-            'time': '12:00 WIB',
-            'dateTime': today,
-            'isRead': false,
-            'type': 'sosiometri_reminder',
-          });
-        } else {
-          list.add({
-            'id': 'notif_sosio_done',
-            'title': 'Sosiometri Selesai',
-            'body':
-                'Terima kasih, Anda telah mengisi sosiometri untuk seluruh rekan peleton Anda dengan lengkap.',
-            'date': _getDynamicDateStr(0),
-            'time': '14:00 WIB',
-            'dateTime': today,
-            'isRead': false,
-            'type': 'sosiometri_done',
-          });
-        }
-      }
-
-      list.addAll([
-        {
-          'id': 'n_kegiatan_baru',
-          'title': 'Kegiatan Baru dari Korsis',
-          'body':
-              'Korsis telah membuat kegiatan "Apel Pagi Gabungan". Harap bersiap dan pastikan kehadiran Anda.',
-          'date': _getDynamicDateStr(0),
-          'time': '06:00 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'info',
-        },
-        {
-          'id': 'n_reward',
-          'title': 'Reward: Menjadi Imam Shalat',
-          'body':
-              'Selamat! Anda mendapatkan reward +0.50 nilai mental dari Patun A.',
-          'date': _getDynamicDateStr(0),
-          'time': '18:30 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'reward',
-        },
-        {
-          'id': 'n_punish',
-          'title': 'Punishment: Terlambat Apel',
-          'body':
-              'Tercatat keterlambatan apel pagi via geofencing. Pengurangan nilai -0.50.',
-          'date': _getDynamicDateStr(0),
-          'time': '07:15 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'punishment',
-        },
-        {
-          'id': 'n_task_done',
-          'title': 'Tugas: Naskah Karya Perseorangan',
-          'body':
-              'Tugas Anda telah selesai dinilai oleh Patun. Nilai Anda: 88.5.',
-          'date': _getDynamicDateStr(1),
-          'time': '09:00 WIB',
-          'dateTime': yesterday,
-          'isRead': true,
-          'type': 'task_dinilai',
-        },
-        {
-          'id': 'n_task_wait',
-          'title': 'Tugas: Resume Kepemimpinan',
-          'body':
-              'Berhasil mengumpulkan tepat waktu. Status saat ini: Sedang dinilai oleh Patun.',
-          'date': _getDynamicDateStr(1),
-          'time': '14:00 WIB',
-          'dateTime': yesterday,
-          'isRead': true,
-          'type': 'task_sedang_dinilai',
-        },
-        {
-          'id': 'n_task_late',
-          'title': 'Tugas Terlambat: Esai Pengendalian Diri',
-          'body':
-              'Anda mengumpulkan tugas melewati batas waktu yang ditentukan. Menunggu penilaian.',
-          'date': _getDynamicDateStr(2),
-          'time': '16:00 WIB',
-          'dateTime': today.subtract(const Duration(days: 2)),
-          'isRead': true,
-          'type': 'task_telat',
-        },
-        {
-          'id': 'n_task_miss',
-          'title': 'Tugas Tidak Dikumpulkan: Sistem Informasi',
-          'body':
-              'Batas waktu telah habis dan Anda belum mengumpulkan tugas ini.',
-          'date': _getDynamicDateStr(2),
-          'time': '23:59 WIB',
-          'dateTime': today.subtract(const Duration(days: 2)),
-          'isRead': true,
-          'type': 'task_alpha',
-        },
-        {
-          'id': 'n_att_hadir',
-          'title': 'Kehadiran: Kelas Kepemimpinan',
-          'body': 'Status kehadiran Anda tercatat: Hadir.',
-          'date': _getDynamicDateStr(3),
-          'time': '08:30 WIB',
-          'dateTime': today.subtract(const Duration(days: 3)),
-          'isRead': true,
-          'type': 'hadir',
-        },
-        {
-          'id': 'n_att_telat',
-          'title': 'Kehadiran: Apel Pagi',
-          'body': 'Status kehadiran Anda tercatat: Telat (Terlambat 15 menit).',
-          'date': _getDynamicDateStr(3),
-          'time': '07:15 WIB',
-          'dateTime': today.subtract(const Duration(days: 3)),
-          'isRead': true,
-          'type': 'telat',
-        },
-        {
-          'id': 'n_att_izin',
-          'title': 'Kehadiran: Kelas Manajemen',
-          'body':
-              'Status kehadiran Anda tercatat: Izin. Surat sakit telah divalidasi.',
-          'date': _getDynamicDateStr(4),
-          'time': '08:30 WIB',
-          'dateTime': today.subtract(const Duration(days: 4)),
-          'isRead': true,
-          'type': 'izin',
-        },
-        {
-          'id': 'n_att_alpha',
-          'title': 'Kehadiran: Olahraga Bersama',
-          'body': 'Status kehadiran Anda tercatat: Alpha (Tanpa keterangan).',
-          'date': _getDynamicDateStr(4),
-          'time': '06:00 WIB',
-          'dateTime': today.subtract(const Duration(days: 4)),
-          'isRead': true,
-          'type': 'alpha',
-        },
-      ]);
-    } else if (role == 'gadik' || role == 'patun' || role == 'instruktur') {
-      if (SociometryPeriodConfig.isAnyActive()) {
-        list.add({
-          'id': 'notif_gadik_sosio',
-          'title': 'Monitoring Sosiometri Aktif',
-          'body':
-              'Periode sosiometri peleton sedang berjalan di aplikasi siswa. Silakan pantau rekapitulasi progres partisipasi.',
-          'date': _getDynamicDateStr(0),
-          'time': 'Baru saja',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'task',
-        });
-      }
-
-      list.addAll([
-        {
-          'id': 'notif_g001',
-          'title': 'Laporan Fisik Jasmani Baru',
-          'body':
-              'Data mentah (Hasil Gerakan) penilaian jasmani baru saja disinkronisasikan dari Pleton B.',
-          'date': _getDynamicDateStr(0),
-          'time': '11:00 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'task',
-        },
-        {
-          'id': 'notif_g002',
-          'title': 'Tugas Dikumpulkan',
-          'body':
-              'Sebanyak 25 / 30 Siswa telah mengumpulkan Resume Kepemimpinan dan siap dilakukan penilaian.',
-          'date': _getDynamicDateStr(0),
-          'time': '09:00 WIB',
-          'dateTime': today,
-          'isRead': false,
-          'type': 'info',
-        },
-        {
-          'id': 'notif_g003',
-          'title': 'Jadwal Mengajar Besok',
-          'body':
-              'Kelas Etika Kepemimpinan dan Administrasi Polri besok pukul 08:00 WIB di Gedung C.',
-          'date': _getDynamicDateStr(1),
-          'time': '17:00 WIB',
-          'dateTime': yesterday,
-          'isRead': true,
-          'type': 'info',
-        },
-      ]);
-    } else {
-      list.add({
-        'id': 'notif_p002',
-        'title': 'Peringatan Zona Tinggi',
-        'body':
-            'Sistem EWS mendeteksi adanya serdik yang berada pada zona risiko tinggi. Mohon segera lakukan peninjauan.',
-        'date': _getDynamicDateStr(0),
-        'time': 'Baru saja',
-        'dateTime': today,
-        'isRead': false,
-        'type': 'punishment',
+    if (!_isDataPopulated) {
+      setState(() {
+        NotificationMockData.initialize(user);
       });
-    }
-
-    setState(() {
-      _mockNotifications = list;
       _isDataPopulated = true;
-    });
+    }
   }
 
   @override
@@ -368,8 +102,8 @@ class _NotificationScreenState extends State<NotificationScreen>
         }
 
         final filteredNotifs = _selectedDateRange == null
-            ? _mockNotifications
-            : _mockNotifications.where((notif) {
+            ? NotificationMockData.items
+            : NotificationMockData.items.where((notif) {
                 final dt = notif['dateTime'] as DateTime;
                 final start = DateTime(
                   _selectedDateRange!.start.year,
@@ -388,14 +122,19 @@ class _NotificationScreenState extends State<NotificationScreen>
                     dt.isBefore(end.add(const Duration(seconds: 1)));
               }).toList();
 
-        final Map<String, List<Map<String, dynamic>>> groupedNotifs = {};
+        final LinkedHashMap<String, List<Map<String, dynamic>>> groupedNotifs = LinkedHashMap();
         for (var notif in filteredNotifs) {
-          final date = notif['date'] as String;
+          final dt = notif['dateTime'] as DateTime;
+          final months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+          final date = '${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year}';
+          
           if (!groupedNotifs.containsKey(date)) {
             groupedNotifs[date] = [];
           }
           groupedNotifs[date]!.add(notif);
         }
+
+        final sortedDates = groupedNotifs.keys.toList();
 
         if (state is AuthInitial ||
             (state is AuthSuccess && !_isDataPopulated)) {
@@ -455,9 +194,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                     });
                   } else if (value == 'read_all') {
                     setState(() {
-                      for (var element in _mockNotifications) {
-                        element['isRead'] = true;
-                      }
+                      NotificationMockData.markAllAsRead();
                     });
                   } else if (value == 'clear_filter') {
                     setState(() {
@@ -503,106 +240,92 @@ class _NotificationScreenState extends State<NotificationScreen>
           body: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
-              child: filteredNotifs.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                      itemCount: groupedNotifs.length,
-                      itemBuilder: (context, index) {
-                        final dateKey = groupedNotifs.keys.elementAt(index);
-                        final items = groupedNotifs[dateKey]!;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                bottom: 12,
-                                top: index == 0 ? 0 : 16,
-                              ),
-                              child: Text(
-                                dateKey,
-                                style: TextStyle(
-                                  fontSize: AppDimensions.fontLg,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.blueGrey.shade700,
-                                ),
-                              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: NotificationMockData.items.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
                             ),
-                            ...items.map((notif) {
-                              final itemIndex = filteredNotifs.indexOf(notif);
-                              final animation = CurvedAnimation(
-                                parent: _animController,
-                                curve: Interval(
-                                  (itemIndex / filteredNotifs.length).clamp(
-                                    0.0,
-                                    1.0,
-                                  ),
-                                  1.0,
-                                  curve: Curves.easeOutCubic,
-                                ),
-                              );
-                              return Dismissible(
-                                key: ValueKey(notif['id']),
-                                direction: DismissDirection.endToStart,
-                                background: Container(
-                                  alignment: Alignment.centerRight,
-                                  padding: const EdgeInsets.only(right: 20.0),
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFD32F2F),
-                                    borderRadius: BorderRadius.circular(
-                                      AppDimensions.radiusLg,
+                            itemCount: sortedDates.length,
+                            itemBuilder: (context, index) {
+                              final dateKey = sortedDates[index];
+                              final items = groupedNotifs[dateKey]!;
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom: 12,
+                                      top: index == 0 ? 0 : 16,
+                                    ),
+                                    child: Text(
+                                      dateKey,
+                                      style: TextStyle(
+                                        fontSize: AppDimensions.fontLg,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.blueGrey.shade700,
+                                      ),
                                     ),
                                   ),
-                                  child: const Icon(
-                                    AppIcons.trashFill,
-                                    color: Colors.white,
-                                    size: AppDimensions.iconDefault + 2,
-                                  ),
-                                ),
-                                onDismissed: (direction) {
-                                  HapticFeedback.mediumImpact();
-                                  final String deletedId =
-                                      notif['id'] as String;
-                                  setState(() {
-                                    _mockNotifications.removeWhere(
-                                      (item) => item['id'] == deletedId,
-                                    );
-                                  });
-                                  AppNotifier.showSuccess(
-                                    context,
-                                    'Notifikasi berhasil dihapus',
-                                  );
-                                },
-                                child: _AnimatedNotificationTile(
-                                  notification: notif,
-                                  animation: animation,
-                                  onTap: () {
-                                    final String currentId =
-                                        notif['id'] as String;
-                                    setState(() {
-                                      final foundIndex = _mockNotifications
-                                          .indexWhere(
-                                            (n) => n['id'] == currentId,
+                                  ...items.map((notif) {
+                                    return Dismissible(
+                                      key: ValueKey(notif['id']),
+                                      direction: DismissDirection.endToStart,
+                                      background: Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: const EdgeInsets.only(right: 20.0),
+                                        margin: const EdgeInsets.only(bottom: 12),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFD32F2F),
+                                          borderRadius: BorderRadius.circular(
+                                            AppDimensions.radiusLg,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          AppIcons.trashFill,
+                                          color: Colors.white,
+                                          size: AppDimensions.iconDefault + 2,
+                                        ),
+                                      ),
+                                      onDismissed: (direction) {
+                                        HapticFeedback.mediumImpact();
+                                        final String deletedId = notif['id'] as String;
+                                        setState(() {
+                                          NotificationMockData.items.removeWhere(
+                                            (item) => item['id'] == deletedId,
                                           );
-                                      if (foundIndex != -1) {
-                                        _mockNotifications[foundIndex]['isRead'] =
-                                            true;
-                                      }
-                                    });
-                                  },
-                                ),
+                                          NotificationMockData.unreadCountNotifier.value =
+                                              NotificationMockData.items.where((i) => !i['isRead']).length;
+                                        });
+                                        AppNotifier.showSuccess(
+                                          context,
+                                          'Notifikasi berhasil dihapus',
+                                        );
+                                      },
+                                      child: _AnimatedNotificationTile(
+                                        notification: notif,
+                                        animation: const AlwaysStoppedAnimation(1.0),
+                                        onTap: () {
+                                          final String currentId = notif['id'] as String;
+                                          setState(() {
+                                            NotificationMockData.markAsRead(currentId);
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  }),
+                                ],
                               );
-                            }),
-                          ],
-                        );
-                      },
-                    ),
+                            },
+                          ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -672,30 +395,22 @@ class _AnimatedNotificationTile extends StatelessWidget {
         return AppIcons.thumbUp;
       case 'punishment':
         return AppIcons.thumbDown;
+      case 'task':
+        return AppIcons.clipboardTextFill;
+      case 'task_dikirim':
+        return AppIcons.paperPlaneTiltFill;
       case 'task_dinilai':
         return AppIcons.checkCircleFill;
-      case 'task_sedang_dinilai':
-        return AppIcons.clipboardTextFill;
-      case 'task_telat':
-        return AppIcons.clockFill;
-      case 'task_alpha':
-        return AppIcons.xCircleFill;
+      case 'task_remedial':
+        return AppIcons.warningOctagonFill;
+      case 'zone':
+        return AppIcons.mapPinFill;
       case 'sosiometri_start':
         return AppIcons.usersThreeFill;
       case 'sosiometri_reminder':
         return AppIcons.usersThreeFill;
       case 'sosiometri_done':
         return AppIcons.checkCircleFill;
-      case 'hadir':
-        return AppIcons.userFocusFill;
-      case 'telat':
-        return AppIcons.clockFill;
-      case 'izin':
-        return AppIcons.filePdfFill;
-      case 'alpha':
-        return AppIcons.warningOctagonFill;
-      case 'task':
-        return AppIcons.clipboardTextFill;
       default:
         return AppIcons.infoFill;
     }
@@ -707,32 +422,22 @@ class _AnimatedNotificationTile extends StatelessWidget {
         return const Color(0xFF2E7D32);
       case 'punishment':
         return const Color(0xFFD32F2F);
+      case 'task':
+        return Colors.blue.shade600;
+      case 'task_dikirim':
+        return Colors.indigo.shade600;
       case 'task_dinilai':
         return const Color(0xFF2E7D32);
-      case 'task_sedang_dinilai':
-        return Colors.blue.shade600;
-      case 'task_telat':
+      case 'task_remedial':
         return const Color(0xFFFBC02D);
-      case 'task_alpha':
-        return const Color(0xFFD32F2F);
+      case 'zone':
+        return const Color(0xFFF57C00);
       case 'sosiometri_start':
         return const Color(0xFF4F46E5);
       case 'sosiometri_reminder':
         return const Color(0xFFF57C00);
       case 'sosiometri_done':
         return const Color(0xFF2E7D32);
-      case 'hadir':
-        return const Color(0xFF2E7D32);
-      case 'telat':
-        return const Color(0xFFFBC02D);
-      case 'izin':
-        return const Color(0xFFF57C00);
-      case 'alpha':
-        return const Color(0xFFD32F2F);
-      case 'task':
-        return Colors.blue.shade600;
-      case 'info':
-        return Colors.amber.shade700;
       default:
         return Colors.blueGrey.shade600;
     }
@@ -832,7 +537,7 @@ class _AnimatedNotificationTile extends StatelessWidget {
                           ),
                           const SizedBox(height: AppDimensions.radiusSm),
                           Text(
-                            notification['body'],
+                            notification['message'] ?? '-',
                             style: TextStyle(
                               fontSize: AppDimensions.fontDefault,
                               fontWeight: FontWeight.w500,
@@ -841,13 +546,23 @@ class _AnimatedNotificationTile extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: AppDimensions.sm),
-                          Text(
-                            notification['time'],
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontSm + 1,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blueGrey.shade400,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                AppIcons.clockFill,
+                                size: AppDimensions.fontSm + 1,
+                                color: Colors.blueGrey.shade400,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${(notification['dateTime'] as DateTime).hour.toString().padLeft(2, '0')}.${(notification['dateTime'] as DateTime).minute.toString().padLeft(2, '0')}',
+                                style: TextStyle(
+                                  fontSize: AppDimensions.fontSm + 1,
+                                  color: Colors.blueGrey.shade400,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

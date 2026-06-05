@@ -4,6 +4,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import '../../data/models/gadik_assignment_model.dart';
 import '../../data/models/gadik_submission_model.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_scores.dart';
 
 class GadikGradingBottomSheet extends StatefulWidget {
   final GadikAssignmentModel assignment;
@@ -208,6 +209,26 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
             ? _parse(_tataRuangCtrl.text)
             : null,
       );
+
+      final nosis = widget.submission.serdikNosis ?? '202602003001';
+      final jenis = widget.assignment.jenisTugas;
+      if (jenis == 'Ujian Mata Pelajaran atau Esai') {
+        SerdikAcademicScores.updateScore(nosis, 'nump', _calculatedNA);
+      } else if (jenis.contains('NKKP')) {
+        SerdikAcademicScores.updateScore(nosis, 'nkkp', _calculatedNA);
+      } else if (jenis.contains('NPKP')) {
+        SerdikAcademicScores.updateScore(nosis, 'npkp', _calculatedNA);
+      } else if (jenis.contains('NKP')) {
+        SerdikAcademicScores.updateScore(nosis, 'nkp', _calculatedNA);
+      } else if (jenis.contains('Simulasi') || jenis.contains('NSK')) {
+        SerdikAcademicScores.updateScore(nosis, 'nsk_keaktifan', _parse(_keaktifanPerseoranganCtrl.text));
+        SerdikAcademicScores.updateScore(nosis, 'nsk_produk', _parse(_produkPerseoranganCtrl.text));
+        SerdikAcademicScores.updateScore(nosis, 'nsk_tata_ruang', _parse(_tataRuangCtrl.text));
+      } else if (jenis.contains('NPTT') || jenis.contains('Taskap')) {
+        SerdikAcademicScores.updateScore(nosis, 'nt_materi', _parse(_materiCtrl.text));
+        SerdikAcademicScores.updateScore(nosis, 'nt_penulisan', _parse(_penulisanCtrl.text));
+        SerdikAcademicScores.updateScore(nosis, 'nt_paparan', _parse(_paparanCtrl.text));
+      }
 
       widget.onSaved(s);
       Navigator.pop(context);

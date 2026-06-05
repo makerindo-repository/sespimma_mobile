@@ -5,7 +5,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/patun_geofence_map_widget.dart';
-import 'package:sespimma_mobile/features/attendance/presentation/widgets/patun_zone_info_sheet.dart';
+import 'package:sespimma_mobile/features/attendance/presentation/pages/patun_attendance_report_screen.dart';
 
 class PatunAttendanceMonitoringScreen extends StatefulWidget {
   const PatunAttendanceMonitoringScreen({super.key});
@@ -19,13 +19,13 @@ class _PatunAttendanceMonitoringScreenState
     extends State<PatunAttendanceMonitoringScreen> {
   static const Color _primaryNavy = Color(0xFF000B1D);
 
-  void _showInfoKegiatan(BuildContext context, String pokjar) {
+  void _goToLaporan(BuildContext context, String pokjar) {
     HapticFeedback.lightImpact();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => PatunZoneInfoSheet(pokjar: pokjar),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PatunAttendanceReportScreen(pokjar: pokjar),
+      ),
     );
   }
 
@@ -55,9 +55,9 @@ class _PatunAttendanceMonitoringScreenState
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.list_alt_rounded, color: Colors.white),
-                tooltip: 'Info Kegiatan',
-                onPressed: () => _showInfoKegiatan(context, userPokjar),
+                icon: const Icon(Icons.description_rounded, color: Colors.white),
+                tooltip: 'Laporan Absen',
+                onPressed: () => _goToLaporan(context, userPokjar),
               ),
             ],
           ),

@@ -83,30 +83,34 @@ class _PatunMentalActivityHistoryScreenState
 
   String _formatDateRange(DateTimeRange range) {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
       'Mei',
-      'Jun',
-      'Jul',
-      'Ags',
-      'Sep',
-      'Okt',
-      'Nov',
-      'Des',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     final start = range.start;
     final end = range.end;
+    
+    final startDay = start.day.toString().padLeft(2, '0');
+    final endDay = end.day.toString().padLeft(2, '0');
+    
     if (start.year == end.year &&
         start.month == end.month &&
         start.day == end.day) {
-      return '${start.day} ${months[start.month - 1]} ${start.year}';
+      return '$startDay ${months[start.month - 1]} ${start.year}';
     }
     if (start.year == end.year) {
-      return '${start.day} ${months[start.month - 1]} - ${end.day} ${months[end.month - 1]} ${start.year}';
+      return '$startDay ${months[start.month - 1]} - $endDay ${months[end.month - 1]} ${start.year}';
     }
-    return '${start.day} ${months[start.month - 1]} ${start.year} - ${end.day} ${months[end.month - 1]} ${end.year}';
+    return '$startDay ${months[start.month - 1]} ${start.year} - $endDay ${months[end.month - 1]} ${end.year}';
   }
 
   Widget _buildActiveFiltersBar() {
@@ -122,33 +126,38 @@ class _PatunMentalActivityHistoryScreenState
         scrollDirection: Axis.horizontal,
         children: [
           if (hasStatusFilter)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: InputChip(
-                label: Text(
-                  'Kategori: $_selectedFilter',
-                  style: const TextStyle(
-                    fontSize: AppDimensions.fontMd,
-                    fontWeight: FontWeight.w700,
-                    color: _primaryNavy,
+            Builder(builder: (context) {
+              final statusColor = _selectedFilter == 'Reward'
+                  ? const Color(0xFF1B5E20)
+                  : const Color(0xFFB71C1C);
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: InputChip(
+                  label: Text(
+                    'Kategori: $_selectedFilter',
+                    style: TextStyle(
+                      fontSize: AppDimensions.fontMd,
+                      fontWeight: FontWeight.w700,
+                      color: statusColor,
+                    ),
+                  ),
+                  backgroundColor: statusColor.withValues(alpha: 0.06),
+                  deleteIcon: Icon(
+                    AppIcons.xCircle,
+                    size: AppDimensions.iconSm,
+                    color: statusColor,
+                  ),
+                  onDeleted: () {
+                    setState(() => _selectedFilter = 'Semua');
+                    _animController.forward(from: 0.0);
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
+                    side: BorderSide(color: statusColor.withValues(alpha: 0.2)),
                   ),
                 ),
-                backgroundColor: _primaryNavy.withValues(alpha: 0.06),
-                deleteIcon: const Icon(
-                  AppIcons.xCircle,
-                  size: AppDimensions.iconSm,
-                  color: _primaryNavy,
-                ),
-                onDeleted: () {
-                  setState(() => _selectedFilter = 'Semua');
-                  _animController.forward(from: 0.0);
-                },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-                  side: BorderSide(color: _primaryNavy.withValues(alpha: 0.12)),
-                ),
-              ),
-            ),
+              );
+            }),
           if (hasDateFilter)
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
@@ -456,6 +465,7 @@ class _PatunMentalActivityHistoryScreenState
                                     point:
                                         (item['point'] as num?)?.toDouble() ??
                                         0.0,
+                                    photoPath: item['photoPath'] as String?,
                                     animation: animation,
                                   );
                                 }),
@@ -481,6 +491,7 @@ class _AnimatedMentalActivityTile extends StatelessWidget {
   final String time;
   final bool isReward;
   final double point;
+  final String? photoPath;
   final Animation<double> animation;
 
   const _AnimatedMentalActivityTile({
@@ -491,6 +502,7 @@ class _AnimatedMentalActivityTile extends StatelessWidget {
     required this.time,
     required this.isReward,
     required this.point,
+    this.photoPath,
     required this.animation,
   });
 
@@ -507,7 +519,7 @@ class _AnimatedMentalActivityTile extends StatelessWidget {
     final pointsStr = point > 0
         ? '+${point.toStringAsFixed(2)}'
         : point.toStringAsFixed(2);
-    final subtitle = '$desc · $sender';
+    final subtitle = 'Diberikan oleh $sender';
 
     return FadeTransition(
       opacity: animation,
@@ -544,6 +556,7 @@ class _AnimatedMentalActivityTile extends StatelessWidget {
                   timeText: time,
                   points: pointsStr,
                   type: isReward ? 'reward' : 'punishment',
+                  photoPath: photoPath,
                 );
               },
               child: Padding(
@@ -593,13 +606,23 @@ class _AnimatedMentalActivityTile extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
-                          Text(
-                            time,
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontSm,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.blueGrey.shade300,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                AppIcons.clock,
+                                size: 14,
+                                color: Colors.blueGrey.shade300,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                time,
+                                style: TextStyle(
+                                  fontSize: AppDimensions.fontSm,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.blueGrey.shade300,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

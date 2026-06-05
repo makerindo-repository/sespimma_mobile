@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_scores.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
-import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_academic_ews_history_screen.dart';
+
 
 class PatunAcademicDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdik;
@@ -17,8 +18,11 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     final name = serdik['nama_lengkap'] ?? '-';
     final noSerdik = serdik['no_serdik'] ?? '-';
     final pangkat = serdik['pangkat'] ?? '-';
-    final double score = (serdik['_mock_score'] as double?) ?? 0.0;
-    final String status = serdik['_mock_status'] ?? '-';
+    
+    final academicScores = SerdikAcademicScores.getScores(noSerdik);
+    final double score = (academicScores['na'] as num?)?.toDouble() ?? 0.0;
+    
+    final String status = score >= 70 ? 'LULUS' : 'TIDAK LULUS';
     final String? profilePhoto =
         serdik['profile_photo'] ?? serdik['profilePhoto'];
 
@@ -63,8 +67,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
                     score,
                     profilePhoto,
                   ),
-                  _buildEWSSection(context, status, score),
-                  _buildAcademicScores(score, status),
+                  _buildAcademicScores(noSerdik),
                 ],
               ),
             ),
@@ -132,7 +135,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: AppDimensions.xs),
                 Text(
-                  '$pangkat • No. Serdik: $noSerdik',
+                  '$pangkat • $noSerdik',
                   style: TextStyle(
                     fontSize: AppDimensions.fontMd,
                     fontWeight: FontWeight.w600,
@@ -184,323 +187,38 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     );
   }
 
-  List<Map<String, dynamic>> _getDynamicEWSActivities(
-    String status,
-    double score,
-  ) {
-    if (status == 'Aman') return [];
+  Widget _buildAcademicScores(String noSerdik) {
+    final scores = SerdikAcademicScores.getScores(noSerdik);
 
-    final now = DateTime.now();
+    double nump = (scores['nump'] as num?)?.toDouble() ?? 0.0;
+    double nkkp = (scores['nkkp'] as num?)?.toDouble() ?? 0.0;
+    double npkp = (scores['npkp'] as num?)?.toDouble() ?? 0.0;
+    double nkp = (scores['nkp'] as num?)?.toDouble() ?? 0.0;
+    double np = (scores['np'] as num?)?.toDouble() ?? 0.0;
 
-    String formatTimeStr(DateTime dt) {
-      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} WIB';
-    }
+    double nskAktif = (scores['nsk_keaktifan'] as num?)?.toDouble() ?? 0.0;
+    double nskProduk = (scores['nsk_produk'] as num?)?.toDouble() ?? 0.0;
+    double nskRuang = (scores['nsk_tata_ruang'] as num?)?.toDouble() ?? 0.0;
+    double nsk = (scores['nsk'] as num?)?.toDouble() ?? 0.0;
 
-    String getDateStr(DateTime dt) {
-      const months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'Mei',
-        'Jun',
-        'Jul',
-        'Ags',
-        'Sep',
-        'Okt',
-        'Nov',
-        'Des',
-      ];
-      return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
-    }
+    double ntMateri = (scores['nt_materi'] as num?)?.toDouble() ?? 0.0;
+    double ntPenulisan = (scores['nt_penulisan'] as num?)?.toDouble() ?? 0.0;
+    double ntPaparan = (scores['nt_paparan'] as num?)?.toDouble() ?? 0.0;
+    double nt = (scores['nt'] as num?)?.toDouble() ?? 0.0;
+    double na = (scores['na'] as num?)?.toDouble() ?? 0.0;
 
-    final d1 = DateTime(now.year, now.month, now.day, 8, 30);
-    final d2 = DateTime(now.year, now.month, now.day - 1, 9, 15);
-    final d3 = DateTime(now.year, now.month, now.day - 3, 14, 10);
-
-    if (status == 'Kritis') {
-      return [
-        {
-          'title': 'Peringatan Kritis Akademik',
-          'desc':
-              'Nilai Ujian Esai Manajemen (${score.toStringAsFixed(2)}). Segera laksanakan penugasan ulang.',
-          'sender': 'Sistem Akademik',
-          'time': formatTimeStr(d1),
-          'dateStr': getDateStr(d1),
-          'dateTime': d1,
-          'isCritical': true,
-          'point': -score,
-        },
-        {
-          'title': 'Peringatan Sistem',
-          'desc':
-              'Nilai akumulasi mingguan menurun drastis di bawah standar kelulusan.',
-          'sender': 'Sistem Akademik',
-          'time': formatTimeStr(d3),
-          'dateStr': getDateStr(d3),
-          'dateTime': d3,
-          'isCritical': false,
-          'point': -10.0,
-        },
-      ];
-    } else {
-      return [
-        {
-          'title': 'Peringatan Sistem',
-          'desc':
-              'Nilai Akademik (${score.toStringAsFixed(2)}) mendekati batas bawah. Perlu pemantauan.',
-          'sender': 'Sistem Akademik',
-          'time': formatTimeStr(d2),
-          'dateStr': getDateStr(d2),
-          'dateTime': d2,
-          'isCritical': false,
-          'point': -5.0,
-        },
-      ];
-    }
-  }
-
-  Widget _buildEWSCard(
-    BuildContext context,
-    String title,
-    String desc,
-    String sender,
-    String time,
-    bool isCritical,
-  ) {
-    final iconColor = isCritical
-        ? const Color(0xFFD32F2F)
-        : const Color(0xFFF57C00);
-    final bgColor = isCritical
-        ? const Color(0xFFFFEBEE)
-        : const Color(0xFFFFF3E0);
-    const iconData = AppIcons.warningCircleFill;
-    final subtitle = '$desc - $sender';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.md),
-              decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
-              child: Icon(
-                iconData,
-                color: iconColor,
-                size: AppDimensions.iconLg,
-              ),
-            ),
-            const SizedBox(width: AppDimensions.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: AppDimensions.fontLg,
-                            fontWeight: FontWeight.w700,
-                            color: _primaryNavy,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: bgColor,
-                          borderRadius: BorderRadius.circular(
-                            AppDimensions.radiusFull,
-                          ),
-                        ),
-                        child: Text(
-                          isCritical ? 'Kritis' : 'Perhatian',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontSm,
-                            fontWeight: FontWeight.w700,
-                            color: iconColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppDimensions.xs),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontMd,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blueGrey.shade400,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.xs / 2),
-                  Text(
-                    time,
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontMd,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blueGrey.shade400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showAllActivities(
-    BuildContext context,
-    List<Map<String, dynamic>> activities,
-  ) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            PatunAcademicEwsHistoryScreen(initialActivities: activities),
-      ),
-    );
-  }
-
-  Widget _buildEWSSection(BuildContext context, String status, double score) {
-    if (status == 'Aman') return const SizedBox.shrink();
-
-    final activities = _getDynamicEWSActivities(status, score);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppDimensions.xl,
-        AppDimensions.xl,
-        AppDimensions.xl,
-        AppDimensions.md,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 4,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: _primaryNavy,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.sm),
-                  const Text(
-                    'EARLY WARNING SYSTEM',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontLg,
-                      fontWeight: FontWeight.w800,
-                      color: _primaryNavy,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-              if (activities.length > 1)
-                TextButton(
-                  onPressed: () => _showAllActivities(context, activities),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.blueGrey.shade600,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.sm,
-                      vertical: AppDimensions.xs,
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Lihat Semua',
-                        style: TextStyle(
-                          fontSize: AppDimensions.fontMd,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(width: 4),
-                      Icon(Icons.chevron_right_rounded, size: 20),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: AppDimensions.md),
-          ...activities
-              .take(2)
-              .map(
-                (act) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppDimensions.md),
-                  child: _buildEWSCard(
-                    context,
-                    (act['title'] as String?) ?? 'Early Warning System',
-                    (act['desc'] as String?) ?? '-',
-                    (act['sender'] as String?) ?? 'Sistem',
-                    (act['time'] as String?) ?? '-',
-                    (act['isCritical'] as bool?) ?? false,
-                  ),
-                ),
-              ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAcademicScores(double baseScore, String status) {
-    double base = baseScore == 0 ? 0.0 : baseScore;
-
-    double nkkpMateri = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-    double nkkpPaparan = base == 0 ? 0 : (base - 0.2).clamp(0, 100);
-    double nkkpKeaktifan = base == 0 ? 0 : (base + 0.8).clamp(0, 100);
-    double nkkp =
-        ((nkkpMateri * 35) + (nkkpPaparan * 35) + (nkkpKeaktifan * 30)) / 100;
-
-    double npkpMateri = base == 0 ? 0 : (base + 0.1).clamp(0, 100);
-    double npkpPaparan = base == 0 ? 0 : (base - 0.5).clamp(0, 100);
-    double npkpKeaktifan = base == 0 ? 0 : (base + 0.4).clamp(0, 100);
-    double npkp =
-        ((npkpMateri * 35) + (npkpPaparan * 35) + (npkpKeaktifan * 30)) / 100;
-
-    double nkpMateri = base == 0 ? 0 : (base - 0.8).clamp(0, 100);
-    double nkpPaparan = base == 0 ? 0 : (base - 0.4).clamp(0, 100);
-    double nkp = ((nkpMateri * 50) + (nkpPaparan * 50)) / 100;
-
-    double ujianMp = base == 0 ? 0 : (base + 1.2).clamp(0, 100);
-    double np = ((ujianMp * 30) + (nkkp * 5) + (npkp * 5) + (nkp * 60)) / 100;
-
-    double nskAktif = base == 0 ? 0 : (base + 2.5).clamp(0, 100);
-    double nskProduk = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-    double nskRuang = base == 0 ? 0 : (base + 1.8).clamp(0, 100);
-    double nsk = ((nskAktif * 60) + (nskProduk * 20) + (nskRuang * 20)) / 100;
-
-    double ntMateri = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-    double ntPenulisan = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-    double ntPaparan = base == 0 ? 0 : (base + 2.0).clamp(0, 100);
-    double nt = ((ntMateri * 40) + (ntPenulisan * 30) + (ntPaparan * 30)) / 100;
+    double ujianMp = nump;
+    double nkkpMateri = nkkp;
+    double nkkpPaparan = nkkp;
+    double nkkpKeaktifan = nkkp;
+    double npkpMateri = npkp;
+    double npkpPaparan = npkp;
+    double npkpKeaktifan = npkp;
+    double nkpMateri = nkp;
+    double nkpPaparan = nkp;
+    
+    double baseScore = na;
+    String status = na >= 70 ? 'Aman' : 'Warning';
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -514,8 +232,8 @@ class PatunAcademicDetailScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(
-              bottom: AppDimensions.md,
-              top: AppDimensions.xs,
+              bottom: AppDimensions.xxl,
+              top: AppDimensions.xl,
             ),
             child: Row(
               children: [
@@ -541,31 +259,31 @@ class PatunAcademicDetailScreen extends StatelessWidget {
             ),
           ),
           _buildScoreGroup('Nilai Pelajaran', '60%', np, [
-            _buildScoreItem('Ujian Mata Pelajaran / Esai', '30%', ujianMp),
-            _buildScoreGroup2('NKKP', '5%', nkkp, [
+            _buildScoreItem('Ujian Mata Pelajaran atau Esai', '30%', ujianMp),
+            _buildScoreGroup2('Naskah Kuliah Kerja Profesi', '5%', nkkp, [
               _buildSubScoreItem('Materi & Penulisan', '35%', nkkpMateri),
               _buildSubScoreItem('Paparan', '35%', nkkpPaparan),
               _buildSubScoreItem('Keaktifan', '30%', nkkpKeaktifan),
             ]),
-            _buildScoreGroup2('NPKP', '5%', npkp, [
+            _buildScoreGroup2('Naskah Praktek Kerja Profesi', '5%', npkp, [
               _buildSubScoreItem('Materi & Penulisan', '35%', npkpMateri),
               _buildSubScoreItem('Paparan', '35%', npkpPaparan),
               _buildSubScoreItem('Keaktifan', '30%', npkpKeaktifan),
             ]),
-            _buildScoreGroup2('NKP', '60%', nkp, [
+            _buildScoreGroup2('Naskah Karya Perseorangan', '60%', nkp, [
               _buildSubScoreItem('Materi & Penulisan', '50%', nkpMateri),
               _buildSubScoreItem('Paparan', '50%', nkpPaparan),
             ]),
           ]),
           const SizedBox(height: AppDimensions.md),
-          _buildScoreGroup('Simulasi Kepemimpinan', '10%', nsk, [
+          _buildScoreGroup('Simulasi Kepemimpinan Kontemporer', '10%', nsk, [
             _buildSubScoreItem('Keaktifan Perseorangan', '60%', nskAktif),
             _buildSubScoreItem('Produk Perseorangan', '20%', nskProduk),
             _buildSubScoreItem('Tata Ruang Kelompok', '20%', nskRuang),
           ]),
           const SizedBox(height: AppDimensions.md),
-          _buildScoreGroup('NPTT / Taskap', '30%', nt, [
-            _buildSubScoreItem('Materi NPTT / Taskap', '40%', ntMateri),
+          _buildScoreGroup('Naskah Program Transformasi Teknis', '30%', nt, [
+            _buildSubScoreItem('Materi', '40%', ntMateri),
             _buildSubScoreItem('Penulisan Efektif', '30%', ntPenulisan),
             _buildSubScoreItem('Paparan & Diskusi', '30%', ntPaparan),
           ]),
@@ -578,11 +296,15 @@ class PatunAcademicDetailScreen extends StatelessWidget {
   }
 
   Widget _buildRecommendationCard(double score, String status) {
-    bool isWarning = status != 'Aman';
+    bool isWarning = status == 'Warning';
+    bool isKritis = status == 'Kritis';
     bool isExcellent = score >= 85.0;
 
     String insight;
-    if (isWarning) {
+    if (isKritis) {
+      insight =
+          'Berdasarkan analisis tren Akademik, Serdik mengalami penurunan performa secara drastis. Disarankan bagi Patun untuk memberikan sesi bimbingan intensif dan evaluasi menyeluruh segera.';
+    } else if (isWarning) {
       insight =
           'Berdasarkan analisis tren Akademik, Serdik mengalami penurunan performa secara spesifik pada pemahaman NPTT / Taskap. Disarankan bagi Patun untuk memberikan sesi bimbingan dan pendalaman materi ekstra.';
     } else if (isExcellent) {
@@ -593,14 +315,38 @@ class PatunAcademicDetailScreen extends StatelessWidget {
           'Nilai Akademik Serdik berada pada kondisi stabil dan baik. Patun disarankan untuk tetap memonitor fokus belajar Serdik, terutama pada simulasi kepemimpinan kontemporer untuk mendongkrak nilai ke tingkat maksimal.';
     }
 
+    Color bgColor = isKritis
+        ? Colors.red.shade50
+        : isWarning
+        ? Colors.orange.shade50
+        : Colors.green.shade50;
+    Color borderColor = isKritis
+        ? Colors.red.shade100
+        : isWarning
+        ? Colors.orange.shade100
+        : Colors.green.shade100;
+    Color iconBgColor = isKritis
+        ? Colors.red.shade100
+        : isWarning
+        ? Colors.orange.shade100
+        : Colors.green.shade100;
+    Color iconColor = isKritis
+        ? Colors.red.shade700
+        : isWarning
+        ? Colors.orange.shade700
+        : Colors.green.shade700;
+    Color titleColor = isKritis
+        ? Colors.red.shade900
+        : isWarning
+        ? Colors.orange.shade900
+        : Colors.green.shade900;
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.xl - 4),
       decoration: BoxDecoration(
-        color: isWarning ? Colors.red.shade50 : Colors.blue.shade50,
+        color: bgColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4),
-        border: Border.all(
-          color: isWarning ? Colors.red.shade100 : Colors.blue.shade100,
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,12 +354,12 @@ class PatunAcademicDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppDimensions.sm),
             decoration: BoxDecoration(
-              color: isWarning ? Colors.red.shade100 : Colors.blue.shade100,
+              color: iconBgColor,
               shape: BoxShape.circle,
             ),
             child: Icon(
               AppIcons.sparkleFill,
-              color: isWarning ? Colors.red.shade700 : Colors.blue.shade700,
+              color: iconColor,
               size: AppDimensions.iconSm,
             ),
           ),
@@ -625,9 +371,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
                 Text(
                   'Rekomendasi Tindakan Patun',
                   style: TextStyle(
-                    color: isWarning
-                        ? Colors.red.shade900
-                        : Colors.blue.shade900,
+                    color: titleColor,
                     fontSize: AppDimensions.fontSm,
                     fontWeight: FontWeight.w800,
                   ),

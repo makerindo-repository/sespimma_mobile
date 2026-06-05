@@ -112,6 +112,47 @@ class _HelpFaqScreenState extends State<HelpFaqScreen>
               'Dari layar monitoring, pilih Serdik, ketuk form "Status Kesehatan Pendidikan", lengkapi informasi jenis rawat dan durasi harinya, lalu ambil bukti foto langsung menggunakan kamera sebelum menekan SIMPAN.',
         },
       ];
+    } else if (role == 'gadik') {
+      return [
+        {
+          'q': 'Bagaimana cara menggunakan fitur Monitoring Tugas?',
+          'a':
+              'Pilih menu "Tugas" di navigasi bawah untuk melihat daftar penugasan. Anda dapat memantau status pengumpulan tugas dari setiap Serdik dan memberikan nilai secara langsung.',
+        },
+        {
+          'q': 'Bagaimana cara memberikan Reward atau Punishment?',
+          'a':
+              'Gunakan menu "Penilaian" di navigasi bawah untuk mencari Serdik dan menginput Reward atau Punishment. Sistem akan otomatis menghitung poin dan memvalidasi batas maksimal pemberian sesuai aturan.',
+        },
+      ];
+    } else if (role == 'patun') {
+      return [
+        {
+          'q': 'Bagaimana cara memantau akademik pokjar saya?',
+          'a':
+              'Buka menu "Akademik". Anda dapat melihat rangkuman nilai dari setiap penugasan, hasil ujian, dan performa Serdik di Pokjar Anda secara real-time.',
+        },
+        {
+          'q': 'Bagaimana cara merekam penilaian mental kepribadian?',
+          'a':
+              'Masuk ke menu "Mental". Anda dapat menambahkan catatan pelanggaran atau penghargaan secara spesifik beserta bukti foto untuk Serdik di bawah asuhan Anda.',
+        },
+        {
+          'q': 'Dimana saya dapat melihat nilai kesamaptaan jasmani?',
+          'a':
+              'Di menu "Jasmani", Anda akan melihat ringkasan skor Lari, Pull Up, Sit Up, dan lari Shuttle Run (NGB) beserta rincian kesehatan terkini tiap Serdik.',
+        },
+        {
+          'q': 'Bagaimana cara memonitor absensi harian serdik?',
+          'a':
+              'Buka menu "Absen". Layar monitoring akan mendeteksi koordinat Serdik secara live di dalam Geofencing. Anda juga dapat mengunduh laporan PDF absensi di tombol "Laporan".',
+        },
+        {
+          'q': 'Bagaimana cara mengontrol progres sosiometri?',
+          'a':
+              'Di menu "Sosiometri", Anda dapat melihat persentase tuntas penilaian antar-rekan. Klik profil Serdik untuk melihat detail penilaian yang sudah ia kerjakan.',
+        },
+      ];
     }
 
     return [
