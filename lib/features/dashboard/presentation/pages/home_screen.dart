@@ -19,6 +19,7 @@ import '../../../auth/data/datasources/serdik_real_data.dart';
 import '../../../gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
 import '../../../attendance/domain/models/map_tile_mode.dart';
 import '../../../leadership_report/domain/services/score_calculator_service.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,15 +55,25 @@ class _HomeScreenState extends State<HomeScreen>
   static const Color _dangerRed = Color(0xFFD32F2F);
   static const Color _warningYellow = Color(0xFFFBC02D);
 
-  double get _rewardPoints {
+  double _getRewardPoints(UserEntity user) {
+    if (user.roleId.toLowerCase() != 'siswa') return 0.0;
     return KorsisInboxMockData.items
-        .where((i) => i.status == 'disetujui' && i.isReward)
+        .where(
+          (i) =>
+              i.status == 'disetujui' && i.isReward && i.nosis == user.noSerdik,
+        )
         .fold(0.0, (sum, item) => sum + item.points);
   }
 
-  double get _punishmentPoints {
+  double _getPunishmentPoints(UserEntity user) {
+    if (user.roleId.toLowerCase() != 'siswa') return 0.0;
     return KorsisInboxMockData.items
-        .where((i) => i.status == 'disetujui' && !i.isReward)
+        .where(
+          (i) =>
+              i.status == 'disetujui' &&
+              !i.isReward &&
+              i.nosis == user.noSerdik,
+        )
         .fold(0.0, (sum, item) => sum + item.points);
   }
 
@@ -135,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
 
       for (var inbox in KorsisInboxMockData.items) {
-        if (inbox.status == 'disetujui') {
+        if (inbox.status == 'approved' && inbox.nosis == user.noSerdik) {
           final isReward = inbox.isReward;
           final typeStr = isReward ? 'reward' : 'punishment';
           final pointStr = isReward
@@ -161,9 +172,9 @@ class _HomeScreenState extends State<HomeScreen>
           'title': zone.activityName,
           'subtitle':
               '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
-          'timeRaw': _formatDynamicTime(zone.startTime),
-          'date': _getDynamicDateStr(zone.startTime),
-          'dateTime': zone.startTime,
+          'timeRaw': _formatDynamicTime(zone.createdAt),
+          'date': _getDynamicDateStr(zone.createdAt),
+          'dateTime': zone.createdAt,
           'points': '',
           'type': 'zone',
         });
@@ -278,8 +289,8 @@ class _HomeScreenState extends State<HomeScreen>
             final raw = ScoreCalculatorService.generateSimulatedScores(
               noSerdik,
             );
-            raw['reward_mental'] = _rewardPoints;
-            raw['punishment_mental'] = _punishmentPoints;
+            raw['reward_mental'] = _getRewardPoints(user);
+            raw['punishment_mental'] = _getPunishmentPoints(user);
 
             final finalRecap = ScoreCalculatorService.calculateFinalRecap(
               serdikData,
@@ -322,6 +333,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   context: context,
                                   child: _buildScoreOverview(
                                     context,
+                                    user,
                                     nilaiAkademik,
                                     nilaiMental,
                                     nilaiJasmani,
@@ -392,10 +404,10 @@ class _HomeScreenState extends State<HomeScreen>
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               radius: 28,
               backgroundColor: _lightGrey,
-              backgroundImage: AssetImage('assets/images/default_avatar.png'),
+              backgroundImage: AvatarHelper.getAvatar(user.profilePhoto),
             ),
           ),
           const SizedBox(width: AppDimensions.md),
@@ -497,6 +509,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildScoreOverview(
     BuildContext context,
+    UserEntity user,
     double akademik,
     double mental,
     double jasmani,
@@ -560,8 +573,8 @@ class _HomeScreenState extends State<HomeScreen>
                   child: _buildRewardPunishmentCard(
                     context,
                     title: 'Reward',
-                    points: _rewardPoints > 0
-                        ? '+${_rewardPoints.toStringAsFixed(2)}'
+                    points: _getRewardPoints(user) > 0
+                        ? '+${_getRewardPoints(user).toStringAsFixed(2)}'
                         : '0',
                     icon: AppIcons.thumbUp,
                     color: _successGreen,
@@ -572,8 +585,8 @@ class _HomeScreenState extends State<HomeScreen>
                   child: _buildRewardPunishmentCard(
                     context,
                     title: 'Punishment',
-                    points: _punishmentPoints != 0
-                        ? _punishmentPoints.toStringAsFixed(2)
+                    points: _getPunishmentPoints(user) != 0
+                        ? _getPunishmentPoints(user).toStringAsFixed(2)
                         : '0',
                     icon: AppIcons.thumbDown,
                     color: _dangerRed,
@@ -586,8 +599,8 @@ class _HomeScreenState extends State<HomeScreen>
               akademik,
               mental,
               jasmani,
-              _rewardPoints,
-              _punishmentPoints,
+              _getRewardPoints(user),
+              _getPunishmentPoints(user),
             ),
           ],
         ),

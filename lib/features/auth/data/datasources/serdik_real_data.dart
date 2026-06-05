@@ -1,5 +1,5 @@
 class SerdikRealData {
-  static const List<Map<String, dynamic>> records = [
+  static List<Map<String, dynamic>> records = [
     {
       'no_serdik': '202602003001',
       'nik': '7308210711770001',

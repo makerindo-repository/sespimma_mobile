@@ -10,6 +10,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart'
 import 'package:sespimma_mobile/features/assessment/data/models/jasmani_grading_data.dart';
 import 'package:sespimma_mobile/features/assessment/data/datasources/jasmani_lookup_tables.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/jasmani_grading_bottom_sheet.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class OperatorJasmaniScreen extends StatefulWidget {
   const OperatorJasmaniScreen({super.key});
@@ -679,7 +680,7 @@ class _OperatorJasmaniScreenState extends State<OperatorJasmaniScreen> {
         image: DecorationImage(
           image: hasPhoto
               ? NetworkImage(serdik['foto'].toString()) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
       ),

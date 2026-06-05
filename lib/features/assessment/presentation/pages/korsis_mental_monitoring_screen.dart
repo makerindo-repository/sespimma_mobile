@@ -11,6 +11,7 @@ import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/korsis_generate_mental_report_screen.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/korsis_mental_form_screen.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class KorsisMentalMonitoringScreen extends StatefulWidget {
   const KorsisMentalMonitoringScreen({super.key});
@@ -864,7 +865,7 @@ class _KorsisMentalMonitoringScreenState
                 image: DecorationImage(
                   image: (profilePhoto != null && profilePhoto.isNotEmpty)
                       ? FileImage(File(profilePhoto)) as ImageProvider
-                      : const AssetImage('assets/images/default_avatar.png'),
+                      : AvatarHelper.getAvatar(null),
                   fit: BoxFit.cover,
                 ),
               ),

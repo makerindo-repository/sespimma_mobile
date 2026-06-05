@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'patun_sociometry_detail_screen.dart';
 import '../../data/models/sociometry_period_config.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunSociometryMonitoringScreen extends StatefulWidget {
   const PatunSociometryMonitoringScreen({super.key});
@@ -547,13 +548,9 @@ class _PatunSociometryMonitoringScreenState
                     CircleAvatar(
                       radius: 26,
                       backgroundColor: _lightGrey,
-                      backgroundImage:
-                          (serdik['foto'] != null &&
-                              serdik['foto'].toString().isNotEmpty)
-                          ? NetworkImage(serdik['foto']) as ImageProvider
-                          : const AssetImage(
-                              'assets/images/default_avatar.png',
-                            ),
+                      backgroundImage: AvatarHelper.getAvatar(
+                        serdik['foto']?.toString(),
+                      ),
                     ),
                     if (isComplete)
                       Positioned(

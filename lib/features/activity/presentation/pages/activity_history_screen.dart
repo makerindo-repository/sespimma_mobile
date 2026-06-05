@@ -111,7 +111,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
       }
 
       for (var inbox in KorsisInboxMockData.items) {
-        if (inbox.status == 'disetujui') {
+        if (inbox.status == 'disetujui' && inbox.nosis == user.noSerdik) {
           final isReward = inbox.isReward;
           final typeStr = isReward ? 'reward' : 'punishment';
           final pointStr = isReward
@@ -137,9 +137,9 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
           'title': zone.activityName,
           'subtitle':
               '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
-          'timeRaw': _formatDynamicTime(zone.startTime),
-          'date': _getDynamicDateStr(zone.startTime),
-          'dateTime': zone.startTime,
+          'timeRaw': _formatDynamicTime(zone.createdAt),
+          'date': _getDynamicDateStr(zone.createdAt),
+          'dateTime': zone.createdAt,
           'points': '',
           'type': 'zone',
         });
@@ -284,6 +284,13 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
     final bool hasDateFilter = _selectedDateRange != null;
     if (!hasStatusFilter && !hasDateFilter) return const SizedBox.shrink();
 
+    Color filterColor = _primaryNavy;
+    if (_selectedFilter == 'Reward') {
+      filterColor = const Color(0xFF2E7D32);
+    } else if (_selectedFilter == 'Punishment') {
+      filterColor = const Color(0xFFD32F2F);
+    }
+
     return Container(
       height: 42,
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -297,17 +304,17 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
               child: InputChip(
                 label: Text(
                   'Kategori: $_selectedFilter',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: AppDimensions.fontMd,
                     fontWeight: FontWeight.w700,
-                    color: _primaryNavy,
+                    color: filterColor,
                   ),
                 ),
-                backgroundColor: _primaryNavy.withValues(alpha: 0.06),
-                deleteIcon: const Icon(
+                backgroundColor: filterColor.withValues(alpha: 0.06),
+                deleteIcon: Icon(
                   AppIcons.xCircle,
                   size: AppDimensions.iconSm,
-                  color: _primaryNavy,
+                  color: filterColor,
                 ),
                 onDeleted: () {
                   setState(() {
@@ -317,7 +324,7 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
                 },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-                  side: BorderSide(color: _primaryNavy.withValues(alpha: 0.12)),
+                  side: BorderSide(color: filterColor.withValues(alpha: 0.12)),
                 ),
               ),
             ),

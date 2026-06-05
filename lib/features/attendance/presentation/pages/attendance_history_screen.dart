@@ -13,6 +13,7 @@ import '../../../auth/data/datasources/korsis_real_data.dart';
 import '../../../auth/data/datasources/operator_real_data.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class AttendanceHistoryScreen extends StatefulWidget {
   const AttendanceHistoryScreen({super.key});
@@ -641,9 +642,7 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
                   child: CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.grey.shade200,
-                    backgroundImage: const AssetImage(
-                      'assets/images/default_avatar.png',
-                    ),
+                    backgroundImage: AvatarHelper.getAvatar(user.profilePhoto),
                   ),
                 ),
                 const SizedBox(height: AppDimensions.lg),

@@ -12,6 +12,7 @@ import '../../domain/entities/user_entity.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import '../bloc/auth_event.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -289,7 +290,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 image: DecorationImage(
                   image: _selectedImage != null
                       ? FileImage(_selectedImage!) as ImageProvider
-                      : const AssetImage('assets/images/default_avatar.png'),
+                      : AvatarHelper.getAvatar(null),
                   fit: BoxFit.cover,
                 ),
                 border: Border.all(color: Colors.white, width: 4),

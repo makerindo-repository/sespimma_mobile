@@ -113,8 +113,14 @@ class ZoneInfoSheet extends StatelessWidget {
             ),
             _InfoRow(
               icon: Icons.straighten_rounded,
-              label: 'Radius Absensi',
-              value: '${zone.radiusMeters.toInt()} meter',
+              label:
+                  (zone.polygonPoints != null && zone.polygonPoints!.isNotEmpty)
+                  ? 'Polygon Absensi'
+                  : 'Radius Absensi',
+              value:
+                  (zone.polygonPoints != null && zone.polygonPoints!.isNotEmpty)
+                  ? '${zone.polygonPoints!.length} Titik'
+                  : '${zone.radiusMeters.toInt()} meter',
             ),
             const SizedBox(height: AppDimensions.xxl),
             SizedBox(

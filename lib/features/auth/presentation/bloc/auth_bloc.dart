@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/login_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
+import '../../data/datasources/serdik_real_data.dart';
+import '../../data/datasources/patun_real_data.dart';
+import '../../data/datasources/gadik_real_data.dart';
+import '../../data/datasources/korsis_real_data.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
@@ -43,6 +47,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         profilePhoto: event.photoPath,
         clearProfilePhoto: event.photoPath == null,
       );
+
+      if (updatedUser.roleId == 'serdik') {
+        for (var record in SerdikRealData.records) {
+          if (record['no_serdik'] == updatedUser.noSerdik) {
+            record['profile_photo'] = event.photoPath;
+            break;
+          }
+        }
+      } else if (updatedUser.roleId == 'patun') {
+        for (var record in PatunRealData.records) {
+          if (record['nrp'] == updatedUser.nrp) {
+            record['foto'] = event.photoPath;
+            break;
+          }
+        }
+      } else if (updatedUser.roleId == 'gadik') {
+        for (var record in GadikRealData.records) {
+          if (record['nrp'] == updatedUser.nrp) {
+            record['foto'] = event.photoPath;
+            break;
+          }
+        }
+      } else if (updatedUser.roleId == 'korsis') {
+        for (var record in KorsisRealData.records) {
+          if (record['nrp'] == updatedUser.nrp) {
+            record['foto'] = event.photoPath;
+            break;
+          }
+        }
+      }
+
       emit(AuthSuccess(updatedUser));
     }
   }

@@ -3,6 +3,7 @@ class AssignmentModel {
   final String judul;
   final String mapel;
   final String pengajar;
+  final String? pengajarFoto;
   final DateTime deadline;
   final String status;
   final String? deskripsi;
@@ -17,6 +18,7 @@ class AssignmentModel {
     required this.judul,
     required this.mapel,
     required this.pengajar,
+    this.pengajarFoto,
     required this.deadline,
     required this.status,
     this.deskripsi,
@@ -33,6 +35,7 @@ class AssignmentModel {
       judul: json['judul'] as String? ?? '',
       mapel: json['mapel'] as String? ?? '',
       pengajar: json['gadik'] as String? ?? '',
+      pengajarFoto: json['pengajarFoto'] as String?,
       deadline: json['deadline'] != null
           ? DateTime.parse(json['deadline'])
           : DateTime.now(),
@@ -52,6 +55,7 @@ class AssignmentModel {
       'judul': judul,
       'mapel': mapel,
       'gadik': pengajar,
+      'pengajarFoto': pengajarFoto,
       'deadline': deadline.toIso8601String(),
       'status': status,
       'deskripsi': deskripsi,

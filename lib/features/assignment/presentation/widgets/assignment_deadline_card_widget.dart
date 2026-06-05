@@ -31,7 +31,7 @@ class AssignmentDeadlineCardWidget extends StatelessWidget {
       'November',
       'Desember',
     ];
-    return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
+    return '${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year}';
   }
 
   @override
@@ -45,7 +45,7 @@ class AssignmentDeadlineCardWidget extends StatelessWidget {
     IconData statusIcon;
 
     if (isAktif) {
-      statusLabel = 'Batas Pengumpulan';
+      statusLabel = 'Tenggat Waktu';
       if (isExpired) {
         cardColor = AppColors.dangerRed;
         statusValue = 'Waktu Pengumpulan Habis';
@@ -53,7 +53,7 @@ class AssignmentDeadlineCardWidget extends StatelessWidget {
       } else {
         cardColor = isCritical ? AppColors.dangerRed : AppColors.primaryNavy;
         statusValue =
-            '${_formatIndoDate(assignment.deadline)} - ${assignment.deadline.hour.toString().padLeft(2, '0')}:${assignment.deadline.minute.toString().padLeft(2, '0')} WIB';
+            '${_formatIndoDate(assignment.deadline)}, ${assignment.deadline.hour.toString().padLeft(2, '0')}.${assignment.deadline.minute.toString().padLeft(2, '0')}';
         statusIcon = AppIcons.timerFill;
       }
     } else {

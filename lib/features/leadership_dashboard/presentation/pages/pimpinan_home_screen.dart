@@ -7,11 +7,13 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
-import '../../../notification/presentation/pages/notification_screen.dart';
+import 'package:sespimma_mobile/features/leadership_report/presentation/widgets/ai_recommendation_card.dart';
+import 'package:sespimma_mobile/features/notification/presentation/pages/notification_screen.dart';
 import '../../data/datasources/pimpinan_mock_data.dart';
 import '../../data/models/pokjar_stats_model.dart';
 import '../../../auth/domain/entities/user_entity.dart';
 import '../../../auth/data/datasources/serdik_real_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PimpinanHomeScreen extends StatefulWidget {
   const PimpinanHomeScreen({super.key});
@@ -212,7 +214,7 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
               backgroundImage:
                   (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
                   ? FileImage(File(user.profilePhoto!)) as ImageProvider
-                  : const AssetImage('assets/images/default_avatar.png'),
+                  : AvatarHelper.getAvatar(null),
             ),
           ),
           const SizedBox(width: AppDimensions.md),
@@ -777,107 +779,41 @@ class _PimpinanHomeScreenState extends State<PimpinanHomeScreen>
   }
 
   Widget _buildAiRecommendation() {
-    final hasDataList = _pokjarData.where((e) => e.rataRataNilai > 0).toList();
-    if (hasDataList.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(AppDimensions.xl - 4),
-        decoration: BoxDecoration(
-          color: Colors.blueGrey.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
-          border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.1)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(
-              AppIcons.infoCircleFill,
-              color: Colors.blueGrey,
-              size: AppDimensions.iconLg,
-            ),
-            const SizedBox(width: AppDimensions.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Rekomendasi Sistem',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontLg,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.xs),
-                  Text(
-                    'Data penilaian belum tersedia untuk dilakukan analisis.',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontMd,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.blueGrey.shade700,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final lowest = hasDataList.reduce(
-      (a, b) => a.rataRataNilai < b.rataRataNilai ? a : b,
-    );
-    final bool hasRisk = lowest.rataRataNilai < 70.0;
+    final compAverages = PimpinanMockData.getGlobalComponentAverages();
+    final double akademik = compAverages['akademik'] ?? 0.0;
+    final double mental = compAverages['mental'] ?? 0.0;
+    final double jasmani = compAverages['jasmani'] ?? 0.0;
 
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.xl - 4),
+      padding: const EdgeInsets.all(AppDimensions.lg),
       decoration: BoxDecoration(
-        color: hasRisk
-            ? _dangerRed.withValues(alpha: 0.05)
-            : _academicBlue.withValues(alpha: 0.05),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
-        border: Border.all(
-          color: hasRisk
-              ? _dangerRed.withValues(alpha: 0.1)
-              : _academicBlue.withValues(alpha: 0.1),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            hasRisk ? AppIcons.warningFill : AppIcons.sparkleFill,
-            color: hasRisk ? _dangerRed : _academicBlue,
-            size: AppDimensions.iconLg,
-          ),
-          const SizedBox(width: AppDimensions.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  hasRisk ? 'Prioritas Perhatian' : 'Rekomendasi Sistem',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontLg,
-                    fontWeight: FontWeight.w800,
-                    color: hasRisk ? _dangerRed : _primaryNavy,
-                  ),
-                ),
-                const SizedBox(height: AppDimensions.xs),
-                Text(
-                  hasRisk
-                      ? '${lowest.namaPokjar} memerlukan atensi khusus karena capaian rata-rata berada di bawah standar kelulusan.'
-                      : 'Kualitas pembelajaran angkatan ini sangat stabil. Fokus pada pemeliharaan performa hingga evaluasi akhir.',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontMd,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blueGrey.shade700,
-                    height: 1.4,
-                  ),
-                ),
-              ],
+          const Text(
+            'Rekomendasi Sistem',
+            style: TextStyle(
+              fontSize: AppDimensions.fontMd,
+              fontWeight: FontWeight.w800,
+              color: _primaryNavy,
+              letterSpacing: 0.5,
             ),
+          ),
+          const SizedBox(height: AppDimensions.lg),
+          AiRecommendationCard(
+            academicScore: akademik,
+            mentalScore: mental,
+            physicalScore: jasmani,
           ),
         ],
       ),

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
-import 'package:sespimma_mobile/features/assessment/presentation/widgets/status_filter_button_widget.dart';
+
 import '../../data/models/gadik_assignment_model.dart';
 import '../../data/datasources/gadik_assignment_mock_data.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
@@ -285,17 +285,95 @@ class _GadikAssignmentMonitoringScreenState
                 ),
               ),
               const SizedBox(width: AppDimensions.md),
-              Expanded(
-                flex: 1,
-                child: StatusFilterButtonWidget(
-                  selectedStatus: _selectedCategory,
-                  statuses: _categoryOptions,
-                  defaultStatus: 'Semua Jenis Tugas',
-                  onSelected: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
+              PopupMenuButton<String>(
+                onSelected: (String value) {
+                  setState(() {
+                    _selectedCategory = value;
+                  });
+                },
+                offset: const Offset(0, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                ),
+                itemBuilder: (context) {
+                  return _categoryOptions.map((subject) {
+                    final bool isSelected = subject == _selectedCategory;
+                    return PopupMenuItem<String>(
+                      value: subject,
+                      child: Row(
+                        children: [
+                          Icon(
+                            isSelected
+                                ? Icons.check_circle_rounded
+                                : Icons.circle_outlined,
+                            color: isSelected
+                                ? _primaryNavy
+                                : Colors.blueGrey.shade300,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              subject,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? _primaryNavy
+                                    : Colors.blueGrey.shade700,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _selectedCategory != 'Semua Jenis Tugas'
+                        ? _primaryNavy.withValues(alpha: 0.05)
+                        : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                    border: Border.all(
+                      color: _selectedCategory != 'Semua Jenis Tugas'
+                          ? _primaryNavy
+                          : Colors.grey.shade200,
+                      width: _selectedCategory != 'Semua Jenis Tugas'
+                          ? 1.5
+                          : 1.0,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _selectedCategory != 'Semua Jenis Tugas'
+                            ? Icons.filter_alt_rounded
+                            : Icons.filter_alt_outlined,
+                        color: _selectedCategory != 'Semua Jenis Tugas'
+                            ? _primaryNavy
+                            : Colors.blueGrey.shade500,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: _selectedCategory != 'Semua Jenis Tugas'
+                            ? _primaryNavy
+                            : Colors.blueGrey.shade400,
+                        size: 16,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

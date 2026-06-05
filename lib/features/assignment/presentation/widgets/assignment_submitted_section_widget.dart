@@ -264,7 +264,7 @@ class AssignmentSubmittedSectionWidget extends StatelessWidget {
             ),
             const SizedBox(width: AppDimensions.sm),
             Text(
-              'Catatan Pengajar:',
+              'Catatan Pengajar',
               style: TextStyle(
                 fontSize: AppDimensions.fontMd,
                 fontWeight: FontWeight.w700,

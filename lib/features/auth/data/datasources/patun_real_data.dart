@@ -1,5 +1,5 @@
 class PatunRealData {
-  static const List<Map<String, dynamic>> records = [
+  static List<Map<String, dynamic>> records = [
     {
       "nama": "Drs. Sabri Manullang, M.Pd.",
       "pangkat": "Ajun Komisaris Besar Polisi",

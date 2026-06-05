@@ -184,7 +184,7 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
         isGraded: true,
         nilaiAkhir: _calculatedNA,
         catatanPengajar: _calculatedNA > 90.00
-            ? 'BERITA ACARA: ${_beritaAcaraCtrl.text}\n\nCatatan: ${_catatanCtrl.text}'
+            ? '${_beritaAcaraCtrl.text}${_catatanCtrl.text.isNotEmpty ? "\n\n${_catatanCtrl.text}" : ""}'
             : _catatanCtrl.text,
         scoreMateri: _materiCtrl.text.isNotEmpty
             ? _parse(_materiCtrl.text)

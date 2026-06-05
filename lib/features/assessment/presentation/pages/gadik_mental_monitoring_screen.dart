@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
 import '../../data/models/korsis_inbox_mock_data.dart';
 import 'gadik_mental_form_screen.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class GadikMentalMonitoringScreen extends StatefulWidget {
   const GadikMentalMonitoringScreen({super.key});
@@ -768,8 +769,8 @@ class _GadikMentalMonitoringScreenState
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         shape: BoxShape.circle,
-        image: const DecorationImage(
-          image: AssetImage('assets/images/default_avatar.png'),
+        image: DecorationImage(
+          image: AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
         border: Border.all(color: Colors.grey.shade200, width: 2),

@@ -2,7 +2,10 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../data/models/assignment_model.dart';
-import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
+import 'package:sespimma_mobile/features/gadik_assignment/data/models/gadik_submission_model.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import '../widgets/task_card.dart';
 
@@ -21,67 +24,82 @@ class _AssignmentScreenState extends State<AssignmentScreen>
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String _selectedSubject = 'Semua Kategori';
-  List<AssignmentModel>? __mockAssignments;
+  String _selectedSubject = 'Semua Jenis Tugas';
+
+  final List<String> _categoryOptions = [
+    'Semua Jenis Tugas',
+    'Ujian Mata Pelajaran atau Esai (NUMP)',
+    'Naskah Kuliah Kerja Profesi (NKKP)',
+    'Naskah Praktek Kerja Profesi (NPKP)',
+    'Naskah Karya Perseorangan (NKP)',
+    'Simulasi Kepemimpinan Kontemporer (NSK)',
+    'Naskah Program Transformasi Teknis (NPTT)',
+  ];
+
   List<AssignmentModel> get _mockAssignments {
-    if (__mockAssignments != null) return __mockAssignments!;
+    final activeUserNrp = SerdikRealData.records.first['nrp'];
 
-    final List<AssignmentModel> base = [
-      AssignmentModel(
-        id: 'TSK-001',
-        judul: 'Naskah Karya Perseorangan (NKP) - Analisis Integritas',
-        mapel: 'NKP (Naskah Karya Perseorangan)',
-        pengajar: 'Kombes Pol. Budi Santoso',
-        deadline: DateTime.now().add(const Duration(minutes: 59)),
-        status: 'aktif',
-      ),
-      AssignmentModel(
-        id: 'TSK-002',
-        judul: 'Naskah Program Transformasi Teknis (Taskap)',
-        mapel: 'NKKP (Naskah Kuliah Kerja Profesi)',
-        pengajar: 'AKBP Andi Wijaya',
-        deadline: DateTime.now().add(const Duration(hours: 23, minutes: 15)),
-        status: 'aktif',
-      ),
-      AssignmentModel(
-        id: 'TSK-003',
-        judul: 'Ujian MP - Pengendalian Diri & Emosi',
-        mapel: 'Ujian MP/Esai',
-        pengajar: 'Kombes Pol. Fajar Nugroho',
-        deadline: DateTime.now().subtract(const Duration(days: 1)),
-        status: 'diperiksa',
-        submissionFileName: 'Ujian_MP_Jawaban.pdf',
-      ),
-      AssignmentModel(
-        id: 'TSK-004',
-        judul: 'Resume Kuliah Umum - Transparansi Digital SESPIMMA',
-        mapel: 'Resume Mata Pelajaran',
-        pengajar: 'AKBP Rina Kartika',
-        deadline: DateTime.now().subtract(const Duration(days: 3)),
-        status: 'selesai',
-        submissionFileName: 'Resume_Kuliah.pdf',
-        nilai: 85.5,
-        catatan: 'Bagus, analisa mendalam namun referensi kurang kuat.',
-      ),
-    ];
-
-    final dynamicTasks = PimpinanMockData.sharedTasks
+    final List<AssignmentModel> dynamicTasks = GadikAssignmentMockData
+        .assignments
         .map((t) {
+          final submission = GadikAssignmentMockData.submissions.firstWhere(
+            (s) => s.assignmentId == t.id && s.serdikNrp == activeUserNrp,
+            orElse: () => GadikSubmissionModel(
+              id: '',
+              assignmentId: '',
+              serdikName: '',
+              serdikNrp: '',
+            ),
+          );
+
+          String status = 'aktif';
+          if (submission.id.isNotEmpty) {
+            if (submission.isGraded) {
+              status = 'selesai';
+            } else {
+              status = 'diperiksa';
+            }
+          }
+
+          String gadikName = t.createdBy;
+          String? gadikFoto;
+          final gadikMatch = GadikRealData.records.firstWhere(
+            (g) =>
+                g['nama'].toString().toLowerCase().contains(
+                  t.createdBy.toLowerCase(),
+                ) ||
+                g['nrp_nip'] == t.createdBy,
+            orElse: () => <String, dynamic>{},
+          );
+          if (gadikMatch.isNotEmpty) {
+            gadikName = gadikMatch['nama'];
+            gadikFoto = gadikMatch['foto'];
+          } else {
+            if (t.createdBy.toLowerCase().contains('gadik')) {
+              gadikName = GadikRealData.records.first['nama'];
+              gadikFoto = GadikRealData.records.first['foto'];
+            }
+          }
+
           return AssignmentModel(
             id: t.id,
             judul: t.judul,
-            mapel: t.mapel,
-            pengajar: t.createdByName,
+            mapel: t.jenisTugas,
+            pengajar: gadikName,
+            pengajarFoto: gadikFoto,
             deadline: t.deadline,
-            status: t.status.toLowerCase() == 'aktif' ? 'aktif' : 'selesai',
-            deskripsi: t.deskripsi,
+            status: status,
+            deskripsi: t.instruksi,
+            nilai: submission.nilaiAkhir,
+            catatan: submission.catatanPengajar,
+            submissionFileName: submission.fileName,
+            attachmentName: t.fileName,
+            attachmentUrl: t.fileUrl,
           );
         })
-        .where((dt) => !base.any((b) => b.id == dt.id))
         .toList();
 
-    __mockAssignments = [...dynamicTasks, ...base];
-    return __mockAssignments!;
+    return dynamicTasks;
   }
 
   @override
@@ -104,27 +122,11 @@ class _AssignmentScreenState extends State<AssignmentScreen>
   }
 
   List<String> get _allSubjects {
-    return const [
-      'Semua Kategori',
-      'Resume Mata Pelajaran',
-      'Ujian Mata Pelajaran atau Esai',
-      'NKKP (Naskah Kuliah Kerja Profesi)',
-      'NPKP (Naskah Praktek Kerja Profesi)',
-      'NKP (Naskah Karya Perseorangan)',
-      'NPTT (Naskah Program Transformasi Teknis)',
-      'NAC (Neuro Associative Conditioning)',
-      'MTL II (Manajemen Training Level II)',
-      'BCS (Bina Cendekia Samapta)',
-      'Simulasi Manajemen Penanggulangan Bencana',
-      'KKP (Kuliah Kerja Profesi)',
-      'PKP (Praktek Kerja Profesi)',
-      'Simulasi Kepemimpinan Kontemporer',
-      'Seminar Sekolah',
-    ];
+    return _categoryOptions;
   }
 
   Widget _buildFilterDropdown() {
-    final bool isFiltered = _selectedSubject != 'Semua Kategori';
+    final bool isFiltered = _selectedSubject != 'Semua Jenis Tugas';
     return PopupMenuButton<String>(
       onSelected: (String value) {
         setState(() {
@@ -226,7 +228,8 @@ class _AssignmentScreenState extends State<AssignmentScreen>
     final List<AssignmentModel> searchedAssignments = _mockAssignments.where((
       t,
     ) {
-      if (_selectedSubject != 'Semua Kategori' && t.mapel != _selectedSubject) {
+      if (_selectedSubject != 'Semua Jenis Tugas' &&
+          t.mapel != _selectedSubject) {
         return false;
       }
       if (query.isEmpty) return true;
@@ -494,7 +497,12 @@ class _AssignmentScreenState extends State<AssignmentScreen>
                 child: Opacity(opacity: value, child: child),
               );
             },
-            child: TaskCard(assignment: task),
+            child: TaskCard(
+              assignment: task,
+              onRefresh: () {
+                setState(() {});
+              },
+            ),
           );
         },
       ),

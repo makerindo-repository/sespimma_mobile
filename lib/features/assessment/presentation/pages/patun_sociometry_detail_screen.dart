@@ -3,6 +3,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 
 import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 import '../../data/models/sociometry_period_config.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunSociometryDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdikData;
@@ -199,7 +200,7 @@ class PatunSociometryDetailScreen extends StatelessWidget {
                 (serdikData['foto'] != null &&
                     serdikData['foto'].toString().isNotEmpty)
                 ? NetworkImage(serdikData['foto']) as ImageProvider
-                : const AssetImage('assets/images/default_avatar.png'),
+                : AvatarHelper.getAvatar(null),
           ),
           const SizedBox(width: AppDimensions.md),
           Expanded(

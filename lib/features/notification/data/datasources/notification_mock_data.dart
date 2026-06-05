@@ -51,72 +51,90 @@ class NotificationMockData {
   }
 
   static void initialize(UserEntity user) {
+    final oldStatus = <String, bool>{};
+    for (var item in items) {
+      oldStatus[item['id']] = item['isRead'] as bool;
+    }
+
     items.clear();
     int unread = 0;
 
     for (var task in GadikAssignmentMockData.assignments) {
       if (task.status == 'Belum Mulai' || task.status == 'Sedang Berjalan') {
+        final id = 'task_${task.id}';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'task_${task.id}',
+          'id': id,
           'title': task.judul,
           'message':
               'Segera kumpulkan tugas sebelum tenggat waktu ${_formatDateWithTime(task.deadline)}',
           'dateTime': task.createdAt,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'task',
           'person': _getGadikFullName(task.createdBy),
         });
-        unread++;
+        if (!isRead) unread++;
       } else if (task.status == 'Selesai') {
+        final id = 'task_${task.id}';
+        final isRead = oldStatus[id] ?? true;
         items.add({
-          'id': 'task_${task.id}',
+          'id': id,
           'title': task.judul,
           'message':
               'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)} terus pantau riwayat tugas untuk melihat nilai',
           'dateTime': task.createdAt,
-          'isRead': true,
+          'isRead': isRead,
           'type': 'task_dikirim',
           'person': _getGadikFullName(task.createdBy),
         });
+        if (!isRead) unread++;
       } else if (task.status == 'Dinilai') {
+        final id = 'task_${task.id}_dinilai';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'task_${task.id}',
+          'id': id,
           'title': task.judul,
           'message':
               'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)} silahkan cek nilaimu segera',
           'dateTime': task.createdAt,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'task_dinilai',
           'person': _getGadikFullName(task.createdBy),
         });
-        unread++;
+        if (!isRead) unread++;
       } else if (task.status == 'Remedial') {
+        final id = 'task_${task.id}_remedial';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'task_${task.id}',
+          'id': id,
           'title': task.judul,
           'message':
               'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_formatDateWithTime(task.deadline)})',
           'dateTime': task.createdAt,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'task_remedial',
           'person': _getGadikFullName(task.createdBy),
         });
-        unread++;
+        if (!isRead) unread++;
       }
     }
 
     for (var item in KorsisInboxMockData.items) {
-      if (item.status == 'disetujui') {
+      bool isTargetSerdik =
+          user.roleId.toLowerCase() != 'siswa' || item.nosis == user.noSerdik;
+      if (item.status == 'disetujui' && isTargetSerdik) {
+        final id = 'inbox_${item.id}';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'inbox_${item.id}',
+          'id': id,
           'title': item.rewardPunishmentName,
           'message': 'Diberikan oleh ${item.senderName}',
           'dateTime': item.timestamp,
-          'isRead': false,
+          'isRead': isRead,
           'type': item.isReward ? 'reward' : 'punishment',
           'person': item.senderName,
         });
-        unread++;
+        if (!isRead) unread++;
       }
     }
 
@@ -124,79 +142,89 @@ class NotificationMockData {
       if (SociometryPeriodConfig.getFilledCount() <
           SociometryPeriodConfig.getTotalCount()) {
         final phaseStart = SociometryPeriodConfig.awalStartDate;
+        final id = 'soc_awal';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'soc_awal',
+          'id': id,
           'title': 'Sosiometri Awal',
           'message':
               'Penilaian terhadap sesama peleton sudah mulai, lihat pada beranda untuk mengisi kolom sosiometri.',
           'dateTime': phaseStart,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'sosiometri_start',
           'person': KorsisRealData.records.first['nama'],
         });
-        unread++;
+        if (!isRead) unread++;
       } else {
         final fillDate = SociometryPeriodConfig.awalStartDate.add(
           const Duration(days: 1, hours: 14, minutes: 30),
         );
+        final id = 'soc_awal_done';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'soc_awal_done',
+          'id': id,
           'title': 'Sosiometri Selesai',
           'message':
               'Selamat kamu telah mengisi sosiometri awal semuanya. Kamu merupakan orang yang paling rajin',
           'dateTime': fillDate,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'sosiometri_done',
           'person': KorsisRealData.records.first['nama'],
         });
-        unread++;
+        if (!isRead) unread++;
       }
     } else if (SociometryPeriodConfig.isAkhirActive()) {
       if (SociometryPeriodConfig.getFilledCount() <
           SociometryPeriodConfig.getTotalCount()) {
         final phaseStart = SociometryPeriodConfig.akhirStartDate;
+        final id = 'soc_akhir';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'soc_akhir',
+          'id': id,
           'title': 'Sosiometri Akhir',
           'message':
               'Penilaian terhadap sesama peleton akan berakhir 3 hari lagi, jangan lupa untuk menuntaskan pemberian nilai',
           'dateTime': phaseStart,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'sosiometri_reminder',
           'person': KorsisRealData.records.first['nama'],
         });
-        unread++;
+        if (!isRead) unread++;
       } else {
         final fillDate = SociometryPeriodConfig.akhirStartDate.add(
           const Duration(days: 1, hours: 14, minutes: 30),
         );
+        final id = 'soc_akhir_done';
+        final isRead = oldStatus[id] ?? false;
         items.add({
-          'id': 'soc_akhir_done',
+          'id': id,
           'title': 'Sosiometri Selesai',
           'message':
               'Selamat kamu telah mengisi sosiometri akhir semuanya. Kamu merupakan orang yang paling rajin',
           'dateTime': fillDate,
-          'isRead': false,
+          'isRead': isRead,
           'type': 'sosiometri_done',
           'person': KorsisRealData.records.first['nama'],
         });
-        unread++;
+        if (!isRead) unread++;
       }
     }
 
     final activeZones = AttendanceZones.activeZones;
     for (var zone in activeZones) {
+      final id = 'zone_${zone.id}';
+      final isRead = oldStatus[id] ?? false;
       items.add({
-        'id': 'zone_${zone.id}',
+        'id': id,
         'title': zone.name,
         'message':
             'Lokasi kegiatan telah dibuat oleh ${_getZoneCreatorFullName(zone.creator)}. Segera melakukan presensi.',
         'dateTime': zone.startTime,
-        'isRead': false,
+        'isRead': isRead,
         'type': 'zone',
         'person': _getZoneCreatorFullName(zone.creator),
       });
-      unread++;
+      if (!isRead) unread++;
     }
 
     items.sort(

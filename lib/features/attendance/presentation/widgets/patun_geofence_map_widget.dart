@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunGeofenceMapWidget extends StatefulWidget {
   final String pokjar;
@@ -346,17 +346,10 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                           color: Colors.grey.shade300,
                           width: 2,
                         ),
-                        image: profilePhoto != null
-                            ? DecorationImage(
-                                image: FileImage(File(profilePhoto)),
-                                fit: BoxFit.cover,
-                              )
-                            : const DecorationImage(
-                                image: AssetImage(
-                                  'assets/images/default_avatar.png',
-                                ),
-                                fit: BoxFit.cover,
-                              ),
+                        image: DecorationImage(
+                          image: AvatarHelper.getAvatar(profilePhoto),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 16),

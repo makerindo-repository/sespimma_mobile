@@ -27,7 +27,11 @@ class AttendanceActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isAlpha =
         activeZone != null && DateTime.now().isAfter(activeZone!.cutoffTime);
-    final bool canSubmit = isInRadius && !isAlpha && !isAttended;
+    final bool isNotStarted =
+        activeZone != null && DateTime.now().isBefore(activeZone!.startTime);
+
+    final bool isGreyedOut =
+        isAttended || isAlpha || isNotStarted || !isInRadius;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -41,14 +45,12 @@ class AttendanceActionButtons extends StatelessWidget {
         const SizedBox(height: AppDimensions.lg),
         _ActionBtn(
           icon: AppIcons.checkSquareOffsetBold,
-          color: canSubmit ? AppColors.primaryNavy : Colors.grey.shade400,
+          color: isGreyedOut ? Colors.grey.shade400 : AppColors.primaryNavy,
           iconColor: Colors.white,
-          onTap: canSubmit
-              ? () {
-                  HapticFeedback.mediumImpact();
-                  onSubmit();
-                }
-              : null,
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            onSubmit();
+          },
           isLoading: isSubmitting,
         ),
       ],

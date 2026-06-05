@@ -5,13 +5,24 @@ import '../../data/models/assignment_model.dart';
 
 class TaskCard extends StatelessWidget {
   final AssignmentModel assignment;
+  final VoidCallback? onRefresh;
 
-  const TaskCard({super.key, required this.assignment});
+  const TaskCard({super.key, required this.assignment, this.onRefresh});
 
   static const Color _primaryNavy = Color(0xFF001C40);
   static const Color _dangerRed = Color(0xFFD32F2F);
   static const Color _warningOrange = Color(0xFFF57C00);
   static const Color _successGreen = Color(0xFF2E7D32);
+
+  String _getDynamicCategoryName(String rawCategory) {
+    if (rawCategory.contains('NKKP')) return 'NKKP';
+    if (rawCategory.contains('NPKP')) return 'NPKP';
+    if (rawCategory.contains('NPTT')) return 'NPTT';
+    if (rawCategory.contains('NKP')) return 'NKP';
+    if (rawCategory.contains('NSK')) return 'NSK';
+    if (rawCategory.contains('Ujian')) return 'NUMP';
+    return rawCategory;
+  }
 
   String _getDeadlineText(DateTime deadline, String status) {
     if (status == 'diperiksa') {
@@ -25,12 +36,15 @@ class TaskCard extends StatelessWidget {
 
     if (difference.isNegative) {
       return 'Batas waktu telah habis';
-    } else if (difference.inDays < 1) {
-      final hours = difference.inHours;
-      final minutes = difference.inMinutes % 60;
-      return 'Sisa waktu: ${hours}j ${minutes}m';
     } else {
-      return 'Sisa waktu: ${difference.inDays} hari';
+      final days = difference.inDays;
+      final hours = difference.inHours % 24;
+      final minutes = difference.inMinutes % 60;
+      if (days > 0) {
+        return 'Sisa waktu: $days hari $hours jam';
+      } else {
+        return 'Sisa waktu: $hours jam $minutes menit';
+      }
     }
   }
 
@@ -99,12 +113,13 @@ class TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusXl),
-          onTap: () {
-            Navigator.pushNamed(
+          onTap: () async {
+            await Navigator.pushNamed(
               context,
               '/assignment-detail',
               arguments: assignment,
             );
+            if (onRefresh != null) onRefresh!();
           },
           child: Padding(
             padding: const EdgeInsets.all(AppDimensions.xl - 4),
@@ -136,6 +151,58 @@ class TaskCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusSm,
+                                  ),
+                                ),
+                                child: Text(
+                                  _getDynamicCategoryName(assignment.mapel),
+                                  style: TextStyle(
+                                    fontSize: AppDimensions.fontXs,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.blueGrey.shade600,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(
+                                      Icons.person,
+                                      size: 16,
+                                      color: Colors.blueGrey.shade500,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        assignment.pengajar,
+                                        style: TextStyle(
+                                          fontSize: AppDimensions.fontDefault,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blueGrey.shade500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppDimensions.sm),
                           Hero(
                             tag: 'title-${assignment.id}',
                             child: Material(
@@ -151,15 +218,6 @@ class TaskCard extends StatelessWidget {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: AppDimensions.sm),
-                          Text(
-                            '${assignment.mapel} • ${assignment.pengajar}',
-                            style: TextStyle(
-                              fontSize: AppDimensions.fontDefault,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blueGrey.shade500,
                             ),
                           ),
                         ],

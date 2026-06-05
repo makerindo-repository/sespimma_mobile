@@ -13,6 +13,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart'
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_form_screen.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_detail_screen.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/patun_senat_validation_sheet.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunMentalMonitoringScreen extends StatefulWidget {
   const PatunMentalMonitoringScreen({super.key});
@@ -664,7 +665,7 @@ class _PatunMentalMonitoringScreenState
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
               ? FileImage(File(profilePhoto)) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
       ),

@@ -12,6 +12,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart'
 import 'package:sespimma_mobile/features/assessment/data/models/health_monitoring_data.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/medis_health_grading_sheet.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class MedisHealthMonitoringScreen extends StatefulWidget {
   const MedisHealthMonitoringScreen({super.key});
@@ -621,7 +622,7 @@ class _MedisHealthMonitoringScreenState
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
               ? FileImage(File(profilePhoto)) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
       ),

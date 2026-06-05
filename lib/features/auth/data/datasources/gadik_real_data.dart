@@ -1,5 +1,5 @@
 class GadikRealData {
-  static const List<Map<String, dynamic>> records = [
+  static List<Map<String, dynamic>> records = [
     {
       "nama": "Tommy Bambang Irawan, S.I.K., M.H.",
       "pangkat": "Komisaris Besar Polisi",
@@ -8,6 +8,7 @@ class GadikRealData {
       "agama": "Islam",
       "eselon": "II B3",
       "golongan": "IV-C",
+      "foto": "assets/images/default_avatar.png",
     },
     {
       "nama": "Purwanto, S.I.K., M.Si.",

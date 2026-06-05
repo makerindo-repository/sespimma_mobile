@@ -170,6 +170,7 @@ class _KorsisZoneFormSheetState extends State<KorsisZoneFormSheet> {
       endTime: endDt,
       deadline: cutoffDt,
       cutoffTime: cutoffDt,
+      createdAt: widget.existingZone?.createdAt ?? now,
       isRoutine: _isRoutine,
     );
 

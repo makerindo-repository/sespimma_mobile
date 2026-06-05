@@ -6,6 +6,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_physical_medical_history_screen.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/health_monitoring_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunPhysicalDetailScreen extends StatefulWidget {
   final Map<String, dynamic> serdik;
@@ -225,7 +226,7 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
               image: DecorationImage(
                 image: (profilePhoto != null && profilePhoto.isNotEmpty)
                     ? FileImage(File(profilePhoto)) as ImageProvider
-                    : const AssetImage('assets/images/default_avatar.png'),
+                    : AvatarHelper.getAvatar(null),
                 fit: BoxFit.cover,
               ),
             ),

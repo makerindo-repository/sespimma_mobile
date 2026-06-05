@@ -4,6 +4,7 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunSenatValidationSheet extends StatefulWidget {
   final List<Map<String, dynamic>> pokjarMembers;
@@ -56,7 +57,7 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
             points: 0.25,
             description: 'Validasi keaktifan senat disetujui oleh Patun.',
             rewardPunishmentName: 'Validasi Keaktifan Senat',
-            status: 'pending',
+            status: 'approved',
           ),
         );
       }
@@ -188,7 +189,7 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
                     (member['profile_photo'] != null &&
                         member['profile_photo'].toString().isNotEmpty)
                     ? FileImage(File(member['profile_photo'])) as ImageProvider
-                    : const AssetImage('assets/images/default_avatar.png'),
+                    : AvatarHelper.getAvatar(null),
                 fit: BoxFit.cover,
               ),
             ),

@@ -9,7 +9,9 @@ import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessment_search_bar_widget.dart';
 import '../../data/models/korsis_inbox_mock_data.dart';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class KorsisInboxScreen extends StatefulWidget {
   const KorsisInboxScreen({super.key});
@@ -706,11 +708,17 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
   }
 
   Widget _buildListItem(InboxItem item) {
+    final isIzin = item.isIzin;
     final isReward = item.isReward;
-    final statusColor = isReward
-        ? const Color(0xFF2E7D32)
-        : const Color(0xFFD32F2F);
-    final statusIcon = isReward ? AppIcons.thumbUp : AppIcons.thumbDown;
+    final statusColor = isIzin
+        ? Colors.orange.shade700
+        : (isReward ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F));
+    final statusIcon = isIzin
+        ? AppIcons.envelopeSimpleBold
+        : (isReward ? AppIcons.thumbUp : AppIcons.thumbDown);
+    final statusText = isIzin
+        ? 'SURAT IZIN'
+        : (isReward ? 'REWARD' : 'PUNISHMENT');
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppDimensions.md),
@@ -730,7 +738,7 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
         borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-          onTap: () => _showItemDetail(item),
+          onTap: isIzin ? null : () => _showItemDetail(item),
           child: Padding(
             padding: const EdgeInsets.all(AppDimensions.lg),
             child: Row(
@@ -760,8 +768,10 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -780,7 +790,7 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
                                 Icon(statusIcon, size: 10, color: statusColor),
                                 const SizedBox(width: 4),
                                 Text(
-                                  isReward ? 'REWARD' : 'PUNISHMENT',
+                                  statusText,
                                   style: TextStyle(
                                     fontSize: AppDimensions.fontXs,
                                     fontWeight: FontWeight.w800,
@@ -791,9 +801,95 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
+                          if (isIzin &&
+                              item.izinStartTime != null &&
+                              item.izinEndTime != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(
+                                  AppDimensions.radiusSm,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    AppIcons.clockBold,
+                                    size: 10,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${DateFormat('HH.mm').format(item.izinStartTime!)} - ${DateFormat('HH.mm').format(item.izinEndTime!)}',
+                                    style: TextStyle(
+                                      fontSize: AppDimensions.fontXs,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.blue.shade700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          if (isIzin && item.attachmentPath != null)
+                            InkWell(
+                              onTap: () async {
+                                String? outputFile = await FilePicker.saveFile(
+                                  dialogTitle: 'Simpan Dokumen Lampiran',
+                                  fileName:
+                                      item.attachmentPath ?? 'lampiran.pdf',
+                                );
+
+                                if (outputFile != null && mounted) {
+                                  AppNotifier.showSuccess(
+                                    context,
+                                    'Berhasil disimpan ke $outputFile',
+                                  );
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(
+                                AppDimensions.radiusSm,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(
+                                    AppDimensions.radiusSm,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      AppIcons.paperclip,
+                                      size: 10,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Lampiran',
+                                      style: TextStyle(
+                                        fontSize: AppDimensions.fontXs,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.grey.shade700,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          if (!isIzin)
+                            Text(
                               item.senderName,
                               style: TextStyle(
                                 fontSize: AppDimensions.fontSm,
@@ -803,7 +899,6 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -841,14 +936,15 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
     if (item.status != 'pending') {
       return Column(
         children: [
-          Text(
-            item.points > 0 ? '+${item.points}' : '${item.points}',
-            style: TextStyle(
-              color: statusColor,
-              fontWeight: FontWeight.w800,
-              fontSize: AppDimensions.fontLg + 1,
+          if (!item.isIzin)
+            Text(
+              item.points > 0 ? '+${item.points}' : '${item.points}',
+              style: TextStyle(
+                color: statusColor,
+                fontWeight: FontWeight.w800,
+                fontSize: AppDimensions.fontLg + 1,
+              ),
             ),
-          ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -877,14 +973,15 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          item.points > 0 ? '+${item.points}' : '${item.points}',
-          style: TextStyle(
-            color: statusColor,
-            fontWeight: FontWeight.w800,
-            fontSize: AppDimensions.fontLg + 1,
+        if (!item.isIzin)
+          Text(
+            item.points > 0 ? '+${item.points}' : '${item.points}',
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.w800,
+              fontSize: AppDimensions.fontLg + 1,
+            ),
           ),
-        ),
         const SizedBox(width: 12),
         Column(
           mainAxisSize: MainAxisSize.min,
@@ -939,8 +1036,8 @@ class _KorsisInboxScreenState extends State<KorsisInboxScreen> {
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         shape: BoxShape.circle,
-        image: const DecorationImage(
-          image: AssetImage('assets/images/default_avatar.png'),
+        image: DecorationImage(
+          image: AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
         border: Border.all(color: Colors.grey.shade200, width: 2),

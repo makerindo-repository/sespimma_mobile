@@ -9,6 +9,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunMentalDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdik;
@@ -192,7 +193,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
               image: DecorationImage(
                 image: (profilePhoto != null && profilePhoto.isNotEmpty)
                     ? FileImage(File(profilePhoto)) as ImageProvider
-                    : const AssetImage('assets/images/default_avatar.png'),
+                    : AvatarHelper.getAvatar(null),
                 fit: BoxFit.cover,
               ),
             ),

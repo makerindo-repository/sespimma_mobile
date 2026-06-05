@@ -1,5 +1,7 @@
+import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
+import 'package:sespimma_mobile/core/utils/scoring_calculator.dart';
 
 class ScoreCalculatorService {
   static List<FinalRecapModel> generateRealReports() {
@@ -21,48 +23,99 @@ class ScoreCalculatorService {
     double nka = _getDouble(raw, 'NKa');
     double nump = _getDouble(raw, 'NUMP');
 
-    double nkkp = (nmpn * 35 + npa * 35 + nka * 30) / 100;
+    double nkkp = ScoringCalculator.hitungNKKPatauNPKP(
+      nmpn: nmpn,
+      npa: npa,
+      nka: nka,
+    );
+    double npkp = ScoringCalculator.hitungNKKPatauNPKP(
+      nmpn: nmpn,
+      npa: npa,
+      nka: nka,
+    );
 
-    double npkp = (nmpn * 35 + npa * 35 + nka * 30) / 100;
+    List<double> nkpTasks =
+        (raw['NKP_tasks'] as List<dynamic>?)
+            ?.map((e) => e as double)
+            .toList() ??
+        [];
+    double nkp = nkpTasks.isEmpty
+        ? ScoringCalculator.hitungNKP(nmpn: nmpn, npa: npa)
+        : nkpTasks.reduce((a, b) => a + b) / nkpTasks.length;
 
-    double nkp = (nmpn * 50 + npa * 50) / 100;
-
-    double np = (nump * 30 + nkkp * 5 + npkp * 5 + nkp * 60) / 100;
+    double np = ScoringCalculator.hitungNP(
+      nump: nump,
+      nkkp: nkkp,
+      npkp: npkp,
+      nkp: nkp,
+    );
 
     double keaktifan = _getDouble(raw, 'keaktifan_sk');
     double produk = _getDouble(raw, 'produk_sk');
     double tataRuang = _getDouble(raw, 'tataruang_sk');
-    double nsk = (keaktifan * 60 + produk * 20 + tataRuang * 20) / 100;
+    double nsk = ScoringCalculator.hitungNSK(
+      keaktifan: keaktifan,
+      produk: produk,
+      tataRuang: tataRuang,
+    );
 
     double nam = _getDouble(raw, 'NAm');
     double nkm = _getDouble(raw, 'NKm');
     double nkp2 = _getDouble(raw, 'NKp');
-    double nt = (nam * 40 + nkm * 30 + nkp2 * 30) / 100;
+    double nt = ScoringCalculator.hitungNT(nam: nam, nkm: nkm, nkp: nkp2);
 
-    double na = (np * 60 + nsk * 10 + nt * 30) / 100;
+    double na = ScoringCalculator.hitungNA(np: np, nsk: nsk, nt: nt);
 
-    double reward = _getDouble(raw, 'reward_mental');
-    double punishment = _getDouble(raw, 'punishment_mental');
+    double dynamicReward = 0.0;
+    double dynamicPunishment = 0.0;
+
+    for (var item in KorsisInboxMockData.items) {
+      if (item.nosis == serdikData['no_serdik'] &&
+          item.status == 'approved' &&
+          !item.isIzin) {
+        if (item.isReward) {
+          dynamicReward += item.points;
+        } else {
+          dynamicPunishment += item.points;
+        }
+      }
+    }
+
+    double reward = _getDouble(raw, 'reward_mental') + dynamicReward;
+    double punishment =
+        _getDouble(raw, 'punishment_mental') + dynamicPunishment;
     double nilaiPengamatan = 80.0 + reward - punishment;
 
     double ns = _getDouble(raw, 'NS');
 
-    double nk = (nilaiPengamatan * 7 + ns * 3) / 10;
+    double nk = ScoringCalculator.hitungNK(
+      nilaiPengamatan: nilaiPengamatan,
+      nilaiSosiometri: ns,
+    );
 
     double kesA = _getDouble(raw, 'kes_awal');
     double kesB = _getDouble(raw, 'kes_akhir');
     double kesC = 80.0 - _getDouble(raw, 'kes_pengurangan');
-    double nkes = (kesA + kesB + kesC) / 3;
+    double nkes = ScoringCalculator.hitungNKes(
+      tesAwal: kesA,
+      tesAkhir: kesB,
+      statusKesehatan: kesC,
+    );
 
     double nga = _getDouble(raw, 'NGA');
     double ngb1 = _getDouble(raw, 'NGB1');
     double ngb2 = _getDouble(raw, 'NGB2');
     double ngb3 = _getDouble(raw, 'NGB3');
     double ngb4 = _getDouble(raw, 'NGB4');
-    double ngb = (ngb1 + ngb2 + ngb3 + ngb4) / 4;
-    double njas = (nga + ngb) / 2;
+    double ngb = ScoringCalculator.hitungNGB(
+      ngb1: ngb1,
+      ngb2: ngb2,
+      ngb3: ngb3,
+      ngb4: ngb4,
+    );
+    double njas = ScoringCalculator.hitungNJas(nga: nga, ngb: ngb);
 
-    double nkj = (nkes * 4 + njas * 6) / 10;
+    double nkj = ScoringCalculator.hitungNKJ(nKes: nkes, nJas: njas);
 
     return FinalRecapModel(
       id: serdikData['no_serdik'] ?? '',
@@ -144,6 +197,8 @@ class ScoreCalculatorService {
       'NGB2': sim(82, 18),
       'NGB3': sim(82, 19),
       'NGB4': sim(82, 20),
+
+      'NKP_tasks': List.generate(10, (i) => sim(80, (21 + i) % 31)),
     };
   }
 }

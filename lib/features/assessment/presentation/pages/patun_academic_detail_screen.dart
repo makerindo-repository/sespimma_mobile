@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_scores.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunAcademicDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdik;
@@ -21,7 +22,14 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     final academicScores = SerdikAcademicScores.getScores(noSerdik);
     final double score = (academicScores['na'] as num?)?.toDouble() ?? 0.0;
 
-    final String status = score >= 70 ? 'LULUS' : 'TIDAK LULUS';
+    String status;
+    if (score >= 75) {
+      status = 'Aman';
+    } else if (score >= 70) {
+      status = 'Warning';
+    } else {
+      status = 'Kritis';
+    }
     final String? profilePhoto =
         serdik['profile_photo'] ?? serdik['profilePhoto'];
 
@@ -112,7 +120,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
               image: DecorationImage(
                 image: (profilePhoto != null && profilePhoto.isNotEmpty)
                     ? FileImage(File(profilePhoto)) as ImageProvider
-                    : const AssetImage('assets/images/default_avatar.png'),
+                    : AvatarHelper.getAvatar(null),
                 fit: BoxFit.cover,
               ),
             ),
@@ -217,7 +225,14 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     double nkpPaparan = nkp;
 
     double baseScore = na;
-    String status = na >= 70 ? 'Aman' : 'Warning';
+    String status;
+    if (na >= 75) {
+      status = 'Aman';
+    } else if (na >= 70) {
+      status = 'Warning';
+    } else {
+      status = 'Kritis';
+    }
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(

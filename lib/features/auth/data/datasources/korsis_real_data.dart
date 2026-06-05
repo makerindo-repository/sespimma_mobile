@@ -1,5 +1,5 @@
 class KorsisRealData {
-  static const List<Map<String, dynamic>> records = [
+  static List<Map<String, dynamic>> records = [
     {
       "nama": "Suprayitno, S.H., S.I.K.",
       "pangkat": "Komisaris Besar Polisi",

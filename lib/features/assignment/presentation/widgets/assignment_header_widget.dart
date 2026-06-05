@@ -72,17 +72,15 @@ class AssignmentHeaderWidget extends StatelessWidget {
         const SizedBox(height: AppDimensions.xl),
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(AppDimensions.sm),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                AppIcons.userFill,
-                size: AppDimensions.iconSm,
-                color: AppColors.textOnPrimary,
-              ),
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.blueGrey.shade100,
+              backgroundImage: assignment.pengajarFoto != null
+                  ? AssetImage(assignment.pengajarFoto!)
+                  : null,
+              child: assignment.pengajarFoto == null
+                  ? const Icon(AppIcons.userFill, size: 20, color: Colors.white)
+                  : null,
             ),
             const SizedBox(width: AppDimensions.md),
             Text(

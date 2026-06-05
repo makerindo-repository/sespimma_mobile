@@ -8,6 +8,10 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assessment/utils/reward_punishment_eligibility.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
+import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
+import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class KorsisMentalFormScreen extends StatefulWidget {
   final bool isReward;
@@ -87,19 +91,22 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
       : RewardPunishmentData.punishments;
 
   double get _calculatedFinalScore {
-    double baseScore = 80.0;
-    if (_selectedSerdik != null &&
-        _selectedSerdik!.containsKey('_mock_score')) {
-      baseScore = (_selectedSerdik!['_mock_score'] as num).toDouble();
-    }
+    double baseScore = _currentBaseScore;
     if (_selectedCategory == null) return baseScore;
     return baseScore + _selectedCategory!.point;
   }
 
   double get _currentBaseScore {
-    if (_selectedSerdik != null &&
-        _selectedSerdik!.containsKey('_mock_score')) {
-      return (_selectedSerdik!['_mock_score'] as num).toDouble();
+    if (_selectedSerdik != null) {
+      if (_selectedSerdik!.containsKey('_mock_score')) {
+        return (_selectedSerdik!['_mock_score'] as num).toDouble();
+      }
+      final targetNrp = _selectedSerdik!['nrp'] ?? '';
+      final report = ScoreCalculatorService.generateRealReports().firstWhere(
+        (r) => r.nrp == targetNrp,
+        orElse: () => FinalRecapModel.empty(),
+      );
+      return report.mentalScore > 0 ? report.mentalScore : 80.0;
     }
     return 80.0;
   }
@@ -321,6 +328,27 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                       _selectedPhoto != null)
                   ? () {
                       HapticFeedback.heavyImpact();
+
+                      final newItem = InboxItem(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        serdikName: _selectedSerdik!['nama_lengkap'],
+                        pangkat: _selectedSerdik!['pangkat'],
+                        nosis: _selectedSerdik!['no_serdik'],
+                        pokjar: _selectedSerdik!['kelompok_kelas'],
+                        isReward: widget.isReward,
+                        senderName: 'Kombes Pol. Ahmad Setiawan',
+                        timestamp: DateTime.now(),
+                        points: _selectedCategory!.point,
+                        description: _justificationController.text.isNotEmpty
+                            ? _justificationController.text
+                            : 'Telah dilakukan observasi dan pencatatan oleh Korsis.',
+                        rewardPunishmentName: _selectedCategory!.description,
+                        status: 'disetujui',
+                        photoPath: _selectedPhoto?.path,
+                        rewardPunishmentId: _selectedCategory!.id,
+                      );
+                      KorsisInboxMockData.addRecord(newItem);
+
                       Navigator.pop(context);
                       AppNotifier.showSuccess(
                         context,
@@ -915,9 +943,7 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
         color: Colors.grey.shade200,
         border: Border.all(color: Colors.grey.shade300),
         image: DecorationImage(
-          image: (photoPath != null && photoPath.isNotEmpty)
-              ? FileImage(File(photoPath)) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+          image: AvatarHelper.getAvatar(photoPath),
           fit: BoxFit.cover,
         ),
       ),

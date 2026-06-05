@@ -9,6 +9,7 @@ import 'package:sespimma_mobile/features/assignment/presentation/widgets/assignm
 import 'package:sespimma_mobile/features/gadik_assignment/data/models/gadik_submission_model.dart';
 import 'package:sespimma_mobile/features/gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 
 class AssignmentDetailScreen extends StatefulWidget {
   const AssignmentDetailScreen({super.key});
@@ -45,15 +46,10 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
   }
 
   String _stdName(AssignmentModel a, String n) {
-    const nrp = '202602003097';
+    final serdik = SerdikRealData.records.first;
+    final nosis = serdik['no_serdik'] ?? 'Unknown';
     final ext = n.contains('.') ? n.split('.').last : 'pdf';
-    String c(String t) => t
-        .replaceAll(RegExp(r'[^\w\s-]'), '')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim()
-        .replaceAll(' ', '_')
-        .toUpperCase();
-    return '${nrp}_${c(a.judul)}_${c(a.mapel)}_${c(a.pengajar)}.$ext';
+    return '$nosis.$ext';
   }
 
   void _pickFile(AssignmentModel a) => showModalBottomSheet(
@@ -103,13 +99,14 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
   Future<void> _submitTask(AssignmentModel a) async {
     await HapticFeedback.heavyImpact();
 
+    final serdik = SerdikRealData.records.first;
     final newSubmission = GadikSubmissionModel(
       id: 'SUB-${DateTime.now().millisecondsSinceEpoch}',
       assignmentId: a.id,
-      serdikName: 'Agus Subiyanto',
-      serdikNrp: '202602003097',
-      serdikPangkat: 'KOMPOL',
-      serdikNosis: '2026.012',
+      serdikName: serdik['nama_lengkap'],
+      serdikNrp: serdik['nrp'],
+      serdikPangkat: serdik['pangkat'],
+      serdikNosis: serdik['no_serdik'],
       submittedAt: DateTime.now(),
       fileName: _fileName,
       fileUrl: 'https://example.com/$_fileName',
@@ -125,7 +122,7 @@ class _AssignmentDetailScreenState extends State<AssignmentDetailScreen>
 
     if (!mounted) return;
     AssignmentSnackbars.showSuccess(context, 'Tugas berhasil dikumpulkan');
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   Future<void> _downloadFile(String name) async {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:flutter/services.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class SociometryFormScreen extends StatefulWidget {
   final String peerName;
@@ -207,7 +208,7 @@ class _SociometryFormScreenState extends State<SociometryFormScreen> {
             backgroundColor: _primaryIndigo.withValues(alpha: 0.1),
             backgroundImage: widget.imageUrl.isNotEmpty
                 ? AssetImage(widget.imageUrl)
-                : const AssetImage('assets/images/default_avatar.png'),
+                : AvatarHelper.getAvatar(null),
           ),
           const SizedBox(width: AppDimensions.md),
           Expanded(

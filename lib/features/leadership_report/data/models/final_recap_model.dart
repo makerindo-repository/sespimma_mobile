@@ -51,6 +51,19 @@ class FinalRecapModel {
     return 'Kurang (K)';
   }
 
+  factory FinalRecapModel.empty() {
+    return FinalRecapModel(
+      id: '',
+      name: '',
+      nrp: '',
+      nosis: '',
+      pokjar: '',
+      academicScore: 0.0,
+      mentalScore: 0.0,
+      physicalScore: 0.0,
+    );
+  }
+
   factory FinalRecapModel.fromJson(Map<String, dynamic> json) {
     return FinalRecapModel(
       id: json['id'] as String? ?? '',

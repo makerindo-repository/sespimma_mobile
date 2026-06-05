@@ -9,6 +9,8 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_academic_detail_screen.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_scores.dart';
 
 class PatunAcademicMonitoringScreen extends StatefulWidget {
   const PatunAcademicMonitoringScreen({super.key});
@@ -63,21 +65,20 @@ class _PatunAcademicMonitoringScreenState
                 .where((r) => r['kelompok_kelas'] == userPokjar)
                 .toList();
 
-            final listWithEWS = baseList.asMap().entries.map((entry) {
-              final index = entry.key;
-              final serdik = Map<String, dynamic>.from(entry.value);
+            final listWithEWS = baseList.map((serdikValue) {
+              final serdik = Map<String, dynamic>.from(serdikValue);
 
-              double score;
+              final noSerdik = serdik['no_serdik']?.toString() ?? '';
+              final scores = SerdikAcademicScores.getScores(noSerdik);
+              final score = (scores['na'] as num?)?.toDouble() ?? 0.0;
+
               String status;
-              if (index % 5 == 0) {
-                status = 'Kritis';
-                score = 65.0 + (index % 5);
-              } else if (index % 3 == 0) {
-                status = 'Warning';
-                score = 70.0 + (index % 3);
-              } else {
+              if (score >= 75) {
                 status = 'Aman';
-                score = 80.0 + (index % 15);
+              } else if (score >= 70) {
+                status = 'Warning';
+              } else {
+                status = 'Kritis';
               }
 
               serdik['_mock_score'] = score;
@@ -548,7 +549,7 @@ class _PatunAcademicMonitoringScreenState
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
               ? FileImage(File(profilePhoto)) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
       ),

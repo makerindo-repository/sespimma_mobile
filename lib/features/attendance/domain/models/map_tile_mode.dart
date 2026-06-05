@@ -73,6 +73,7 @@ class AttendanceZone {
   final DateTime endTime;
   final DateTime deadline;
   final DateTime cutoffTime;
+  final DateTime createdAt;
   final bool isRoutine;
   final bool isTraining;
 
@@ -89,6 +90,7 @@ class AttendanceZone {
     required this.endTime,
     required this.deadline,
     required this.cutoffTime,
+    required this.createdAt,
     this.isRoutine = false,
     this.isTraining = false,
   });
@@ -127,6 +129,7 @@ class AttendanceZones {
           endTime: now.add(const Duration(hours: 4)),
           deadline: now.add(const Duration(hours: 3, minutes: 30)),
           cutoffTime: now.add(const Duration(hours: 3, minutes: 45)),
+          createdAt: now.subtract(const Duration(hours: 2)),
           isRoutine: true,
         ),
       );

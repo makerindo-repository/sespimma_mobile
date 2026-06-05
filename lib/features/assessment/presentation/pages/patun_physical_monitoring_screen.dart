@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_physical_detail_screen.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class PatunPhysicalMonitoringScreen extends StatefulWidget {
   const PatunPhysicalMonitoringScreen({super.key});
@@ -515,7 +516,7 @@ class _PatunPhysicalMonitoringScreenState
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
               ? NetworkImage(profilePhoto) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
       ),

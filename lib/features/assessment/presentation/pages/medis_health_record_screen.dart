@@ -8,6 +8,7 @@ import 'package:sespimma_mobile/features/assessment/data/models/health_monitorin
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class MedisHealthRecordScreen extends StatefulWidget {
   final Map<String, dynamic> serdik;
@@ -324,7 +325,7 @@ class _MedisHealthRecordScreenState extends State<MedisHealthRecordScreen> {
         image: DecorationImage(
           image: (profilePhoto != null && profilePhoto.isNotEmpty)
               ? FileImage(File(profilePhoto)) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
       ),

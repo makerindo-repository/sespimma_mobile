@@ -9,6 +9,7 @@ import '../../domain/entities/user_entity.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -256,7 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         image: DecorationImage(
           image: (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
               ? FileImage(File(user.profilePhoto!)) as ImageProvider
-              : const AssetImage('assets/images/default_avatar.png'),
+              : AvatarHelper.getAvatar(null),
           fit: BoxFit.cover,
         ),
         boxShadow: [

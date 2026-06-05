@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class SerdikInfoHeaderWidget extends StatelessWidget {
   final Map<String, dynamic> serdik;
@@ -56,7 +57,7 @@ class SerdikInfoHeaderWidget extends StatelessWidget {
               image: DecorationImage(
                 image: hasPhoto
                     ? NetworkImage(serdik['foto'].toString()) as ImageProvider
-                    : const AssetImage('assets/images/default_avatar.png'),
+                    : AvatarHelper.getAvatar(null),
                 fit: BoxFit.cover,
               ),
             ),

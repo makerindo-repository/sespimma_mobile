@@ -8,6 +8,7 @@ import '../../data/datasources/gadik_assignment_mock_data.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
 
 class GadikCreateAssignmentScreen extends StatefulWidget {
   final bool isRemedialMode;
@@ -73,7 +74,7 @@ class _GadikCreateAssignmentScreenState
         targetPokjar: _targetPokjar,
         instruksi: _instruksiController.text,
         status: 'Belum Mulai',
-        createdBy: 'Kombes Pol. Fajar Nugroho',
+        createdBy: GadikRealData.records.first['nama'],
         createdAt: DateTime.now(),
         fileName: _fileName,
         fileUrl: _fileName != null ? 'https://example.com/$_fileName' : null,
@@ -88,8 +89,8 @@ class _GadikCreateAssignmentScreenState
         mapel: _jenisTugas,
         deadline: _deadline!,
         status: 'Aktif',
-        createdBy: '12345678',
-        createdByName: 'Kombes Pol. Fajar Nugroho',
+        createdBy: GadikRealData.records.first['nrp_nip'],
+        createdByName: GadikRealData.records.first['nama'],
       );
       PimpinanMockData.sharedTasks.add(newSerdikTask);
 

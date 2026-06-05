@@ -183,8 +183,37 @@ class _LeadershipReportScreenState extends State<LeadershipReportScreen>
                   const SizedBox(height: AppDimensions.xl),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: AiRecommendationCard(
-                      selectedPokjar: _selectedPokjar,
+                    child: Builder(
+                      builder: (context) {
+                        double academicAvg = 0;
+                        double mentalAvg = 0;
+                        double physicalAvg = 0;
+
+                        if (filtered.isNotEmpty) {
+                          academicAvg =
+                              filtered
+                                  .map((e) => e.academicScore)
+                                  .reduce((a, b) => a + b) /
+                              filtered.length;
+                          mentalAvg =
+                              filtered
+                                  .map((e) => e.mentalScore)
+                                  .reduce((a, b) => a + b) /
+                              filtered.length;
+                          physicalAvg =
+                              filtered
+                                  .map((e) => e.physicalScore)
+                                  .reduce((a, b) => a + b) /
+                              filtered.length;
+                        }
+
+                        return AiRecommendationCard(
+                          academicScore: academicAvg,
+                          mentalScore: mentalAvg,
+                          physicalScore: physicalAvg,
+                          title: 'Rekomendasi $_selectedPokjar',
+                        );
+                      },
                     ),
                   ),
                 ],

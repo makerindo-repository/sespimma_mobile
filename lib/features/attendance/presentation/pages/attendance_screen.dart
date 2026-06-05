@@ -7,14 +7,18 @@ import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.
 import 'package:sespimma_mobile/features/attendance/presentation/pages/attendance_qr_scanner_screen.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/geofence_map_widget.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/zone_info_sheet.dart';
+import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/empty_zone_sheet.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/leave_form_sheet.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_status_chip.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_floating_info.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_action_buttons.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
-import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -108,6 +112,14 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           .firstOrNull;
 
       if (matchedZone != null) {
+        final bool isNotStarted = DateTime.now().isBefore(
+          matchedZone.startTime,
+        );
+        if (isNotStarted) {
+          AppNotifier.showWarning(context, 'Maaf kegiatan ini belum dimulai');
+          return;
+        }
+
         AppNotifier.showSuccess(
           context,
           'QR Code Valid: ${matchedZone.activityName}. Mengirim presensi...',
@@ -124,6 +136,13 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   }
 
   Future<void> _submitAttendance({bool fromQr = false}) async {
+    final bool isNotStarted =
+        _activeZone != null && DateTime.now().isBefore(_activeZone!.startTime);
+    if (isNotStarted) {
+      AppNotifier.showWarning(context, 'Maaf kegiatan ini belum dimulai');
+      return;
+    }
+
     if (_isSubmitting ||
         (!fromQr && !_isInRadius) ||
         _isFakeGps ||
@@ -148,7 +167,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           : 'P_D_05 (-0.90)';
       _showErrorDialog(
         'Absensi Ditutup',
-        'Waktu toleransi kehadiran untuk sesi ini telah sepenuhnya berakhir. Status Anda otomatis tercatat sebagai ALPHA.\n\nSanksi pelanggaran: $punishmentCode',
+        'Waktu toleransi kehadiran untuk sesi ini telah sepenuhnya berakhir. Status Anda otomatis tercatat sebagai TANPA KETERANGAN.\n\nSanksi pelanggaran: $punishmentCode',
       );
       return;
     }
@@ -196,8 +215,42 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     });
 
     final activityName = _activeZone?.activityName ?? 'Kegiatan Presensi';
-    final bool isLate =
-        _activeZone != null && now.isAfter(_activeZone!.deadline);
+    bool isLate = _activeZone != null && now.isAfter(_activeZone!.deadline);
+    bool isLateFromIzin = false;
+
+    final approvedIzin = KorsisInboxMockData.items
+        .where((i) => i.isIzin && i.status == 'approved')
+        .firstOrNull;
+    if (_activeZone != null &&
+        approvedIzin != null &&
+        approvedIzin.izinStartTime != null &&
+        approvedIzin.izinEndTime != null) {
+      final izinStartDt = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        approvedIzin.izinStartTime!.hour,
+        approvedIzin.izinStartTime!.minute,
+      );
+      final izinEndDt = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        approvedIzin.izinEndTime!.hour,
+        approvedIzin.izinEndTime!.minute,
+      );
+
+      if (_activeZone!.deadline.isAfter(izinStartDt) &&
+              _activeZone!.deadline.isBefore(izinEndDt) ||
+          _activeZone!.deadline.isAtSameMomentAs(izinStartDt)) {
+        if (now.isAfter(izinEndDt)) {
+          isLate = true;
+          isLateFromIzin = true;
+        } else {
+          isLate = false;
+        }
+      }
+    }
 
     if (isLate) {
       final actLower = activityName.toLowerCase();
@@ -206,16 +259,64 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           actLower.contains('apel malam') ||
           actLower.contains('olahraga pagi') ||
           actLower.contains('olga pagi');
-      String punishmentCode = 'P_D_02 (-0.53)';
-      if (isApelOrOlga) {
-        punishmentCode = 'P_D_04 (-0.50)';
+      String punishmentCode = 'P_D_02';
+      double pointsToDeduct = -0.53;
+      String desc = 'Terlambat mengikuti kegiatan kelas/ceramah/pengarahan';
+
+      if (isLateFromIzin) {
+        punishmentCode = 'P_D_03';
+        pointsToDeduct = -0.50;
+        desc =
+            'Terlambat kembali pada waktu ijin/IBL tanpa alasan yang dapat dipertanggungjawabkan';
+      } else if (isApelOrOlga) {
+        punishmentCode = 'P_D_04';
+        pointsToDeduct = -0.50;
+        desc = 'Terlambat mengikuti apel/olahraga/kegiatan lain';
       } else if (fromQr || _isInRadius) {
-        punishmentCode = 'P_D_01 (-0.50)';
+        punishmentCode = 'P_D_01';
+        pointsToDeduct = -0.50;
+        desc = 'Terlambat mengikuti kegiatan yang telah ditentukan';
       }
+
+      String sName = 'Dummy User';
+      String sPangkat = 'AKP';
+      String sNosis = '000000';
+      String sPokjar = 'POKJAR 1';
+
+      final authState = context.read<AuthBloc>().state;
+      if (authState is AuthSuccess) {
+        sName = authState.user.name;
+        sPangkat = authState.user.pangkat;
+        sNosis = authState.user.noSerdik.isNotEmpty
+            ? authState.user.noSerdik
+            : authState.user.nrp;
+        sPokjar = authState.user.pokjar.isNotEmpty
+            ? authState.user.pokjar
+            : 'POKJAR 1';
+      }
+
+      KorsisInboxMockData.addRecord(
+        InboxItem(
+          id: 'auto_punish_${now.millisecondsSinceEpoch}',
+          serdikName: sName,
+          pangkat: sPangkat,
+          nosis: sNosis,
+          pokjar: sPokjar,
+          isReward: false,
+          senderName: 'Sistem (Otomatis)',
+          timestamp: now,
+          points: pointsToDeduct,
+          description: desc,
+          rewardPunishmentName: '$punishmentCode | PUNISHMENT | DISIPLIN',
+          status: 'disetujui',
+        ),
+      );
 
       AppNotifier.showWarning(
         context,
-        'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.\nSanksi pelanggaran: $punishmentCode',
+        isLateFromIzin
+            ? 'Tercatat masuk di jam $timeStr (Terlambat Izin) untuk $activityName.\nSanksi pelanggaran: $punishmentCode ($pointsToDeduct)'
+            : 'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.\nSanksi pelanggaran: $punishmentCode ($pointsToDeduct)',
       );
     } else {
       AppNotifier.showSuccess(

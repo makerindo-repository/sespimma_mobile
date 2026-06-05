@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class LookupSelectionDialog extends StatefulWidget {
   const LookupSelectionDialog({super.key});
@@ -478,10 +479,8 @@ class _LookupSelectionDialogState extends State<LookupSelectionDialog>
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: AppDimensions.iconDefault,
+                      backgroundImage: AvatarHelper.getAvatar(
+                        serdik['profile_photo'] ?? serdik['profilePhoto'],
                       ),
                     ),
                     const SizedBox(width: AppDimensions.md - 4),

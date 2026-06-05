@@ -10,6 +10,7 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/features/auth/data/datasources/patun_real_data.dart';
 import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
 import 'package:intl/intl.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class EwsScreen extends StatefulWidget {
   const EwsScreen({super.key});
@@ -522,8 +523,8 @@ class _EwsScreenState extends State<EwsScreen>
               color: Colors.grey.shade200,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
-              image: const DecorationImage(
-                image: AssetImage('assets/images/default_avatar.png'),
+              image: DecorationImage(
+                image: AvatarHelper.getAvatar(null),
                 fit: BoxFit.cover,
               ),
             ),
@@ -642,8 +643,8 @@ class _EwsScreenState extends State<EwsScreen>
                     offset: const Offset(0, 2),
                   ),
                 ],
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/default_avatar.png'),
+                image: DecorationImage(
+                  image: AvatarHelper.getAvatar(null),
                   fit: BoxFit.cover,
                 ),
               ),

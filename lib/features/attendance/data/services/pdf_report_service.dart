@@ -4,6 +4,7 @@ import 'package:printing/printing.dart';
 import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:intl/intl.dart';
+import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 
 class PdfReportService {
   static Future<void> generateAndDownloadReport({
@@ -34,11 +35,25 @@ class PdfReportService {
     final String tahunStr = DateFormat('yyyy').format(date);
 
     int total = listSerdik.length;
-    int hadir = total - 3;
-    int kurang = 3;
+
+    final history = PimpinanMockData.serdikAttendanceHistory;
+    final todayHistory = history.where((e) {
+      final dt = e['dateTime'] as DateTime;
+      return dt.year == date.year &&
+          dt.month == date.month &&
+          dt.day == date.day;
+    }).toList();
+
+    int hadir =
+        (total - 3) +
+        todayHistory
+            .where((e) => e['type'] == 'hadir' || e['type'] == 'telat')
+            .length;
+    int ijin = 1 + todayHistory.where((e) => e['type'] == 'izin').length;
+    int alphaCount = todayHistory.where((e) => e['type'] == 'alpha').length;
     int sakit = 1;
-    int ijin = 1;
-    int tk = 1;
+    int tk = 1 + alphaCount;
+    int kurang = sakit + ijin + tk;
 
     final List<AttendanceZone> zones = AttendanceZones.activeZones.isEmpty
         ? List.generate(
@@ -55,6 +70,7 @@ class PdfReportService {
               endTime: date.add(const Duration(hours: 2)),
               deadline: date.add(const Duration(hours: 1)),
               cutoffTime: date.add(const Duration(hours: 1)),
+              createdAt: date.subtract(const Duration(hours: 3)),
             ),
           )
         : AttendanceZones.activeZones;

@@ -2,6 +2,8 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../data/models/final_recap_model.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
+import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
 class ReportCardItem extends StatefulWidget {
   final FinalRecapModel data;
@@ -18,6 +20,17 @@ class _ReportCardItemState extends State<ReportCardItem> {
   static const Color _successGreen = Color(0xFF2E7D32);
   static const Color _dangerRed = Color(0xFFD32F2F);
 
+  String? _getProfilePhoto() {
+    try {
+      final serdik = SerdikRealData.records.firstWhere(
+        (s) => s['no_serdik'] == widget.data.nosis,
+      );
+      return serdik['profile_photo'] as String?;
+    } catch (_) {
+      return null;
+    }
+  }
+
   double _clampScore(double val) {
     if (val > 100.0) return 100.0;
     if (val < 0.0) return 0.0;
@@ -27,6 +40,7 @@ class _ReportCardItemState extends State<ReportCardItem> {
   @override
   Widget build(BuildContext context) {
     final data = widget.data;
+    final photo = _getProfilePhoto();
     final bool isFailed = !data.isPassed;
 
     Color getPredicateColor(double score) {
@@ -95,12 +109,10 @@ class _ReportCardItemState extends State<ReportCardItem> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 22,
-                    backgroundColor: Color(0xFF001C40),
-                    backgroundImage: AssetImage(
-                      'assets/images/default_avatar.png',
-                    ),
+                    backgroundColor: _primaryNavy,
+                    backgroundImage: AvatarHelper.getAvatar(photo),
                   ),
                   const SizedBox(width: AppDimensions.md),
                   Expanded(

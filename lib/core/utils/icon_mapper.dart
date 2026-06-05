@@ -131,4 +131,6 @@ abstract final class AppIcons {
   static const IconData buildings = Icons.business_outlined;
   static const IconData clock = Icons.schedule;
   static const IconData printer = Icons.print;
+  static const IconData envelopeSimpleBold = Icons.mail;
+  static const IconData clockBold = Icons.access_time_filled;
 }

@@ -39,37 +39,9 @@ class _GadikAssignmentDetailScreenState
 
   void _loadSubmissions() {
     setState(() {
-      final targetPokjar = widget.assignment.targetPokjar.toUpperCase();
-      final isSemua =
-          targetPokjar == 'SEMUA POKJAR' || targetPokjar == 'SELURUH POKJAR';
-
-      final matchingSerdik = isSemua
-          ? SerdikRealData.records
-          : SerdikRealData.records.where((s) {
-              final group = s['kelompok_kelas']?.toString().toUpperCase() ?? '';
-              final groupFixed = group
-                  .replaceAll('POKJAR 1', 'POKJAR I')
-                  .replaceAll('POKJAR 2', 'POKJAR II')
-                  .replaceAll('POKJAR 3', 'POKJAR III')
-                  .replaceAll('POKJAR 4', 'POKJAR IV')
-                  .replaceAll('POKJAR 5', 'POKJAR V');
-              return groupFixed == targetPokjar;
-            }).toList();
-
-      _submissions = matchingSerdik.map((serdik) {
-        return GadikSubmissionModel(
-          id: 'SUB-${serdik['no_serdik']}-${widget.assignment.id}',
-          assignmentId: widget.assignment.id,
-          serdikName: serdik['nama_lengkap'] ?? 'Unknown',
-          serdikNrp: serdik['nrp'] ?? '-',
-          serdikPangkat: serdik['pangkat'] ?? '-',
-          serdikNosis: serdik['no_serdik'] ?? '-',
-          submittedAt: DateTime.now().subtract(const Duration(hours: 1)),
-          fileName: 'Tugas_${serdik['nama_lengkap']}.pdf',
-          fileUrl: 'https://example.com/file',
-          isGraded: false,
-        );
-      }).toList();
+      _submissions = GadikAssignmentMockData.submissions
+          .where((s) => s.assignmentId == widget.assignment.id)
+          .toList();
     });
   }
 
@@ -200,6 +172,8 @@ class _GadikAssignmentDetailScreenState
               if (mockIdx != -1) {
                 GadikAssignmentMockData.submissions[mockIdx] =
                     updatedSubmission;
+              } else {
+                GadikAssignmentMockData.submissions.add(updatedSubmission);
               }
             }
           });
@@ -643,7 +617,8 @@ class _GadikAssignmentDetailScreenState
               padding: const EdgeInsets.symmetric(horizontal: AppDimensions.xl),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final sub = _submissions[index];
+                  final submittedList = _submissions.toList();
+                  final sub = submittedList[index];
                   return _buildSubmissionCard(sub);
                 }, childCount: _submissions.length),
               ),
