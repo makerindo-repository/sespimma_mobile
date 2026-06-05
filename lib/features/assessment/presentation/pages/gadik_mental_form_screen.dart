@@ -1165,22 +1165,36 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                         const SizedBox(height: AppDimensions.md),
                     itemBuilder: (context, index) {
                       final opt = filteredList[index];
-                      
+
                       EligibilityStatus eligibility = EligibilityStatus(true);
-                      if (_selectedSerdik != null && _selectedSerdik!['no_serdik'] != null) {
-                        eligibility = RewardPunishmentEligibility.checkEligibility(_selectedSerdik!['no_serdik'], opt);
+                      if (_selectedSerdik != null &&
+                          _selectedSerdik!['no_serdik'] != null) {
+                        eligibility =
+                            RewardPunishmentEligibility.checkEligibility(
+                              _selectedSerdik!['no_serdik'],
+                              opt,
+                            );
                       }
                       final bool isGreyedOut = !eligibility.isEligible;
-                      final Color effectiveColor = isGreyedOut ? Colors.grey.shade400 : pointColor;
+                      final Color effectiveColor = isGreyedOut
+                          ? Colors.grey.shade400
+                          : pointColor;
 
                       return InkWell(
                         onTap: () {
                           if (_selectedSerdik == null) {
-                            AppNotifier.showError(context, "Silakan pilih serdik terlebih dahulu");
+                            AppNotifier.showError(
+                              context,
+                              "Silakan pilih serdik terlebih dahulu",
+                            );
                             return;
                           }
                           if (isGreyedOut) {
-                            AppNotifier.showError(context, eligibility.message ?? "Item ini sudah mencapai batas maksimum");
+                            AppNotifier.showError(
+                              context,
+                              eligibility.message ??
+                                  "Item ini sudah mencapai batas maksimum",
+                            );
                             return;
                           }
                           setState(() => _selectedCategory = opt);
@@ -1192,7 +1206,9 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(AppDimensions.lg),
                           decoration: BoxDecoration(
-                            color: isGreyedOut ? Colors.grey.shade50 : Colors.white,
+                            color: isGreyedOut
+                                ? Colors.grey.shade50
+                                : Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusLg,
@@ -1237,8 +1253,12 @@ class _GadikMentalFormScreenState extends State<GadikMentalFormScreen> {
                                             style: TextStyle(
                                               fontWeight: FontWeight.w800,
                                               fontSize: AppDimensions.fontMd,
-                                              color: isGreyedOut ? Colors.grey.shade500 : _primaryNavy,
-                                              decoration: isGreyedOut ? TextDecoration.lineThrough : null,
+                                              color: isGreyedOut
+                                                  ? Colors.grey.shade500
+                                                  : _primaryNavy,
+                                              decoration: isGreyedOut
+                                                  ? TextDecoration.lineThrough
+                                                  : null,
                                             ),
                                           ),
                                         ),

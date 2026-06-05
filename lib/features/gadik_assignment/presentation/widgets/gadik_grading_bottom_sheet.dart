@@ -221,13 +221,37 @@ class _GadikGradingBottomSheetState extends State<GadikGradingBottomSheet> {
       } else if (jenis.contains('NKP')) {
         SerdikAcademicScores.updateScore(nosis, 'nkp', _calculatedNA);
       } else if (jenis.contains('Simulasi') || jenis.contains('NSK')) {
-        SerdikAcademicScores.updateScore(nosis, 'nsk_keaktifan', _parse(_keaktifanPerseoranganCtrl.text));
-        SerdikAcademicScores.updateScore(nosis, 'nsk_produk', _parse(_produkPerseoranganCtrl.text));
-        SerdikAcademicScores.updateScore(nosis, 'nsk_tata_ruang', _parse(_tataRuangCtrl.text));
+        SerdikAcademicScores.updateScore(
+          nosis,
+          'nsk_keaktifan',
+          _parse(_keaktifanPerseoranganCtrl.text),
+        );
+        SerdikAcademicScores.updateScore(
+          nosis,
+          'nsk_produk',
+          _parse(_produkPerseoranganCtrl.text),
+        );
+        SerdikAcademicScores.updateScore(
+          nosis,
+          'nsk_tata_ruang',
+          _parse(_tataRuangCtrl.text),
+        );
       } else if (jenis.contains('NPTT') || jenis.contains('Taskap')) {
-        SerdikAcademicScores.updateScore(nosis, 'nt_materi', _parse(_materiCtrl.text));
-        SerdikAcademicScores.updateScore(nosis, 'nt_penulisan', _parse(_penulisanCtrl.text));
-        SerdikAcademicScores.updateScore(nosis, 'nt_paparan', _parse(_paparanCtrl.text));
+        SerdikAcademicScores.updateScore(
+          nosis,
+          'nt_materi',
+          _parse(_materiCtrl.text),
+        );
+        SerdikAcademicScores.updateScore(
+          nosis,
+          'nt_penulisan',
+          _parse(_penulisanCtrl.text),
+        );
+        SerdikAcademicScores.updateScore(
+          nosis,
+          'nt_paparan',
+          _parse(_paparanCtrl.text),
+        );
       }
 
       widget.onSaved(s);

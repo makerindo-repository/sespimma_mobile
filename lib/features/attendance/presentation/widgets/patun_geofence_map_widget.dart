@@ -73,7 +73,6 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     _checkPermissionsAndStartTracking();
     _generateMockSerdikData();
 
-    // Timer untuk menarik data real-time dari Backend setiap 10 detik
     _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
       if (mounted) {
         _generateMockSerdikData();
@@ -216,16 +215,14 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     for (int i = 0; i < baseList.length; i++) {
       final serdik = Map<String, dynamic>.from(baseList[i]);
       final noSerdik = serdik['no_serdik']?.toString() ?? '';
-      
-      // Ambil data asli dari Sinkronisasi Backend Tiruan
+
       final backendData = MockBackendDatabase.serdikLocations[noSerdik];
 
-      // Jika serdik belum pernah mengirim lokasi (belum absen / buka app), jangan tampilkan di peta!
       if (backendData == null) continue;
 
       final double lat = backendData['latitude'];
       final double lng = backendData['longitude'];
-      
+
       double distanceOffset = 999999.0;
       if (_zones.isNotEmpty) {
         distanceOffset = distanceCalc.as(
@@ -299,7 +296,8 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     final double distance = serdik['mock_distance'] ?? 999.0;
     final String? profilePhoto = serdik['profile_photo'];
 
-    final bool isInsideZone = _zones.isNotEmpty && distance <= _zones.first.radiusMeters;
+    final bool isInsideZone =
+        _zones.isNotEmpty && distance <= _zones.first.radiusMeters;
     final zoneName = _zones.isNotEmpty ? _zones.first.name : '-';
     final activityName = _zones.isNotEmpty ? _zones.first.activityName : '-';
 
@@ -311,7 +309,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     } else if (status == 'Tanpa Keterangan') {
       badgeColor = Colors.red.shade600;
     } else if (status == 'Sakit') {
-      badgeColor = Colors.pink.shade400; // Merah Muda
+      badgeColor = Colors.pink.shade400;
     }
 
     showModalBottomSheet(
@@ -386,7 +384,10 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                           const SizedBox(height: 8),
                           if (status == 'Izin')
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.blue.shade50,
                                 borderRadius: BorderRadius.circular(12),
@@ -404,7 +405,11 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  Icon(Icons.person, size: 12, color: Colors.blue.shade700),
+                                  Icon(
+                                    Icons.person,
+                                    size: 12,
+                                    color: Colors.blue.shade700,
+                                  ),
                                   const SizedBox(width: 4),
                                   Text(
                                     'AKBP Budi Setiawan',

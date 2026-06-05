@@ -5,7 +5,6 @@ class SerdikPhysicalScores {
 
   static Map<String, dynamic> getScores(String noSerdik) {
     if (!_scores.containsKey(noSerdik)) {
-      // Mock data awal untuk semua serdik
       _scores[noSerdik] = {
         'tes_awal': 85.0,
         'tes_akhir': 85.0,
@@ -14,24 +13,21 @@ class SerdikPhysicalScores {
         'ngb': 85.0,
       };
     }
-    
+
     final data = _scores[noSerdik]!;
-    
+
     final nKes = ScoringCalculator.hitungNKes(
       tesAwal: data['tes_awal'],
       tesAkhir: data['tes_akhir'],
       statusKesehatan: data['status_kesehatan'],
     );
-    
+
     final nJas = ScoringCalculator.hitungNJas(
       nga: data['nga'],
       ngb: data['ngb'],
     );
-    
-    final nKj = ScoringCalculator.hitungNKJ(
-      nKes: nKes,
-      nJas: nJas,
-    );
+
+    final nKj = ScoringCalculator.hitungNKJ(nKes: nKes, nJas: nJas);
 
     return {
       'tes_awal': data['tes_awal'],
@@ -47,7 +43,7 @@ class SerdikPhysicalScores {
 
   static void updateScore(String noSerdik, String category, double score) {
     if (!_scores.containsKey(noSerdik)) {
-      getScores(noSerdik); // Initialize if not present
+      getScores(noSerdik);
     }
     _scores[noSerdik]![category] = score;
   }

@@ -20,9 +20,13 @@ class PatunMentalDetailScreen extends StatelessWidget {
 
   List<Map<String, dynamic>> _getDynamicActivities() {
     final String noSerdik = (serdik['no_serdik'] as String?) ?? '-';
-    
+
     final approvedItems = KorsisInboxMockData.items
-        .where((item) => (item.status == 'Setuju' || item.status == 'approved') && item.nosis == noSerdik)
+        .where(
+          (item) =>
+              (item.status == 'Setuju' || item.status == 'approved') &&
+              item.nosis == noSerdik,
+        )
         .toList();
 
     approvedItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
@@ -32,7 +36,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
 
     String dateStr(DateTime dt) {
       const m = [
-        'Januari', // 0-index fallback
+        'Januari',
         'Januari',
         'Februari',
         'Maret',
@@ -364,14 +368,7 @@ class PatunMentalDetailScreen extends StatelessWidget {
       ];
     }
 
-    // Di backend, ini akan merepresentasikan bulan saat ini (misal: Mg 1 Juni)
-    // namun secara UI hanya ditampilkan Mg 1, Mg 2, dll agar lebih bersih.
-    final dynamicTitles = [
-      'Mg 1',
-      'Mg 2',
-      'Mg 3',
-      'Mg 4',
-    ];
+    final dynamicTitles = ['Mg 1', 'Mg 2', 'Mg 3', 'Mg 4'];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -845,12 +842,17 @@ class PatunMentalDetailScreen extends StatelessWidget {
     double pdPoints = 0.0;
     double penampilanPoints = 0.0;
 
-    final approvedItems = KorsisInboxMockData.items
-        .where((item) => (item.status == 'Setuju' || item.status == 'approved') && item.nosis == noSerdik);
+    final approvedItems = KorsisInboxMockData.items.where(
+      (item) =>
+          (item.status == 'Setuju' || item.status == 'approved') &&
+          item.nosis == noSerdik,
+    );
 
     for (var item in approvedItems) {
       if (item.rewardPunishmentId != null) {
-        final rules = RewardPunishmentData.rules.where((r) => r.id == item.rewardPunishmentId);
+        final rules = RewardPunishmentData.rules.where(
+          (r) => r.id == item.rewardPunishmentId,
+        );
         if (rules.isNotEmpty) {
           final aspect = rules.first.aspect;
           switch (aspect) {
@@ -878,16 +880,26 @@ class PatunMentalDetailScreen extends StatelessWidget {
         ? ((scores['moral'] as num).toDouble() + moralPoints).clamp(0, 100)
         : (base + 1.2 + moralPoints).clamp(0, 100);
     final double disiplin = scores != null
-        ? ((scores['disiplin'] as num).toDouble() + disiplinPoints).clamp(0, 100)
+        ? ((scores['disiplin'] as num).toDouble() + disiplinPoints).clamp(
+            0,
+            100,
+          )
         : (base + 0.5 + disiplinPoints).clamp(0, 100);
     final double kepemimpinan = scores != null
-        ? ((scores['kepemimpinan'] as num).toDouble() + kepemimpinanPoints).clamp(0, 100)
+        ? ((scores['kepemimpinan'] as num).toDouble() + kepemimpinanPoints)
+              .clamp(0, 100)
         : (base - 0.2 + kepemimpinanPoints).clamp(0, 100);
     final double pengendalianDiri = scores != null
-        ? ((scores['pengendalian_diri'] as num).toDouble() + pdPoints).clamp(0, 100)
+        ? ((scores['pengendalian_diri'] as num).toDouble() + pdPoints).clamp(
+            0,
+            100,
+          )
         : (base + 1.5 + pdPoints).clamp(0, 100);
     final double penampilan = scores != null
-        ? ((scores['penampilan'] as num).toDouble() + penampilanPoints).clamp(0, 100)
+        ? ((scores['penampilan'] as num).toDouble() + penampilanPoints).clamp(
+            0,
+            100,
+          )
         : (base - 1.0 + penampilanPoints).clamp(0, 100);
     final double sosiometriAwal = scores != null
         ? (scores['sosiometri_awal'] as num).toDouble()

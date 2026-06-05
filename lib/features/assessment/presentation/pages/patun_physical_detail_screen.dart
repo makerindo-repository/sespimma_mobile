@@ -24,8 +24,6 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
 
   late AnimationController _animController;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -53,8 +51,18 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
 
   String _formatDate(DateTime dt) {
     final indonesianMonths = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     final month = indonesianMonths[dt.month - 1];
     return '${dt.day.toString().padLeft(2, '0')} $month ${dt.year}, ${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
@@ -96,7 +104,7 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
         'date': dt,
       });
     }
-    
+
     if (data.nilaiB != null) {
       final dt = DateTime.now().subtract(const Duration(days: 2));
       list.add({
@@ -109,7 +117,9 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
       });
     }
 
-    list.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
+    list.sort(
+      (a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime),
+    );
     return list;
   }
 
@@ -118,10 +128,10 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
     final name = widget.serdik['nama_lengkap'] ?? '-';
     final noSerdik = widget.serdik['no_serdik'] ?? '-';
     final pangkat = widget.serdik['pangkat'] ?? '-';
-    
+
     final physicalScores = SerdikPhysicalScores.getScores(noSerdik);
     final double score = (physicalScores['nKj'] as num?)?.toDouble() ?? 0.0;
-    
+
     final String status = score >= 70 ? 'LULUS' : 'TIDAK LULUS';
     final String? profilePhoto =
         widget.serdik['profile_photo'] ?? widget.serdik['profilePhoto'];
@@ -337,9 +347,12 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
 
   Widget _buildHealthScoresSection(String noSerdik) {
     final physicalScores = SerdikPhysicalScores.getScores(noSerdik);
-    final double scoreA = (physicalScores['tes_awal'] as num?)?.toDouble() ?? 0.0;
-    final double scoreB = (physicalScores['tes_akhir'] as num?)?.toDouble() ?? 0.0;
-    final double scoreC = (physicalScores['status_kesehatan'] as num?)?.toDouble() ?? 0.0;
+    final double scoreA =
+        (physicalScores['tes_awal'] as num?)?.toDouble() ?? 0.0;
+    final double scoreB =
+        (physicalScores['tes_akhir'] as num?)?.toDouble() ?? 0.0;
+    final double scoreC =
+        (physicalScores['status_kesehatan'] as num?)?.toDouble() ?? 0.0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -628,17 +641,12 @@ class _PatunPhysicalDetailScreenState extends State<PatunPhysicalDetailScreen>
             _buildSubScoreItem('Lari / Jalan 12 Menit', scoreA),
           ]),
           const SizedBox(height: AppDimensions.sm),
-          _buildScoreGroup(
-            'Samapta B',
-            '',
-            scoreB,
-            [
-              _buildSubScoreItem('Pull Up (1 menit)', scoreB),
-              _buildSubScoreItem('Sit Up (1 menit)', scoreB),
-              _buildSubScoreItem('Push Up (1 menit)', scoreB),
-              _buildSubScoreItem('Shuttle Run 6x10m', scoreB),
-            ],
-          ),
+          _buildScoreGroup('Samapta B', '', scoreB, [
+            _buildSubScoreItem('Pull Up (1 menit)', scoreB),
+            _buildSubScoreItem('Sit Up (1 menit)', scoreB),
+            _buildSubScoreItem('Push Up (1 menit)', scoreB),
+            _buildSubScoreItem('Shuttle Run 6x10m', scoreB),
+          ]),
           const SizedBox(height: AppDimensions.lg),
         ],
       ),

@@ -73,16 +73,17 @@ class PimpinanMockData {
     final List<Map<String, dynamic>> results = List.from(_manualAttendances);
     final now = DateTime.now();
 
-    // Parse Izin from inbox
     for (var inbox in KorsisInboxMockData.items) {
-      if (inbox.rewardPunishmentName.toLowerCase().contains('izin') && inbox.status == 'disetujui') {
+      if (inbox.rewardPunishmentName.toLowerCase().contains('izin') &&
+          inbox.status == 'disetujui') {
         final existing = results.any((r) => r['id'] == 'izin_${inbox.id}');
         if (!existing) {
           results.add({
             'id': 'izin_${inbox.id}',
             'title': 'Izin Kegiatan',
             'date': _getFormattedDateFrom(inbox.timestamp),
-            'time': '${inbox.timestamp.hour.toString().padLeft(2, '0')}:${inbox.timestamp.minute.toString().padLeft(2, '0')} WIB',
+            'time':
+                '${inbox.timestamp.hour.toString().padLeft(2, '0')}:${inbox.timestamp.minute.toString().padLeft(2, '0')} WIB',
             'dateTime': inbox.timestamp,
             'status': 'Izin',
             'type': 'izin',
@@ -96,10 +97,11 @@ class PimpinanMockData {
       }
     }
 
-    // Parse Alpha/Tanpa Keterangan from missed zones
     for (var zone in AttendanceZones.activeZones) {
       if (now.isAfter(zone.cutoffTime)) {
-        final attended = results.any((r) => r['title'] == zone.name || r['title'] == zone.activityName);
+        final attended = results.any(
+          (r) => r['title'] == zone.name || r['title'] == zone.activityName,
+        );
         if (!attended) {
           results.add({
             'id': 'alpha_${zone.id}',
@@ -119,7 +121,10 @@ class PimpinanMockData {
       }
     }
 
-    results.sort((a, b) => (b['dateTime'] as DateTime).compareTo(a['dateTime'] as DateTime));
+    results.sort(
+      (a, b) =>
+          (b['dateTime'] as DateTime).compareTo(a['dateTime'] as DateTime),
+    );
     return results;
   }
 
@@ -128,8 +133,29 @@ class PimpinanMockData {
   }
 
   static String _getFormattedDateFrom(DateTime target) {
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    const days = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
     final dayIndex = target.weekday == 7 ? 0 : target.weekday;
     return '${days[dayIndex]}, ${target.day} ${months[target.month - 1]} ${target.year}';
   }
@@ -272,5 +298,4 @@ class PimpinanMockData {
       createdByName: 'KOMPOL Reza Mahendra',
     ),
   ];
-
 }

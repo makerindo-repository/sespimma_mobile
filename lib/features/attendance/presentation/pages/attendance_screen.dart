@@ -51,9 +51,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       parent: _chipController,
       curve: Curves.elasticOut,
     );
-    
-    // AKTIFKAN BACKGROUND LOCATION SYNC KE BACKEND (Pondasi Arsitektur)
-    // Di aplikasi nyata, NRP ini didapatkan dari User Provider / AuthBloc
+
     LocationSyncService().startSyncing('202602003001');
   }
 

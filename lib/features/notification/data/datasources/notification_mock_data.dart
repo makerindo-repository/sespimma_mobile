@@ -121,12 +121,14 @@ class NotificationMockData {
     }
 
     if (SociometryPeriodConfig.isAwalActive()) {
-      if (SociometryPeriodConfig.getFilledCount() < SociometryPeriodConfig.getTotalCount()) {
+      if (SociometryPeriodConfig.getFilledCount() <
+          SociometryPeriodConfig.getTotalCount()) {
         final phaseStart = SociometryPeriodConfig.awalStartDate;
         items.add({
           'id': 'soc_awal',
           'title': 'Sosiometri Awal',
-          'message': 'Penilaian terhadap sesama peleton sudah mulai, lihat pada beranda untuk mengisi kolom sosiometri.',
+          'message':
+              'Penilaian terhadap sesama peleton sudah mulai, lihat pada beranda untuk mengisi kolom sosiometri.',
           'dateTime': phaseStart,
           'isRead': false,
           'type': 'sosiometri_start',
@@ -134,11 +136,14 @@ class NotificationMockData {
         });
         unread++;
       } else {
-        final fillDate = SociometryPeriodConfig.awalStartDate.add(const Duration(days: 1, hours: 14, minutes: 30));
+        final fillDate = SociometryPeriodConfig.awalStartDate.add(
+          const Duration(days: 1, hours: 14, minutes: 30),
+        );
         items.add({
           'id': 'soc_awal_done',
           'title': 'Sosiometri Selesai',
-          'message': 'Selamat kamu telah mengisi sosiometri awal semuanya. Kamu merupakan orang yang paling rajin',
+          'message':
+              'Selamat kamu telah mengisi sosiometri awal semuanya. Kamu merupakan orang yang paling rajin',
           'dateTime': fillDate,
           'isRead': false,
           'type': 'sosiometri_done',
@@ -147,12 +152,14 @@ class NotificationMockData {
         unread++;
       }
     } else if (SociometryPeriodConfig.isAkhirActive()) {
-      if (SociometryPeriodConfig.getFilledCount() < SociometryPeriodConfig.getTotalCount()) {
+      if (SociometryPeriodConfig.getFilledCount() <
+          SociometryPeriodConfig.getTotalCount()) {
         final phaseStart = SociometryPeriodConfig.akhirStartDate;
         items.add({
           'id': 'soc_akhir',
           'title': 'Sosiometri Akhir',
-          'message': 'Penilaian terhadap sesama peleton akan berakhir 3 hari lagi, jangan lupa untuk menuntaskan pemberian nilai',
+          'message':
+              'Penilaian terhadap sesama peleton akan berakhir 3 hari lagi, jangan lupa untuk menuntaskan pemberian nilai',
           'dateTime': phaseStart,
           'isRead': false,
           'type': 'sosiometri_reminder',
@@ -160,11 +167,14 @@ class NotificationMockData {
         });
         unread++;
       } else {
-        final fillDate = SociometryPeriodConfig.akhirStartDate.add(const Duration(days: 1, hours: 14, minutes: 30));
+        final fillDate = SociometryPeriodConfig.akhirStartDate.add(
+          const Duration(days: 1, hours: 14, minutes: 30),
+        );
         items.add({
           'id': 'soc_akhir_done',
           'title': 'Sosiometri Selesai',
-          'message': 'Selamat kamu telah mengisi sosiometri akhir semuanya. Kamu merupakan orang yang paling rajin',
+          'message':
+              'Selamat kamu telah mengisi sosiometri akhir semuanya. Kamu merupakan orang yang paling rajin',
           'dateTime': fillDate,
           'isRead': false,
           'type': 'sosiometri_done',

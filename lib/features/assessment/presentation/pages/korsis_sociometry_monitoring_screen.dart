@@ -60,8 +60,6 @@ class _KorsisSociometryMonitoringScreenState
   int _getFilledEvaluations(String nrp, int totalSerdik) {
     if (!_isCurrentPhaseActive && !_isCurrentPhaseClosed) return 0;
 
-    // INTEGRASI LOKAL DINAMIS: Menghubungkan secara real-time pengisian sosiometri Serdik
-    // (mock menggunakan NRP 77110075) dengan layar pantauan Korsis.
     if (nrp == '77110075') {
       final peers = _isPhaseAwal
           ? SociometryPeriodConfig.peersAwal
@@ -71,8 +69,6 @@ class _KorsisSociometryMonitoringScreenState
 
       if (totalPeers == 0) return 0;
 
-      // Scaling agar persentase yang dikerjakan Serdik (dari 15 mock peer)
-      // akurat terkonversi ke ukuran pokjar yang sesungguhnya (30 serdik).
       return ((evaluated / totalPeers) * totalSerdik).round();
     }
 

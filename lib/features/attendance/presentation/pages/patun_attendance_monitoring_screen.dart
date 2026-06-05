@@ -55,7 +55,10 @@ class _PatunAttendanceMonitoringScreenState
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.description_rounded, color: Colors.white),
+                icon: const Icon(
+                  Icons.description_rounded,
+                  color: Colors.white,
+                ),
                 tooltip: 'Laporan Absen',
                 onPressed: () => _goToLaporan(context, userPokjar),
               ),

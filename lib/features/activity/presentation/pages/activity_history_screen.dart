@@ -32,8 +32,18 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
 
   String _getDynamicDateStr(DateTime target) {
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     final monthName = months[target.month - 1];
     final dayStr = target.day.toString().padLeft(2, '0');
@@ -77,13 +87,20 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
         final filledCount = SociometryPeriodConfig.getFilledCount();
         if (filledCount > 0) {
           final totalCount = SociometryPeriodConfig.getTotalCount();
-          final phase = SociometryPeriodConfig.isAkhirActive() ? 'Akhir' : 'Awal';
-          final phaseStart = SociometryPeriodConfig.isAkhirActive() ? SociometryPeriodConfig.akhirStartDate : SociometryPeriodConfig.awalStartDate;
-          final fillDate = phaseStart.add(const Duration(days: 1, hours: 14, minutes: 30));
+          final phase = SociometryPeriodConfig.isAkhirActive()
+              ? 'Akhir'
+              : 'Awal';
+          final phaseStart = SociometryPeriodConfig.isAkhirActive()
+              ? SociometryPeriodConfig.akhirStartDate
+              : SociometryPeriodConfig.awalStartDate;
+          final fillDate = phaseStart.add(
+            const Duration(days: 1, hours: 14, minutes: 30),
+          );
           list.add({
             'id': 'act_dyn_sosiometri',
             'title': 'Pengisian Sosiometri $phase',
-            'subtitle': 'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
+            'subtitle':
+                'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
             'timeRaw': _formatDynamicTime(fillDate),
             'date': _getDynamicDateStr(fillDate),
             'dateTime': fillDate,
@@ -93,12 +110,13 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
         }
       }
 
-
       for (var inbox in KorsisInboxMockData.items) {
         if (inbox.status == 'disetujui') {
           final isReward = inbox.isReward;
           final typeStr = isReward ? 'reward' : 'punishment';
-          final pointStr = isReward ? '+${inbox.points.toStringAsFixed(2)}' : inbox.points.toStringAsFixed(2);
+          final pointStr = isReward
+              ? '+${inbox.points.toStringAsFixed(2)}'
+              : inbox.points.toStringAsFixed(2);
           list.add({
             'id': inbox.id,
             'title': inbox.rewardPunishmentName,
@@ -117,7 +135,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
         list.add({
           'id': 'zone_${zone.id}',
           'title': zone.activityName,
-          'subtitle': '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
+          'subtitle':
+              '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
           'timeRaw': _formatDynamicTime(zone.startTime),
           'date': _getDynamicDateStr(zone.startTime),
           'dateTime': zone.startTime,
@@ -131,7 +150,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Segera kumpulkan tugas sebelum tenggat waktu ${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)}.',
+            'subtitle':
+                'Segera kumpulkan tugas sebelum tenggat waktu ${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)}.',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -142,7 +162,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
+            'subtitle':
+                'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -153,7 +174,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera',
+            'subtitle':
+                'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -164,7 +186,8 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)})',
+            'subtitle':
+                'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)})',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -173,14 +196,16 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
           });
         }
       }
-
     } else if (role == 'gadik' || role == 'patun' || role == 'instruktur') {
       if (SociometryPeriodConfig.isAnyActive()) {
         list.add({
           'id': 'act_gadik_dyn_sosiometri',
           'title': 'Memonitor Progres Sosiometri',
-          'subtitle': 'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
-          'timeRaw': _formatDynamicTime(today.subtract(const Duration(hours: 1))),
+          'subtitle':
+              'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
+          'timeRaw': _formatDynamicTime(
+            today.subtract(const Duration(hours: 1)),
+          ),
           'date': _getDynamicDateStr(today),
           'dateTime': today,
           'points': '',
@@ -189,7 +214,6 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
       }
     }
 
-    // Sort descending: terbaru (DateTime.now) di atas, terlama di bawah
     list.sort((a, b) {
       final dtA = a['dateTime'] as DateTime;
       final dtB = b['dateTime'] as DateTime;
@@ -211,7 +235,13 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
   static const Color _lightGrey = AppColors.background;
 
   late String _selectedFilter;
-  final List<String> _filters = ['Semua', 'Reward', 'Punishment', 'Tugas', 'Zona'];
+  final List<String> _filters = [
+    'Semua',
+    'Reward',
+    'Punishment',
+    'Tugas',
+    'Zona',
+  ];
   DateTimeRange? _selectedDateRange;
 
   Future<void> _pickDateRange() async {
@@ -374,13 +404,18 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
                 if (_selectedFilter == 'Punishment') {
                   return a['type'] == 'punishment';
                 }
-                if (_selectedFilter == 'Tugas') return a['type'] == 'task' || a['type'] == 'task_dikirim' || a['type'] == 'task_dinilai' || a['type'] == 'task_remedial';
+                if (_selectedFilter == 'Tugas') {
+                  return a['type'] == 'task' ||
+                      a['type'] == 'task_dikirim' ||
+                      a['type'] == 'task_dinilai' ||
+                      a['type'] == 'task_remedial';
+                }
                 if (_selectedFilter == 'Zona') return a['type'] == 'zone';
                 return true;
               }).toList();
 
-        // LinkedHashMap preserves insertion order (already sorted descending)
-        final LinkedHashMap<String, List<Map<String, dynamic>>> groupedActivities = LinkedHashMap();
+        final LinkedHashMap<String, List<Map<String, dynamic>>>
+        groupedActivities = LinkedHashMap();
         for (var activity in filteredActivities) {
           final date = activity['date'] as String;
           if (!groupedActivities.containsKey(date)) {

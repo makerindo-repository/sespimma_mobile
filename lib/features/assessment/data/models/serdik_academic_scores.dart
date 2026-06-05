@@ -5,7 +5,6 @@ class SerdikAcademicScores {
 
   static Map<String, dynamic> getScores(String noSerdik) {
     if (!_scores.containsKey(noSerdik)) {
-      // Mock data awal untuk semua serdik
       _scores[noSerdik] = {
         'nump': 85.0,
         'nkkp': 80.0,
@@ -19,33 +18,29 @@ class SerdikAcademicScores {
         'nt_paparan': 82.0,
       };
     }
-    
+
     final data = _scores[noSerdik]!;
-    
+
     final np = ScoringCalculator.hitungNP(
       nump: data['nump'],
       nkkp: data['nkkp'],
       npkp: data['npkp'],
       nkp: data['nkp'],
     );
-    
+
     final nsk = ScoringCalculator.hitungNSK(
       keaktifan: data['nsk_keaktifan'],
       produk: data['nsk_produk'],
       tataRuang: data['nsk_tata_ruang'],
     );
-    
+
     final nt = ScoringCalculator.hitungNT(
       nam: data['nt_materi'],
       nkm: data['nt_penulisan'],
       nkp: data['nt_paparan'],
     );
-    
-    final na = ScoringCalculator.hitungNA(
-      np: np,
-      nsk: nsk,
-      nt: nt,
-    );
+
+    final na = ScoringCalculator.hitungNA(np: np, nsk: nsk, nt: nt);
 
     return {
       'nump': data['nump'],
@@ -67,7 +62,7 @@ class SerdikAcademicScores {
 
   static void updateScore(String noSerdik, String category, double score) {
     if (!_scores.containsKey(noSerdik)) {
-      getScores(noSerdik); // Initialize if not present
+      getScores(noSerdik);
     }
     _scores[noSerdik]![category] = score;
   }

@@ -219,11 +219,27 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
                     if (val != null) {
                       final catatan = noteController.text.trim();
                       if (type == 'A') {
-                        HealthMonitoringData.updateNilaiA(noSerdik, val, catatan: catatan.isEmpty ? null : catatan);
-                        SerdikPhysicalScores.updateScore(noSerdik, 'tes_awal', val);
+                        HealthMonitoringData.updateNilaiA(
+                          noSerdik,
+                          val,
+                          catatan: catatan.isEmpty ? null : catatan,
+                        );
+                        SerdikPhysicalScores.updateScore(
+                          noSerdik,
+                          'tes_awal',
+                          val,
+                        );
                       } else {
-                        HealthMonitoringData.updateNilaiB(noSerdik, val, catatan: catatan.isEmpty ? null : catatan);
-                        SerdikPhysicalScores.updateScore(noSerdik, 'tes_akhir', val);
+                        HealthMonitoringData.updateNilaiB(
+                          noSerdik,
+                          val,
+                          catatan: catatan.isEmpty ? null : catatan,
+                        );
+                        SerdikPhysicalScores.updateScore(
+                          noSerdik,
+                          'tes_akhir',
+                          val,
+                        );
                       }
                       widget.onDataChanged();
                       Navigator.pop(context);

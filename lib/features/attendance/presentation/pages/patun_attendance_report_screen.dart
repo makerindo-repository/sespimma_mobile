@@ -22,7 +22,7 @@ class _PatunAttendanceReportScreenState
   void _generateAndDownloadPdf() async {
     if (_isGenerating) return;
     setState(() => _isGenerating = true);
-    
+
     HapticFeedback.mediumImpact();
     AppNotifier.showSuccess(context, 'Membuat laporan PDF...');
 
@@ -51,7 +51,10 @@ class _PatunAttendanceReportScreenState
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -68,24 +71,23 @@ class _PatunAttendanceReportScreenState
             tooltip: 'Filter Tanggal',
             onPressed: () {
               HapticFeedback.selectionClick();
-              // TODO: Implement date filter
             },
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppDimensions.lg),
-        children: [
-          _buildDateSection('05 Juni 2026'),
-          _buildReportCard(),
-        ],
+        children: [_buildDateSection('05 Juni 2026'), _buildReportCard()],
       ),
     );
   }
 
   Widget _buildDateSection(String dateStr) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppDimensions.md, left: AppDimensions.xs),
+      padding: const EdgeInsets.only(
+        bottom: AppDimensions.md,
+        left: AppDimensions.xs,
+      ),
       child: Text(
         dateStr,
         style: TextStyle(
@@ -108,10 +110,7 @@ class _PatunAttendanceReportScreenState
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-            border: Border.all(
-              color: Colors.grey.shade200,
-              width: 1.5,
-            ),
+            border: Border.all(color: Colors.grey.shade200, width: 1.5),
           ),
           child: Row(
             children: [

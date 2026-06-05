@@ -222,16 +222,10 @@ class _PatunSenatValidationSheetState extends State<PatunSenatValidationSheet> {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(
-                      0xFF1A237E,
-                    ).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(
-                      AppDimensions.radiusMd,
-                    ),
+                    color: const Color(0xFF1A237E).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                     border: Border.all(
-                      color: const Color(
-                        0xFF1A237E,
-                      ).withValues(alpha: 0.2),
+                      color: const Color(0xFF1A237E).withValues(alpha: 0.2),
                     ),
                   ),
                   child: Row(

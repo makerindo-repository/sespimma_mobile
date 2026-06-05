@@ -122,12 +122,27 @@ class _NotificationScreenState extends State<NotificationScreen>
                     dt.isBefore(end.add(const Duration(seconds: 1)));
               }).toList();
 
-        final LinkedHashMap<String, List<Map<String, dynamic>>> groupedNotifs = LinkedHashMap();
+        final LinkedHashMap<String, List<Map<String, dynamic>>> groupedNotifs =
+            LinkedHashMap();
         for (var notif in filteredNotifs) {
           final dt = notif['dateTime'] as DateTime;
-          final months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-          final date = '${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year}';
-          
+          final months = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember',
+          ];
+          final date =
+              '${dt.day.toString().padLeft(2, '0')} ${months[dt.month - 1]} ${dt.year}';
+
           if (!groupedNotifs.containsKey(date)) {
             groupedNotifs[date] = [];
           }
@@ -278,8 +293,12 @@ class _NotificationScreenState extends State<NotificationScreen>
                                       direction: DismissDirection.endToStart,
                                       background: Container(
                                         alignment: Alignment.centerRight,
-                                        padding: const EdgeInsets.only(right: 20.0),
-                                        margin: const EdgeInsets.only(bottom: 12),
+                                        padding: const EdgeInsets.only(
+                                          right: 20.0,
+                                        ),
+                                        margin: const EdgeInsets.only(
+                                          bottom: 12,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFD32F2F),
                                           borderRadius: BorderRadius.circular(
@@ -294,13 +313,20 @@ class _NotificationScreenState extends State<NotificationScreen>
                                       ),
                                       onDismissed: (direction) {
                                         HapticFeedback.mediumImpact();
-                                        final String deletedId = notif['id'] as String;
+                                        final String deletedId =
+                                            notif['id'] as String;
                                         setState(() {
-                                          NotificationMockData.items.removeWhere(
-                                            (item) => item['id'] == deletedId,
-                                          );
-                                          NotificationMockData.unreadCountNotifier.value =
-                                              NotificationMockData.items.where((i) => !i['isRead']).length;
+                                          NotificationMockData.items
+                                              .removeWhere(
+                                                (item) =>
+                                                    item['id'] == deletedId,
+                                              );
+                                          NotificationMockData
+                                              .unreadCountNotifier
+                                              .value = NotificationMockData
+                                              .items
+                                              .where((i) => !i['isRead'])
+                                              .length;
                                         });
                                         AppNotifier.showSuccess(
                                           context,
@@ -309,11 +335,16 @@ class _NotificationScreenState extends State<NotificationScreen>
                                       },
                                       child: _AnimatedNotificationTile(
                                         notification: notif,
-                                        animation: const AlwaysStoppedAnimation(1.0),
+                                        animation: const AlwaysStoppedAnimation(
+                                          1.0,
+                                        ),
                                         onTap: () {
-                                          final String currentId = notif['id'] as String;
+                                          final String currentId =
+                                              notif['id'] as String;
                                           setState(() {
-                                            NotificationMockData.markAsRead(currentId);
+                                            NotificationMockData.markAsRead(
+                                              currentId,
+                                            );
                                           });
                                         },
                                       ),

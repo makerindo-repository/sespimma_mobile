@@ -98,10 +98,10 @@ class _PatunMentalActivityHistoryScreenState
     ];
     final start = range.start;
     final end = range.end;
-    
+
     final startDay = start.day.toString().padLeft(2, '0');
     final endDay = end.day.toString().padLeft(2, '0');
-    
+
     if (start.year == end.year &&
         start.month == end.month &&
         start.day == end.day) {
@@ -126,38 +126,44 @@ class _PatunMentalActivityHistoryScreenState
         scrollDirection: Axis.horizontal,
         children: [
           if (hasStatusFilter)
-            Builder(builder: (context) {
-              final statusColor = _selectedFilter == 'Reward'
-                  ? const Color(0xFF1B5E20)
-                  : const Color(0xFFB71C1C);
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: InputChip(
-                  label: Text(
-                    'Kategori: $_selectedFilter',
-                    style: TextStyle(
-                      fontSize: AppDimensions.fontMd,
-                      fontWeight: FontWeight.w700,
+            Builder(
+              builder: (context) {
+                final statusColor = _selectedFilter == 'Reward'
+                    ? const Color(0xFF1B5E20)
+                    : const Color(0xFFB71C1C);
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: InputChip(
+                    label: Text(
+                      'Kategori: $_selectedFilter',
+                      style: TextStyle(
+                        fontSize: AppDimensions.fontMd,
+                        fontWeight: FontWeight.w700,
+                        color: statusColor,
+                      ),
+                    ),
+                    backgroundColor: statusColor.withValues(alpha: 0.06),
+                    deleteIcon: Icon(
+                      AppIcons.xCircle,
+                      size: AppDimensions.iconSm,
                       color: statusColor,
                     ),
+                    onDeleted: () {
+                      setState(() => _selectedFilter = 'Semua');
+                      _animController.forward(from: 0.0);
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusFull,
+                      ),
+                      side: BorderSide(
+                        color: statusColor.withValues(alpha: 0.2),
+                      ),
+                    ),
                   ),
-                  backgroundColor: statusColor.withValues(alpha: 0.06),
-                  deleteIcon: Icon(
-                    AppIcons.xCircle,
-                    size: AppDimensions.iconSm,
-                    color: statusColor,
-                  ),
-                  onDeleted: () {
-                    setState(() => _selectedFilter = 'Semua');
-                    _animController.forward(from: 0.0);
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
-                    side: BorderSide(color: statusColor.withValues(alpha: 0.2)),
-                  ),
-                ),
-              );
-            }),
+                );
+              },
+            ),
           if (hasDateFilter)
             Padding(
               padding: const EdgeInsets.only(right: 8.0),

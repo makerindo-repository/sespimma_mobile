@@ -4,7 +4,6 @@ import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
-
 class PatunAcademicDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdik;
 
@@ -18,10 +17,10 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     final name = serdik['nama_lengkap'] ?? '-';
     final noSerdik = serdik['no_serdik'] ?? '-';
     final pangkat = serdik['pangkat'] ?? '-';
-    
+
     final academicScores = SerdikAcademicScores.getScores(noSerdik);
     final double score = (academicScores['na'] as num?)?.toDouble() ?? 0.0;
-    
+
     final String status = score >= 70 ? 'LULUS' : 'TIDAK LULUS';
     final String? profilePhoto =
         serdik['profile_photo'] ?? serdik['profilePhoto'];
@@ -216,7 +215,7 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     double npkpKeaktifan = npkp;
     double nkpMateri = nkp;
     double nkpPaparan = nkp;
-    
+
     double baseScore = na;
     String status = na >= 70 ? 'Aman' : 'Warning';
 

@@ -68,8 +68,18 @@ class _HomeScreenState extends State<HomeScreen>
 
   String _getDynamicDateStr(DateTime target) {
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     final monthName = months[target.month - 1];
     final dayStr = target.day.toString().padLeft(2, '0');
@@ -101,13 +111,20 @@ class _HomeScreenState extends State<HomeScreen>
         final filledCount = SociometryPeriodConfig.getFilledCount();
         if (filledCount > 0) {
           final totalCount = SociometryPeriodConfig.getTotalCount();
-          final phase = SociometryPeriodConfig.isAkhirActive() ? 'Akhir' : 'Awal';
-          final phaseStart = SociometryPeriodConfig.isAkhirActive() ? SociometryPeriodConfig.akhirStartDate : SociometryPeriodConfig.awalStartDate;
-          final fillDate = phaseStart.add(const Duration(days: 1, hours: 14, minutes: 30));
+          final phase = SociometryPeriodConfig.isAkhirActive()
+              ? 'Akhir'
+              : 'Awal';
+          final phaseStart = SociometryPeriodConfig.isAkhirActive()
+              ? SociometryPeriodConfig.akhirStartDate
+              : SociometryPeriodConfig.awalStartDate;
+          final fillDate = phaseStart.add(
+            const Duration(days: 1, hours: 14, minutes: 30),
+          );
           list.add({
             'id': 'act_dyn_sosiometri',
             'title': 'Pengisian Sosiometri $phase',
-            'subtitle': 'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
+            'subtitle':
+                'Telah berhasil mengisi partisipasi evaluasi sosiometri untuk $filledCount / $totalCount rekan peleton.',
             'timeRaw': _formatDynamicTime(fillDate),
             'date': _getDynamicDateStr(fillDate),
             'dateTime': fillDate,
@@ -121,7 +138,9 @@ class _HomeScreenState extends State<HomeScreen>
         if (inbox.status == 'disetujui') {
           final isReward = inbox.isReward;
           final typeStr = isReward ? 'reward' : 'punishment';
-          final pointStr = isReward ? '+${inbox.points.toStringAsFixed(2)}' : inbox.points.toStringAsFixed(2);
+          final pointStr = isReward
+              ? '+${inbox.points.toStringAsFixed(2)}'
+              : inbox.points.toStringAsFixed(2);
           list.add({
             'id': inbox.id,
             'title': inbox.rewardPunishmentName,
@@ -140,7 +159,8 @@ class _HomeScreenState extends State<HomeScreen>
         list.add({
           'id': 'zone_${zone.id}',
           'title': zone.activityName,
-          'subtitle': '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
+          'subtitle':
+              '${zone.name} telah dibuat oleh ${_getGadikFullName(zone.creator)}. Segera melakukan presensi.',
           'timeRaw': _formatDynamicTime(zone.startTime),
           'date': _getDynamicDateStr(zone.startTime),
           'dateTime': zone.startTime,
@@ -154,7 +174,8 @@ class _HomeScreenState extends State<HomeScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Segera kumpulkan tugas sebelum tenggat waktu ${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)}.',
+            'subtitle':
+                'Segera kumpulkan tugas sebelum tenggat waktu ${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)}.',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -165,7 +186,8 @@ class _HomeScreenState extends State<HomeScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
+            'subtitle':
+                'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -176,7 +198,8 @@ class _HomeScreenState extends State<HomeScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera',
+            'subtitle':
+                'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -187,7 +210,8 @@ class _HomeScreenState extends State<HomeScreen>
           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle': 'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)})',
+            'subtitle':
+                'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)})',
             'timeRaw': _formatDynamicTime(task.createdAt),
             'date': _getDynamicDateStr(task.createdAt),
             'dateTime': task.createdAt,
@@ -196,14 +220,16 @@ class _HomeScreenState extends State<HomeScreen>
           });
         }
       }
-
     } else if (role == 'gadik' || role == 'patun' || role == 'instruktur') {
       if (SociometryPeriodConfig.isAnyActive()) {
         list.add({
           'id': 'act_gadik_dyn_sosiometri',
           'title': 'Memonitor Progres Sosiometri',
-          'subtitle': 'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
-          'timeRaw': _formatDynamicTime(today.subtract(const Duration(hours: 1))),
+          'subtitle':
+              'Mengakses panel rekapitulasi pengisian evaluasi sosiometri peleton yang sedang berlangsung.',
+          'timeRaw': _formatDynamicTime(
+            today.subtract(const Duration(hours: 1)),
+          ),
           'date': _getDynamicDateStr(today),
           'dateTime': today,
           'points': '',
@@ -220,6 +246,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     return list.take(3).toList();
   }
+
   String _getGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 11) {
@@ -241,18 +268,23 @@ class _HomeScreenState extends State<HomeScreen>
         builder: (context, state) {
           if (state is AuthSuccess) {
             final user = state.user;
-            
-            // Hitung skor dinamis
+
             final serdikData = SerdikRealData.records.firstWhere(
-                (r) => r['nrp'] == user.nrp,
-                orElse: () => SerdikRealData.records.first);
+              (r) => r['nrp'] == user.nrp,
+              orElse: () => SerdikRealData.records.first,
+            );
             final String noSerdik = serdikData['no_serdik'] ?? '';
-            
-            final raw = ScoreCalculatorService.generateSimulatedScores(noSerdik);
+
+            final raw = ScoreCalculatorService.generateSimulatedScores(
+              noSerdik,
+            );
             raw['reward_mental'] = _rewardPoints;
             raw['punishment_mental'] = _punishmentPoints;
-            
-            final finalRecap = ScoreCalculatorService.calculateFinalRecap(serdikData, raw);
+
+            final finalRecap = ScoreCalculatorService.calculateFinalRecap(
+              serdikData,
+              raw,
+            );
 
             final double nilaiAkademik = finalRecap.academicScore;
             final double nilaiMental = finalRecap.mentalScore;
@@ -403,9 +435,7 @@ class _HomeScreenState extends State<HomeScreen>
                     borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
                   ),
                   child: Text(
-                    user.roleId == 'siswa'
-                        ? user.noSerdik
-                        : 'NRP: ${user.nrp}',
+                    user.roleId == 'siswa' ? user.noSerdik : 'NRP: ${user.nrp}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: AppDimensions.fontMd,
@@ -552,7 +582,13 @@ class _HomeScreenState extends State<HomeScreen>
               ],
             ),
             const SizedBox(height: AppDimensions.lg),
-            _buildAiRecommendation(akademik, mental, jasmani, _rewardPoints, _punishmentPoints),
+            _buildAiRecommendation(
+              akademik,
+              mental,
+              jasmani,
+              _rewardPoints,
+              _punishmentPoints,
+            ),
           ],
         ),
       ),
@@ -613,7 +649,13 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildAiRecommendation(double ak, double ment, double jas, double reward, double punishment) {
+  Widget _buildAiRecommendation(
+    double ak,
+    double ment,
+    double jas,
+    double reward,
+    double punishment,
+  ) {
     String title = 'Rekomendasi Pintar';
     String message = '';
     Color cardColor;
@@ -972,7 +1014,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildActivityFeed(BuildContext context, UserEntity user) {
-      final mockActivities = _getMockActivities(user);
+    final mockActivities = _getMockActivities(user);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(

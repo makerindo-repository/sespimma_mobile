@@ -14,7 +14,6 @@ import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_men
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_mental_detail_screen.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/widgets/patun_senat_validation_sheet.dart';
 
-
 class PatunMentalMonitoringScreen extends StatefulWidget {
   const PatunMentalMonitoringScreen({super.key});
 
@@ -90,9 +89,7 @@ class _PatunMentalMonitoringScreenState
             fontSize: AppDimensions.fontXxl,
           ),
         ),
-        actions: [
-          const SizedBox(width: AppDimensions.sm),
-        ],
+        actions: [const SizedBox(width: AppDimensions.sm)],
       ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
@@ -104,7 +101,11 @@ class _PatunMentalMonitoringScreenState
               onPressed: _showSenatValidationSheet,
               backgroundColor: Colors.amber.shade700,
               elevation: 6,
-              icon: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 22),
+              icon: const Icon(
+                Icons.notifications_active_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
               label: const Text(
                 'Validasi Senat',
                 style: TextStyle(
