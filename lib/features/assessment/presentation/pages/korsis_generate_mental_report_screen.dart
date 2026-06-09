@@ -12,6 +12,7 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/features/auth/data/datasources/korsis_real_data.dart';
 import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 import 'package:sespimma_mobile/core/data/serdik_senat_roles.dart';
+import 'package:sespimma_mobile/core/utils/app_logger.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 
 class KorsisGenerateMentalReportScreen extends StatefulWidget {
@@ -63,7 +64,9 @@ class _KorsisGenerateMentalReportScreenState
         _namaKetuaController.text = nama;
         _pangkatNrpController.text = '$pangkat NRP. $nrp';
       }
-    } catch (_) {}
+    } catch (e, st) {
+      talker.error('Gagal memuat data ketua pelaksana', e, st);
+    }
   }
 
   String _mapPangkat(String pangkatLengkap) {
@@ -604,7 +607,8 @@ class _KorsisGenerateMentalReportScreenState
       }
 
       await OpenFilex.open(file.path);
-    } catch (e) {
+    } catch (e, st) {
+      talker.error('Gagal membuat laporan PDF mental korsis', e, st);
       if (mounted) {
         AppNotifier.showError(context, 'Gagal membuat laporan: $e');
       }

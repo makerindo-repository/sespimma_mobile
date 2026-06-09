@@ -56,7 +56,7 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
     return 'Kurang (K)';
   }
 
-  void _showInputDialog(String type) {
+  Future<void> _showInputDialog(String type) async {
     Navigator.pop(context);
 
     final TextEditingController controller = TextEditingController();
@@ -71,7 +71,8 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
       noteController.text = data.catatanDokterB ?? '';
     }
 
-    showDialog(
+    try {
+    await showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
@@ -258,6 +259,10 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
         );
       },
     );
+    } finally {
+      controller.dispose();
+      noteController.dispose();
+    }
   }
 
   void _navigateToRecordScreen() {

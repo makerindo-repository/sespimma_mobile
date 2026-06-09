@@ -12,6 +12,7 @@ import '../../data/models/gadik_submission_model.dart';
 import '../../data/datasources/gadik_assignment_mock_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
+import 'package:sespimma_mobile/injection_container.dart';
 import '../widgets/gadik_grading_bottom_sheet.dart';
 
 class GadikAssignmentDetailScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _GadikAssignmentDetailScreenState
   static const Color _primaryNavy = AppColors.primaryNavy;
   static const Color _lightGrey = AppColors.background;
 
+  final Dio _dio = sl<Dio>();
   List<GadikSubmissionModel> _submissions = [];
 
   @override
@@ -220,7 +222,7 @@ class _GadikAssignmentDetailScreenState
         final file = File(savePath);
         await file.writeAsBytes([0]);
       } else {
-        await Dio().download(url, savePath);
+        await _dio.download(url, savePath);
       }
 
       if (!mounted) return;

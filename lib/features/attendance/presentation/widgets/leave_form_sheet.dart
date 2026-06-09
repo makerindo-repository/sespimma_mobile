@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sespimma_mobile/core/utils/app_logger.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
@@ -183,7 +184,11 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                             attachedFileName = result.files.single.name;
                           });
                         }
-                      } catch (_) {}
+                      } on PlatformException catch (e, st) {
+                        talker.error('Gagal memilih file lampiran (platform)', e, st);
+                      } catch (e, st) {
+                        talker.error('Gagal memilih file lampiran', e, st);
+                      }
                       setState(() => isAttaching = false);
                     },
               borderRadius: BorderRadius.circular(AppDimensions.radiusLg),

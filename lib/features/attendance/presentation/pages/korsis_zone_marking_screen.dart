@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sespimma_mobile/core/utils/app_logger.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
@@ -71,7 +72,11 @@ class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen>
       if (!mounted) return;
       setState(() => _userLocation = LatLng(pos.latitude, pos.longitude));
       _mapController.move(_userLocation!, 18.0);
-    } catch (_) {}
+    } on LocationServiceDisabledException catch (e, st) {
+      talker.warning('Layanan lokasi tidak aktif saat menandai zona', e, st);
+    } catch (e, st) {
+      talker.error('Gagal mendapatkan lokasi pengguna untuk zona', e, st);
+    }
   }
 
   void _handleTap(TapPosition _, LatLng point) {

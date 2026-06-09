@@ -28,6 +28,7 @@ import 'features/leadership_report/presentation/pages/leadership_report_screen.d
 import 'features/leadership_dashboard/presentation/pages/pimpinan_home_screen.dart';
 import 'features/assessment/presentation/pages/serdik_sosiometri_screen.dart';
 import 'shared/widgets/main_nav_screen.dart';
+import 'features/auth/data/datasources/serdik_real_data.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -60,6 +61,7 @@ void main() async {
   await initializeDateFormatting('id_ID', null);
 
   await di.init();
+  await SerdikRealData.loadFromAsset();
 
   runApp(const MyApp());
 }

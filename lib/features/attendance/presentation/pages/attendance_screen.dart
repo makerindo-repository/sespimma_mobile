@@ -31,11 +31,12 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     with SingleTickerProviderStateMixin {
   bool _isInRadius = false;
   bool _isGpsLoading = true;
-  bool _hasGpsError = false;
-  bool _isSubmitting = false;
   bool _isFakeGps = false;
-  bool _isAttended = false;
   DateTime? _lastSubmitTime;
+
+  final _hasGpsError = ValueNotifier<bool>(false);
+  final _isSubmitting = ValueNotifier<bool>(false);
+  final _isAttended = ValueNotifier<bool>(false);
 
   List<AttendanceZone> _zones = AttendanceZones.activeZones;
   AttendanceZone? _activeZone;
@@ -63,6 +64,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   void dispose() {
     LocationSyncService().stopSyncing();
     _chipController.dispose();
+    _hasGpsError.dispose();
+    _isSubmitting.dispose();
+    _isAttended.dispose();
     super.dispose();
   }
 
@@ -143,14 +147,14 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       return;
     }
 
-    if (_isSubmitting ||
+    if (_isSubmitting.value ||
         (!fromQr && !_isInRadius) ||
         _isFakeGps ||
-        _isAttended) {
+        _isAttended.value) {
       return;
     }
 
-    if (_isAttended) {
+    if (_isAttended.value) {
       AppNotifier.showWarning(
         context,
         'Anda sudah melakukan presensi untuk sesi ini.',
@@ -182,19 +186,17 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     }
 
     HapticFeedback.lightImpact();
-    setState(() => _isSubmitting = true);
+    _isSubmitting.value = true;
 
     await Future.delayed(const Duration(milliseconds: 1500));
 
     if (!mounted) return;
     HapticFeedback.heavyImpact();
 
-    setState(() {
-      _isSubmitting = false;
-      _lastSubmitTime = DateTime.now();
-      _isAttended = true;
-      PimpinanMockData.attendanceReportCount += 1;
-    });
+    _isSubmitting.value = false;
+    _lastSubmitTime = DateTime.now();
+    _isAttended.value = true;
+    PimpinanMockData.attendanceReportCount += 1;
 
     final now = DateTime.now();
     final timeStr =
@@ -478,8 +480,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
               zones: _zones,
               onLocationDetected: _onLocationDetected,
               onGpsStateChanged: (hasError) {
-                if (mounted && _hasGpsError != hasError) {
-                  setState(() => _hasGpsError = hasError);
+                if (mounted && _hasGpsError.value != hasError) {
+                  _hasGpsError.value = hasError;
                 }
               },
               onReload: () {
@@ -492,11 +494,14 @@ class _AttendanceScreenState extends State<AttendanceScreen>
               onRadiusTap: (tappedZone) => _showZoneInfo(context, tappedZone),
             ),
           ),
-          if (!_hasGpsError)
-            Positioned(
-              top: AppDimensions.lg,
-              left: 0,
-              right: 0,
+          Positioned(
+            top: AppDimensions.lg,
+            left: 0,
+            right: 0,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _hasGpsError,
+              builder: (_, hasError, child) =>
+                  hasError ? const SizedBox.shrink() : child!,
               child: Center(
                 child: AttendanceStatusChip(
                   zones: _zones,
@@ -508,49 +513,58 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                 ),
               ),
             ),
-          if (!_hasGpsError)
-            Positioned(
-              bottom: AppDimensions.xxxl,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppDimensions.lg,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child:
-                              (_activeZone != null &&
-                                  !_isGpsLoading &&
-                                  _isInRadius &&
-                                  !_isFakeGps)
-                              ? AttendanceFloatingInfo(
-                                  activeZone: _activeZone!,
+          ),
+          Positioned(
+            bottom: AppDimensions.xxxl,
+            left: 0,
+            right: 0,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _hasGpsError,
+              builder: (_, hasError, _) => hasError
+                  ? const SizedBox.shrink()
+                  : Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 600),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppDimensions.lg,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Expanded(
+                                child: (_activeZone != null &&
+                                        !_isGpsLoading &&
+                                        _isInRadius &&
+                                        !_isFakeGps)
+                                    ? AttendanceFloatingInfo(
+                                        activeZone: _activeZone!,
+                                        isInRadius: _isInRadius,
+                                        onTapInfo: () =>
+                                            _showZoneInfo(context),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              const SizedBox(width: AppDimensions.lg),
+                              ListenableBuilder(
+                                listenable: Listenable.merge(
+                                    [_isSubmitting, _isAttended]),
+                                builder: (_, _) => AttendanceActionButtons(
+                                  isAttended: _isAttended.value,
                                   isInRadius: _isInRadius,
-                                  onTapInfo: () => _showZoneInfo(context),
-                                )
-                              : const SizedBox.shrink(),
+                                  isSubmitting: _isSubmitting.value,
+                                  activeZone: _activeZone,
+                                  onOpenQr: _openQRScanner,
+                                  onSubmit: _submitAttendance,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(width: AppDimensions.lg),
-                        AttendanceActionButtons(
-                          isAttended: _isAttended,
-                          isInRadius: _isInRadius,
-                          isSubmitting: _isSubmitting,
-                          activeZone: _activeZone,
-                          onOpenQr: _openQRScanner,
-                          onSubmit: _submitAttendance,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ),
+          ),
         ],
       ),
     );
