@@ -47,7 +47,6 @@ dependencies:
   maps_toolkit: ^3.1.0
   intl: ^0.20.2
   open_filex: ^4.7.0
-  google_fonts: ^8.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -65,6 +64,30 @@ flutter:
     - assets/images/
     - assets/serdik_clean.json
     - .env
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter/static/Inter_18pt-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter/static/Inter_18pt-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter/static/Inter_18pt-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter/static/Inter_18pt-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Inter/static/Inter_18pt-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Inter/static/Inter_18pt-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Inter/static/Inter_18pt-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Inter/static/Inter_18pt-BoldItalic.ttf
+          weight: 700
+          style: italic
 
 flutter_launcher_icons:
   android: true
