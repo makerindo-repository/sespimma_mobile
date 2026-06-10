@@ -11,6 +11,10 @@ class LoginUseCase {
     required String password,
     required String fcmToken,
   }) {
-    return repository.login(nrpNip: nrpNip, password: password, fcmToken: fcmToken);
+    return repository.login(
+      nrpNip: nrpNip,
+      password: password,
+      fcmToken: fcmToken,
+    );
   }
 }

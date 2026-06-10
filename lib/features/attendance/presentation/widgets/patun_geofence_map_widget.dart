@@ -235,7 +235,11 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
             if (_zones.isNotEmpty) {
               final zone = _zones.first;
               dist = Geolocator.distanceBetween(
-                  zone.latitude, zone.longitude, lat, lng);
+                zone.latitude,
+                zone.longitude,
+                lat,
+                lng,
+              );
               final now = DateTime.now();
               if (dist <= zone.radiusMeters) {
                 if (now.isAfter(zone.deadline)) {
@@ -290,9 +294,11 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     if (!mounted) return;
     setState(() {
       _serdikMarkers = _liveLocations.values
-          .where((m) =>
-              widget.pokjar.isEmpty ||
-              (m['pangkat'] as String?) == widget.pokjar)
+          .where(
+            (m) =>
+                widget.pokjar.isEmpty ||
+                (m['pangkat'] as String?) == widget.pokjar,
+          )
           .toList();
     });
   }

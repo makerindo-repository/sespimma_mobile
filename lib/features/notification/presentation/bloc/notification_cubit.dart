@@ -6,8 +6,8 @@ class NotificationCubit extends Cubit<NotificationState> {
   final NotificationService _notificationService;
 
   NotificationCubit({required NotificationService notificationService})
-      : _notificationService = notificationService,
-        super(const NotificationState(unreadCount: 0));
+    : _notificationService = notificationService,
+      super(const NotificationState(unreadCount: 0));
 
   void incrementUnreadCount() {
     emit(state.copyWith(unreadCount: state.unreadCount + 1));
@@ -30,7 +30,7 @@ class NotificationCubit extends Cubit<NotificationState> {
       payload: payload,
     );
   }
-  
+
   void setUnreadCount(int count) {
     emit(state.copyWith(unreadCount: count));
   }

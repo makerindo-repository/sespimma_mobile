@@ -29,7 +29,13 @@ class _PatunAcademicMonitoringScreenState
   String _selectedFilter = 'Semua';
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _filterOptions = ['Semua', 'Aman', 'Warning', 'Kritis', 'Belum Dinilai'];
+  final List<String> _filterOptions = [
+    'Semua',
+    'Aman',
+    'Warning',
+    'Kritis',
+    'Belum Dinilai',
+  ];
 
   @override
   void dispose() {
@@ -69,8 +75,12 @@ class _PatunAcademicMonitoringScreenState
               final serdik = Map<String, dynamic>.from(serdikValue);
 
               final noSerdik = serdik['no_serdik']?.toString() ?? '';
-              final rawSimulated = ScoreCalculatorService.generateSimulatedScores(noSerdik);
-              final recap = ScoreCalculatorService.calculateFinalRecap(serdik, rawSimulated);
+              final rawSimulated =
+                  ScoreCalculatorService.generateSimulatedScores(noSerdik);
+              final recap = ScoreCalculatorService.calculateFinalRecap(
+                serdik,
+                rawSimulated,
+              );
               final score = recap.academicScore;
 
               String status;

@@ -56,13 +56,14 @@ class LocationSyncService {
 
   Future<void> _sendToBackend(Position pos) async {
     try {
-      await sl<Dio>().put('/users/me/location', data: {
-        'latitude': pos.latitude,
-        'longitude': pos.longitude,
-        'accuracy': pos.accuracy,
-      });
-    } catch (_) {
-      // best-effort — silently swallow to avoid UI noise
-    }
+      await sl<Dio>().put(
+        '/users/me/location',
+        data: {
+          'latitude': pos.latitude,
+          'longitude': pos.longitude,
+          'accuracy': pos.accuracy,
+        },
+      );
+    } catch (_) {}
   }
 }

@@ -11,9 +11,7 @@ abstract class AuthRepository {
 
   Future<void> logout();
 
-  Future<void> updatePassword({
-    required String newPassword,
-  });
+  Future<void> updatePassword({required String newPassword});
 
   Future<void> resetPassword({
     required String nrpNip,

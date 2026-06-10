@@ -72,193 +72,194 @@ class _MedisHealthGradingSheetState extends State<MedisHealthGradingSheet> {
     }
 
     try {
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            final double currentScore = double.tryParse(controller.text) ?? 0.0;
-            final Color scoreColor = _getScoreColor(currentScore);
-            final String scoreCategory = _getScoreCategory(currentScore);
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setStateDialog) {
+              final double currentScore =
+                  double.tryParse(controller.text) ?? 0.0;
+              final Color scoreColor = _getScoreColor(currentScore);
+              final String scoreCategory = _getScoreCategory(currentScore);
 
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-              ),
-              title: Text(
-                type == 'A' ? 'Tes Kesehatan Awal' : 'Tes Kesehatan Akhir',
-                style: const TextStyle(
-                  color: _primaryNavy,
-                  fontWeight: FontWeight.w800,
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                 ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  TextField(
-                    controller: controller,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
+                title: Text(
+                  type == 'A' ? 'Tes Kesehatan Awal' : 'Tes Kesehatan Akhir',
+                  style: const TextStyle(
+                    color: _primaryNavy,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Masukkan nilai (0-100)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                          borderSide: const BorderSide(
+                            color: _primaryNavy,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        final parsed = double.tryParse(val) ?? 0.0;
+                        if (parsed > 100) {
+                          controller.text = '100';
+                          controller.selection = TextSelection.fromPosition(
+                            const TextPosition(offset: 3),
+                          );
+                        }
+                        setStateDialog(() {});
+                      },
                     ),
-                    decoration: InputDecoration(
-                      hintText: 'Masukkan nilai (0-100)',
-                      border: OutlineInputBorder(
+                    const SizedBox(height: AppDimensions.lg),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: currentScore > 0
+                            ? scoreColor.withValues(alpha: 0.1)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusMd,
+                        ),
+                        border: Border.all(
+                          color: currentScore > 0
+                              ? scoreColor.withValues(alpha: 0.5)
+                              : Colors.grey.shade300,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          const Text(
+                            'PREDIKAT',
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontXs,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.blueGrey,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            scoreCategory,
+                            style: TextStyle(
+                              fontSize: AppDimensions.fontMd,
+                              fontWeight: FontWeight.w800,
+                              color: currentScore > 0
+                                  ? scoreColor
+                                  : Colors.grey.shade500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppDimensions.lg),
+                    TextField(
+                      controller: noteController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'Catatan Dokter (opsional)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppDimensions.radiusMd,
+                          ),
+                          borderSide: const BorderSide(
+                            color: _primaryNavy,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Batal',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _primaryNavy,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           AppDimensions.radiusMd,
                         ),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusMd,
-                        ),
-                        borderSide: const BorderSide(
-                          color: _primaryNavy,
-                          width: 2,
-                        ),
-                      ),
                     ),
-                    onChanged: (val) {
-                      final parsed = double.tryParse(val) ?? 0.0;
-                      if (parsed > 100) {
-                        controller.text = '100';
-                        controller.selection = TextSelection.fromPosition(
-                          const TextPosition(offset: 3),
+                    onPressed: () {
+                      final val = double.tryParse(controller.text);
+                      if (val != null) {
+                        final catatan = noteController.text.trim();
+                        if (type == 'A') {
+                          HealthMonitoringData.updateNilaiA(
+                            noSerdik,
+                            val,
+                            catatan: catatan.isEmpty ? null : catatan,
+                          );
+                          SerdikPhysicalScores.updateScore(
+                            noSerdik,
+                            'tes_awal',
+                            val,
+                          );
+                        } else {
+                          HealthMonitoringData.updateNilaiB(
+                            noSerdik,
+                            val,
+                            catatan: catatan.isEmpty ? null : catatan,
+                          );
+                          SerdikPhysicalScores.updateScore(
+                            noSerdik,
+                            'tes_akhir',
+                            val,
+                          );
+                        }
+                        widget.onDataChanged();
+                        Navigator.pop(context);
+
+                        AppNotifier.showSuccess(
+                          context,
+                          'Nilai berhasil disimpan',
                         );
                       }
-                      setStateDialog(() {});
                     },
-                  ),
-                  const SizedBox(height: AppDimensions.lg),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      color: currentScore > 0
-                          ? scoreColor.withValues(alpha: 0.1)
-                          : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
-                      ),
-                      border: Border.all(
-                        color: currentScore > 0
-                            ? scoreColor.withValues(alpha: 0.5)
-                            : Colors.grey.shade300,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'PREDIKAT',
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontXs,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.blueGrey,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          scoreCategory,
-                          style: TextStyle(
-                            fontSize: AppDimensions.fontMd,
-                            fontWeight: FontWeight.w800,
-                            color: currentScore > 0
-                                ? scoreColor
-                                : Colors.grey.shade500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppDimensions.lg),
-                  TextField(
-                    controller: noteController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Catatan Dokter (opsional)',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusMd,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusMd,
-                        ),
-                        borderSide: const BorderSide(
-                          color: _primaryNavy,
-                          width: 2,
-                        ),
-                      ),
-                    ),
+                    child: const Text('Simpan'),
                   ),
                 ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Batal',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _primaryNavy,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppDimensions.radiusMd,
-                      ),
-                    ),
-                  ),
-                  onPressed: () {
-                    final val = double.tryParse(controller.text);
-                    if (val != null) {
-                      final catatan = noteController.text.trim();
-                      if (type == 'A') {
-                        HealthMonitoringData.updateNilaiA(
-                          noSerdik,
-                          val,
-                          catatan: catatan.isEmpty ? null : catatan,
-                        );
-                        SerdikPhysicalScores.updateScore(
-                          noSerdik,
-                          'tes_awal',
-                          val,
-                        );
-                      } else {
-                        HealthMonitoringData.updateNilaiB(
-                          noSerdik,
-                          val,
-                          catatan: catatan.isEmpty ? null : catatan,
-                        );
-                        SerdikPhysicalScores.updateScore(
-                          noSerdik,
-                          'tes_akhir',
-                          val,
-                        );
-                      }
-                      widget.onDataChanged();
-                      Navigator.pop(context);
-
-                      AppNotifier.showSuccess(
-                        context,
-                        'Nilai berhasil disimpan',
-                      );
-                    }
-                  },
-                  child: const Text('Simpan'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+              );
+            },
+          );
+        },
+      );
     } finally {
       controller.dispose();
       noteController.dispose();

@@ -92,12 +92,12 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
     final time = type == 'start' ? _startTime : _endTime;
     final date = type == 'start' ? _startDate : _endDate;
     final label = type == 'start' ? 'Waktu Mulai' : 'Waktu Berakhir';
-    
+
     final dateStr = date != null
         ? '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}'
         : '--/--/----';
     final timeStr = time?.format(context) ?? '--:--';
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,14 +121,21 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.calendar_month),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 0,
+                    ),
                   ),
                   child: Text(
                     dateStr,
                     style: TextStyle(
-                      fontWeight: date != null ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: date != null
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: date != null ? Colors.black87 : Colors.grey,
                       fontSize: AppDimensions.fontSm,
                     ),
@@ -146,14 +153,21 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(AppIcons.clock),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusLg,
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 0,
+                    ),
                   ),
                   child: Text(
                     timeStr,
                     style: TextStyle(
-                      fontWeight: time != null ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: time != null
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: time != null ? Colors.black87 : Colors.grey,
                       fontSize: AppDimensions.fontSm,
                     ),
@@ -238,16 +252,12 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
             const SizedBox(height: AppDimensions.xl),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: _buildDateTimePicker(type: 'start')),
-              ],
+              children: [Expanded(child: _buildDateTimePicker(type: 'start'))],
             ),
             const SizedBox(height: AppDimensions.lg),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: _buildDateTimePicker(type: 'end')),
-              ],
+              children: [Expanded(child: _buildDateTimePicker(type: 'end'))],
             ),
             const SizedBox(height: AppDimensions.xl),
             InkWell(
@@ -272,7 +282,11 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                           });
                         }
                       } on PlatformException catch (e, st) {
-                        talker.error('Gagal memilih file lampiran (platform)', e, st);
+                        talker.error(
+                          'Gagal memilih file lampiran (platform)',
+                          e,
+                          st,
+                        );
                       } catch (e, st) {
                         talker.error('Gagal memilih file lampiran', e, st);
                       }
@@ -365,12 +379,15 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                         final ctx = context;
                         setState(() => _isSubmitting = true);
                         try {
-                          await sl<Dio>().post('/izin', data: {
-                            'start_time': startDt.toUtc().toIso8601String(),
-                            'end_time': endDt.toUtc().toIso8601String(),
-                            'description': reasonCtrl.text.trim(),
-                            'attachment_file_name': attachedFileName,
-                          });
+                          await sl<Dio>().post(
+                            '/izin',
+                            data: {
+                              'start_time': startDt.toUtc().toIso8601String(),
+                              'end_time': endDt.toUtc().toIso8601String(),
+                              'description': reasonCtrl.text.trim(),
+                              'attachment_file_name': attachedFileName,
+                            },
+                          );
                           if (!ctx.mounted) return;
                           HapticFeedback.heavyImpact();
                           Navigator.pop(ctx);
@@ -384,7 +401,11 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
                             'Gagal mengirim permohonan izin. Silakan coba lagi.',
                           );
                         } catch (e, st) {
-                          talker.error('Submit izin error tidak terduga', e, st);
+                          talker.error(
+                            'Submit izin error tidak terduga',
+                            e,
+                            st,
+                          );
                           if (!ctx.mounted) return;
                           setState(() => _isSubmitting = false);
                           AppNotifier.showError(ctx, 'Terjadi kesalahan.');

@@ -48,16 +48,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> updatePassword(String newPassword) async {
     try {
-      final response = await dio.post('/update_password', data: {
-        'new_password': newPassword,
-      });
+      final response = await dio.post(
+        '/update_password',
+        data: {'new_password': newPassword},
+      );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception(response.data?['message'] ?? 'Gagal memperbarui password');
+        throw Exception(
+          response.data?['message'] ?? 'Gagal memperbarui password',
+        );
       }
     } on DioException catch (e) {
       if (e.response != null && e.response?.data is Map) {
-        throw Exception(e.response!.data['message'] ?? 'Gagal memperbarui password');
+        throw Exception(
+          e.response!.data['message'] ?? 'Gagal memperbarui password',
+        );
       }
       throw Exception(e.message ?? 'Network error');
     } catch (e) {
@@ -66,13 +71,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> resetPassword(String nrpNip, String token, String newPassword) async {
+  Future<void> resetPassword(
+    String nrpNip,
+    String token,
+    String newPassword,
+  ) async {
     try {
-      final response = await dio.post('/reset_password', data: {
-        'nrp_nip': nrpNip,
-        'token': token,
-        'password': newPassword,
-      });
+      final response = await dio.post(
+        '/reset_password',
+        data: {'nrp_nip': nrpNip, 'token': token, 'password': newPassword},
+      );
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception(response.data?['message'] ?? 'Gagal reset password');
@@ -90,10 +98,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<bool> verifyResetToken(String nrpNip, String token) async {
     try {
-      final response = await dio.post('/verify_reset_token', data: {
-        'nrp_nip': nrpNip,
-        'token': token,
-      });
+      final response = await dio.post(
+        '/verify_reset_token',
+        data: {'nrp_nip': nrpNip, 'token': token},
+      );
 
       return response.statusCode == 200 && response.data['status'] == true;
     } on DioException catch (e) {
@@ -110,7 +118,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<String> uploadProfilePhoto(String filePath) async {
     try {
       final formData = FormData.fromMap({
-        'photo': await MultipartFile.fromFile(filePath, filename: File(filePath).uri.pathSegments.last),
+        'photo': await MultipartFile.fromFile(
+          filePath,
+          filename: File(filePath).uri.pathSegments.last,
+        ),
       });
       final response = await dio.post(
         '/me/photo',

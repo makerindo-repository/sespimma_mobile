@@ -83,7 +83,6 @@ Future<void> _initCore() async {
 
   sl.registerLazySingleton<LocalDatabaseHelper>(() => dbHelper);
 
-  // Initialize Notification Service
   final notificationService = NotificationService();
   await notificationService.init();
   sl.registerLazySingleton<NotificationService>(() => notificationService);
@@ -97,16 +96,22 @@ void _initFeatures() {
 }
 
 void _initAuthFeature() {
-  sl.registerFactory<AuthBloc>(() => AuthBloc(
-        loginUseCase: sl(),
-        updatePasswordUseCase: sl(),
-        resetPasswordUseCase: sl(),
-        authRepository: sl(),
-      ));
+  sl.registerFactory<AuthBloc>(
+    () => AuthBloc(
+      loginUseCase: sl(),
+      updatePasswordUseCase: sl(),
+      resetPasswordUseCase: sl(),
+      authRepository: sl(),
+    ),
+  );
 
   sl.registerLazySingleton<LoginUseCase>(() => LoginUseCase(sl()));
-  sl.registerLazySingleton<UpdatePasswordUseCase>(() => UpdatePasswordUseCase(sl()));
-  sl.registerLazySingleton<ResetPasswordUseCase>(() => ResetPasswordUseCase(sl()));
+  sl.registerLazySingleton<UpdatePasswordUseCase>(
+    () => UpdatePasswordUseCase(sl()),
+  );
+  sl.registerLazySingleton<ResetPasswordUseCase>(
+    () => ResetPasswordUseCase(sl()),
+  );
 
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),

@@ -83,17 +83,21 @@ class ScoreCalculatorService {
       if (item.nosis == serdikData['no_serdik'] &&
           (item.status == 'approved' || item.status == 'disetujui') &&
           !item.isIzin) {
-        
         String aspect = '';
         if (item.rewardPunishmentId != null) {
           final rule = RewardPunishmentData.rules.firstWhere(
             (r) => r.id == item.rewardPunishmentId,
             orElse: () => RewardPunishmentItem(
-                id: '', type: '', aspect: 'MORAL', description: '', point: 0),
+              id: '',
+              type: '',
+              aspect: 'MORAL',
+              description: '',
+              point: 0,
+            ),
           );
           aspect = rule.aspect;
         } else {
-          aspect = 'MORAL'; // Fallback
+          aspect = 'MORAL';
         }
 
         if (item.isReward) {
@@ -216,8 +220,6 @@ class ScoreCalculatorService {
   }
 
   static Map<String, dynamic> generateSimulatedScores(String noSerdik) {
-    // Dynamically calculate actual score from PimpinanMockData and KorsisInboxMockData
-    // We will find submissions by this serdik
     final submissions = PimpinanMockData.sharedTaskSubmissions
         .where((sub) => sub['noSerdik'] == noSerdik)
         .toList();
@@ -248,7 +250,7 @@ class ScoreCalculatorService {
             createdByName: '',
           ),
         );
-        
+
         final mapelLower = task.mapel.toLowerCase();
         if (mapelLower.contains('nump')) {
           sumNump += score;
@@ -273,7 +275,9 @@ class ScoreCalculatorService {
     double rewardMental = 0.0;
     double punishmentMental = 0.0;
     for (var item in KorsisInboxMockData.items) {
-      if (item.nosis == noSerdik && item.status == 'disetujui' && !item.isIzin) {
+      if (item.nosis == noSerdik &&
+          item.status == 'disetujui' &&
+          !item.isIzin) {
         if (item.isReward) {
           rewardMental += item.points;
         } else {
@@ -282,7 +286,6 @@ class ScoreCalculatorService {
       }
     }
 
-
     final healthData = HealthMonitoringData.getHealthData(noSerdik);
 
     int totalMinus = 0;
@@ -290,7 +293,6 @@ class ScoreCalculatorService {
       totalMinus += r.minusPoints;
     }
 
-    // Default other components to 0.0 if not filled
     return {
       'NMPN': nmpn,
       'NPa': countNkkp > 0 ? (sumNkkp / countNkkp) : 0.0,

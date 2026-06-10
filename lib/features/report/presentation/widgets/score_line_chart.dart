@@ -57,7 +57,7 @@ class ScoreLineChart extends StatelessWidget {
         children: [
           _buildHeader(hasWarning, colorAka),
           const SizedBox(height: AppDimensions.xl),
-// Removed legends
+
           const SizedBox(height: AppDimensions.xxl),
           SizedBox(
             height: 200,
@@ -106,14 +106,14 @@ class ScoreLineChart extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppDimensions.xs / 2),
-                Text(
-                  'Evaluasi Mingguan Terkini Mg 1 - Mg 4',
-                  style: TextStyle(
-                    fontSize: AppDimensions.fontXs + 1,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blueGrey.shade400,
-                  ),
+              Text(
+                'Evaluasi Mingguan Terkini Mg 1 - Mg 4',
+                style: TextStyle(
+                  fontSize: AppDimensions.fontXs + 1,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blueGrey.shade400,
                 ),
+              ),
             ],
           ),
         ),
@@ -286,17 +286,14 @@ class ScoreLineChart extends StatelessWidget {
     if (finalScore == 0) {
       return [];
     }
-    
-    // Carry-over logic: Draw the history line dynamically up to the current week.
-    // If it's Week 4, we carry over the previous score to Week 4 and plot a connected line.
+
     int weekIndex = ((DateTime.now().day - 1) ~/ 7).clamp(0, 3);
-    
+
     List<FlSpot> spots = [];
     for (int i = 0; i <= weekIndex; i++) {
       spots.add(FlSpot(i.toDouble(), finalScore));
     }
-    
+
     return spots;
   }
-
 }

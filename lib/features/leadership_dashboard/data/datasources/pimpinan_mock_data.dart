@@ -74,15 +74,21 @@ class PimpinanMockData {
     final now = DateTime.now();
 
     final approvedIzins = KorsisInboxMockData.items
-        .where((i) => i.isIzin && i.status == 'disetujui' && i.izinStartTime != null && i.izinEndTime != null)
+        .where(
+          (i) =>
+              i.isIzin &&
+              i.status == 'disetujui' &&
+              i.izinStartTime != null &&
+              i.izinEndTime != null,
+        )
         .toList();
 
-    // Remove any manual attendances that fall within an approved Izin period
     results.removeWhere((att) {
       final dt = att['dateTime'] as DateTime;
       for (var izin in approvedIzins) {
         if (dt.isAfter(izin.izinStartTime!) && dt.isBefore(izin.izinEndTime!) ||
-            dt.isAtSameMomentAs(izin.izinStartTime!) || dt.isAtSameMomentAs(izin.izinEndTime!)) {
+            dt.isAtSameMomentAs(izin.izinStartTime!) ||
+            dt.isAtSameMomentAs(izin.izinEndTime!)) {
           return true;
         }
       }
@@ -92,8 +98,8 @@ class PimpinanMockData {
     for (var zone in AttendanceZones.activeZones) {
       bool isIzin = false;
       for (var izin in approvedIzins) {
-        // If the zone falls within the izin period
-        if (zone.cutoffTime.isAfter(izin.izinStartTime!) && zone.startTime.isBefore(izin.izinEndTime!)) {
+        if (zone.cutoffTime.isAfter(izin.izinStartTime!) &&
+            zone.startTime.isBefore(izin.izinEndTime!)) {
           isIzin = true;
           break;
         }
@@ -104,9 +110,12 @@ class PimpinanMockData {
       );
 
       final dt = zone.startTime;
-      final startStr = '${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
-      final endStr = '${zone.endTime.hour.toString().padLeft(2, '0')}.${zone.endTime.minute.toString().padLeft(2, '0')}';
-      final deadlineStr = '${zone.deadline.hour.toString().padLeft(2, '0')}.${zone.deadline.minute.toString().padLeft(2, '0')}';
+      final startStr =
+          '${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
+      final endStr =
+          '${zone.endTime.hour.toString().padLeft(2, '0')}.${zone.endTime.minute.toString().padLeft(2, '0')}';
+      final deadlineStr =
+          '${zone.deadline.hour.toString().padLeft(2, '0')}.${zone.deadline.minute.toString().padLeft(2, '0')}';
 
       if (isIzin) {
         if (!attended) {

@@ -35,7 +35,10 @@ class DetailedCompetencies extends StatelessWidget {
           _CompetencyItem(title: 'Moral (20%)', score: moral),
           _CompetencyItem(title: 'Disiplin (15%)', score: disiplin),
           _CompetencyItem(title: 'Kepemimpinan (20%)', score: kepemimpinan),
-          _CompetencyItem(title: 'Pengendalian Diri (15%)', score: pengendalian),
+          _CompetencyItem(
+            title: 'Pengendalian Diri (15%)',
+            score: pengendalian,
+          ),
           _CompetencyItem(title: 'Penampilan (15%)', score: penampilan),
 
           const SizedBox(height: AppDimensions.lg),
@@ -61,7 +64,8 @@ class DetailedCompetencies extends StatelessWidget {
       double npkp = recap.rawScores['NMPN'] ?? 0.0;
       double nkp = recap.rawScores['NKa'] ?? 0.0;
       double ujianMp = recap.rawScores['NUMP'] ?? 0.0;
-      double np = (ujianMp * 0.3) + (nkkp * 0.05) + (npkp * 0.05) + (nkp * 0.60);
+      double np =
+          (ujianMp * 0.3) + (nkkp * 0.05) + (npkp * 0.05) + (nkp * 0.60);
 
       double nsk = recap.rawScores['NSK'] ?? 0.0;
       double nt = recap.rawScores['NPa'] ?? 0.0;
@@ -83,10 +87,7 @@ class DetailedCompetencies extends StatelessWidget {
                 score: nkkp,
               ),
               _SubCompetencyItem(title: 'Paparan (35%)', score: nkkp),
-              _SubCompetencyItem(
-                title: 'Keaktifan (30%)',
-                score: nkkp,
-              ),
+              _SubCompetencyItem(title: 'Keaktifan (30%)', score: nkkp),
             ],
           ),
           _ExpandableCompetencyGroup(
@@ -98,10 +99,7 @@ class DetailedCompetencies extends StatelessWidget {
                 score: npkp,
               ),
               _SubCompetencyItem(title: 'Paparan (35%)', score: npkp),
-              _SubCompetencyItem(
-                title: 'Keaktifan (30%)',
-                score: npkp,
-              ),
+              _SubCompetencyItem(title: 'Keaktifan (30%)', score: npkp),
             ],
           ),
           _ExpandableCompetencyGroup(
@@ -147,14 +145,8 @@ class DetailedCompetencies extends StatelessWidget {
                 title: 'Materi NPTT atau Taskap (40%)',
                 score: nt,
               ),
-              _SubCompetencyItem(
-                title: 'Penulisan Efektif (30%)',
-                score: nt,
-              ),
-              _SubCompetencyItem(
-                title: 'Paparan dan Diskusi (30%)',
-                score: nt,
-              ),
+              _SubCompetencyItem(title: 'Penulisan Efektif (30%)', score: nt),
+              _SubCompetencyItem(title: 'Paparan dan Diskusi (30%)', score: nt),
             ],
           ),
         ],
@@ -162,21 +154,18 @@ class DetailedCompetencies extends StatelessWidget {
     } else {
       double kesehatan = recap.rawScores['NKes'] ?? 0.0;
       double jasmani = recap.rawScores['NJas'] ?? 0.0;
-      
+
       double kesAwal = recap.rawScores['kes_awal'] ?? 0.0;
       double kesAkhir = recap.rawScores['kes_akhir'] ?? 0.0;
       double kesStatus = recap.rawScores['kes_status'] ?? 0.0;
 
       double samaptaA = recap.rawScores['NGA'] ?? 0.0;
-      
-      // Calculate average of NGB1-4 for Samapta B title score if needed,
-      // or just use NGB as average. The rawScores only has NGB1-4,
-      // let's compute samaptaB average:
+
       double pullUp = recap.rawScores['NGB1'] ?? 0.0;
       double sitUp = recap.rawScores['NGB2'] ?? 0.0;
       double pushUp = recap.rawScores['NGB3'] ?? 0.0;
       double shuttleRun = recap.rawScores['NGB4'] ?? 0.0;
-      
+
       double samaptaB = (pullUp + sitUp + pushUp + shuttleRun) / 4;
 
       return Column(

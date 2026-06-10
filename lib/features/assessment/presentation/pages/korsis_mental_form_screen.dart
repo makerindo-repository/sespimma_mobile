@@ -16,15 +16,8 @@ import 'package:sespimma_mobile/features/leadership_report/domain/services/score
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
 import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
 
-// ---------------------------------------------------------------------------
-// File-level constants shared across private widgets in this file
-// ---------------------------------------------------------------------------
 const Color _kPrimaryNavy = Color(0xFF000B1D);
 const Color _kLightGrey = Color(0xFFF8F9FA);
-
-// ---------------------------------------------------------------------------
-// Screen
-// ---------------------------------------------------------------------------
 
 class KorsisMentalFormScreen extends StatefulWidget {
   final bool isReward;
@@ -59,10 +52,6 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
     super.dispose();
   }
 
-  // -------------------------------------------------------------------------
-  // Score computation
-  // -------------------------------------------------------------------------
-
   List<RewardPunishmentItem> get _currentOptions => widget.isReward
       ? RewardPunishmentData.rewards
       : RewardPunishmentData.punishments;
@@ -94,10 +83,6 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
     if (s > 70.00) return Colors.amber.shade500;
     return Colors.red.shade700;
   }
-
-  // -------------------------------------------------------------------------
-  // Photo actions
-  // -------------------------------------------------------------------------
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -139,8 +124,7 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.xs / 2),
+                    borderRadius: BorderRadius.circular(AppDimensions.xs / 2),
                   ),
                 ),
                 const Text(
@@ -175,10 +159,6 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // Lookup sheets
-  // -------------------------------------------------------------------------
-
   void _showSerdikLookup() {
     showModalBottomSheet(
       context: context,
@@ -205,10 +185,6 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
       ),
     );
   }
-
-  // -------------------------------------------------------------------------
-  // Section-level build helpers
-  // -------------------------------------------------------------------------
 
   Widget _buildSectionTitle(String title) {
     return Padding(
@@ -379,11 +355,14 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                   if (isSelected && _selectedCategory!.note != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.orange.shade100,
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusSm),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusSm,
+                        ),
                       ),
                       child: Text(
                         _selectedCategory!.note!,
@@ -397,11 +376,14 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                   else if (isSelected)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blueGrey.shade50,
-                        borderRadius:
-                            BorderRadius.circular(AppDimensions.radiusSm),
+                        borderRadius: BorderRadius.circular(
+                          AppDimensions.radiusSm,
+                        ),
                       ),
                       child: Text(
                         _selectedCategory!.aspect.toUpperCase(),
@@ -430,11 +412,12 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
               Container(
                 margin: const EdgeInsets.only(left: AppDimensions.sm),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 6),
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: pointColor.withValues(alpha: 0.1),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusMd),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                 ),
                 child: Text(
                   '${_selectedCategory!.point > 0 ? "+" : ""}${_selectedCategory!.point}',
@@ -617,13 +600,13 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
             padding: const EdgeInsets.all(AppDimensions.md),
             decoration: BoxDecoration(
               color: _kLightGrey,
-              borderRadius:
-                  BorderRadius.circular(AppDimensions.radiusMd),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
             ),
             child: _selectedSerdik == null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(
-                        vertical: AppDimensions.lg),
+                      vertical: AppDimensions.lg,
+                    ),
                     child: Center(
                       child: Text(
                         'Pilih target serdik terlebih dahulu',
@@ -650,12 +633,16 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: _getScoreColor(_currentBaseScore)
-                                  .withValues(alpha: 0.1),
+                              color: _getScoreColor(
+                                _currentBaseScore,
+                              ).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(
-                                  AppDimensions.radiusSm),
+                                AppDimensions.radiusSm,
+                              ),
                             ),
                             child: Text(
                               _currentBaseScore.toStringAsFixed(2),
@@ -674,8 +661,7 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                           child: Divider(height: 1, thickness: 1),
                         ),
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               widget.isReward
@@ -689,7 +675,9 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: pointColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
@@ -724,12 +712,14 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 4),
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: _getScoreColor(_calculatedFinalScore)
-                        .withValues(alpha: 0.1),
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.radiusMd),
+                    color: _getScoreColor(
+                      _calculatedFinalScore,
+                    ).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
                   ),
                   child: Text(
                     _calculatedFinalScore.toStringAsFixed(2),
@@ -748,16 +738,12 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
     );
   }
 
-  // -------------------------------------------------------------------------
-  // build
-  // -------------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
-    final String title =
-        widget.isReward ? 'Input Reward' : 'Input Punishment';
-    final Color pointColor =
-        widget.isReward ? Colors.green.shade600 : Colors.red.shade600;
+    final String title = widget.isReward ? 'Input Reward' : 'Input Punishment';
+    final Color pointColor = widget.isReward
+        ? Colors.green.shade600
+        : Colors.red.shade600;
 
     return Scaffold(
       backgroundColor: _kLightGrey,
@@ -793,9 +779,7 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
             const SizedBox(height: AppDimensions.xl),
 
             _buildSectionTitle(
-              widget.isReward
-                  ? 'Indikator Prestasi'
-                  : 'Indikator Pelanggaran',
+              widget.isReward ? 'Indikator Prestasi' : 'Indikator Pelanggaran',
             ),
             _buildIndicatorSelectionCard(pointColor),
             const SizedBox(height: AppDimensions.xl),
@@ -837,15 +821,14 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
             const SizedBox(height: AppDimensions.xxl),
 
             ElevatedButton(
-              onPressed: (_selectedSerdik != null &&
+              onPressed:
+                  (_selectedSerdik != null &&
                       _selectedCategory != null &&
                       _selectedPhoto != null)
                   ? () {
                       HapticFeedback.heavyImpact();
                       final newItem = InboxItem(
-                        id: DateTime.now()
-                            .millisecondsSinceEpoch
-                            .toString(),
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
                         serdikName: _selectedSerdik!['nama_lengkap'],
                         pangkat: _selectedSerdik!['pangkat'],
                         nosis: _selectedSerdik!['no_serdik'],
@@ -860,12 +843,10 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                         }(),
                         timestamp: DateTime.now(),
                         points: _selectedCategory!.point,
-                        description:
-                            _justificationController.text.isNotEmpty
-                                ? _justificationController.text
-                                : 'Telah dilakukan observasi dan pencatatan oleh Korsis.',
-                        rewardPunishmentName:
-                            _selectedCategory!.description,
+                        description: _justificationController.text.isNotEmpty
+                            ? _justificationController.text
+                            : 'Telah dilakukan observasi dan pencatatan oleh Korsis.',
+                        rewardPunishmentName: _selectedCategory!.description,
                         status: 'disetujui',
                         photoPath: _selectedPhoto?.path,
                         rewardPunishmentId: _selectedCategory!.id,
@@ -883,8 +864,7 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                 disabledBackgroundColor: Colors.grey.shade300,
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusLg),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                 ),
                 elevation: 0,
               ),
@@ -905,12 +885,6 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// _SerdikLookupSheet
-// Bottom sheet for searching and selecting a serdik. Owns its own search
-// query and POKJAR filter state so the parent form state stays clean.
-// ---------------------------------------------------------------------------
 
 class _SerdikLookupSheet extends StatefulWidget {
   final List<Map<String, dynamic>> serdikList;
@@ -933,23 +907,35 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
 
   static String _mapRomanToArabic(String roman) {
     switch (roman) {
-      case 'POKJAR I':   return 'POKJAR 1';
-      case 'POKJAR II':  return 'POKJAR 2';
-      case 'POKJAR III': return 'POKJAR 3';
-      case 'POKJAR IV':  return 'POKJAR 4';
-      case 'POKJAR V':   return 'POKJAR 5';
-      default:           return roman;
+      case 'POKJAR I':
+        return 'POKJAR 1';
+      case 'POKJAR II':
+        return 'POKJAR 2';
+      case 'POKJAR III':
+        return 'POKJAR 3';
+      case 'POKJAR IV':
+        return 'POKJAR 4';
+      case 'POKJAR V':
+        return 'POKJAR 5';
+      default:
+        return roman;
     }
   }
 
   static String _mapArabicToRoman(String arabic) {
     switch (arabic) {
-      case 'POKJAR 1': return 'POKJAR I';
-      case 'POKJAR 2': return 'POKJAR II';
-      case 'POKJAR 3': return 'POKJAR III';
-      case 'POKJAR 4': return 'POKJAR IV';
-      case 'POKJAR 5': return 'POKJAR V';
-      default:         return arabic;
+      case 'POKJAR 1':
+        return 'POKJAR I';
+      case 'POKJAR 2':
+        return 'POKJAR II';
+      case 'POKJAR 3':
+        return 'POKJAR III';
+      case 'POKJAR 4':
+        return 'POKJAR IV';
+      case 'POKJAR 5':
+        return 'POKJAR V';
+      default:
+        return arabic;
     }
   }
 
@@ -960,7 +946,8 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
       final noSerdik = (serdik['no_serdik'] ?? '').toString().toLowerCase();
       final pokjar = (serdik['kelompok_kelas'] ?? '').toString();
       final matchQuery = name.contains(query) || noSerdik.contains(query);
-      final matchPokjar = _selectedFilterPokjar == 'Semua' ||
+      final matchPokjar =
+          _selectedFilterPokjar == 'Semua' ||
           pokjar == _mapRomanToArabic(_selectedFilterPokjar);
       return matchQuery && matchPokjar;
     }).toList();
@@ -989,14 +976,10 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
               children: [
                 Expanded(
                   child: TextField(
-                    onChanged: (val) =>
-                        setState(() => _searchQuery = val),
+                    onChanged: (val) => setState(() => _searchQuery = val),
                     decoration: InputDecoration(
                       hintText: 'Cari nama atau nomor serdik...',
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.grey,
-                      ),
+                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
                       fillColor: _kLightGrey,
                       border: OutlineInputBorder(
@@ -1014,8 +997,7 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
                     color: _selectedFilterPokjar == 'Semua'
                         ? _kLightGrey
                         : _kPrimaryNavy.withValues(alpha: 0.1),
-                    borderRadius:
-                        BorderRadius.circular(AppDimensions.radiusLg),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   ),
                   child: PopupMenuButton<String>(
                     icon: Icon(
@@ -1026,8 +1008,7 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
                     ),
                     onSelected: (val) =>
                         setState(() => _selectedFilterPokjar = val),
-                    itemBuilder: (context) =>
-                        widget.pokjarOptions.map((opt) {
+                    itemBuilder: (context) => widget.pokjarOptions.map((opt) {
                       return PopupMenuItem<String>(
                         value: opt,
                         child: Text(
@@ -1061,8 +1042,7 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
                       horizontal: AppDimensions.xl,
                       vertical: 4,
                     ),
-                    leading:
-                        _SerdikAvatar(photoPath: serdik['profile_photo']),
+                    leading: _SerdikAvatar(photoPath: serdik['profile_photo']),
                     title: Text(
                       serdik['nama_lengkap'] ?? '-',
                       style: const TextStyle(
@@ -1079,7 +1059,9 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
                     ),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blueGrey.shade50,
                         borderRadius: BorderRadius.circular(
@@ -1112,12 +1094,6 @@ class _SerdikLookupSheetState extends State<_SerdikLookupSheet> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// _IndicatorLookupSheet
-// Bottom sheet for searching and selecting a reward/punishment indicator.
-// Owns its own search query state.
-// ---------------------------------------------------------------------------
-
 class _IndicatorLookupSheet extends StatefulWidget {
   final List<RewardPunishmentItem> options;
   final bool isReward;
@@ -1132,8 +1108,7 @@ class _IndicatorLookupSheet extends StatefulWidget {
   });
 
   @override
-  State<_IndicatorLookupSheet> createState() =>
-      _IndicatorLookupSheetState();
+  State<_IndicatorLookupSheet> createState() => _IndicatorLookupSheetState();
 }
 
 class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
@@ -1149,8 +1124,9 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final pointColor =
-        widget.isReward ? Colors.green.shade600 : Colors.red.shade600;
+    final pointColor = widget.isReward
+        ? Colors.green.shade600
+        : Colors.red.shade600;
     final filtered = _filtered;
 
     return Container(
@@ -1177,13 +1153,11 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                 hintText: widget.isReward
                     ? 'Cari indikator prestasi...'
                     : 'Cari indikator pelanggaran...',
-                prefixIcon:
-                    const Icon(Icons.search, color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
                 fillColor: _kLightGrey,
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusLg),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   borderSide: BorderSide.none,
                 ),
               ),
@@ -1200,15 +1174,15 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                 final opt = filtered[index];
                 EligibilityStatus eligibility = EligibilityStatus(true);
                 if (widget.selectedSerdikId != null) {
-                  eligibility =
-                      RewardPunishmentEligibility.checkEligibility(
+                  eligibility = RewardPunishmentEligibility.checkEligibility(
                     widget.selectedSerdikId!,
                     opt,
                   );
                 }
                 final bool isGreyedOut = !eligibility.isEligible;
-                final Color effectiveColor =
-                    isGreyedOut ? Colors.grey.shade400 : pointColor;
+                final Color effectiveColor = isGreyedOut
+                    ? Colors.grey.shade400
+                    : pointColor;
 
                 return InkWell(
                   onTap: () {
@@ -1230,22 +1204,18 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                     widget.onSelected(opt);
                     Navigator.pop(context);
                   },
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusLg),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                   child: Container(
                     padding: const EdgeInsets.all(AppDimensions.lg),
                     decoration: BoxDecoration(
-                      color: isGreyedOut
-                          ? Colors.grey.shade50
-                          : Colors.white,
-                      border:
-                          Border.all(color: Colors.grey.shade300),
+                      color: isGreyedOut ? Colors.grey.shade50 : Colors.white,
+                      border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(
-                          AppDimensions.radiusLg),
+                        AppDimensions.radiusLg,
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              Colors.black.withValues(alpha: 0.01),
+                          color: Colors.black.withValues(alpha: 0.01),
                           blurRadius: 5,
                           offset: const Offset(0, 2),
                         ),
@@ -1257,8 +1227,7 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: effectiveColor
-                                .withValues(alpha: 0.1),
+                            color: effectiveColor.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -1272,50 +1241,42 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                         const SizedBox(width: AppDimensions.md),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     child: Text(
                                       opt.description,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w800,
-                                        fontSize:
-                                            AppDimensions.fontMd,
+                                        fontSize: AppDimensions.fontMd,
                                         color: isGreyedOut
                                             ? Colors.grey.shade500
                                             : _kPrimaryNavy,
                                         decoration: isGreyedOut
-                                            ? TextDecoration
-                                                .lineThrough
+                                            ? TextDecoration.lineThrough
                                             : null,
                                       ),
                                     ),
                                   ),
                                   Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 8),
-                                    padding:
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4),
+                                    margin: const EdgeInsets.only(left: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: pointColor
-                                          .withValues(alpha: 0.1),
-                                      borderRadius:
-                                          BorderRadius.circular(
+                                      color: pointColor.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(
                                         AppDimensions.radiusSm,
                                       ),
                                     ),
                                     child: Text(
                                       '${opt.point > 0 ? "+" : ""}${opt.point}',
                                       style: TextStyle(
-                                        fontSize:
-                                            AppDimensions.fontLg,
+                                        fontSize: AppDimensions.fontLg,
                                         fontWeight: FontWeight.w900,
                                         color: effectiveColor,
                                       ),
@@ -1327,25 +1288,22 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                               Row(
                                 children: [
                                   Container(
-                                    padding:
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.blueGrey.shade50,
-                                      borderRadius:
-                                          BorderRadius.circular(
+                                      borderRadius: BorderRadius.circular(
                                         AppDimensions.radiusSm,
                                       ),
                                     ),
                                     child: Text(
                                       opt.aspect.toUpperCase(),
                                       style: TextStyle(
-                                        fontSize:
-                                            AppDimensions.fontXs,
+                                        fontSize: AppDimensions.fontXs,
                                         fontWeight: FontWeight.w800,
-                                        color:
-                                            Colors.blueGrey.shade600,
+                                        color: Colors.blueGrey.shade600,
                                         letterSpacing: 0.5,
                                       ),
                                     ),
@@ -1353,25 +1311,22 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
                                   if (opt.note != null) ...[
                                     const SizedBox(width: 8),
                                     Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: Colors.orange.shade50,
-                                        borderRadius:
-                                            BorderRadius.circular(
+                                        borderRadius: BorderRadius.circular(
                                           AppDimensions.radiusSm,
                                         ),
                                       ),
                                       child: Text(
                                         opt.note!,
                                         style: TextStyle(
-                                          fontSize:
-                                              AppDimensions.fontXs,
+                                          fontSize: AppDimensions.fontXs,
                                           fontWeight: FontWeight.w800,
-                                          color:
-                                              Colors.orange.shade800,
+                                          color: Colors.orange.shade800,
                                         ),
                                       ),
                                     ),
@@ -1394,10 +1349,6 @@ class _IndicatorLookupSheetState extends State<_IndicatorLookupSheet> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Shared private widgets
-// ---------------------------------------------------------------------------
-
 class _BottomSheetHeader extends StatelessWidget {
   final String title;
   final VoidCallback onClose;
@@ -1413,10 +1364,8 @@ class _BottomSheetHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(
-            bottom: BorderSide(color: Colors.grey.shade200)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1460,8 +1409,7 @@ class _BottomSheetTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
         leading: Container(
           padding: const EdgeInsets.all(AppDimensions.md),
           decoration: BoxDecoration(

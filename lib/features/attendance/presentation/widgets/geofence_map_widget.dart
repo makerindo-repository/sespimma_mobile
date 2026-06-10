@@ -20,8 +20,9 @@ class GeofenceMapWidget extends StatefulWidget {
   final Function(
     AttendanceZone? activeZone,
     double distanceMeters,
-    bool isFakeGps,
-  )
+    bool isFakeGps, [
+    LatLng? userLocation,
+  ])
   onLocationDetected;
   final ValueChanged<bool>? onGpsStateChanged;
   final VoidCallback? onReload;
@@ -254,7 +255,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
           _isInRadius = false;
           _isLoading = false;
         });
-        widget.onLocationDetected(null, -1.0, isFakeGps);
+        widget.onLocationDetected(null, -1.0, isFakeGps, LatLng(lat, lng));
       }
       return;
     }
@@ -311,7 +312,12 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
         _isInRadius = inRadius;
         _isLoading = false;
       });
-      widget.onLocationDetected(matchedZone, finalDistance, isFakeGps);
+      widget.onLocationDetected(
+        matchedZone,
+        finalDistance,
+        isFakeGps,
+        LatLng(lat, lng),
+      );
     }
   }
 

@@ -17,10 +17,8 @@ import 'package:sespimma_mobile/features/attendance/presentation/widgets/attenda
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:dio/dio.dart';
 import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'package:sespimma_mobile/injection_container.dart';
+import 'package:latlong2/latlong.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -42,6 +40,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
   List<AttendanceZone> _zones = AttendanceZones.activeZones;
   AttendanceZone? _activeZone;
+  LatLng? _userLatLng;
 
   late final AnimationController _chipController;
   late final Animation<double> _chipScale;
@@ -85,8 +84,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   void _onLocationDetected(
     AttendanceZone? activeZone,
     double distance,
-    bool isFakeGps,
-  ) {
+    bool isFakeGps, [
+    LatLng? userLocation,
+  ]) {
     final inRadius = activeZone != null;
     final changed = inRadius != _isInRadius;
 
@@ -105,6 +105,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       _isInRadius = inRadius && !isFakeGps;
       _isFakeGps = isFakeGps;
       _isGpsLoading = false;
+      if (userLocation != null) _userLatLng = userLocation;
     });
 
     if (changed && !isFakeGps) {
@@ -215,13 +216,19 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} WIB";
     final activityName = _activeZone?.activityName ?? 'Kegiatan Presensi';
     bool isLate = _activeZone != null && now.isAfter(_activeZone!.deadline);
-    final approvedIzins = KorsisInboxMockData.items
-        .where((i) => i.isIzin && i.status == 'disetujui' && i.izinStartTime != null && i.izinEndTime != null);
+    final approvedIzins = KorsisInboxMockData.items.where(
+      (i) =>
+          i.isIzin &&
+          i.status == 'disetujui' &&
+          i.izinStartTime != null &&
+          i.izinEndTime != null,
+    );
 
     bool isOnIzin = false;
     for (var izin in approvedIzins) {
       if (now.isAfter(izin.izinStartTime!) && now.isBefore(izin.izinEndTime!) ||
-          now.isAtSameMomentAs(izin.izinStartTime!) || now.isAtSameMomentAs(izin.izinEndTime!)) {
+          now.isAtSameMomentAs(izin.izinStartTime!) ||
+          now.isAtSameMomentAs(izin.izinEndTime!)) {
         isOnIzin = true;
         break;
       }
@@ -236,94 +243,48 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       return;
     }
 
-    String sName = 'Dummy User';
-    String sNrp = '00000000';
-    final authState = context.read<AuthBloc>().state;
-    if (authState is AuthSuccess) {
-      sName = authState.user.name;
-      sNrp = authState.user.nrp;
-    }
+    try {
+      final dio = sl<Dio>();
+      final payload = {
+        "kegiatan_id": int.parse(_activeZone!.id),
+        "datetime": now.toUtc().toIso8601String(),
+        "status": "hadir",
+        "type": "checkin",
+        "method": fromQr ? "qr_code" : "gps",
+        "is_late": isLate,
+        "is_location_valid": _isInRadius,
+        "latitude": _userLatLng?.latitude,
+        "longitude": _userLatLng?.longitude,
+      };
 
-    PimpinanMockData.serdikAttendanceHistory.insert(0, {
-      'id': 'att_${now.millisecondsSinceEpoch}',
-      'title': activityName,
-      'date': '${now.day}-${now.month}-${now.year}',
-      'time': timeStr,
-      'dateTime': now,
-      'status': isLate ? 'Terlambat' : 'Hadir',
-      'type': isLate ? 'telat' : 'hadir',
-      'method': fromQr ? 'QR Code' : 'Geofencing',
-      'verification': 'Valid',
-      'location': _activeZone?.name ?? 'Lokasi Sespimma',
-      'device': 'Perangkat Serdik',
-      'image': 'assets/images/avatar.png',
-      'nama': sName,
-      'nrp': sNrp,
-    });
+      final response = await dio.post('/api/absensi', data: payload);
 
-    if (isLate) {
-      final actLower = activityName.toLowerCase();
-      final isApelOrOlga =
-          actLower.contains('apel pagi') ||
-          actLower.contains('apel malam') ||
-          actLower.contains('olahraga pagi') ||
-          actLower.contains('olga pagi');
-      String punishmentCode = 'P_D_02';
-      double pointsToDeduct = -0.53;
-      String desc = 'Terlambat mengikuti kegiatan kelas/ceramah/pengarahan';
+      if (!mounted) return;
 
-      if (isApelOrOlga) {
-        punishmentCode = 'P_D_04';
-        pointsToDeduct = -0.50;
-        desc = 'Terlambat mengikuti apel/olahraga/kegiatan lain';
-      } else if (fromQr || _isInRadius) {
-        punishmentCode = 'P_D_01';
-        pointsToDeduct = -0.50;
-        desc = 'Terlambat mengikuti kegiatan yang telah ditentukan';
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        _isSubmitting.value = false;
+        _lastSubmitTime = now;
+        _isAttended.value = true;
+
+        if (isLate) {
+          AppNotifier.showWarning(
+            context,
+            'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.',
+          );
+        } else {
+          AppNotifier.showSuccess(
+            context,
+            'Berhasil absen di jam $timeStr untuk kegiatan $activityName.',
+          );
+        }
+      } else {
+        throw Exception("Gagal menyimpan presensi");
       }
-
-      String sName = 'Dummy User';
-      String sPangkat = 'AKP';
-      String sNosis = '000000';
-      String sPokjar = 'POKJAR 1';
-
-      final authState = context.read<AuthBloc>().state;
-      if (authState is AuthSuccess) {
-        sName = authState.user.name;
-        sPangkat = authState.user.pangkat;
-        sNosis = authState.user.noSerdik.isNotEmpty
-            ? authState.user.noSerdik
-            : authState.user.nrp;
-        sPokjar = authState.user.pokjar.isNotEmpty
-            ? authState.user.pokjar
-            : 'POKJAR 1';
-      }
-
-      KorsisInboxMockData.addRecord(
-        InboxItem(
-          id: 'auto_punish_${now.millisecondsSinceEpoch}',
-          serdikName: sName,
-          pangkat: sPangkat,
-          nosis: sNosis,
-          pokjar: sPokjar,
-          isReward: false,
-          senderName: 'Sistem (Otomatis)',
-          timestamp: now,
-          points: pointsToDeduct,
-          description: desc,
-          rewardPunishmentName: '$punishmentCode | PUNISHMENT | DISIPLIN',
-          status: 'disetujui',
-        ),
-      );
-
-      AppNotifier.showWarning(
-        context,
-        'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.\nSanksi pelanggaran: $punishmentCode ($pointsToDeduct)',
-      );
-    } else {
-      AppNotifier.showSuccess(
-        context,
-        'Berhasil absen di jam $timeStr untuk kegiatan $activityName.',
+    } catch (e) {
+      _isSubmitting.value = false;
+      _showErrorDialog(
+        'Gagal Presensi',
+        'Terjadi kesalahan saat menghubungi server: $e',
       );
     }
   }
@@ -533,22 +494,24 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Expanded(
-                                child: (_activeZone != null &&
+                                child:
+                                    (_activeZone != null &&
                                         !_isGpsLoading &&
                                         _isInRadius &&
                                         !_isFakeGps)
                                     ? AttendanceFloatingInfo(
                                         activeZone: _activeZone!,
                                         isInRadius: _isInRadius,
-                                        onTapInfo: () =>
-                                            _showZoneInfo(context),
+                                        onTapInfo: () => _showZoneInfo(context),
                                       )
                                     : const SizedBox.shrink(),
                               ),
                               const SizedBox(width: AppDimensions.lg),
                               ListenableBuilder(
-                                listenable: Listenable.merge(
-                                    [_isSubmitting, _isAttended]),
+                                listenable: Listenable.merge([
+                                  _isSubmitting,
+                                  _isAttended,
+                                ]),
                                 builder: (_, _) => AttendanceActionButtons(
                                   isAttended: _isAttended.value,
                                   isInRadius: _isInRadius,

@@ -20,8 +20,13 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     final noSerdik = serdik['no_serdik'] ?? '-';
     final pangkat = serdik['pangkat'] ?? '-';
 
-    final rawSimulated = ScoreCalculatorService.generateSimulatedScores(noSerdik);
-    final recap = ScoreCalculatorService.calculateFinalRecap(serdik, rawSimulated);
+    final rawSimulated = ScoreCalculatorService.generateSimulatedScores(
+      noSerdik,
+    );
+    final recap = ScoreCalculatorService.calculateFinalRecap(
+      serdik,
+      rawSimulated,
+    );
     final double score = recap.academicScore;
 
     String status;
@@ -201,8 +206,13 @@ class PatunAcademicDetailScreen extends StatelessWidget {
   }
 
   Widget _buildAcademicScores(String noSerdik) {
-    final rawSimulated = ScoreCalculatorService.generateSimulatedScores(noSerdik);
-    final recap = ScoreCalculatorService.calculateFinalRecap(serdik, rawSimulated);
+    final rawSimulated = ScoreCalculatorService.generateSimulatedScores(
+      noSerdik,
+    );
+    final recap = ScoreCalculatorService.calculateFinalRecap(
+      serdik,
+      rawSimulated,
+    );
     final scores = recap.rawScores;
 
     double nump = scores['NUMP'] ?? 0.0;

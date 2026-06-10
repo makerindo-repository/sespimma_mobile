@@ -110,11 +110,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
           Navigator.pop(context);
         }
       } else {
-        // Find token and nrp from route args or somewhere
-        final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+        final args =
+            ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
         final nrpNip = args?['nrpNip'] ?? '';
         final token = args?['token'] ?? '';
-        
+
         context.read<AuthBloc>().add(
           ResetPasswordRequested(
             nrpNip: nrpNip,
@@ -122,7 +122,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
             newPassword: _passController.text,
           ),
         );
-        AppNotifier.showSuccess(context, 'Password berhasil direset, silakan login!');
+        AppNotifier.showSuccess(
+          context,
+          'Password berhasil direset, silakan login!',
+        );
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
     }
@@ -140,7 +143,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           final bool isAuthenticated = state is AuthSuccess;
-          final bool isFirstLogin = state is AuthSuccess && state.user.isFirstLogin;
+          final bool isFirstLogin =
+              state is AuthSuccess && state.user.isFirstLogin;
           final bool isLoading = state is AuthLoading;
 
           return Stack(
@@ -247,7 +251,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
     );
   }
 
-  Widget _buildFormCard(bool isAuthenticated, bool isFirstLogin, bool isLoading) {
+  Widget _buildFormCard(
+    bool isAuthenticated,
+    bool isFirstLogin,
+    bool isLoading,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.xxl + 4),
       decoration: BoxDecoration(
@@ -340,7 +348,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
               obscureText: !_isConfirmPassVisible,
               enabled: !isLoading,
               textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _submitNewPassword(isAuthenticated, isFirstLogin),
+              onFieldSubmitted: (_) =>
+                  _submitNewPassword(isAuthenticated, isFirstLogin),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Konfirmasi password tidak boleh kosong';

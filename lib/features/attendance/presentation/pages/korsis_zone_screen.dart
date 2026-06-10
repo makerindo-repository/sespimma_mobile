@@ -111,7 +111,7 @@ class _KorsisZoneScreenState extends State<KorsisZoneScreen> {
       ),
       body: GeofenceMapWidget(
         zones: _zones,
-        onLocationDetected: (zone, dist, isFake) {
+        onLocationDetected: (zone, dist, isFake, [userLocation]) {
           if (_isLocating) {
             setState(() => _isLocating = false);
           }

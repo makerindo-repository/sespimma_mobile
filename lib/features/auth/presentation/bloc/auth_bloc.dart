@@ -83,7 +83,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthSuccess(user));
       } catch (e) {
         emit(AuthFailure(e.toString().replaceAll('Exception: ', '')));
-        emit(AuthSuccess(user)); // restore success state but show error UI via listener
+        emit(AuthSuccess(user));
       }
     }
   }
@@ -99,7 +99,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         token: event.token,
         newPassword: event.newPassword,
       );
-      emit(AuthInitial()); // Back to initial so they can login
+      emit(AuthInitial());
     } catch (e) {
       emit(AuthFailure(e.toString().replaceAll('Exception: ', '')));
       emit(AuthInitial());

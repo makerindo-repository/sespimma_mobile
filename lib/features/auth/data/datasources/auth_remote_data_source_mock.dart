@@ -501,7 +501,11 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> resetPassword(String nrpNip, String token, String newPassword) async {
+  Future<void> resetPassword(
+    String nrpNip,
+    String token,
+    String newPassword,
+  ) async {
     await Future.delayed(const Duration(seconds: 1));
     if (token != 'MAKERINDO75') {
       throw Exception('Token tidak valid');

@@ -27,7 +27,7 @@ class ReportContentBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final serdikId = user.noSerdik.isNotEmpty ? user.noSerdik : user.nrp;
     final rawScores = ScoreCalculatorService.generateSimulatedScores(serdikId);
-    
+
     final serdikMap = {
       'id': serdikId,
       'name': user.name,
@@ -37,7 +37,10 @@ class ReportContentBody extends StatelessWidget {
       'pangkat': user.pangkat,
     };
 
-    final recap = ScoreCalculatorService.calculateFinalRecap(serdikMap, rawScores);
+    final recap = ScoreCalculatorService.calculateFinalRecap(
+      serdikMap,
+      rawScores,
+    );
 
     final double dynamicAkademik = recap.academicScore;
     final double dynamicMentalScore = recap.mentalScore;

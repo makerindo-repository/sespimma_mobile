@@ -198,7 +198,6 @@ class _HomeScreenState extends State<HomeScreen>
         }
       }
 
-      // Check tasks submitted by this user
       final submissions = PimpinanMockData.sharedTaskSubmissions
           .where((sub) => sub['noSerdik'] == user.noSerdik)
           .toList();
@@ -220,16 +219,26 @@ class _HomeScreenState extends State<HomeScreen>
         if (task.id.isEmpty) continue;
 
         if (sub['status'] == 'Terkirim' || sub['status'] == 'Dinilai') {
-           final isDinilai = sub['status'] == 'Dinilai';
-           list.add({
+          final isDinilai = sub['status'] == 'Dinilai';
+          list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
             'subtitle': isDinilai
                 ? 'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera'
                 : 'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
-            'timeRaw': _formatDynamicTime(DateTime.parse(sub['submittedAt'] ?? DateTime.now().toIso8601String())),
-            'date': _getDynamicDateStr(DateTime.parse(sub['submittedAt'] ?? DateTime.now().toIso8601String())),
-            'dateTime': DateTime.parse(sub['submittedAt'] ?? DateTime.now().toIso8601String()),
+            'timeRaw': _formatDynamicTime(
+              DateTime.parse(
+                sub['submittedAt'] ?? DateTime.now().toIso8601String(),
+              ),
+            ),
+            'date': _getDynamicDateStr(
+              DateTime.parse(
+                sub['submittedAt'] ?? DateTime.now().toIso8601String(),
+              ),
+            ),
+            'dateTime': DateTime.parse(
+              sub['submittedAt'] ?? DateTime.now().toIso8601String(),
+            ),
             'points': '',
             'type': isDinilai ? 'task_dinilai' : 'task_dikirim',
           });
@@ -899,7 +908,9 @@ class _HomeScreenState extends State<HomeScreen>
     final int hadir = history.where((e) => e['type'] == 'hadir').length;
     final int telat = history.where((e) => e['type'] == 'telat').length;
     final int izin = KorsisInboxMockData.items
-        .where((i) => i.isIzin && i.status == 'approved' && i.nosis == user.noSerdik)
+        .where(
+          (i) => i.isIzin && i.status == 'approved' && i.nosis == user.noSerdik,
+        )
         .length;
 
     int alpha = history.where((e) => e['type'] == 'alpha').length;
@@ -907,10 +918,9 @@ class _HomeScreenState extends State<HomeScreen>
     for (var zone in AttendanceZones.activeZones) {
       if (now.isAfter(zone.cutoffTime)) {
         bool attended = history.any((h) => h['title'] == zone.activityName);
-        bool hasIzin = KorsisInboxMockData.items.any((i) =>
-            i.isIzin &&
-            i.status == 'approved' &&
-            i.nosis == user.noSerdik);
+        bool hasIzin = KorsisInboxMockData.items.any(
+          (i) => i.isIzin && i.status == 'approved' && i.nosis == user.noSerdik,
+        );
         if (!attended && !hasIzin) {
           alpha++;
         }
