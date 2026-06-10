@@ -15,10 +15,12 @@ import 'package:sespimma_mobile/features/attendance/presentation/widgets/attenda
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_floating_info.dart';
 import 'package:sespimma_mobile/features/attendance/presentation/widgets/attendance_action_buttons.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
+import 'package:dio/dio.dart';
 import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
+import 'package:sespimma_mobile/injection_container.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -57,7 +59,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       curve: Curves.elasticOut,
     );
 
-    LocationSyncService().startSyncing('202602003001');
+    LocationSyncService().startSyncing();
+    _loadZonesFromApi();
   }
 
   @override
@@ -68,6 +71,15 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     _isSubmitting.dispose();
     _isAttended.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadZonesFromApi() async {
+    await AttendanceZones.loadFromApi(sl<Dio>());
+    if (mounted) {
+      setState(() {
+        _zones = AttendanceZones.activeZones;
+      });
+    }
   }
 
   void _onLocationDetected(
@@ -201,58 +213,53 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     final now = DateTime.now();
     final timeStr =
         "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} WIB";
+    final activityName = _activeZone?.activityName ?? 'Kegiatan Presensi';
+    bool isLate = _activeZone != null && now.isAfter(_activeZone!.deadline);
+    final approvedIzins = KorsisInboxMockData.items
+        .where((i) => i.isIzin && i.status == 'disetujui' && i.izinStartTime != null && i.izinEndTime != null);
+
+    bool isOnIzin = false;
+    for (var izin in approvedIzins) {
+      if (now.isAfter(izin.izinStartTime!) && now.isBefore(izin.izinEndTime!) ||
+          now.isAtSameMomentAs(izin.izinStartTime!) || now.isAtSameMomentAs(izin.izinEndTime!)) {
+        isOnIzin = true;
+        break;
+      }
+    }
+
+    if (isOnIzin) {
+      _isSubmitting.value = false;
+      _showErrorDialog(
+        'Status Izin Aktif',
+        'Anda saat ini dalam masa Izin Khusus yang disetujui Korsis. Sistem otomatis mencatat absensi Anda sebagai IZIN.',
+      );
+      return;
+    }
+
+    String sName = 'Dummy User';
+    String sNrp = '00000000';
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthSuccess) {
+      sName = authState.user.name;
+      sNrp = authState.user.nrp;
+    }
+
     PimpinanMockData.serdikAttendanceHistory.insert(0, {
       'id': 'att_${now.millisecondsSinceEpoch}',
-      'title': _activeZone?.activityName ?? 'Kegiatan Presensi',
+      'title': activityName,
       'date': '${now.day}-${now.month}-${now.year}',
       'time': timeStr,
       'dateTime': now,
-      'status': 'Hadir',
-      'type': 'hadir',
+      'status': isLate ? 'Terlambat' : 'Hadir',
+      'type': isLate ? 'telat' : 'hadir',
       'method': fromQr ? 'QR Code' : 'Geofencing',
       'verification': 'Valid',
       'location': _activeZone?.name ?? 'Lokasi Sespimma',
       'device': 'Perangkat Serdik',
       'image': 'assets/images/avatar.png',
+      'nama': sName,
+      'nrp': sNrp,
     });
-
-    final activityName = _activeZone?.activityName ?? 'Kegiatan Presensi';
-    bool isLate = _activeZone != null && now.isAfter(_activeZone!.deadline);
-    bool isLateFromIzin = false;
-
-    final approvedIzin = KorsisInboxMockData.items
-        .where((i) => i.isIzin && i.status == 'approved')
-        .firstOrNull;
-    if (_activeZone != null &&
-        approvedIzin != null &&
-        approvedIzin.izinStartTime != null &&
-        approvedIzin.izinEndTime != null) {
-      final izinStartDt = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        approvedIzin.izinStartTime!.hour,
-        approvedIzin.izinStartTime!.minute,
-      );
-      final izinEndDt = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        approvedIzin.izinEndTime!.hour,
-        approvedIzin.izinEndTime!.minute,
-      );
-
-      if (_activeZone!.deadline.isAfter(izinStartDt) &&
-              _activeZone!.deadline.isBefore(izinEndDt) ||
-          _activeZone!.deadline.isAtSameMomentAs(izinStartDt)) {
-        if (now.isAfter(izinEndDt)) {
-          isLate = true;
-          isLateFromIzin = true;
-        } else {
-          isLate = false;
-        }
-      }
-    }
 
     if (isLate) {
       final actLower = activityName.toLowerCase();
@@ -265,12 +272,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       double pointsToDeduct = -0.53;
       String desc = 'Terlambat mengikuti kegiatan kelas/ceramah/pengarahan';
 
-      if (isLateFromIzin) {
-        punishmentCode = 'P_D_03';
-        pointsToDeduct = -0.50;
-        desc =
-            'Terlambat kembali pada waktu ijin/IBL tanpa alasan yang dapat dipertanggungjawabkan';
-      } else if (isApelOrOlga) {
+      if (isApelOrOlga) {
         punishmentCode = 'P_D_04';
         pointsToDeduct = -0.50;
         desc = 'Terlambat mengikuti apel/olahraga/kegiatan lain';
@@ -316,9 +318,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
       AppNotifier.showWarning(
         context,
-        isLateFromIzin
-            ? 'Tercatat masuk di jam $timeStr (Terlambat Izin) untuk $activityName.\nSanksi pelanggaran: $punishmentCode ($pointsToDeduct)'
-            : 'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.\nSanksi pelanggaran: $punishmentCode ($pointsToDeduct)',
+        'Tercatat masuk di jam $timeStr (Terlambat) untuk $activityName.\nSanksi pelanggaran: $punishmentCode ($pointsToDeduct)',
       );
     } else {
       AppNotifier.showSuccess(

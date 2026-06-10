@@ -103,7 +103,7 @@ class AttendanceStatusChip extends StatelessWidget {
     if (zones.isEmpty) return 'Tidak Ada Jadwal';
     if (isGpsLoading) return 'Mencari Lokasi...';
     if (isFakeGps) return 'Deteksi Manipulasi GPS!';
-    if (isAlpha) return 'Batas Waktu Berakhir (ALPHA)';
+    if (isAlpha) return 'Batas Waktu Berakhir';
     if (isInRadius) return 'Dalam Zona Absensi';
     return 'Lokasi Tidak Ditemukan';
   }

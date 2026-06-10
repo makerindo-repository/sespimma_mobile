@@ -9,7 +9,7 @@ import 'package:sespimma_mobile/features/report/presentation/widgets/nak_summary
 import 'package:sespimma_mobile/features/report/presentation/widgets/score_category_row.dart';
 import 'package:sespimma_mobile/features/report/presentation/widgets/score_line_chart.dart';
 import 'package:sespimma_mobile/features/report/presentation/widgets/report_section_header.dart';
-import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
+import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
 
 class ReportContentBody extends StatelessWidget {
   final UserEntity user;
@@ -25,15 +25,24 @@ class ReportContentBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double dynamicMentalScore = SerdikMentalScores.getNilai(
-      user.noSerdik,
-      user.nilaiMental,
-    );
+    final serdikId = user.noSerdik.isNotEmpty ? user.noSerdik : user.nrp;
+    final rawScores = ScoreCalculatorService.generateSimulatedScores(serdikId);
+    
+    final serdikMap = {
+      'id': serdikId,
+      'name': user.name,
+      'nrp': user.nrp,
+      'nosis': user.noSerdik,
+      'pokjar': user.pokjar,
+      'pangkat': user.pangkat,
+    };
 
-    final nak =
-        (user.nilaiAkademik * 0.70) +
-        (dynamicMentalScore * 0.20) +
-        (user.nilaiJasmani * 0.10);
+    final recap = ScoreCalculatorService.calculateFinalRecap(serdikMap, rawScores);
+
+    final double dynamicAkademik = recap.academicScore;
+    final double dynamicMentalScore = recap.mentalScore;
+    final double dynamicJasmani = recap.physicalScore;
+    final nak = recap.nak;
 
     return RefreshIndicator(
       color: AppColors.primaryNavy,
@@ -54,9 +63,9 @@ class ReportContentBody extends StatelessWidget {
             NakSummaryCard(user: user, nak: nak),
             const SizedBox(height: AppDimensions.xxl),
             ScoreCategoryRow(
-              nilaiAkademik: user.nilaiAkademik,
+              nilaiAkademik: dynamicAkademik,
               nilaiMental: dynamicMentalScore,
-              nilaiJasmani: user.nilaiJasmani,
+              nilaiJasmani: dynamicJasmani,
               selectedCategory: selectedCategory,
               onCategoryChanged: onCategoryChanged,
             ),
@@ -65,11 +74,11 @@ class ReportContentBody extends StatelessWidget {
             const SizedBox(height: AppDimensions.md),
             ScoreLineChart(
               key: const ValueKey('integrated_trend_chart'),
-              nilaiAkademik: user.nilaiAkademik,
+              nilaiAkademik: dynamicAkademik,
               nilaiMental: dynamicMentalScore,
-              nilaiJasmani: user.nilaiJasmani,
+              nilaiJasmani: dynamicJasmani,
               selectedCategory: selectedCategory,
-              noSerdik: user.noSerdik,
+              noSerdik: user.noSerdik.isNotEmpty ? user.noSerdik : user.nrp,
             ),
             const SizedBox(height: AppDimensions.xxl + AppDimensions.md),
             const ReportSectionHeader(judul: 'Rincian Kompetensi'),
@@ -78,7 +87,7 @@ class ReportContentBody extends StatelessWidget {
               DetailedCompetencies(
                 key: ValueKey<String>('details_$selectedCategory'),
                 category: selectedCategory,
-                user: user,
+                recap: recap,
               ),
             ),
             const SizedBox(height: AppDimensions.xxl),
@@ -86,7 +95,7 @@ class ReportContentBody extends StatelessWidget {
               AiInsightCard(
                 key: ValueKey<String>('insight_$selectedCategory'),
                 category: selectedCategory,
-                user: user,
+                recap: recap,
               ),
             ),
           ],

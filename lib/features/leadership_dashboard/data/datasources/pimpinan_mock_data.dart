@@ -73,39 +73,66 @@ class PimpinanMockData {
     final List<Map<String, dynamic>> results = List.from(_manualAttendances);
     final now = DateTime.now();
 
-    for (var inbox in KorsisInboxMockData.items) {
-      if (inbox.rewardPunishmentName.toLowerCase().contains('izin') &&
-          inbox.status == 'disetujui') {
-        final existing = results.any((r) => r['id'] == 'izin_${inbox.id}');
-        if (!existing) {
-          results.add({
-            'id': 'izin_${inbox.id}',
-            'title': 'Izin Kegiatan',
-            'date': _getFormattedDateFrom(inbox.timestamp),
-            'time':
-                '${inbox.timestamp.hour.toString().padLeft(2, '0')}:${inbox.timestamp.minute.toString().padLeft(2, '0')} WIB',
-            'dateTime': inbox.timestamp,
-            'status': 'Izin',
-            'type': 'izin',
-            'method': 'Pengajuan Surat',
-            'verification': 'Valid',
-            'location': '-',
-            'device': '-',
-            'image': null,
-          });
+    final approvedIzins = KorsisInboxMockData.items
+        .where((i) => i.isIzin && i.status == 'disetujui' && i.izinStartTime != null && i.izinEndTime != null)
+        .toList();
+
+    // Remove any manual attendances that fall within an approved Izin period
+    results.removeWhere((att) {
+      final dt = att['dateTime'] as DateTime;
+      for (var izin in approvedIzins) {
+        if (dt.isAfter(izin.izinStartTime!) && dt.isBefore(izin.izinEndTime!) ||
+            dt.isAtSameMomentAs(izin.izinStartTime!) || dt.isAtSameMomentAs(izin.izinEndTime!)) {
+          return true;
         }
       }
-    }
+      return false;
+    });
 
     for (var zone in AttendanceZones.activeZones) {
-      if (now.isAfter(zone.cutoffTime)) {
-        final attended = results.any(
-          (r) => r['title'] == zone.name || r['title'] == zone.activityName,
-        );
+      bool isIzin = false;
+      for (var izin in approvedIzins) {
+        // If the zone falls within the izin period
+        if (zone.cutoffTime.isAfter(izin.izinStartTime!) && zone.startTime.isBefore(izin.izinEndTime!)) {
+          isIzin = true;
+          break;
+        }
+      }
+
+      final attended = results.any(
+        (r) => r['title'] == zone.name || r['title'] == zone.activityName,
+      );
+
+      final dt = zone.startTime;
+      final startStr = '${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
+      final endStr = '${zone.endTime.hour.toString().padLeft(2, '0')}.${zone.endTime.minute.toString().padLeft(2, '0')}';
+      final deadlineStr = '${zone.deadline.hour.toString().padLeft(2, '0')}.${zone.deadline.minute.toString().padLeft(2, '0')}';
+
+      if (isIzin) {
         if (!attended) {
           results.add({
+            'id': 'izin_${zone.id}',
+            'title': zone.activityName,
+            'date': _getFormattedDateFrom(zone.cutoffTime),
+            'time': '-',
+            'dateTime': zone.cutoffTime,
+            'status': 'Izin',
+            'type': 'izin',
+            'method': 'Surat Izin Khusus',
+            'verification': 'Valid',
+            'location': zone.name,
+            'device': '-',
+            'image': null,
+            'waktuPelaksanaan': '$startStr - $endStr',
+            'waktuBatasAbsen': deadlineStr,
+            'pembuatZona': zone.creator,
+          });
+        }
+      } else {
+        if (now.isAfter(zone.cutoffTime) && !attended) {
+          results.add({
             'id': 'alpha_${zone.id}',
-            'title': zone.name,
+            'title': zone.activityName,
             'date': _getFormattedDateFrom(zone.cutoffTime),
             'time': '-',
             'dateTime': zone.cutoffTime,
@@ -113,9 +140,12 @@ class PimpinanMockData {
             'type': 'alpha',
             'method': '-',
             'verification': '-',
-            'location': '-',
+            'location': zone.name,
             'device': '-',
             'image': null,
+            'waktuPelaksanaan': '$startStr - $endStr',
+            'waktuBatasAbsen': deadlineStr,
+            'pembuatZona': zone.creator,
           });
         }
       }

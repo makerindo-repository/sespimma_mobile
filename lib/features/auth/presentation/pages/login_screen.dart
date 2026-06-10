@@ -134,7 +134,11 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _handleAuthState(BuildContext context, AuthState state) {
     if (state is AuthSuccess) {
-      Navigator.pushReplacementNamed(context, '/main');
+      if (state.user.isFirstLogin) {
+        Navigator.pushReplacementNamed(context, '/reset-password');
+      } else {
+        Navigator.pushReplacementNamed(context, '/main');
+      }
     } else if (state is AuthFailure) {
       AppNotifier.showError(context, state.message);
     }
@@ -279,7 +283,7 @@ class _LoginFormState extends State<LoginForm> {
       _handleRememberMeStorage();
       context.read<AuthBloc>().add(
         LoginSubmitted(
-          nrp: _nrpController.text.trim(),
+          nrpNip: _nrpController.text.trim(),
           password: _passwordController.text,
           fcmToken: 'DUMMY_TOKEN',
         ),

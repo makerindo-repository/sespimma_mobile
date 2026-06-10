@@ -1,48 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:sespimma_mobile/features/auth/domain/entities/user_entity.dart';
+import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
-import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 
 class DetailedCompetencies extends StatelessWidget {
   final String category;
-  final UserEntity user;
+  final FinalRecapModel recap;
 
   const DetailedCompetencies({
     super.key,
     required this.category,
-    required this.user,
+    required this.recap,
   });
 
   @override
   Widget build(BuildContext context) {
-    double baseScore = 0.0;
     if (category == 'Mental Kepribadian') {
-      baseScore = user.nilaiMental;
-    } else if (category == 'Akademik') {
-      baseScore = user.nilaiAkademik;
-    } else {
-      baseScore = user.nilaiJasmani;
-    }
+      double ns = recap.rawScores['NS'] ?? 0.0;
+      double pengamatan = recap.rawScores['NilaiPengamatan'] ?? 0.0;
+      double sosiometriAwal = ns;
+      double sosiometriAkhir = ns;
 
-    if (category == 'Mental Kepribadian') {
-      final scores = SerdikMentalScores.getScores(user.noSerdik);
-
-      double moral = scores?['moral']?.toDouble() ?? 0.0;
-      double disiplin = scores?['disiplin']?.toDouble() ?? 0.0;
-      double kepemimpinan = scores?['kepemimpinan']?.toDouble() ?? 0.0;
-      double pengendalian = scores?['pengendalian_diri']?.toDouble() ?? 0.0;
-      double penampilan = scores?['penampilan']?.toDouble() ?? 0.0;
-      double sosiometriAwal = scores?['sosiometri_awal']?.toDouble() ?? 0.0;
-      double sosiometriAkhir = scores?['sosiometri_akhir']?.toDouble() ?? 0.0;
-      double pengamatan =
-          ((moral * 20) +
-              (disiplin * 15) +
-              (kepemimpinan * 20) +
-              (pengendalian * 15) +
-              (penampilan * 15)) /
-          85;
-      double ns = (sosiometriAwal + sosiometriAkhir) / 2;
+      double moral = recap.rawScores['moral_score'] ?? 0.0;
+      double disiplin = recap.rawScores['disiplin_score'] ?? 0.0;
+      double kepemimpinan = recap.rawScores['kepemimpinan_score'] ?? 0.0;
+      double pengendalian = recap.rawScores['pengendalian_score'] ?? 0.0;
+      double penampilan = recap.rawScores['penampilan_score'] ?? 0.0;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,10 +35,7 @@ class DetailedCompetencies extends StatelessWidget {
           _CompetencyItem(title: 'Moral (20%)', score: moral),
           _CompetencyItem(title: 'Disiplin (15%)', score: disiplin),
           _CompetencyItem(title: 'Kepemimpinan (20%)', score: kepemimpinan),
-          _CompetencyItem(
-            title: 'Pengendalian Diri (15%)',
-            score: pengendalian,
-          ),
+          _CompetencyItem(title: 'Pengendalian Diri (15%)', score: pengendalian),
           _CompetencyItem(title: 'Penampilan (15%)', score: penampilan),
 
           const SizedBox(height: AppDimensions.lg),
@@ -77,37 +57,14 @@ class DetailedCompetencies extends StatelessWidget {
         ],
       );
     } else if (category == 'Akademik') {
-      double base = baseScore == 0 ? 0.0 : baseScore;
+      double nkkp = recap.rawScores['NMPN'] ?? 0.0;
+      double npkp = recap.rawScores['NMPN'] ?? 0.0;
+      double nkp = recap.rawScores['NKa'] ?? 0.0;
+      double ujianMp = recap.rawScores['NUMP'] ?? 0.0;
+      double np = (ujianMp * 0.3) + (nkkp * 0.05) + (npkp * 0.05) + (nkp * 0.60);
 
-      double nkkpMateri = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-      double nkkpPaparan = base == 0 ? 0 : (base - 0.2).clamp(0, 100);
-      double nkkpKeaktifan = base == 0 ? 0 : (base + 0.8).clamp(0, 100);
-      double nkkp =
-          ((nkkpMateri * 35) + (nkkpPaparan * 35) + (nkkpKeaktifan * 30)) / 100;
-
-      double npkpMateri = base == 0 ? 0 : (base + 0.1).clamp(0, 100);
-      double npkpPaparan = base == 0 ? 0 : (base - 0.5).clamp(0, 100);
-      double npkpKeaktifan = base == 0 ? 0 : (base + 0.4).clamp(0, 100);
-      double npkp =
-          ((npkpMateri * 35) + (npkpPaparan * 35) + (npkpKeaktifan * 30)) / 100;
-
-      double nkpMateri = base == 0 ? 0 : (base - 0.8).clamp(0, 100);
-      double nkpPaparan = base == 0 ? 0 : (base - 0.4).clamp(0, 100);
-      double nkp = ((nkpMateri * 50) + (nkpPaparan * 50)) / 100;
-
-      double ujianMp = base == 0 ? 0 : (base + 1.2).clamp(0, 100);
-      double np = ((ujianMp * 30) + (nkkp * 5) + (npkp * 5) + (nkp * 60)) / 100;
-
-      double nskAktif = base == 0 ? 0 : (base + 2.5).clamp(0, 100);
-      double nskProduk = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-      double nskRuang = base == 0 ? 0 : (base + 1.8).clamp(0, 100);
-      double nsk = ((nskAktif * 60) + (nskProduk * 20) + (nskRuang * 20)) / 100;
-
-      double ntMateri = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-      double ntPenulisan = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-      double ntPaparan = base == 0 ? 0 : (base + 2.0).clamp(0, 100);
-      double nt =
-          ((ntMateri * 40) + (ntPenulisan * 30) + (ntPaparan * 30)) / 100;
+      double nsk = recap.rawScores['NSK'] ?? 0.0;
+      double nt = recap.rawScores['NPa'] ?? 0.0;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,12 +80,12 @@ class DetailedCompetencies extends StatelessWidget {
             children: [
               _SubCompetencyItem(
                 title: 'Materi dan Penulisan (35%)',
-                score: nkkpMateri,
+                score: nkkp,
               ),
-              _SubCompetencyItem(title: 'Paparan (35%)', score: nkkpPaparan),
+              _SubCompetencyItem(title: 'Paparan (35%)', score: nkkp),
               _SubCompetencyItem(
                 title: 'Keaktifan (30%)',
-                score: nkkpKeaktifan,
+                score: nkkp,
               ),
             ],
           ),
@@ -138,12 +95,12 @@ class DetailedCompetencies extends StatelessWidget {
             children: [
               _SubCompetencyItem(
                 title: 'Materi dan Penulisan (35%)',
-                score: npkpMateri,
+                score: npkp,
               ),
-              _SubCompetencyItem(title: 'Paparan (35%)', score: npkpPaparan),
+              _SubCompetencyItem(title: 'Paparan (35%)', score: npkp),
               _SubCompetencyItem(
                 title: 'Keaktifan (30%)',
-                score: npkpKeaktifan,
+                score: npkp,
               ),
             ],
           ),
@@ -153,9 +110,9 @@ class DetailedCompetencies extends StatelessWidget {
             children: [
               _SubCompetencyItem(
                 title: 'Materi dan Penulisan (50%)',
-                score: nkpMateri,
+                score: nkp,
               ),
-              _SubCompetencyItem(title: 'Paparan (50%)', score: nkpPaparan),
+              _SubCompetencyItem(title: 'Paparan (50%)', score: nkp),
             ],
           ),
 
@@ -167,15 +124,15 @@ class DetailedCompetencies extends StatelessWidget {
             children: [
               _SubCompetencyItem(
                 title: 'Keaktifan Perseorangan (60%)',
-                score: nskAktif,
+                score: nsk,
               ),
               _SubCompetencyItem(
                 title: 'Produk Perseorangan (20%)',
-                score: nskProduk,
+                score: nsk,
               ),
               _SubCompetencyItem(
                 title: 'Tata Ruang Kelompok (20%)',
-                score: nskRuang,
+                score: nsk,
               ),
             ],
           ),
@@ -188,35 +145,39 @@ class DetailedCompetencies extends StatelessWidget {
             children: [
               _SubCompetencyItem(
                 title: 'Materi NPTT atau Taskap (40%)',
-                score: ntMateri,
+                score: nt,
               ),
               _SubCompetencyItem(
                 title: 'Penulisan Efektif (30%)',
-                score: ntPenulisan,
+                score: nt,
               ),
               _SubCompetencyItem(
                 title: 'Paparan dan Diskusi (30%)',
-                score: ntPaparan,
+                score: nt,
               ),
             ],
           ),
         ],
       );
     } else {
-      double base = baseScore == 0 ? 0.0 : baseScore;
+      double kesehatan = recap.rawScores['NKes'] ?? 0.0;
+      double jasmani = recap.rawScores['NJas'] ?? 0.0;
+      
+      double kesAwal = recap.rawScores['kes_awal'] ?? 0.0;
+      double kesAkhir = recap.rawScores['kes_akhir'] ?? 0.0;
+      double kesStatus = recap.rawScores['kes_status'] ?? 0.0;
 
-      double kesAwal = base == 0 ? 0 : (base + 1.2).clamp(0, 100);
-      double kesStatus = base == 0 ? 0 : (base - 0.5).clamp(0, 100);
-      double kesAkhir = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-      double kesehatan = (kesAwal + kesStatus + kesAkhir) / 3;
-
-      double samaptaA = base == 0 ? 0 : (base + 2.0).clamp(0, 100);
-      double pullUp = base == 0 ? 0 : (base + 1.5).clamp(0, 100);
-      double sitUp = base == 0 ? 0 : (base - 1.0).clamp(0, 100);
-      double pushUp = base == 0 ? 0 : (base + 0.5).clamp(0, 100);
-      double shuttleRun = base == 0 ? 0 : (base + 1.2).clamp(0, 100);
+      double samaptaA = recap.rawScores['NGA'] ?? 0.0;
+      
+      // Calculate average of NGB1-4 for Samapta B title score if needed,
+      // or just use NGB as average. The rawScores only has NGB1-4,
+      // let's compute samaptaB average:
+      double pullUp = recap.rawScores['NGB1'] ?? 0.0;
+      double sitUp = recap.rawScores['NGB2'] ?? 0.0;
+      double pushUp = recap.rawScores['NGB3'] ?? 0.0;
+      double shuttleRun = recap.rawScores['NGB4'] ?? 0.0;
+      
       double samaptaB = (pullUp + sitUp + pushUp + shuttleRun) / 4;
-      double jasmani = (samaptaA + samaptaB) / 2;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,

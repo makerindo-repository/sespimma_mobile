@@ -2,7 +2,10 @@ import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
+import 'package:sespimma_mobile/injection_container.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../data/datasources/auth_remote_data_source.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -14,6 +17,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _nrpController = TextEditingController();
   final _tokenController = TextEditingController();
 
   late AnimationController _animationController;
@@ -27,7 +31,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   static const String _adminWaNumber = '6285862393696';
   static const String _adminWaText =
       'Halo Admin Makerindo, saya di akun SESPIMMA ingin meminta token reset password.';
-  static const String _validResetToken = 'MAKERINDO75';
 
   bool _isLoading = false;
 
@@ -57,6 +60,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _nrpController.dispose();
     _tokenController.dispose();
     super.dispose();
   }
@@ -87,18 +91,38 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         _isLoading = true;
       });
 
-      await Future.delayed(const Duration(milliseconds: 1500));
+      try {
+        final authRemoteDataSource = sl<AuthRemoteDataSource>();
+        final isValid = await authRemoteDataSource.verifyResetToken(
+          _nrpController.text.trim(),
+          _tokenController.text.trim(),
+        );
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (_tokenController.text.trim() == _validResetToken) {
-        Navigator.pushReplacementNamed(context, '/reset-password');
-      } else {
-        AppNotifier.showError(context, 'Token verifikasi tidak valid!');
+        if (isValid) {
+          Navigator.pushReplacementNamed(
+            context,
+            '/reset-password',
+            arguments: {
+              'nrpNip': _nrpController.text.trim(),
+              'token': _tokenController.text.trim(),
+            },
+          );
+        } else {
+          AppNotifier.showError(context, 'Token tidak valid!');
+        }
+      } catch (e) {
+        if (mounted) {
+          final errorMessage = e.toString().replaceAll('Exception: ', '');
+          AppNotifier.showError(context, errorMessage);
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -221,6 +245,58 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Text(
+              'NRP',
+              style: TextStyle(
+                fontSize: AppDimensions.fontDefault,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey.shade700,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.sm),
+            TextFormField(
+              controller: _nrpController,
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.next,
+              validator: (value) => value == null || value.isEmpty
+                  ? 'NRP tidak boleh kosong'
+                  : null,
+              decoration: InputDecoration(
+                hintText: 'Masukkan NRP Anda',
+                hintStyle: TextStyle(
+                  color: Colors.blueGrey.shade300,
+                  fontSize: AppDimensions.fontLg,
+                ),
+                prefixIcon: Icon(
+                  AppIcons.user,
+                  color: Colors.blueGrey.shade400,
+                  size: AppDimensions.iconDefault + 2,
+                ),
+                filled: true,
+                fillColor: const Color(0xFFFAFAFA),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  borderSide: const BorderSide(color: _primaryNavy, width: 1.5),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMd),
+                  borderSide: BorderSide(color: Colors.red.shade400),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.lg),
             Text(
               'Token Verifikasi',
               style: TextStyle(

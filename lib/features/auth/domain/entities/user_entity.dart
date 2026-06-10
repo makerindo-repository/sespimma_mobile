@@ -15,6 +15,7 @@ class UserEntity extends Equatable {
   final String? tanggalLahir;
   final String? umur;
   final bool? isNakApproved;
+  final bool isFirstLogin;
   final String? profilePhoto;
   final String noSerdik;
   final String nik;
@@ -51,6 +52,7 @@ class UserEntity extends Equatable {
     this.tanggalLahir,
     this.umur,
     this.isNakApproved,
+    this.isFirstLogin = false,
     this.profilePhoto,
     required this.noSerdik,
     required this.nik,
@@ -108,6 +110,7 @@ class UserEntity extends Equatable {
     String? tanggalLahir,
     String? umur,
     bool? isNakApproved,
+    bool? isFirstLogin,
     String? profilePhoto,
     bool clearProfilePhoto = false,
     String? noSerdik,
@@ -145,6 +148,7 @@ class UserEntity extends Equatable {
       tanggalLahir: tanggalLahir ?? this.tanggalLahir,
       umur: umur ?? this.umur,
       isNakApproved: isNakApproved ?? this.isNakApproved,
+      isFirstLogin: isFirstLogin ?? this.isFirstLogin,
       profilePhoto: clearProfilePhoto
           ? null
           : (profilePhoto ?? this.profilePhoto),
@@ -186,6 +190,7 @@ class UserEntity extends Equatable {
     tanggalLahir,
     umur,
     isNakApproved,
+    isFirstLogin,
     profilePhoto,
     noSerdik,
     nik,

@@ -4,14 +4,15 @@ part 'login_request.g.dart';
 
 @JsonSerializable()
 class LoginRequest {
-  final String nrp;
+  @JsonKey(name: 'nrp_nip')
+  final String nrpNip;
   final String password;
 
   @JsonKey(name: 'fcm_token')
   final String fcmToken;
 
   const LoginRequest({
-    required this.nrp,
+    required this.nrpNip,
     required this.password,
     required this.fcmToken,
   });

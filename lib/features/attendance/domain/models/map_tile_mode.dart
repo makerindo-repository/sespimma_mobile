@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:latlong2/latlong.dart';
 
 enum MapTileMode {
@@ -157,6 +158,36 @@ class AttendanceZones {
 
   static void clearAllZones() {
     _dynamicZones.clear();
+  }
+
+  static Future<void> loadFromApi(Dio dio) async {
+    try {
+      final response = await dio.get('/kegiatan/today/zones');
+      final body = response.data;
+      if (body is Map && body['data'] is List) {
+        clearAllZones();
+        for (final z in body['data'] as List<dynamic>) {
+          addZone(AttendanceZone(
+            id: z['id'] as String,
+            name: z['name'] as String,
+            activityName: z['activity_name'] as String,
+            latitude: (z['latitude'] as num).toDouble(),
+            longitude: (z['longitude'] as num).toDouble(),
+            radiusMeters: (z['radius_meters'] as num).toDouble(),
+            creator: 'Korsis',
+            startTime: DateTime.parse(z['start_time'] as String),
+            endTime: DateTime.parse(z['end_time'] as String),
+            deadline: DateTime.parse(z['deadline'] as String),
+            cutoffTime: DateTime.parse(z['cutoff_time'] as String),
+            createdAt: DateTime.parse(z['created_at'] as String),
+            isRoutine: (z['is_routine'] as bool?) ?? false,
+            isTraining: (z['is_training'] as bool?) ?? false,
+          ));
+        }
+      }
+    } catch (_) {
+      // silent — keep existing zones on failure
+    }
   }
 
   static AttendanceZone get apelHarian => activeZones.first;

@@ -8,6 +8,9 @@ import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assessment/utils/reward_punishment_eligibility.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
 import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
@@ -848,7 +851,13 @@ class _KorsisMentalFormScreenState extends State<KorsisMentalFormScreen> {
                         nosis: _selectedSerdik!['no_serdik'],
                         pokjar: _selectedSerdik!['kelompok_kelas'],
                         isReward: widget.isReward,
-                        senderName: 'Kombes Pol. Ahmad Setiawan',
+                        senderName: () {
+                          final authState = context.read<AuthBloc>().state;
+                          if (authState is AuthSuccess) {
+                            return authState.user.name;
+                          }
+                          return 'Korsis Sespimma';
+                        }(),
                         timestamp: DateTime.now(),
                         points: _selectedCategory!.point,
                         description:

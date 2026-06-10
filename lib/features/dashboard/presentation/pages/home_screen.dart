@@ -7,16 +7,19 @@ import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../notification/presentation/pages/notification_screen.dart';
+import '../../../notification/presentation/bloc/notification_cubit.dart';
+import '../../../notification/presentation/bloc/notification_state.dart';
 import '../../../activity/presentation/pages/activity_history_screen.dart';
 import '../../../assessment/data/models/korsis_inbox_mock_data.dart';
-import '../../../notification/data/datasources/notification_mock_data.dart';
 import '../../../attendance/presentation/pages/attendance_history_screen.dart';
 import 'package:sespimma_mobile/shared/widgets/evidence_bottom_sheet.dart';
 import '../../../assessment/data/models/sociometry_period_config.dart';
+
+import 'package:sespimma_mobile/features/gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
+import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 import '../../../auth/domain/entities/user_entity.dart';
-import '../../../leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 import '../../../auth/data/datasources/serdik_real_data.dart';
-import '../../../gadik_assignment/data/datasources/gadik_assignment_mock_data.dart';
+import '../../../assignment/data/models/tugas_model.dart';
 import '../../../attendance/domain/models/map_tile_mode.dart';
 import '../../../leadership_report/domain/services/score_calculator_service.dart';
 import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
@@ -107,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen>
     if (sender == 'Gadik A') return 'Kombes Pol. Anton Suratto';
     if (sender == 'Gadik B') return 'Kombes Pol. Budi Santoso';
     if (sender == 'Gadik C') return 'Kombes Pol. Candra Muka';
-    if (sender == 'Korsis A') return 'Kombes Pol. Ahmad Setiawan';
     if (sender == 'Patun A') return 'Kombes Pol. Bambang Sugeng';
     return sender;
   }
@@ -146,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
 
       for (var inbox in KorsisInboxMockData.items) {
-        if (inbox.status == 'approved' && inbox.nosis == user.noSerdik) {
+        if (inbox.status == 'disetujui' && inbox.nosis == user.noSerdik) {
           final isReward = inbox.isReward;
           final typeStr = isReward ? 'reward' : 'punishment';
           final pointStr = isReward
@@ -193,41 +195,43 @@ class _HomeScreenState extends State<HomeScreen>
             'points': '',
             'type': 'task',
           });
-        } else if (task.status == 'Selesai') {
-          list.add({
+        }
+      }
+
+      // Check tasks submitted by this user
+      final submissions = PimpinanMockData.sharedTaskSubmissions
+          .where((sub) => sub['noSerdik'] == user.noSerdik)
+          .toList();
+
+      for (var sub in submissions) {
+        final task = PimpinanMockData.sharedTasks.firstWhere(
+          (t) => t.id == sub['taskId'],
+          orElse: () => TugasModel(
+            id: '',
+            judul: '',
+            deskripsi: '',
+            mapel: '',
+            deadline: DateTime.now(),
+            status: '',
+            createdBy: '',
+            createdByName: '',
+          ),
+        );
+        if (task.id.isEmpty) continue;
+
+        if (sub['status'] == 'Terkirim' || sub['status'] == 'Dinilai') {
+           final isDinilai = sub['status'] == 'Dinilai';
+           list.add({
             'id': 'task_${task.id}',
             'title': task.judul,
-            'subtitle':
-                'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
-            'timeRaw': _formatDynamicTime(task.createdAt),
-            'date': _getDynamicDateStr(task.createdAt),
-            'dateTime': task.createdAt,
+            'subtitle': isDinilai
+                ? 'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera'
+                : 'Selamat tugas kamu sudah dikirim ke ${_getGadikFullName(task.createdBy)}. Terus pantau riwayat tugas untuk melihat nilai',
+            'timeRaw': _formatDynamicTime(DateTime.parse(sub['submittedAt'] ?? DateTime.now().toIso8601String())),
+            'date': _getDynamicDateStr(DateTime.parse(sub['submittedAt'] ?? DateTime.now().toIso8601String())),
+            'dateTime': DateTime.parse(sub['submittedAt'] ?? DateTime.now().toIso8601String()),
             'points': '',
-            'type': 'task_dikirim',
-          });
-        } else if (task.status == 'Dinilai') {
-          list.add({
-            'id': 'task_${task.id}',
-            'title': task.judul,
-            'subtitle':
-                'Selamat tugas kamu sudah dinilai oleh ${_getGadikFullName(task.createdBy)}. Silahkan cek nilaimu segera',
-            'timeRaw': _formatDynamicTime(task.createdAt),
-            'date': _getDynamicDateStr(task.createdAt),
-            'dateTime': task.createdAt,
-            'points': '',
-            'type': 'task_dinilai',
-          });
-        } else if (task.status == 'Remedial') {
-          list.add({
-            'id': 'task_${task.id}',
-            'title': task.judul,
-            'subtitle':
-                'Remedial untuk kamu, segera cek tugas aktif. Kumpulkan sebelum tenggat waktu (${_getDynamicDateStr(task.deadline)}, ${_formatDynamicTime(task.deadline)})',
-            'timeRaw': _formatDynamicTime(task.createdAt),
-            'date': _getDynamicDateStr(task.createdAt),
-            'dateTime': task.createdAt,
-            'points': '',
-            'type': 'task_remedial',
+            'type': isDinilai ? 'task_dinilai' : 'task_dikirim',
           });
         }
       }
@@ -353,7 +357,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 const SizedBox(height: AppDimensions.md),
                                 _buildAnimatedSection(
                                   context: context,
-                                  child: _buildAttendanceRecap(context),
+                                  child: _buildAttendanceRecap(context, user),
                                   beginInterval: 0.4,
                                   endInterval: 0.7,
                                 ),
@@ -364,6 +368,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   beginInterval: 0.5,
                                   endInterval: 1.0,
                                 ),
+                                const SizedBox(height: AppDimensions.xxxl),
                               ],
                             ),
                           ),
@@ -471,9 +476,9 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 );
               },
-              child: ValueListenableBuilder<int>(
-                valueListenable: NotificationMockData.unreadCountNotifier,
-                builder: (context, unreadCount, child) {
+              child: BlocBuilder<NotificationCubit, NotificationState>(
+                builder: (context, notificationState) {
+                  final unreadCount = notificationState.unreadCount;
                   return Badge(
                     isLabelVisible: unreadCount > 0,
                     backgroundColor: _dangerRed,
@@ -887,12 +892,30 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildAttendanceRecap(BuildContext context) {
-    final history = PimpinanMockData.serdikAttendanceHistory;
+  Widget _buildAttendanceRecap(BuildContext context, UserEntity user) {
+    final history = PimpinanMockData.serdikAttendanceHistory.where((e) {
+      return e['nrp'] == user.nrp || e['nama'] == user.name;
+    }).toList();
     final int hadir = history.where((e) => e['type'] == 'hadir').length;
     final int telat = history.where((e) => e['type'] == 'telat').length;
-    final int izin = history.where((e) => e['type'] == 'izin').length;
-    final int alpha = history.where((e) => e['type'] == 'alpha').length;
+    final int izin = KorsisInboxMockData.items
+        .where((i) => i.isIzin && i.status == 'approved' && i.nosis == user.noSerdik)
+        .length;
+
+    int alpha = history.where((e) => e['type'] == 'alpha').length;
+    final now = DateTime.now();
+    for (var zone in AttendanceZones.activeZones) {
+      if (now.isAfter(zone.cutoffTime)) {
+        bool attended = history.any((h) => h['title'] == zone.activityName);
+        bool hasIzin = KorsisInboxMockData.items.any((i) =>
+            i.isIzin &&
+            i.status == 'approved' &&
+            i.nosis == user.noSerdik);
+        if (!attended && !hasIzin) {
+          alpha++;
+        }
+      }
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

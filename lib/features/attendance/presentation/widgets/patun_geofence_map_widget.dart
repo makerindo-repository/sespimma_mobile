@@ -1,16 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io' as io;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
-import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
-import 'package:sespimma_mobile/features/attendance/data/services/location_sync_service.dart';
+import 'package:sespimma_mobile/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
+import 'package:sespimma_mobile/injection_container.dart';
 
 class PatunGeofenceMapWidget extends StatefulWidget {
   final String pokjar;
@@ -30,7 +33,8 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
   String? _gpsErrorMessage;
   bool _isPermissionError = false;
   LatLng? _userLatLng;
-  Timer? _refreshTimer;
+  io.WebSocket? _wsSocket;
+  final Map<int, Map<String, dynamic>> _liveLocations = {};
 
   StreamSubscription<Position>? _positionStreamSubscription;
   StreamSubscription<ServiceStatus>? _serviceStatusSubscription;
@@ -71,13 +75,7 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     });
 
     _checkPermissionsAndStartTracking();
-    _generateMockSerdikData();
-
-    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      if (mounted) {
-        _generateMockSerdikData();
-      }
-    });
+    _connectWebSocket();
   }
 
   void _setupPulseAnimation() {
@@ -187,14 +185,14 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
   void didUpdateWidget(covariant PatunGeofenceMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.pokjar != widget.pokjar) {
-      _generateMockSerdikData();
+      _filterByPokjar();
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _refreshTimer?.cancel();
+    _wsSocket?.close();
     _serviceStatusSubscription?.cancel();
     _positionStreamSubscription?.cancel();
     _pulseController.dispose();
@@ -202,72 +200,100 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
     super.dispose();
   }
 
-  void _generateMockSerdikData() {
-    final baseList = SerdikRealData.records
-        .where(
-          (r) => widget.pokjar.isEmpty || r['kelompok_kelas'] == widget.pokjar,
-        )
-        .toList();
+  Future<void> _connectWebSocket() async {
+    try {
+      final token = await sl<AuthLocalDataSource>().getAccessToken();
+      if (token == null) return;
 
-    final List<Map<String, dynamic>> generated = [];
-    const Distance distanceCalc = Distance();
+      final baseUrl = dotenv.env['API_BASE_URL'] ?? '';
+      final wsBase = baseUrl
+          .replaceFirst('https://', 'wss://')
+          .replaceFirst('http://', 'ws://');
+      final wsUrl = '$wsBase/ws/locations?token=$token';
 
-    for (int i = 0; i < baseList.length; i++) {
-      final serdik = Map<String, dynamic>.from(baseList[i]);
-      final noSerdik = serdik['no_serdik']?.toString() ?? '';
+      _wsSocket = await io.WebSocket.connect(wsUrl);
+      _wsSocket!.listen(
+        (data) {
+          if (!mounted) return;
+          try {
+            final msg = jsonDecode(data as String) as Map<String, dynamic>;
+            if (msg['type'] != 'location_update') return;
 
-      final backendData = MockBackendDatabase.serdikLocations[noSerdik];
+            final int userId = (msg['user_id'] as num).toInt();
+            final String pokjar = (msg['pokjar'] as String?) ?? '';
+            if (widget.pokjar.isNotEmpty && pokjar != widget.pokjar) return;
 
-      if (backendData == null) continue;
+            final double lat = (msg['latitude'] as num).toDouble();
+            final double lng = (msg['longitude'] as num).toDouble();
+            final String name = (msg['name'] as String?) ?? '';
+            final String role = (msg['role'] as String?) ?? '';
 
-      final double lat = backendData['latitude'];
-      final double lng = backendData['longitude'];
+            double dist = 999999.0;
+            String status = 'Belum Absen';
+            Color color = Colors.grey;
 
-      double distanceOffset = 999999.0;
-      if (_zones.isNotEmpty) {
-        distanceOffset = distanceCalc.as(
-          LengthUnit.Meter,
-          LatLng(lat, lng),
-          LatLng(_zones.first.latitude, _zones.first.longitude),
-        );
-      }
+            if (_zones.isNotEmpty) {
+              final zone = _zones.first;
+              dist = Geolocator.distanceBetween(
+                  zone.latitude, zone.longitude, lat, lng);
+              final now = DateTime.now();
+              if (dist <= zone.radiusMeters) {
+                if (now.isAfter(zone.deadline)) {
+                  status = 'Telat';
+                  color = Colors.yellow.shade700;
+                } else {
+                  status = 'Hadir';
+                  color = Colors.green.shade600;
+                }
+              } else if (now.isAfter(zone.cutoffTime)) {
+                status = 'Tanpa Keterangan';
+                color = Colors.red.shade600;
+              }
+            }
 
-      String status = 'Belum Absen';
-      Color color = Colors.grey;
-
-      if (_zones.isNotEmpty) {
-        final zone = _zones.first;
-        final now = DateTime.now();
-        if (distanceOffset <= zone.radiusMeters) {
-          if (now.isAfter(zone.deadline)) {
-            status = 'Telat';
-            color = Colors.yellow.shade700;
-          } else {
-            status = 'Hadir';
-            color = Colors.grey;
+            setState(() {
+              _liveLocations[userId] = {
+                'nama_lengkap': name,
+                'pangkat': role,
+                'no_serdik': userId.toString(),
+                'profile_photo': null,
+                'mock_lat': lat,
+                'mock_lng': lng,
+                'mock_status': status,
+                'mock_color': color,
+                'mock_distance': dist,
+              };
+              _serdikMarkers = _liveLocations.values.toList();
+            });
+          } catch (_) {}
+        },
+        onDone: () {
+          if (mounted) {
+            Future.delayed(const Duration(seconds: 5), _connectWebSocket);
           }
-        } else {
-          if (now.isAfter(zone.cutoffTime)) {
-            status = 'Tanpa Keterangan';
-            color = Colors.red.shade600;
-          } else {
-            status = 'Belum Absen';
-            color = Colors.grey;
+        },
+        onError: (_) {
+          if (mounted) {
+            Future.delayed(const Duration(seconds: 5), _connectWebSocket);
           }
-        }
+        },
+        cancelOnError: false,
+      );
+    } catch (_) {
+      if (mounted) {
+        Future.delayed(const Duration(seconds: 10), _connectWebSocket);
       }
-
-      serdik['mock_lat'] = lat;
-      serdik['mock_lng'] = lng;
-      serdik['mock_status'] = status;
-      serdik['mock_color'] = color;
-      serdik['mock_distance'] = distanceOffset;
-
-      generated.add(serdik);
     }
+  }
 
+  void _filterByPokjar() {
+    if (!mounted) return;
     setState(() {
-      _serdikMarkers = generated;
+      _serdikMarkers = _liveLocations.values
+          .where((m) =>
+              widget.pokjar.isEmpty ||
+              (m['pangkat'] as String?) == widget.pokjar)
+          .toList();
     });
   }
 
@@ -800,9 +826,9 @@ class _PatunGeofenceMapWidgetState extends State<PatunGeofenceMapWidget>
                     if (mounted) {
                       setState(() {
                         _zones = AttendanceZones.activeZones;
-                        _generateMockSerdikData();
                         _isRefreshingMap = false;
                       });
+                      _filterByPokjar();
                     }
                   },
           ),

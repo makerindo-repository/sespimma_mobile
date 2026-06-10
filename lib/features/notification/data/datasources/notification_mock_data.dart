@@ -219,7 +219,7 @@ class NotificationMockData {
         'title': zone.name,
         'message':
             'Lokasi kegiatan telah dibuat oleh ${_getZoneCreatorFullName(zone.creator)}. Segera melakukan presensi.',
-        'dateTime': zone.startTime,
+        'dateTime': zone.createdAt,
         'isRead': isRead,
         'type': 'zone',
         'person': _getZoneCreatorFullName(zone.creator),

@@ -2,6 +2,10 @@ import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_moc
 import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/serdik_real_data.dart';
 import 'package:sespimma_mobile/core/utils/scoring_calculator.dart';
+import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
+import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
+import 'package:sespimma_mobile/core/constants/reward_punishment_data.dart';
+import 'package:sespimma_mobile/features/assessment/data/models/health_monitoring_data.dart';
 
 class ScoreCalculatorService {
   static List<FinalRecapModel> generateRealReports() {
@@ -69,14 +73,43 @@ class ScoreCalculatorService {
     double dynamicReward = 0.0;
     double dynamicPunishment = 0.0;
 
+    double moral = 80.0;
+    double disiplin = 80.0;
+    double kepemimpinan = 80.0;
+    double pengendalian = 80.0;
+    double penampilan = 80.0;
+
     for (var item in KorsisInboxMockData.items) {
       if (item.nosis == serdikData['no_serdik'] &&
-          item.status == 'approved' &&
+          (item.status == 'approved' || item.status == 'disetujui') &&
           !item.isIzin) {
+        
+        String aspect = '';
+        if (item.rewardPunishmentId != null) {
+          final rule = RewardPunishmentData.rules.firstWhere(
+            (r) => r.id == item.rewardPunishmentId,
+            orElse: () => RewardPunishmentItem(
+                id: '', type: '', aspect: 'MORAL', description: '', point: 0),
+          );
+          aspect = rule.aspect;
+        } else {
+          aspect = 'MORAL'; // Fallback
+        }
+
         if (item.isReward) {
           dynamicReward += item.points;
+          if (aspect == 'MORAL') moral += item.points;
+          if (aspect == 'DISIPLIN') disiplin += item.points;
+          if (aspect == 'KEPEMIMPINAN') kepemimpinan += item.points;
+          if (aspect == 'PENGENDALIAN DIRI') pengendalian += item.points;
+          if (aspect == 'PENAMPILAN') penampilan += item.points;
         } else {
-          dynamicPunishment += item.points;
+          dynamicPunishment += item.points.abs();
+          if (aspect == 'MORAL') moral -= item.points.abs();
+          if (aspect == 'DISIPLIN') disiplin -= item.points.abs();
+          if (aspect == 'KEPEMIMPINAN') kepemimpinan -= item.points.abs();
+          if (aspect == 'PENGENDALIAN DIRI') pengendalian -= item.points.abs();
+          if (aspect == 'PENAMPILAN') penampilan -= item.points.abs();
         }
       }
     }
@@ -130,11 +163,18 @@ class ScoreCalculatorService {
       tanggalLahir: serdikData['tanggal_lahir'] ?? '1985-01-01',
       jenisKelamin: serdikData['jenis_kelamin'] ?? 'Pria',
       rawScores: {
+        'NUMP': _getDouble(raw, 'NUMP'),
         'NKKP': nkkp,
         'NPKP': npkp,
         'NKP': nkp,
         'NP': np,
+        'nsk_keaktifan': keaktifan,
+        'nsk_produk': produk,
+        'nsk_tata_ruang': tataRuang,
         'NSK': nsk,
+        'nt_materi': nam,
+        'nt_penulisan': nkm,
+        'nt_paparan': nkp2,
         'NT': nt,
         'NA': na,
         'NilaiPengamatan': nilaiPengamatan,
@@ -143,6 +183,19 @@ class ScoreCalculatorService {
         'NKes': nkes,
         'NJas': njas,
         'NKJ': nkj,
+        'moral_score': moral,
+        'disiplin_score': disiplin,
+        'kepemimpinan_score': kepemimpinan,
+        'pengendalian_score': pengendalian,
+        'penampilan_score': penampilan,
+        'kes_awal': kesA,
+        'kes_akhir': kesB,
+        'kes_status': kesC,
+        'NGA': nga,
+        'NGB1': ngb1,
+        'NGB2': ngb2,
+        'NGB3': ngb3,
+        'NGB4': ngb4,
       },
     );
   }
@@ -163,42 +216,111 @@ class ScoreCalculatorService {
   }
 
   static Map<String, dynamic> generateSimulatedScores(String noSerdik) {
-    int hash = noSerdik.hashCode;
+    // Dynamically calculate actual score from PimpinanMockData and KorsisInboxMockData
+    // We will find submissions by this serdik
+    final submissions = PimpinanMockData.sharedTaskSubmissions
+        .where((sub) => sub['noSerdik'] == noSerdik)
+        .toList();
 
-    double sim(double base, int varianceIndex) {
-      double offset = ((hash >> varianceIndex) % 15) - 5;
-      return base + offset;
+    double sumNump = 0;
+    int countNump = 0;
+    double sumNkkp = 0;
+    int countNkkp = 0;
+    double sumNpkp = 0;
+    int countNpkp = 0;
+    double sumNkp = 0;
+    int countNkp = 0;
+    List<double> nkpTasks = [];
+
+    for (var sub in submissions) {
+      if (sub['status'] == 'Dinilai') {
+        double score = (sub['score'] as num?)?.toDouble() ?? 0.0;
+        final task = PimpinanMockData.sharedTasks.firstWhere(
+          (t) => t.id == sub['taskId'],
+          orElse: () => TugasModel(
+            id: '',
+            judul: '',
+            deskripsi: '',
+            mapel: '',
+            deadline: DateTime.now(),
+            status: '',
+            createdBy: '',
+            createdByName: '',
+          ),
+        );
+        
+        final mapelLower = task.mapel.toLowerCase();
+        if (mapelLower.contains('nump')) {
+          sumNump += score;
+          countNump++;
+        } else if (mapelLower.contains('nkkp')) {
+          sumNkkp += score;
+          countNkkp++;
+        } else if (mapelLower.contains('npkp')) {
+          sumNpkp += score;
+          countNpkp++;
+        } else if (mapelLower.contains('nkp')) {
+          sumNkp += score;
+          countNkp++;
+          nkpTasks.add(score);
+        }
+      }
     }
 
+    double nmpn = countNump > 0 ? (sumNump / countNump) : 0.0;
+    double nump = countNump > 0 ? (sumNump / countNump) : 0.0;
+
+    double rewardMental = 0.0;
+    double punishmentMental = 0.0;
+    for (var item in KorsisInboxMockData.items) {
+      if (item.nosis == noSerdik && item.status == 'disetujui' && !item.isIzin) {
+        if (item.isReward) {
+          rewardMental += item.points;
+        } else {
+          punishmentMental += item.points;
+        }
+      }
+    }
+
+
+    final healthData = HealthMonitoringData.getHealthData(noSerdik);
+
+    int totalMinus = 0;
+    for (var r in healthData.records) {
+      totalMinus += r.minusPoints;
+    }
+
+    // Default other components to 0.0 if not filled
     return {
-      'NMPN': sim(80, 0),
-      'NPa': sim(80, 1),
-      'NKa': sim(80, 2),
-      'NUMP': sim(80, 3),
+      'NMPN': nmpn,
+      'NPa': countNkkp > 0 ? (sumNkkp / countNkkp) : 0.0,
+      'NKa': countNpkp > 0 ? (sumNpkp / countNpkp) : 0.0,
+      'NKP': countNkp > 0 ? (sumNkp / countNkp) : 0.0,
+      'NUMP': nump,
 
-      'keaktifan_sk': sim(80, 4),
-      'produk_sk': sim(80, 5),
-      'tataruang_sk': sim(80, 6),
+      'keaktifan_sk': 0.0,
+      'produk_sk': 0.0,
+      'tataruang_sk': 0.0,
 
-      'NAm': sim(82, 7),
-      'NKm': sim(82, 8),
-      'NKp': sim(82, 9),
+      'NAm': 0.0,
+      'NKm': 0.0,
+      'NKp': 0.0,
 
-      'reward_mental': ((hash >> 10) % 3).toDouble(),
-      'punishment_mental': ((hash >> 11) % 2).toDouble(),
-      'NS': sim(82, 12),
+      'reward_mental': rewardMental,
+      'punishment_mental': punishmentMental,
+      'NS': 0.0,
 
-      'kes_awal': sim(80, 13),
-      'kes_akhir': sim(81, 14),
-      'kes_pengurangan': ((hash >> 15) % 3).toDouble(),
+      'kes_awal': healthData.nilaiA ?? 0.0,
+      'kes_akhir': healthData.nilaiB ?? 0.0,
+      'kes_pengurangan': totalMinus.toDouble(),
 
-      'NGA': sim(82, 16),
-      'NGB1': sim(82, 17),
-      'NGB2': sim(82, 18),
-      'NGB3': sim(82, 19),
-      'NGB4': sim(82, 20),
+      'NGA': 0.0,
+      'NGB1': 0.0,
+      'NGB2': 0.0,
+      'NGB3': 0.0,
+      'NGB4': 0.0,
 
-      'NKP_tasks': List.generate(10, (i) => sim(80, (21 + i) % 31)),
+      'NKP_tasks': nkpTasks,
     };
   }
 }

@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+
+import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sespimma_mobile/injection_container.dart';
 
 class LocationSyncService {
   static final LocationSyncService _instance = LocationSyncService._internal();
@@ -15,7 +18,7 @@ class LocationSyncService {
 
   static const Duration syncInterval = Duration(seconds: 10);
 
-  void startSyncing(String serdikNrp) {
+  void startSyncing() {
     if (_isSyncing) return;
     _isSyncing = true;
 
@@ -31,18 +34,17 @@ class LocationSyncService {
               _lastPosition = position;
             }
           },
+          onError: (dynamic _) {},
+          cancelOnError: false,
         );
 
     _syncTimer = Timer.periodic(syncInterval, (timer) {
       if (_lastPosition != null) {
-        _sendToBackendAPI(serdikNrp, _lastPosition!);
+        _sendToBackend(_lastPosition!);
       }
     });
 
-    developer.log(
-      'LocationSyncService STARTED for NRP: $serdikNrp',
-      name: 'LocationSync',
-    );
+    developer.log('LocationSyncService STARTED', name: 'LocationSync');
   }
 
   void stopSyncing() {
@@ -52,20 +54,15 @@ class LocationSyncService {
     developer.log('LocationSyncService STOPPED', name: 'LocationSync');
   }
 
-  Future<void> _sendToBackendAPI(String nrp, Position pos) async {
-    MockBackendDatabase.serdikLocations[nrp] = {
-      'latitude': pos.latitude,
-      'longitude': pos.longitude,
-      'timestamp': DateTime.now(),
-    };
-
-    developer.log(
-      'MENGIRIM LOKASI REALTIME KE BACKEND -> NRP: $nrp | Lat: ${pos.latitude}, Lng: ${pos.longitude}',
-      name: 'LocationSyncAPI',
-    );
+  Future<void> _sendToBackend(Position pos) async {
+    try {
+      await sl<Dio>().put('/users/me/location', data: {
+        'latitude': pos.latitude,
+        'longitude': pos.longitude,
+        'accuracy': pos.accuracy,
+      });
+    } catch (_) {
+      // best-effort — silently swallow to avoid UI noise
+    }
   }
-}
-
-class MockBackendDatabase {
-  static final Map<String, Map<String, dynamic>> serdikLocations = {};
 }

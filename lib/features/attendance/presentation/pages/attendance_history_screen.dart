@@ -4,7 +4,6 @@ import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import '../../../../core/theme/app_colors.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
-import 'package:sespimma_mobile/features/attendance/domain/models/map_tile_mode.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -104,32 +103,6 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
   List<Map<String, dynamic>> _getAttendances() {
     final List<Map<String, dynamic>> result = [];
 
-    final activeZones = AttendanceZones.activeZones;
-    for (var zone in activeZones) {
-      final dt = zone.startTime;
-      final startStr =
-          '${dt.hour.toString().padLeft(2, '0')}.${dt.minute.toString().padLeft(2, '0')}';
-      final endStr =
-          '${zone.endTime.hour.toString().padLeft(2, '0')}.${zone.endTime.minute.toString().padLeft(2, '0')}';
-      final deadlineStr =
-          '${zone.deadline.hour.toString().padLeft(2, '0')}.${zone.deadline.minute.toString().padLeft(2, '0')}';
-
-      result.add({
-        'id': 'zone_${zone.id}',
-        'title': zone.activityName,
-        'date': _formatDate(dt),
-        'time': _formatTime(dt),
-        'dateTime': dt,
-        'status': 'Hadir',
-        'type': 'hadir',
-        'location': zone.name,
-        'method': 'Geofencing',
-        'waktuPelaksanaan': '$startStr - $endStr',
-        'waktuBatasAbsen': deadlineStr,
-        'pembuatZona': _getZoneCreatorFullName(zone.creator),
-      });
-    }
-
     for (var att in PimpinanMockData.serdikAttendanceHistory) {
       final dt = att['dateTime'] as DateTime;
       result.add({
@@ -143,9 +116,9 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen>
         'location': att['location'] ?? '-',
         'method': att['method'] ?? '-',
         'attachment': att['attachment'],
-        'waktuPelaksanaan': '07.00 - 09.00',
-        'waktuBatasAbsen': '07.30',
-        'pembuatZona': KorsisRealData.records.first['nama'],
+        'waktuPelaksanaan': att['waktuPelaksanaan'] ?? '00.00 - 00.00',
+        'waktuBatasAbsen': att['waktuBatasAbsen'] ?? '00.00',
+        'pembuatZona': _getZoneCreatorFullName(att['pembuatZona'] ?? 'Sistem'),
       });
     }
 

@@ -9,6 +9,9 @@ import 'package:sespimma_mobile/core/utils/app_notifier.dart';
 import 'package:sespimma_mobile/features/assignment/data/models/tugas_model.dart';
 import 'package:sespimma_mobile/features/leadership_dashboard/data/datasources/pimpinan_mock_data.dart';
 import 'package:sespimma_mobile/features/auth/data/datasources/gadik_real_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 
 class GadikCreateAssignmentScreen extends StatefulWidget {
   final bool isRemedialMode;
@@ -66,6 +69,14 @@ class _GadikCreateAssignmentScreenState
 
       final String id = 'G-${DateTime.now().millisecondsSinceEpoch}';
 
+      final authState = context.read<AuthBloc>().state;
+      String currentName = GadikRealData.records.first['nama'] as String;
+      String currentNrp = GadikRealData.records.first['nrp_nip'] as String;
+      if (authState is AuthSuccess) {
+        currentName = authState.user.name;
+        currentNrp = authState.user.nrp;
+      }
+
       final newTask = GadikAssignmentModel(
         id: id,
         judul: _judulController.text,
@@ -74,7 +85,7 @@ class _GadikCreateAssignmentScreenState
         targetPokjar: _targetPokjar,
         instruksi: _instruksiController.text,
         status: 'Belum Mulai',
-        createdBy: GadikRealData.records.first['nama'],
+        createdBy: currentNrp,
         createdAt: DateTime.now(),
         fileName: _fileName,
         fileUrl: _fileName != null ? 'https://example.com/$_fileName' : null,
@@ -89,8 +100,8 @@ class _GadikCreateAssignmentScreenState
         mapel: _jenisTugas,
         deadline: _deadline!,
         status: 'Aktif',
-        createdBy: GadikRealData.records.first['nrp_nip'],
-        createdByName: GadikRealData.records.first['nama'],
+        createdBy: currentNrp,
+        createdByName: currentName,
       );
       PimpinanMockData.sharedTasks.add(newSerdikTask);
 

@@ -1,4 +1,4 @@
-package com.example.sespimma_mobile
+package com.makerindo.sespimma
 
 import io.flutter.embedding.android.FlutterActivity
 

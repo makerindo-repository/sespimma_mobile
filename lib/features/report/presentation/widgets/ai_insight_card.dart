@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:sespimma_mobile/features/auth/domain/entities/user_entity.dart';
+import 'package:sespimma_mobile/features/leadership_report/data/models/final_recap_model.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 
 class AiInsightCard extends StatelessWidget {
   final String category;
-  final UserEntity user;
+  final FinalRecapModel recap;
 
-  const AiInsightCard({super.key, required this.category, required this.user});
+  const AiInsightCard({super.key, required this.category, required this.recap});
 
   @override
   Widget build(BuildContext context) {
     double score = 0.0;
     if (category == 'Mental Kepribadian') {
-      score = user.nilaiMental;
+      score = recap.mentalScore;
     } else if (category == 'Akademik') {
-      score = user.nilaiAkademik;
+      score = recap.academicScore;
     } else {
-      score = user.nilaiJasmani;
+      score = recap.physicalScore;
     }
 
     bool isWarning = score > 0 && score < 70.0;
@@ -25,28 +25,49 @@ class AiInsightCard extends StatelessWidget {
 
     String insight = _getInsight(isWarning, isExcellent);
 
+    Color bgColor;
+    Color borderColor;
+    Color iconColor;
+    Color titleColor;
+
+    if (score == 0) {
+      bgColor = Colors.blueGrey.shade50;
+      borderColor = Colors.blueGrey.shade100;
+      iconColor = Colors.blueGrey.shade400;
+      titleColor = Colors.blueGrey.shade700;
+    } else if (isWarning) {
+      bgColor = Colors.red.shade50;
+      borderColor = Colors.red.shade200;
+      iconColor = Colors.red.shade700;
+      titleColor = Colors.red.shade900;
+    } else if (isExcellent) {
+      bgColor = Colors.green.shade50;
+      borderColor = Colors.green.shade200;
+      iconColor = Colors.green.shade700;
+      titleColor = Colors.green.shade900;
+    } else {
+      bgColor = Colors.amber.shade50;
+      borderColor = Colors.amber.shade200;
+      iconColor = Colors.amber.shade700;
+      titleColor = Colors.amber.shade900;
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppDimensions.xl - 4),
       decoration: BoxDecoration(
-        color: isWarning ? Colors.red.shade50 : Colors.blue.shade50,
+        color: bgColor,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXl - 4),
-        border: Border.all(
-          color: isWarning ? Colors.red.shade100 : Colors.blue.shade100,
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(AppDimensions.sm),
-            decoration: BoxDecoration(
-              color: isWarning ? Colors.red.shade100 : Colors.blue.shade100,
-              shape: BoxShape.circle,
-            ),
+            padding: const EdgeInsets.all(AppDimensions.xs),
             child: Icon(
               AppIcons.sparkleFill,
-              color: isWarning ? Colors.red.shade700 : Colors.blue.shade700,
-              size: AppDimensions.iconSm,
+              color: iconColor,
+              size: AppDimensions.iconMd,
             ),
           ),
           const SizedBox(width: AppDimensions.md),
@@ -57,9 +78,7 @@ class AiInsightCard extends StatelessWidget {
                 Text(
                   'Rekomendasi',
                   style: TextStyle(
-                    color: isWarning
-                        ? Colors.red.shade900
-                        : Colors.blue.shade900,
+                    color: titleColor,
                     fontSize: AppDimensions.fontSm,
                     fontWeight: FontWeight.w800,
                   ),

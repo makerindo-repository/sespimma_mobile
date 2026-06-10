@@ -1,20 +1,28 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_usecase.dart';
+import '../../domain/usecases/update_password_usecase.dart';
+import '../../domain/usecases/reset_password_usecase.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
-import '../../data/datasources/serdik_real_data.dart';
-import '../../data/datasources/patun_real_data.dart';
-import '../../data/datasources/gadik_real_data.dart';
-import '../../data/datasources/korsis_real_data.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase loginUseCase;
+  final UpdatePasswordUseCase updatePasswordUseCase;
+  final ResetPasswordUseCase resetPasswordUseCase;
+  final AuthRepository authRepository;
 
-  AuthBloc({required this.loginUseCase}) : super(AuthInitial()) {
+  AuthBloc({
+    required this.loginUseCase,
+    required this.updatePasswordUseCase,
+    required this.resetPasswordUseCase,
+    required this.authRepository,
+  }) : super(AuthInitial()) {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<UpdateProfilePhotoRequested>(_onUpdateProfilePhotoRequested);
     on<ChangePasswordRequested>(_onChangePasswordRequested);
+    on<ResetPasswordRequested>(_onResetPasswordRequested);
   }
 
   Future<void> _onLoginSubmitted(
@@ -25,7 +33,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     try {
       final user = await loginUseCase.execute(
-        nrp: event.nrp,
+        nrpNip: event.nrpNip,
         password: event.password,
         fcmToken: event.fcmToken,
       );
@@ -37,48 +45,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onUpdateProfilePhotoRequested(
+  Future<void> _onUpdateProfilePhotoRequested(
     UpdateProfilePhotoRequested event,
     Emitter<AuthState> emit,
-  ) {
-    if (state is AuthSuccess) {
-      final currentUser = (state as AuthSuccess).user;
+  ) async {
+    if (state is! AuthSuccess) return;
+    final currentUser = (state as AuthSuccess).user;
+    emit(AuthLoading());
+    try {
+      String? newPhotoUrl;
+      if (event.photoPath != null) {
+        newPhotoUrl = await authRepository.uploadProfilePhoto(event.photoPath!);
+      } else {
+        await authRepository.deleteProfilePhoto();
+      }
       final updatedUser = currentUser.copyWith(
-        profilePhoto: event.photoPath,
+        profilePhoto: newPhotoUrl,
         clearProfilePhoto: event.photoPath == null,
       );
-
-      if (updatedUser.roleId == 'serdik') {
-        for (var record in SerdikRealData.records) {
-          if (record['no_serdik'] == updatedUser.noSerdik) {
-            record['profile_photo'] = event.photoPath;
-            break;
-          }
-        }
-      } else if (updatedUser.roleId == 'patun') {
-        for (var record in PatunRealData.records) {
-          if (record['nrp'] == updatedUser.nrp) {
-            record['foto'] = event.photoPath;
-            break;
-          }
-        }
-      } else if (updatedUser.roleId == 'gadik') {
-        for (var record in GadikRealData.records) {
-          if (record['nrp'] == updatedUser.nrp) {
-            record['foto'] = event.photoPath;
-            break;
-          }
-        }
-      } else if (updatedUser.roleId == 'korsis') {
-        for (var record in KorsisRealData.records) {
-          if (record['nrp'] == updatedUser.nrp) {
-            record['foto'] = event.photoPath;
-            break;
-          }
-        }
-      }
-
       emit(AuthSuccess(updatedUser));
+    } catch (e) {
+      emit(AuthFailure(e.toString().replaceAll('Exception: ', '')));
+      emit(AuthSuccess(currentUser));
     }
   }
 
@@ -89,16 +77,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (state is AuthSuccess) {
       final user = (state as AuthSuccess).user;
       emit(AuthLoading());
-      await Future.delayed(const Duration(milliseconds: 1200));
 
-      if (event.oldPassword != 'password123') {
-        emit(AuthFailure('Password lama yang Anda masukkan salah.'));
-        await Future.delayed(const Duration(milliseconds: 100));
+      try {
+        await updatePasswordUseCase.execute(newPassword: event.newPassword);
         emit(AuthSuccess(user));
-        return;
+      } catch (e) {
+        emit(AuthFailure(e.toString().replaceAll('Exception: ', '')));
+        emit(AuthSuccess(user)); // restore success state but show error UI via listener
       }
+    }
+  }
 
-      emit(AuthSuccess(user));
+  Future<void> _onResetPasswordRequested(
+    ResetPasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await resetPasswordUseCase.execute(
+        nrpNip: event.nrpNip,
+        token: event.token,
+        newPassword: event.newPassword,
+      );
+      emit(AuthInitial()); // Back to initial so they can login
+    } catch (e) {
+      emit(AuthFailure(e.toString().replaceAll('Exception: ', '')));
+      emit(AuthInitial());
     }
   }
 }

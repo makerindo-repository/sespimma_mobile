@@ -10,7 +10,7 @@ import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'package:sespimma_mobile/features/assessment/presentation/pages/patun_academic_detail_screen.dart';
 import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
-import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_scores.dart';
+import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
 
 class PatunAcademicMonitoringScreen extends StatefulWidget {
   const PatunAcademicMonitoringScreen({super.key});
@@ -29,7 +29,7 @@ class _PatunAcademicMonitoringScreenState
   String _selectedFilter = 'Semua';
   final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _filterOptions = ['Semua', 'Aman', 'Warning', 'Kritis'];
+  final List<String> _filterOptions = ['Semua', 'Aman', 'Warning', 'Kritis', 'Belum Dinilai'];
 
   @override
   void dispose() {
@@ -69,11 +69,14 @@ class _PatunAcademicMonitoringScreenState
               final serdik = Map<String, dynamic>.from(serdikValue);
 
               final noSerdik = serdik['no_serdik']?.toString() ?? '';
-              final scores = SerdikAcademicScores.getScores(noSerdik);
-              final score = (scores['na'] as num?)?.toDouble() ?? 0.0;
+              final rawSimulated = ScoreCalculatorService.generateSimulatedScores(noSerdik);
+              final recap = ScoreCalculatorService.calculateFinalRecap(serdik, rawSimulated);
+              final score = recap.academicScore;
 
               String status;
-              if (score >= 75) {
+              if (score == 0.0) {
+                status = 'Belum Dinilai';
+              } else if (score >= 75) {
                 status = 'Aman';
               } else if (score >= 70) {
                 status = 'Warning';
@@ -394,6 +397,9 @@ class _PatunAcademicMonitoringScreenState
     } else if (status == 'Warning') {
       statusColor = const Color(0xFFF57C00);
       statusIcon = Icons.warning_rounded;
+    } else if (status == 'Belum Dinilai') {
+      statusColor = Colors.blueGrey;
+      statusIcon = Icons.pending_actions_rounded;
     } else {
       statusColor = const Color(0xFFD32F2F);
       statusIcon = Icons.error_rounded;
@@ -517,7 +523,7 @@ class _PatunAcademicMonitoringScreenState
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        score.toStringAsFixed(2),
+                        score > 0 ? score.toStringAsFixed(2) : '-',
                         style: TextStyle(
                           fontSize: AppDimensions.fontXl,
                           fontWeight: FontWeight.w900,

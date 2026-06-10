@@ -15,12 +15,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity> login({
-    required String nrp,
+    required String nrpNip,
     required String password,
     required String fcmToken,
   }) async {
     final loginResponse = await remoteDataSource.login(
-      LoginRequest(nrp: nrp, password: password, fcmToken: fcmToken),
+      LoginRequest(nrpNip: nrpNip, password: password, fcmToken: fcmToken),
     );
 
     await localDataSource.saveTokens(
@@ -58,9 +58,11 @@ class AuthRepositoryImpl implements AuthRepository {
       eselon: loginResponse.eselon,
       golongan: loginResponse.golongan,
       isNakApproved: loginResponse.isNakApproved,
+      isFirstLogin: loginResponse.isFirstLogin,
       nilaiAkademik: loginResponse.nilaiAkademik,
       nilaiMental: loginResponse.nilaiMental,
       nilaiJasmani: loginResponse.nilaiJasmani,
+      profilePhoto: loginResponse.profilePhoto,
     );
   }
 
@@ -73,5 +75,36 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await localDataSource.clearTokens();
+  }
+
+  @override
+  Future<void> updatePassword({
+    required String newPassword,
+  }) async {
+    await remoteDataSource.updatePassword(newPassword);
+  }
+
+  @override
+  Future<void> resetPassword({
+    required String nrpNip,
+    required String token,
+    required String newPassword,
+  }) async {
+    await remoteDataSource.resetPassword(nrpNip, token, newPassword);
+  }
+
+  @override
+  Future<bool> verifyResetToken(String nrpNip, String token) async {
+    return await remoteDataSource.verifyResetToken(nrpNip, token);
+  }
+
+  @override
+  Future<String> uploadProfilePhoto(String filePath) async {
+    return await remoteDataSource.uploadProfilePhoto(filePath);
+  }
+
+  @override
+  Future<void> deleteProfilePhoto() async {
+    await remoteDataSource.deleteProfilePhoto();
   }
 }

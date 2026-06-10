@@ -12,7 +12,11 @@ import 'features/auth/data/datasources/auth_remote_data_source_mock.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/login_usecase.dart';
+import 'features/auth/domain/usecases/update_password_usecase.dart';
+import 'features/auth/domain/usecases/reset_password_usecase.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'core/services/notification_service.dart';
+import 'features/notification/presentation/bloc/notification_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -78,18 +82,31 @@ Future<void> _initCore() async {
   await dbHelper.database;
 
   sl.registerLazySingleton<LocalDatabaseHelper>(() => dbHelper);
+
+  // Initialize Notification Service
+  final notificationService = NotificationService();
+  await notificationService.init();
+  sl.registerLazySingleton<NotificationService>(() => notificationService);
 }
 
 void _initFeatures() {
   _initAuthFeature();
   _initAbsensiFeature();
   _initPenilaianFeature();
+  _initNotificationFeature();
 }
 
 void _initAuthFeature() {
-  sl.registerFactory<AuthBloc>(() => AuthBloc(loginUseCase: sl()));
+  sl.registerFactory<AuthBloc>(() => AuthBloc(
+        loginUseCase: sl(),
+        updatePasswordUseCase: sl(),
+        resetPasswordUseCase: sl(),
+        authRepository: sl(),
+      ));
 
   sl.registerLazySingleton<LoginUseCase>(() => LoginUseCase(sl()));
+  sl.registerLazySingleton<UpdatePasswordUseCase>(() => UpdatePasswordUseCase(sl()));
+  sl.registerLazySingleton<ResetPasswordUseCase>(() => ResetPasswordUseCase(sl()));
 
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
@@ -115,3 +132,9 @@ void _initAuthFeature() {
 void _initAbsensiFeature() {}
 
 void _initPenilaianFeature() {}
+
+void _initNotificationFeature() {
+  sl.registerFactory<NotificationCubit>(
+    () => NotificationCubit(notificationService: sl()),
+  );
+}

@@ -22,6 +22,7 @@ import 'features/attendance/presentation/pages/scan_qr_screen.dart';
 import 'features/assignment/presentation/pages/assignment_detail_screen.dart';
 import 'features/assignment/presentation/pages/create_task_screen.dart';
 import 'features/assignment/presentation/pages/monitoring_task_screen.dart';
+import 'features/notification/presentation/bloc/notification_cubit.dart';
 import 'features/assessment/presentation/widgets/lookup_selection_dialog.dart';
 import 'features/leadership_report/presentation/pages/leadership_report_screen.dart';
 import 'features/leadership_dashboard/presentation/pages/pimpinan_home_screen.dart';
@@ -71,7 +72,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => di.sl<AuthBloc>())],
+      providers: [
+        BlocProvider(create: (_) => di.sl<AuthBloc>()),
+        BlocProvider(create: (_) => di.sl<NotificationCubit>()),
+      ],
       child: MaterialApp(
         title: 'SESPIMMA',
         debugShowCheckedModeBanner: false,

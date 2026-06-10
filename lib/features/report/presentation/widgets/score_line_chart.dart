@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
-import 'package:sespimma_mobile/core/data/serdik_mental_scores.dart';
 
 class ScoreLineChart extends StatelessWidget {
   final double nilaiAkademik;
@@ -58,31 +57,7 @@ class ScoreLineChart extends StatelessWidget {
         children: [
           _buildHeader(hasWarning, colorAka),
           const SizedBox(height: AppDimensions.xl),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                _buildLegendItem(
-                  'Akademik',
-                  _getScoreColor(nilaiAkademik, colorAka),
-                  selectedCategory == 'Akademik',
-                ),
-                const SizedBox(width: AppDimensions.sm),
-                _buildLegendItem(
-                  'Mental Kepribadian',
-                  _getScoreColor(nilaiMental, colorMen),
-                  selectedCategory == 'Mental Kepribadian',
-                ),
-                const SizedBox(width: AppDimensions.sm),
-                _buildLegendItem(
-                  'Jasmani',
-                  _getScoreColor(nilaiJasmani, colorJas),
-                  selectedCategory == 'Jasmani',
-                ),
-              ],
-            ),
-          ),
+// Removed legends
           const SizedBox(height: AppDimensions.xxl),
           SizedBox(
             height: 200,
@@ -122,7 +97,7 @@ class ScoreLineChart extends StatelessWidget {
             children: [
               Text(
                 hasWarning
-                    ? 'Peringatan Tren Menurun (EWS)'
+                    ? 'Peringatan Tren Menurun'
                     : 'Analisis Tren Perkembangan',
                 style: TextStyle(
                   fontSize: AppDimensions.fontMd,
@@ -131,16 +106,14 @@ class ScoreLineChart extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppDimensions.xs / 2),
-              Text(
-                selectedCategory == 'Mental Kepribadian'
-                    ? 'Evaluasi Mingguan Terkini'
-                    : 'Evaluasi Komprehensif Periode I - IV',
-                style: TextStyle(
-                  fontSize: AppDimensions.fontXs + 1,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blueGrey.shade400,
+                Text(
+                  'Evaluasi Mingguan Terkini Mg 1 - Mg 4',
+                  style: TextStyle(
+                    fontSize: AppDimensions.fontXs + 1,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.blueGrey.shade400,
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -213,17 +186,10 @@ class ScoreLineChart extends StatelessWidget {
                   fontSize: AppDimensions.fontSm,
                 );
                 String text = '';
-                if (selectedCategory == 'Mental Kepribadian') {
-                  if (value == 0.0) text = 'Mg 1';
-                  if (value == 1.0) text = 'Mg 2';
-                  if (value == 2.0) text = 'Mg 3';
-                  if (value == 3.0) text = 'Mg 4';
-                } else {
-                  if (value == 0.0) text = 'Periode I';
-                  if (value == 1.0) text = 'Periode II';
-                  if (value == 2.0) text = 'Periode III';
-                  if (value == 3.0) text = 'Periode IV';
-                }
+                if (value == 0.0) text = 'Mg 1';
+                if (value == 1.0) text = 'Mg 2';
+                if (value == 2.0) text = 'Mg 3';
+                if (value == 3.0) text = 'Mg 4';
                 if (text.isEmpty) return const SizedBox.shrink();
                 return Padding(
                   padding: const EdgeInsets.only(top: 10.0),
@@ -255,9 +221,12 @@ class ScoreLineChart extends StatelessWidget {
         minY: 0,
         maxY: 100,
         lineBarsData: [
-          _buildLineBar(sAka, dynAka, 'Akademik'),
-          _buildLineBar(sMen, dynMen, 'Mental Kepribadian'),
-          _buildLineBar(sJas, dynJas, 'Jasmani'),
+          if (selectedCategory == 'Akademik')
+            _buildLineBar(sAka, dynAka, 'Akademik'),
+          if (selectedCategory == 'Mental Kepribadian')
+            _buildLineBar(sMen, dynMen, 'Mental Kepribadian'),
+          if (selectedCategory == 'Jasmani')
+            _buildLineBar(sJas, dynJas, 'Jasmani'),
         ],
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
@@ -298,11 +267,11 @@ class ScoreLineChart extends StatelessWidget {
       spots: spots,
       isCurved: true,
       curveSmoothness: 0.35,
-      color: color.withValues(alpha: selectedCategory == cat ? 1.0 : 0.35),
-      barWidth: selectedCategory == cat ? 4.0 : 2.2,
+      color: color,
+      barWidth: 4.0,
       isStrokeCapRound: true,
       dotData: FlDotData(
-        show: selectedCategory == cat,
+        show: true,
         getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
           radius: 4,
           color: Colors.white,
@@ -315,94 +284,19 @@ class ScoreLineChart extends StatelessWidget {
 
   List<FlSpot> _generateSpots(double finalScore, String cat) {
     if (finalScore == 0) {
-      return [
-        const FlSpot(0, 0),
-        const FlSpot(1, 0),
-        const FlSpot(2, 0),
-        const FlSpot(3, 0),
-      ];
+      return [];
     }
-    final bool isWarning = finalScore < 70.0;
-    if (isWarning) {
-      return [
-        FlSpot(0, (finalScore + 5.8).clamp(0.0, 100.0)),
-        FlSpot(1, (finalScore + 4.2).clamp(0.0, 100.0)),
-        FlSpot(2, (finalScore + 1.8).clamp(0.0, 100.0)),
-        FlSpot(3, finalScore),
-      ];
-    } else {
-      if (cat == 'Akademik') {
-        return [
-          FlSpot(0, (finalScore - 4.5).clamp(0.0, 100.0)),
-          FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)),
-          FlSpot(2, (finalScore - 1.2).clamp(0.0, 100.0)),
-          FlSpot(3, finalScore),
-        ];
-      } else if (cat == 'Mental Kepribadian') {
-        final scores = SerdikMentalScores.getScores(noSerdik);
-        if (scores != null) {
-          return [
-            FlSpot(0, (scores['moral'] as num).toDouble()),
-            FlSpot(1, (scores['disiplin'] as num).toDouble()),
-            FlSpot(2, (scores['kepemimpinan'] as num).toDouble()),
-            FlSpot(3, (scores['nilai'] as num).toDouble()),
-          ];
-        }
-        return [
-          FlSpot(0, (finalScore - 3.8).clamp(0.0, 100.0)),
-          FlSpot(1, (finalScore - 3.2).clamp(0.0, 100.0)),
-          FlSpot(2, (finalScore - 1.0).clamp(0.0, 100.0)),
-          FlSpot(3, finalScore),
-        ];
-      } else {
-        return [
-          FlSpot(0, (finalScore - 2.5).clamp(0.0, 100.0)),
-          FlSpot(1, (finalScore - 1.8).clamp(0.0, 100.0)),
-          FlSpot(2, (finalScore - 0.6).clamp(0.0, 100.0)),
-          FlSpot(3, finalScore),
-        ];
-      }
+    
+    // Carry-over logic: Draw the history line dynamically up to the current week.
+    // If it's Week 4, we carry over the previous score to Week 4 and plot a connected line.
+    int weekIndex = ((DateTime.now().day - 1) ~/ 7).clamp(0, 3);
+    
+    List<FlSpot> spots = [];
+    for (int i = 0; i <= weekIndex; i++) {
+      spots.add(FlSpot(i.toDouble(), finalScore));
     }
+    
+    return spots;
   }
 
-  Widget _buildLegendItem(String label, Color color, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppDimensions.sm + 2,
-        vertical: AppDimensions.xs + 2,
-      ),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? color.withValues(alpha: 0.08)
-            : Colors.blueGrey.shade50.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(AppDimensions.radiusSm + 2),
-        border: Border.all(
-          color: isSelected ? color.withValues(alpha: 0.2) : Colors.transparent,
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(
-              color: isSelected ? color : color.withValues(alpha: 0.5),
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: AppDimensions.xs + 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: AppDimensions.fontXs,
-              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-              color: isSelected ? color : Colors.blueGrey.shade500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

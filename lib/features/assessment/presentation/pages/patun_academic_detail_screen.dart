@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:sespimma_mobile/features/assessment/data/models/serdik_academic_scores.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/core/utils/avatar_helper.dart';
+import 'package:sespimma_mobile/features/leadership_report/domain/services/score_calculator_service.dart';
+import 'package:sespimma_mobile/features/report/presentation/widgets/score_line_chart.dart';
 
 class PatunAcademicDetailScreen extends StatelessWidget {
   final Map<String, dynamic> serdik;
@@ -19,11 +20,14 @@ class PatunAcademicDetailScreen extends StatelessWidget {
     final noSerdik = serdik['no_serdik'] ?? '-';
     final pangkat = serdik['pangkat'] ?? '-';
 
-    final academicScores = SerdikAcademicScores.getScores(noSerdik);
-    final double score = (academicScores['na'] as num?)?.toDouble() ?? 0.0;
+    final rawSimulated = ScoreCalculatorService.generateSimulatedScores(noSerdik);
+    final recap = ScoreCalculatorService.calculateFinalRecap(serdik, rawSimulated);
+    final double score = recap.academicScore;
 
     String status;
-    if (score >= 75) {
+    if (score == 0.0) {
+      status = 'Belum Dinilai';
+    } else if (score >= 75) {
       status = 'Aman';
     } else if (score >= 70) {
       status = 'Warning';
@@ -97,6 +101,8 @@ class PatunAcademicDetailScreen extends StatelessWidget {
       statusColor = Colors.green.shade600;
     } else if (status == 'Warning') {
       statusColor = Colors.orange.shade600;
+    } else if (status == 'Belum Dinilai') {
+      statusColor = Colors.blueGrey;
     } else {
       statusColor = Colors.red.shade600;
     }
@@ -195,24 +201,26 @@ class PatunAcademicDetailScreen extends StatelessWidget {
   }
 
   Widget _buildAcademicScores(String noSerdik) {
-    final scores = SerdikAcademicScores.getScores(noSerdik);
+    final rawSimulated = ScoreCalculatorService.generateSimulatedScores(noSerdik);
+    final recap = ScoreCalculatorService.calculateFinalRecap(serdik, rawSimulated);
+    final scores = recap.rawScores;
 
-    double nump = (scores['nump'] as num?)?.toDouble() ?? 0.0;
-    double nkkp = (scores['nkkp'] as num?)?.toDouble() ?? 0.0;
-    double npkp = (scores['npkp'] as num?)?.toDouble() ?? 0.0;
-    double nkp = (scores['nkp'] as num?)?.toDouble() ?? 0.0;
-    double np = (scores['np'] as num?)?.toDouble() ?? 0.0;
+    double nump = scores['NUMP'] ?? 0.0;
+    double nkkp = scores['NKKP'] ?? 0.0;
+    double npkp = scores['NPKP'] ?? 0.0;
+    double nkp = scores['NKP'] ?? 0.0;
+    double np = scores['NP'] ?? 0.0;
 
-    double nskAktif = (scores['nsk_keaktifan'] as num?)?.toDouble() ?? 0.0;
-    double nskProduk = (scores['nsk_produk'] as num?)?.toDouble() ?? 0.0;
-    double nskRuang = (scores['nsk_tata_ruang'] as num?)?.toDouble() ?? 0.0;
-    double nsk = (scores['nsk'] as num?)?.toDouble() ?? 0.0;
+    double nskAktif = scores['nsk_keaktifan'] ?? 0.0;
+    double nskProduk = scores['nsk_produk'] ?? 0.0;
+    double nskRuang = scores['nsk_tata_ruang'] ?? 0.0;
+    double nsk = scores['NSK'] ?? 0.0;
 
-    double ntMateri = (scores['nt_materi'] as num?)?.toDouble() ?? 0.0;
-    double ntPenulisan = (scores['nt_penulisan'] as num?)?.toDouble() ?? 0.0;
-    double ntPaparan = (scores['nt_paparan'] as num?)?.toDouble() ?? 0.0;
-    double nt = (scores['nt'] as num?)?.toDouble() ?? 0.0;
-    double na = (scores['na'] as num?)?.toDouble() ?? 0.0;
+    double ntMateri = scores['nt_materi'] ?? 0.0;
+    double ntPenulisan = scores['nt_penulisan'] ?? 0.0;
+    double ntPaparan = scores['nt_paparan'] ?? 0.0;
+    double nt = scores['NT'] ?? 0.0;
+    double na = recap.academicScore;
 
     double ujianMp = nump;
     double nkkpMateri = nkkp;
@@ -226,7 +234,9 @@ class PatunAcademicDetailScreen extends StatelessWidget {
 
     double baseScore = na;
     String status;
-    if (na >= 75) {
+    if (na == 0.0) {
+      status = 'Belum Dinilai';
+    } else if (na >= 75) {
       status = 'Aman';
     } else if (na >= 70) {
       status = 'Warning';
@@ -302,6 +312,14 @@ class PatunAcademicDetailScreen extends StatelessWidget {
             _buildSubScoreItem('Paparan & Diskusi', '30%', ntPaparan),
           ]),
           const SizedBox(height: AppDimensions.lg),
+          ScoreLineChart(
+            nilaiAkademik: recap.academicScore,
+            nilaiMental: recap.mentalScore,
+            nilaiJasmani: recap.physicalScore,
+            selectedCategory: 'Akademik',
+            noSerdik: noSerdik,
+          ),
+          const SizedBox(height: AppDimensions.lg),
           _buildRecommendationCard(baseScore, status),
           const SizedBox(height: AppDimensions.xxl),
         ],
@@ -310,12 +328,16 @@ class PatunAcademicDetailScreen extends StatelessWidget {
   }
 
   Widget _buildRecommendationCard(double score, String status) {
+    bool isBelumDinilai = status == 'Belum Dinilai';
     bool isWarning = status == 'Warning';
     bool isKritis = status == 'Kritis';
     bool isExcellent = score >= 85.0;
 
     String insight;
-    if (isKritis) {
+    if (isBelumDinilai) {
+      insight =
+          'Belum ada data nilai akademik yang terdata. Silakan pantau perkembangan pengumpulan tugas dan evaluasi Serdik.';
+    } else if (isKritis) {
       insight =
           'Berdasarkan analisis tren Akademik, Serdik mengalami penurunan performa secara drastis. Disarankan bagi Patun untuk memberikan sesi bimbingan intensif dan evaluasi menyeluruh segera.';
     } else if (isWarning) {
@@ -329,27 +351,37 @@ class PatunAcademicDetailScreen extends StatelessWidget {
           'Nilai Akademik Serdik berada pada kondisi stabil dan baik. Patun disarankan untuk tetap memonitor fokus belajar Serdik, terutama pada simulasi kepemimpinan kontemporer untuk mendongkrak nilai ke tingkat maksimal.';
     }
 
-    Color bgColor = isKritis
+    Color bgColor = isBelumDinilai
+        ? Colors.grey.shade100
+        : isKritis
         ? Colors.red.shade50
         : isWarning
         ? Colors.orange.shade50
         : Colors.green.shade50;
-    Color borderColor = isKritis
+    Color borderColor = isBelumDinilai
+        ? Colors.grey.shade300
+        : isKritis
         ? Colors.red.shade100
         : isWarning
         ? Colors.orange.shade100
         : Colors.green.shade100;
-    Color iconBgColor = isKritis
+    Color iconBgColor = isBelumDinilai
+        ? Colors.grey.shade300
+        : isKritis
         ? Colors.red.shade100
         : isWarning
         ? Colors.orange.shade100
         : Colors.green.shade100;
-    Color iconColor = isKritis
+    Color iconColor = isBelumDinilai
+        ? Colors.blueGrey.shade600
+        : isKritis
         ? Colors.red.shade700
         : isWarning
         ? Colors.orange.shade700
         : Colors.green.shade700;
-    Color titleColor = isKritis
+    Color titleColor = isBelumDinilai
+        ? Colors.blueGrey.shade900
+        : isKritis
         ? Colors.red.shade900
         : isWarning
         ? Colors.orange.shade900

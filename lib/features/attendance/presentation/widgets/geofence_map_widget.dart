@@ -198,6 +198,7 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
               }
               return;
             }
+            if (!pos.latitude.isFinite || !pos.longitude.isFinite) return;
             _updateFromPosition(pos.latitude, pos.longitude, false);
           },
           onError: (dynamic _) {},
@@ -218,8 +219,10 @@ class _GeofenceMapWidgetState extends State<GeofenceMapWidget>
           });
           widget.onLocationDetected(null, -1.0, true);
         } else {
-          _updateFromPosition(current.latitude, current.longitude, false);
-          _animateTo(LatLng(current.latitude, current.longitude));
+          if (current.latitude.isFinite && current.longitude.isFinite) {
+            _updateFromPosition(current.latitude, current.longitude, false);
+            _animateTo(LatLng(current.latitude, current.longitude));
+          }
         }
       }
     } catch (_) {

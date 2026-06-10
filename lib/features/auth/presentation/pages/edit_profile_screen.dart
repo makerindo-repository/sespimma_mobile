@@ -203,9 +203,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         final user = state is AuthSuccess ? state.user : null;
 
         if (user != null && !_isInitialized) {
-          if (user.profilePhoto != null && user.profilePhoto!.isNotEmpty) {
-            _selectedImage = File(user.profilePhoto!);
-          }
           _isInitialized = true;
         }
 
@@ -290,7 +287,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 image: DecorationImage(
                   image: _selectedImage != null
                       ? FileImage(_selectedImage!) as ImageProvider
-                      : AvatarHelper.getAvatar(null),
+                      : AvatarHelper.getAvatar(user?.profilePhoto),
                   fit: BoxFit.cover,
                 ),
                 border: Border.all(color: Colors.white, width: 4),

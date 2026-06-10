@@ -22,7 +22,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final serdikRecord = SerdikRealData.records
-        .where((r) => r['nrp'] == request.nrp)
+        .where((r) => r['nrp'] == request.nrpNip)
         .firstOrNull;
 
     if (serdikRecord != null) {
@@ -57,6 +57,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: true,
+        isFirstLogin: false,
         nilaiAkademik: 82.5,
         nilaiMental: 85.0,
         nilaiJasmani: 78.0,
@@ -65,7 +66,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       );
     }
 
-    if (request.nrp == '99999999') {
+    if (request.nrpNip == '99999999') {
       return LoginResponse(
         userId: 'USR-EWS',
         name: 'Serdik Dummy EWS',
@@ -96,6 +97,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 65.0,
         nilaiMental: 68.0,
         nilaiJasmani: 70.0,
@@ -105,7 +107,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final patunRecord = PatunRealData.records
-        .where((r) => r['nrp_nip'] == request.nrp)
+        .where((r) => r['nrp_nip'] == request.nrpNip)
         .firstOrNull;
 
     if (patunRecord != null) {
@@ -139,6 +141,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -147,7 +150,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       );
     }
 
-    if (request.nrp == '80101234') {
+    if (request.nrpNip == '80101234') {
       return LoginResponse(
         userId: 'USR-002',
         name: 'KOMPOL Reza Mahendra, S.T., M.M.',
@@ -178,6 +181,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -186,7 +190,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       );
     }
 
-    if (request.nrp == '80102222') {
+    if (request.nrpNip == '80102222') {
       return LoginResponse(
         userId: 'USR-PATUN',
         name: 'KOMPOL Budi Prakoso, S.I.K., M.H.',
@@ -217,6 +221,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -225,7 +230,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
       );
     }
 
-    if (request.nrp == '80103333') {
+    if (request.nrpNip == '80103333') {
       return LoginResponse(
         userId: 'USR-MEDIS',
         name: 'dr. Siti Aminah, Sp.PD.',
@@ -256,6 +261,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -265,7 +271,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final pimpinanRecord = PimpinanRealData.records
-        .where((r) => r['nrp_nip'] == request.nrp)
+        .where((r) => r['nrp_nip'] == request.nrpNip)
         .firstOrNull;
 
     if (pimpinanRecord != null) {
@@ -299,6 +305,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -308,7 +315,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final operatorRecord = OperatorRealData.records
-        .where((r) => r['nrp_nip'] == request.nrp)
+        .where((r) => r['nrp_nip'] == request.nrpNip)
         .firstOrNull;
 
     if (operatorRecord != null) {
@@ -342,6 +349,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -351,7 +359,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final korsisRecord = KorsisRealData.records
-        .where((r) => r['nrp_nip'] == request.nrp)
+        .where((r) => r['nrp_nip'] == request.nrpNip)
         .firstOrNull;
 
     if (korsisRecord != null) {
@@ -385,6 +393,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -394,7 +403,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final gadikRecord = GadikRealData.records
-        .where((r) => r['nrp_nip'] == request.nrp)
+        .where((r) => r['nrp_nip'] == request.nrpNip)
         .firstOrNull;
 
     if (gadikRecord != null) {
@@ -428,6 +437,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: gadikRecord['eselon'] ?? '-',
         golongan: gadikRecord['golongan'] ?? '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -437,7 +447,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     final medisRecord = MedisRealData.records
-        .where((r) => r['nrp_nip'] == request.nrp)
+        .where((r) => r['nrp_nip'] == request.nrpNip)
         .firstOrNull;
 
     if (medisRecord != null) {
@@ -471,6 +481,7 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
         eselon: '-',
         golongan: '-',
         isNakApproved: false,
+        isFirstLogin: false,
         nilaiAkademik: 0.0,
         nilaiMental: 0.0,
         nilaiJasmani: 0.0,
@@ -480,7 +491,37 @@ class AuthRemoteDataSourceMock implements AuthRemoteDataSource {
     }
 
     throw Exception(
-      'Personel dengan NRP ${request.nrp} tidak ditemukan di database lokal.',
+      'Personel dengan NRP ${request.nrpNip} tidak ditemukan di database lokal.',
     );
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    await Future.delayed(const Duration(seconds: 1));
+  }
+
+  @override
+  Future<void> resetPassword(String nrpNip, String token, String newPassword) async {
+    await Future.delayed(const Duration(seconds: 1));
+    if (token != 'MAKERINDO75') {
+      throw Exception('Token tidak valid');
+    }
+  }
+
+  @override
+  Future<bool> verifyResetToken(String nrpNip, String token) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return true;
+  }
+
+  @override
+  Future<String> uploadProfilePhoto(String filePath) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return filePath;
+  }
+
+  @override
+  Future<void> deleteProfilePhoto() async {
+    await Future.delayed(const Duration(milliseconds: 300));
   }
 }

@@ -97,7 +97,7 @@ class NakSummaryCard extends StatelessWidget {
               ),
               const SizedBox(height: AppDimensions.sm),
               Text(
-                nak.toStringAsFixed(2),
+                nak > 0.0 ? nak.toStringAsFixed(2) : '00.00',
                 style: TextStyle(
                   color: _getScoreColor(),
                   fontSize: AppDimensions.fontHuge + 6,
@@ -124,7 +124,9 @@ class NakSummaryCard extends StatelessWidget {
               ],
             ),
             child: Text(
-              nak >= 70 ? 'LULUS' : 'TIDAK LULUS',
+              nak > 0.0
+                  ? (nak >= 70 ? 'LULUS' : 'TIDAK LULUS')
+                  : 'BELUM DINILAI',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: _getBadgeTextColor(),
@@ -143,7 +145,11 @@ class NakSummaryCard extends StatelessWidget {
     Color pillBg = Colors.white.withValues(alpha: 0.15);
     Color predColor = Colors.white;
 
-    if (nak > 85.0) {
+    if (nak == 0.0) {
+      pred = 'Belum Ada Penilaian (-)';
+      pillBg = Colors.grey.shade100;
+      predColor = Colors.grey.shade700;
+    } else if (nak > 85.0) {
       pred = 'Sangat Memuaskan (SM)';
       pillBg = Colors.green.shade100;
       predColor = Colors.green.shade900;
@@ -155,7 +161,7 @@ class NakSummaryCard extends StatelessWidget {
       pred = 'Baik (B)';
       pillBg = Colors.lime.shade100;
       predColor = Colors.lime.shade900;
-    } else if (nak > 70.0) {
+    } else if (nak >= 70.0) {
       pred = 'Cukup (C)';
       pillBg = Colors.amber.shade100;
       predColor = Colors.amber.shade900;
@@ -190,42 +196,47 @@ class NakSummaryCard extends StatelessWidget {
   }
 
   Color _getCardBgColor() {
+    if (nak == 0.0) return Colors.grey.shade50;
     if (nak > 85.0) return Colors.green.shade50;
     if (nak > 80.0) return Colors.green.shade50;
     if (nak > 75.0) return Colors.lime.shade50;
-    if (nak > 70.0) return Colors.amber.shade50;
+    if (nak >= 70.0) return Colors.amber.shade50;
     return Colors.red.shade50;
   }
 
   Color _getBorderColor() {
+    if (nak == 0.0) return Colors.grey.shade300;
     if (nak > 85.0) return Colors.green.shade300;
     if (nak > 80.0) return Colors.green.shade200;
     if (nak > 75.0) return Colors.lime.shade300;
-    if (nak > 70.0) return Colors.amber.shade300;
+    if (nak >= 70.0) return Colors.amber.shade300;
     return Colors.red.shade300;
   }
 
   Color _getTextHeaderColor() {
+    if (nak == 0.0) return Colors.grey.shade800;
     if (nak > 85.0) return Colors.green.shade800;
     if (nak > 80.0) return Colors.green.shade700;
     if (nak > 75.0) return Colors.lime.shade800;
-    if (nak > 70.0) return Colors.amber.shade900;
+    if (nak >= 70.0) return Colors.amber.shade900;
     return Colors.red.shade800;
   }
 
   Color _getScoreColor() {
+    if (nak == 0.0) return Colors.grey.shade600;
     if (nak > 85.0) return Colors.green.shade800;
     if (nak > 80.0) return Colors.green.shade500;
     if (nak > 75.0) return Colors.lime.shade700;
-    if (nak > 70.0) return Colors.amber.shade500;
+    if (nak >= 70.0) return Colors.amber.shade500;
     return Colors.red.shade700;
   }
 
   Color _getBadgeBgColor() {
+    if (nak == 0.0) return Colors.grey.shade500;
     if (nak > 85.0) return Colors.green.shade700;
     if (nak > 80.0) return Colors.green.shade500;
     if (nak > 75.0) return Colors.lime.shade600;
-    if (nak > 70.0) return Colors.amber.shade600;
+    if (nak >= 70.0) return Colors.amber.shade600;
     return Colors.red.shade600;
   }
 

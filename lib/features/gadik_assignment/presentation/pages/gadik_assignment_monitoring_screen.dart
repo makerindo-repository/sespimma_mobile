@@ -8,6 +8,9 @@ import 'package:sespimma_mobile/features/assessment/presentation/widgets/assessm
 import '../../data/models/gadik_assignment_model.dart';
 import '../../data/datasources/gadik_assignment_mock_data.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
 import 'gadik_assignment_detail_screen.dart';
 import 'gadik_create_assignment_screen.dart';
 
@@ -125,7 +128,15 @@ class _GadikAssignmentMonitoringScreenState
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthBloc>().state;
+    String currentNrp = '';
+    if (authState is AuthSuccess) {
+      currentNrp = authState.user.nrp;
+    }
+
     var filteredList = GadikAssignmentMockData.assignments.where((task) {
+      if (task.createdBy != currentNrp) return false;
+
       final title = task.judul.toLowerCase();
       final query = _searchQuery.toLowerCase();
       if (!title.contains(query)) return false;

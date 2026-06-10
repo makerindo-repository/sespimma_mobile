@@ -1,4 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'login_response.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
 
 LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
     LoginResponse(
@@ -31,11 +37,13 @@ LoginResponse _$LoginResponseFromJson(Map<String, dynamic> json) =>
       eselon: json['eselon'] as String? ?? '-',
       golongan: json['golongan'] as String? ?? '-',
       isNakApproved: json['is_nak_approved'] as bool? ?? false,
+      isFirstLogin: json['is_first_login'] as bool? ?? false,
       nilaiAkademik: (json['nilai_akademik'] as num?)?.toDouble() ?? 0.0,
       nilaiMental: (json['nilai_mental'] as num?)?.toDouble() ?? 0.0,
       nilaiJasmani: (json['nilai_jasmani'] as num?)?.toDouble() ?? 0.0,
       accessToken: json['access_token'] as String,
       refreshToken: json['refresh_token'] as String,
+      profilePhoto: json['profile_photo'] as String?,
     );
 
 Map<String, dynamic> _$LoginResponseToJson(LoginResponse instance) =>
@@ -68,10 +76,12 @@ Map<String, dynamic> _$LoginResponseToJson(LoginResponse instance) =>
       'eselon': instance.eselon,
       'golongan': instance.golongan,
       'is_nak_approved': instance.isNakApproved,
+      'is_first_login': instance.isFirstLogin,
       'jenis_kelamin': instance.jenisKelamin,
       'nilai_akademik': instance.nilaiAkademik,
       'nilai_mental': instance.nilaiMental,
       'nilai_jasmani': instance.nilaiJasmani,
       'access_token': instance.accessToken,
       'refresh_token': instance.refreshToken,
+      'profile_photo': instance.profilePhoto,
     };

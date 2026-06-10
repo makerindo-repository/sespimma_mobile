@@ -1,5 +1,4 @@
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -255,9 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusXxl),
         image: DecorationImage(
-          image: (user.profilePhoto != null && user.profilePhoto!.isNotEmpty)
-              ? FileImage(File(user.profilePhoto!)) as ImageProvider
-              : AvatarHelper.getAvatar(null),
+          image: AvatarHelper.getAvatar(user.profilePhoto),
           fit: BoxFit.cover,
         ),
         boxShadow: [

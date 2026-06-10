@@ -76,6 +76,9 @@ class LoginResponse {
   @JsonKey(name: 'is_nak_approved', defaultValue: false)
   final bool isNakApproved;
 
+  @JsonKey(name: 'is_first_login', defaultValue: false)
+  final bool isFirstLogin;
+
   @JsonKey(name: 'jenis_kelamin', defaultValue: '-')
   final String jenisKelamin;
 
@@ -93,6 +96,9 @@ class LoginResponse {
 
   @JsonKey(name: 'refresh_token')
   final String refreshToken;
+
+  @JsonKey(name: 'profile_photo')
+  final String? profilePhoto;
 
   const LoginResponse({
     required this.userId,
@@ -124,11 +130,13 @@ class LoginResponse {
     required this.eselon,
     required this.golongan,
     required this.isNakApproved,
+    required this.isFirstLogin,
     required this.nilaiAkademik,
     required this.nilaiMental,
     required this.nilaiJasmani,
     required this.accessToken,
     required this.refreshToken,
+    this.profilePhoto,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) =>

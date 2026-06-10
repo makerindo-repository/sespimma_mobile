@@ -70,8 +70,10 @@ class _KorsisZoneMarkingScreenState extends State<KorsisZoneMarkingScreen>
         ),
       );
       if (!mounted) return;
-      setState(() => _userLocation = LatLng(pos.latitude, pos.longitude));
-      _mapController.move(_userLocation!, 18.0);
+      if (pos.latitude.isFinite && pos.longitude.isFinite) {
+        setState(() => _userLocation = LatLng(pos.latitude, pos.longitude));
+        _mapController.move(_userLocation!, 18.0);
+      }
     } on LocationServiceDisabledException catch (e, st) {
       talker.warning('Layanan lokasi tidak aktif saat menandai zona', e, st);
     } catch (e, st) {

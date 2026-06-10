@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:dio/dio.dart';
 import 'package:sespimma_mobile/core/utils/app_logger.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:sespimma_mobile/core/constants/app_dimensions.dart';
 import 'package:sespimma_mobile/core/theme/app_colors.dart';
 import 'package:sespimma_mobile/core/utils/icon_mapper.dart';
 import 'package:sespimma_mobile/core/utils/app_notifier.dart';
-import 'package:sespimma_mobile/features/assessment/data/models/korsis_inbox_mock_data.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:sespimma_mobile/features/auth/presentation/bloc/auth_state.dart';
+import 'package:sespimma_mobile/injection_container.dart';
 
 class LeaveFormSheet extends StatefulWidget {
   final VoidCallback onSuccess;
@@ -23,6 +21,7 @@ class LeaveFormSheet extends StatefulWidget {
 class _LeaveFormSheetState extends State<LeaveFormSheet> {
   String? attachedFileName;
   bool isAttaching = false;
+  bool _isSubmitting = false;
   late final TextEditingController reasonCtrl;
   final formKey = GlobalKey<FormState>();
 
@@ -38,8 +37,34 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
     super.dispose();
   }
 
+  DateTime? _startDate;
+  DateTime? _endDate;
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
+
+  Future<void> _selectDate(String type) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (ctx, child) => Theme(
+        data: ThemeData.light().copyWith(
+          colorScheme: const ColorScheme.light(primary: AppColors.primaryNavy),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      setState(() {
+        if (type == 'start') {
+          _startDate = picked;
+        } else {
+          _endDate = picked;
+        }
+      });
+    }
+  }
 
   Future<void> _selectTime(String type) async {
     final picked = await showTimePicker(
@@ -63,28 +88,82 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
     }
   }
 
-  Widget _buildTimePicker({required String type}) {
+  Widget _buildDateTimePicker({required String type}) {
     final time = type == 'start' ? _startTime : _endTime;
-    final label = type == 'start' ? 'Mulai' : 'Berakhir';
-    return InkWell(
-      onTap: () => _selectTime(type),
-      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-      child: InputDecorator(
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: const Icon(AppIcons.clock),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+    final date = type == 'start' ? _startDate : _endDate;
+    final label = type == 'start' ? 'Waktu Mulai' : 'Waktu Berakhir';
+    
+    final dateStr = date != null
+        ? '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}'
+        : '--/--/----';
+    final timeStr = time?.format(context) ?? '--:--';
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: AppDimensions.fontSm,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueGrey,
           ),
         ),
-        child: Text(
-          time?.format(context) ?? '--:--',
-          style: TextStyle(
-            fontWeight: time != null ? FontWeight.bold : FontWeight.normal,
-            color: time != null ? Colors.black87 : Colors.grey,
-          ),
+        const SizedBox(height: AppDimensions.xs),
+        Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: InkWell(
+                onTap: () => _selectDate(type),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.calendar_month),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                  ),
+                  child: Text(
+                    dateStr,
+                    style: TextStyle(
+                      fontWeight: date != null ? FontWeight.bold : FontWeight.normal,
+                      color: date != null ? Colors.black87 : Colors.grey,
+                      fontSize: AppDimensions.fontSm,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppDimensions.sm),
+            Expanded(
+              flex: 2,
+              child: InkWell(
+                onTap: () => _selectTime(type),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(AppIcons.clock),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                  ),
+                  child: Text(
+                    timeStr,
+                    style: TextStyle(
+                      fontWeight: time != null ? FontWeight.bold : FontWeight.normal,
+                      color: time != null ? Colors.black87 : Colors.grey,
+                      fontSize: AppDimensions.fontSm,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
+      ],
     );
   }
 
@@ -92,6 +171,8 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
   Widget build(BuildContext context) {
     final bool isReady =
         attachedFileName != null &&
+        _startDate != null &&
+        _endDate != null &&
         _startTime != null &&
         _endTime != null &&
         reasonCtrl.text.trim().isNotEmpty;
@@ -156,10 +237,16 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
             ),
             const SizedBox(height: AppDimensions.xl),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildTimePicker(type: 'start')),
-                const SizedBox(width: AppDimensions.md),
-                Expanded(child: _buildTimePicker(type: 'end')),
+                Expanded(child: _buildDateTimePicker(type: 'start')),
+              ],
+            ),
+            const SizedBox(height: AppDimensions.lg),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildDateTimePicker(type: 'end')),
               ],
             ),
             const SizedBox(height: AppDimensions.xl),
@@ -238,83 +325,73 @@ class _LeaveFormSheetState extends State<LeaveFormSheet> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  if (_startTime == null || _endTime == null) {
-                    AppNotifier.showError(
-                      context,
-                      'Harap isi waktu mulai dan berakhir izin!',
-                    );
-                    return;
-                  }
-                  if (attachedFileName == null) {
-                    AppNotifier.showError(
-                      context,
-                      'Harap lampirkan dokumen bukti izin',
-                    );
-                    return;
-                  }
-                  if (formKey.currentState!.validate()) {
-                    Navigator.pop(context);
-                    HapticFeedback.heavyImpact();
+                onPressed: _isSubmitting
+                    ? null
+                    : () async {
+                        if (_startDate == null ||
+                            _endDate == null ||
+                            _startTime == null ||
+                            _endTime == null) {
+                          AppNotifier.showError(
+                            context,
+                            'Harap lengkapi tanggal dan waktu izin!',
+                          );
+                          return;
+                        }
+                        if (attachedFileName == null) {
+                          AppNotifier.showError(
+                            context,
+                            'Harap lampirkan dokumen bukti izin',
+                          );
+                          return;
+                        }
+                        if (!formKey.currentState!.validate()) return;
 
-                    final now = DateTime.now();
-                    final startDt = DateTime(
-                      now.year,
-                      now.month,
-                      now.day,
-                      _startTime!.hour,
-                      _startTime!.minute,
-                    );
-                    final endDt = DateTime(
-                      now.year,
-                      now.month,
-                      now.day,
-                      _endTime!.hour,
-                      _endTime!.minute,
-                    );
+                        final startDt = DateTime(
+                          _startDate!.year,
+                          _startDate!.month,
+                          _startDate!.day,
+                          _startTime!.hour,
+                          _startTime!.minute,
+                        );
+                        final endDt = DateTime(
+                          _endDate!.year,
+                          _endDate!.month,
+                          _endDate!.day,
+                          _endTime!.hour,
+                          _endTime!.minute,
+                        );
 
-                    String sName = 'Dummy User';
-                    String sPangkat = 'AKP';
-                    String sNosis = '000000';
-                    String sPokjar = 'POKJAR I';
-
-                    final authState = context.read<AuthBloc>().state;
-                    if (authState is AuthSuccess) {
-                      sName = authState.user.name;
-                      sPangkat = authState.user.pangkat;
-                      sNosis = authState.user.noSerdik.isNotEmpty
-                          ? authState.user.noSerdik
-                          : authState.user.nrp;
-                      sPokjar = authState.user.pokjar.isNotEmpty
-                          ? authState.user.pokjar
-                          : 'POKJAR I';
-                    }
-
-                    KorsisInboxMockData.addRecord(
-                      InboxItem(
-                        id: 'izin_${now.millisecondsSinceEpoch}',
-                        serdikName: sName,
-                        pangkat: sPangkat,
-                        nosis: sNosis,
-                        pokjar: sPokjar,
-                        isReward: false,
-                        senderName: sName,
-                        timestamp: now,
-                        points: 0,
-                        description: reasonCtrl.text.trim(),
-                        rewardPunishmentName: 'Pengajuan Izin Khusus',
-                        isIzin: true,
-                        izinStartTime: startDt,
-                        izinEndTime: endDt,
-                        attachmentPath: attachedFileName,
-                      ),
-                    );
-
-                    widget.onSuccess();
-                  }
-                },
+                        final ctx = context;
+                        setState(() => _isSubmitting = true);
+                        try {
+                          await sl<Dio>().post('/izin', data: {
+                            'start_time': startDt.toUtc().toIso8601String(),
+                            'end_time': endDt.toUtc().toIso8601String(),
+                            'description': reasonCtrl.text.trim(),
+                            'attachment_file_name': attachedFileName,
+                          });
+                          if (!ctx.mounted) return;
+                          HapticFeedback.heavyImpact();
+                          Navigator.pop(ctx);
+                          widget.onSuccess();
+                        } on DioException catch (e, st) {
+                          talker.error('Submit izin gagal', e, st);
+                          if (!ctx.mounted) return;
+                          setState(() => _isSubmitting = false);
+                          AppNotifier.showError(
+                            ctx,
+                            'Gagal mengirim permohonan izin. Silakan coba lagi.',
+                          );
+                        } catch (e, st) {
+                          talker.error('Submit izin error tidak terduga', e, st);
+                          if (!ctx.mounted) return;
+                          setState(() => _isSubmitting = false);
+                          AppNotifier.showError(ctx, 'Terjadi kesalahan.');
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isReady
+                  backgroundColor: (isReady && !_isSubmitting)
                       ? AppColors.primaryNavy
                       : Colors.grey.shade400,
                   foregroundColor: Colors.white,

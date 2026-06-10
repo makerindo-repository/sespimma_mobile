@@ -60,7 +60,6 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen>
     if (sender == 'Gadik A') return 'Kombes Pol. Anton Suratto';
     if (sender == 'Gadik B') return 'Kombes Pol. Budi Santoso';
     if (sender == 'Gadik C') return 'Kombes Pol. Candra Muka';
-    if (sender == 'Korsis A') return 'Kombes Pol. Ahmad Setiawan';
     if (sender == 'Patun A') return 'Kombes Pol. Bambang Sugeng';
     return sender;
   }
